@@ -202,26 +202,28 @@ export const Card:React.FC<Props> = ({data}) => {
 
                 {
                     isShow &&  <div className="flex gap-[5px] flex-col w-full mt-[30px]">
-                        <div>
-                            <span className="text-[#9A9A9A] font-normal text-[16px] leading-[22px] max-lg:text-[14px]">
+                       <div className="flex flex-col">
+                            <span className="text-[#9A9A9A] text-[16px] leading-[22px] max-lg:text-[14px]">
                                 О хранителе
-                            </span> 
-
-                            <span className="overflow-hidden text-ellipsis line-clamp-2 text-[#151515] max-lg:text-[14px] flex-col w-full justify-between font-normal text-[18px] leading-[25px] flex gap-[10px] mt-[5px]">
-                                {data.short_description}
-                                {
-                                    isShowInfo && <span className="block max-lg:text-[14px]">
-                                        ..................
-                                    </span>
-                                }
                             </span>
 
-                            <button onClick={() => setShowInfo(prev => !prev)} className="text-[#116466] w-full flex justify-start cursor-pointer">
-                                {
-                                    isShowInfo ? 'Свернуть' : "Читать ещё"
-                                }     
-                            </button>       
-                        </div>
+                            <div className="relative">
+                                <p className={`text-[#151515] max-lg:text-[14px] font-normal text-[18px] leading-[25px] mt-[5px] ${isShowInfo ? '' : 'line-clamp-2'}`}>
+                                {data.short_description}
+                                </p>
+                                
+                                {!isShowInfo && (
+                                <div className="absolute bottom-0 right-0 h-[25px] w-[80px] bg-gradient-to-l from-white to-transparent" />
+                                )}
+                            </div>
+
+                            <button 
+                                onClick={() => setShowInfo(prev => !prev)} 
+                                className="text-[#116466] mt-1 text-left cursor-pointer hover:underline"
+                            >
+                                {isShowInfo ? 'Свернуть' : 'Читать ещё'}
+                            </button>
+                            </div>
 
                         <div className="mt-[30px]">
                             <span className="text-[#9A9A9A] font-normal text-[16px] leading-[22px] max-lg:text-[14px]">
@@ -245,7 +247,7 @@ export const Card:React.FC<Props> = ({data}) => {
                                 Подробнее о хранителе
                             </span> 
 
-                            <ul className="flex w-full font-normal text-[14px] mt-[10px] overflow-auto gap-[20px]">
+                            <ul className="flex w-full font-normal text-[16px] max-lg:text-[14px] mt-[10px] overflow-auto gap-[20px] hide-scrollbar">
                                 <li className="shrink-0 flex items-center justify-center gap-[15px]">
                                     <Image src={'/card/favorites_icon.svg'} alt="favorites" height={40} width={40} />
                                     <span>
