@@ -115,61 +115,54 @@ export const Psychologist_cards = ({data} : Props) => {
             filterData = result;
         }
 
-        // Фильтрация по пс.заболеваниям
-        if(filterData !== null && filterData !== undefined) { 
-            const result = [] as any;
-            if (mental_Illness) {
-                filterData.forEach((element: any) => {
-                    const works_with = element.works_with.split(';').map(function(item: any){
-                        return item.trimStart();
-                    }); 
-                    if (works_with.includes('Есть диагностированное психическое заболевание (РПП, СДВГ и др)')){
-                        result.push(element);
-                    }                
-                })
-                
-                filterData = result;
-            }
-            if (mental_Illness === false) {
-                filterData.forEach((element: any) => {
-                    const works_with = element.works_with.split(';').map(function(item: any){
-                        return item.trimStart();
-                    }); 
-                    if (!works_with.includes('Есть диагностированное психическое заболевание (РПП, СДВГ и др)')){
-                        result.push(element);
-                    }                
-                })
-                
-                filterData = result;
-            }
+// Фильтрация по психическим заболеваниям
+if (filterData) {
+    filterData = filterData.filter((psychologist: IPsychologist) => {
+        if (!psychologist.works_with) return false;
+        
+        const conditions = psychologist.works_with
+            .split(';')
+            .map(item => item.trim());
+        
+        // Проверяем "содержит" вместо точного соответствия
+        const hasMental = conditions.some(condition => 
+            condition.includes('психическое заболевание') || 
+            condition.includes('РПП') ||
+            condition.includes('СДВГ')
+        );
+        
+        const hasPsychiatric = conditions.some(condition =>
+            condition.includes('психиатрическое заболевание') ||
+            condition.includes('ПРЛ') ||
+            condition.includes('БАР') ||
+            condition.includes('ПТСР')
+        );
+        
+        // Определяем, нужно ли применять каждый фильтр
+        const applyMentalFilter = mental_Illness !== false;
+        const applyPsychiatricFilter = mental_Illness2 !== false;
+        
+        // Если ни один фильтр не применяется - показываем всех
+        if (!applyMentalFilter && !applyPsychiatricFilter) {
+            return true;
         }
-
-        //Фильтрация по пс.заболеваниям2
-        if(filterData !== null && filterData !== undefined && mental_Illness2) { 
-            const result = [] as any;
-            if (mental_Illness === true) {
-                filterData.forEach((element: any) => {
-                    const works_with = element.works_with.split(';').map(function(item: any){
-                        return item.trimStart();
-                    }); 
-                    if (works_with.includes('Есть диагностированное психиатрическое заболевание (ПРЛ, БАР, ПТСР и др)')){
-                        result.push(element);
-                    }                
-                })
-            }
-            else {
-                filterData.forEach((element: any) => {
-                    const works_with = element.works_with.split(';').map(function(item: any){
-                        return item.trimStart();
-                    }); 
-                    if (!works_with.includes('Есть диагностированное психиатрическое заболевание (ПРЛ, БАР, ПТСР и др)')){
-                        result.push(element);
-                    }                
-                })
-            }
-            
-            filterData = result;
+        
+        // Проверяем соответствие включенным фильтрам
+        let matchesMental = true;
+        let matchesPsychiatric = true;
+        
+        if (applyMentalFilter) {
+            matchesMental = (mental_Illness === hasMental);
         }
+        
+        if (applyPsychiatricFilter) {
+            matchesPsychiatric = (mental_Illness2 === hasPsychiatric);
+        }
+        
+        return matchesMental && matchesPsychiatric;
+    });
+}
+        
 
         // Фильтрация по запросу
         if(filterData !== null && filterData !== undefined && requests.length > 0) {
