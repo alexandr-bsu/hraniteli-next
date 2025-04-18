@@ -1,0 +1,37 @@
+version: "3.7"
+
+services:
+  nginx: 
+      image: nginx:latest
+      container_name: demo-docker-nextjs-nginx
+      volumes:
+        - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      ports:
+        - 80:80
+        - 443:443
+
+  dev:
+
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: demo-docker-nextjs-dev
+    environment:
+      - WATCHPACK_POLLING=true
+    volumes:
+      - .:/psychologist-cards
+      - /psychologist-cards/node_modules
+      - /psychologist-cards/.next
+    ports:
+      - "3000:3000"
+
+  prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: demo-docker-nextjs
+    ports:
+      - "3001:3001"
+
+volumes:
+  node_modules:
