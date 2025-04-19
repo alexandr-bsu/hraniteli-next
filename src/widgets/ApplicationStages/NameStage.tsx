@@ -38,7 +38,7 @@ export default function NameStageApplication() {
   return (
     <div className='px-[50px] max-lg:px-[20px] flex w-full grow'>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full mt-[20px] flex flex-col">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full mt-[30px] flex flex-col">
           <FormField
             control={form.control}
             name="username"
@@ -64,10 +64,10 @@ export default function NameStageApplication() {
                   </div>
                   {!form.formState.errors.username && (
                     <span className='mt-[10px] max-lg:text-[12px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
-                      ! Поле обязательное для заполнения
+                      Это обязательное поле
                     </span>
                   )}
-                  <FormMessage />
+                  <FormMessage className='mt-[10px]'/>
                 </FormItem>
               </div>
             )}

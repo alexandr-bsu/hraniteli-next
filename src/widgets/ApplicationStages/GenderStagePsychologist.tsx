@@ -107,10 +107,10 @@ export const GenderStagePsychologist = () => {
                     </FormControl>
                     {
                         !form.formState.errors.gender && <span className='mt-[10px] max-lg:text-[12px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
-                            ! Поле обязательное для заполнения
+                             Это обязательное поле
                         </span>
                     }
-                    <FormMessage />
+                    <FormMessage className="mt-[10px]"/>
                 </FormItem>
                 </div>
             )}

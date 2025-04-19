@@ -39,7 +39,7 @@ const AgeStageApplication = () => {
     return (
         <div className='px-[50px] max-lg:px-[20px]  flex w-full grow'>
             <Form {...form} >
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col mt-[20px]">
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col mt-[30px]">
                     <FormField
                         
                         control={form.control}
@@ -64,10 +64,10 @@ const AgeStageApplication = () => {
                                     </div>
                                     { !form.formState.errors.age &&
                                         <span className='mt-[10px] max-lg:text-[12px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
-                                            ! Поле обязательное для заполнения
+                                            Это обязательное поле
                                         </span>
                                     }
-                                    <FormMessage />
+                                    <FormMessage className='mt-[10px]'/>
                                 </FormItem>
                             </div>
                         )}
