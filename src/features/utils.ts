@@ -21,4 +21,5 @@ export const getTimeDifference = (): number => {
     const moscowTime = getMoscowTime().getTime();
     const timeDifference = Math.round((userTime - moscowTime) / 1000 / 60 / 60);
     return timeDifference;
+    
 };

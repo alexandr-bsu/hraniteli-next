@@ -18,7 +18,7 @@ import { toNextStage } from "@/redux/slices/application_form"
 import { fill_gender_psychologist } from "@/redux/slices/application_form_data"
 
 const FormSchema = z.object({
-    gender: z.enum(["male", "female", 'nothing'], {
+    gender: z.enum(["male", "female", 'no_matter'], {
     required_error: "Вы не заполнили обязательное поле",
   }),
 })
@@ -26,22 +26,38 @@ const FormSchema = z.object({
 const sex_data = {
     ['male']: 'Мужчина',
     ['female']: 'Женщина',
-    ['nothing']: 'Не имеет значения',
+    ['no_matter']: 'Не имеет значения',
 } 
 
 export const GenderStagePsychologist = () => {
-
-
-    const dispatch = useDispatch();
-
+    const dispatch = useDispatch()
+  
+    // 1. Загружаем сохраненные данные из localStorage
+    const savedGender = typeof window !== 'undefined' 
+      ? localStorage.getItem('app_psychologist_gender') || 'no_matter'
+      : 'no_matter'
+  
+    // 2. Настраиваем форму
     const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
+      resolver: zodResolver(FormSchema),
+      defaultValues: {
+        gender: savedGender as 'male' | 'female' | 'no_matter'
+      }
     })
-
-    function handleSubmit(data: z.infer<typeof FormSchema>) {
-        dispatch(toNextStage('request')) 
-        dispatch(fill_gender_psychologist(sex_data[data.gender]))
+  
+    // 3. Сохраняем данные при изменении
+    const handleGenderChange = (gender: 'male' | 'female' | 'no_matter') => {
+      form.setValue('gender', gender)
+      localStorage.setItem('app_psychologist_gender', gender)
     }
+  
+    // 4. Отправка формы
+    const handleSubmit = (data: z.infer<typeof FormSchema>) => {
+      localStorage.setItem('app_psychologist_gender', data.gender) // Дублируем сохранение
+      dispatch(fill_gender_psychologist(sex_data[data.gender]))
+      dispatch(toNextStage('request')) 
+    }
+  
 
   return (
     <div className='px-[50px] max-lg:px-[20px]  flex w-full grow'>
@@ -55,7 +71,7 @@ export const GenderStagePsychologist = () => {
                 <FormItem className='grow max-[425px]:mb-[30px]'>
                     <FormLabel className=' max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px]  leading-[27px] '>С психологом какого пола вы готовы работать?</FormLabel>
                     <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px] mt-[10px]'>
-                        Мы учитываем ваш пол при подборе психолога
+                        Выберите один вариант ответа
                     </FormDescription>
                     <FormControl className="mt-[20px]">
                         <RadioGroup
@@ -67,23 +83,23 @@ export const GenderStagePsychologist = () => {
                                 <FormControl>
                                 <RadioGroupItem className="h-[30px] w-[30px]" value="male" />
                                 </FormControl>
-                                <FormLabel className="font-normal text-[18px]">
+                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
                                     Мужской
-                                </FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center gap-[15px]">
-                                <FormControl> 
-                                <RadioGroupItem className="h-[30px] w-[30px]" value="nothing" />
-                                </FormControl>
-                                <FormLabel className="font-normal text-[18px]">
-                                    Женский
                                 </FormLabel>
                             </FormItem>
                             <FormItem className="flex items-center gap-[15px]">
                                 <FormControl> 
                                 <RadioGroupItem className="h-[30px] w-[30px]" value="female" />
                                 </FormControl>
-                                <FormLabel className="font-normal text-[18px]">
+                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
+                                    Женский
+                                </FormLabel>
+                            </FormItem>
+                            <FormItem className="flex items-center gap-[15px]">
+                                <FormControl> 
+                                <RadioGroupItem className="h-[30px] w-[30px]" value="no_matter" />
+                                </FormControl>
+                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
                                     Не имеет значения
                                 </FormLabel>
                             </FormItem>

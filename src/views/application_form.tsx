@@ -35,7 +35,7 @@ export const ApplicationForm = () => {
 
     return (
         <>  
-            <div className="w-full   min-lg:max-w-[960px] min-lg:rounded-[30px] min-h-[100svh] bg-[white]  flex flex-col">
+            <div className="w-full overflow-hidden h-screen min-lg:max-w-[960px] min-lg:rounded-[30px] min-h-[100svh] bg-[white]  flex flex-col">
                 {
                     application_stage === 'gratitude' && <FinalStage /> 
                 }
@@ -83,7 +83,7 @@ export const ApplicationForm = () => {
                                         </div>
                                     </li>
                                 </ul>
-                                <hr className="w-full border-t-[2px] border-dotted mt-[25px]  #000;" />
+                                <hr className="w-full border-t-[2px] border-dotted mt-[30px]  #000;" />
                             </>
                         } 
                         {
@@ -123,7 +123,7 @@ export const ApplicationForm = () => {
                                 application_stage === 'request' && <RequestStage />
                             }
                             {
-                                application_stage === 'condition' && <ConditionStage />
+                                application_stage === 'condition' && <ConditionStage/>
                             }
                             {
                                 application_stage === 'action' && <ActionStage />
