@@ -33,6 +33,10 @@ export default function NameStageApplication() {
     localStorage.setItem('app_username', data.username) // Сохраняем в localStorage
     dispatch(fill_username(data.username)) // Сохраняем в Redux (если нужно)
     dispatch(toNextStage('age')) // Переход на следующую страницу
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      console.log('Данные локалстореж')
+    }
   }
 
   return (

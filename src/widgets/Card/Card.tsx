@@ -16,6 +16,7 @@ import { IPsychologist } from "@/entities/IPsychologist";
 
 import axios from "axios";
 import { IEducation } from "@/entities/IEducation";
+import React from "react";
 
 type Props =  {
     data: IPsychologist
@@ -56,12 +57,13 @@ export const Card:React.FC<Props> = ({data}) => {
 
     useEffect(() => {
         const apiUrl = `https://n8n-v2.hrani.live/webhook/download-psychologist-education-test-contur?psychologist_id=${data.telegram_id}`;
-
         axios.get(apiUrl).then((resp) => {
             const data = resp.data;
             setEducation(data[0]);
         });
     },[])
+
+    console.log('tlegram_id',data.link_photo)
 
     return (
         <>
@@ -78,6 +80,7 @@ export const Card:React.FC<Props> = ({data}) => {
                                     </h2>
 
                                     <h3 className=" flex max-lg:text-[16px] leading-[22px] gap-[10px]">
+                                        {/* 6 месяцев в сообществе {data.verified ? (<Image src={'/card/check.svg'} alt="check" height={23} width={23} />) : ''} */}
                                         6 месяцев в сообществе <Image src={'/card/check.svg'} alt="check" height={23} width={23} />
                                     </h3>
                                 </div>
@@ -108,7 +111,37 @@ export const Card:React.FC<Props> = ({data}) => {
                                         Дополнительные подходы:
                                         <ul className="font-normal  leading-[25px] text-[18px]  max-lg:text-[14px] gap-[10px] flex text-[#151515] mt-[5px]">
                                             {                                        
-                                                <li className="flex w-fit gap-[5px]">{data.additional_modals} <Image src={'/card/hint.svg'} alt="hint" height={23} width={23} /></li>
+                                               <li className="flex items-center gap-[10px] flex-wrap">
+                                               {typeof data.additional_modals === 'string' ? (
+                                                 <>
+                                                   {data.additional_modals.split(';').map((item: string, index: number) => (
+                                                     <span key={index} className="flex items-center">
+                                                       {item.trim()}
+                                                       <Image 
+                                                         src="/card/hint.svg" 
+                                                         alt="hint" 
+                                                         width={23}
+                                                         height={23}
+                                                         className="ml-1"
+                                                       />
+                                                     </span>
+                                                   ))}
+                                                 </>
+                                               ) : Array.isArray(data.additional_modals) ? (
+                                                data.additional_modals.map((item: string, index: number) => (
+                                                   <span key={index} className="flex items-center">
+                                                     {item}
+                                                     <Image 
+                                                       src="/card/hint.svg" 
+                                                       alt="hint" 
+                                                       width={23}
+                                                       height={23}
+                                                       className="ml-1"
+                                                     />
+                                                   </span>
+                                                 ))
+                                               ) : null}
+                                             </li>
                                             }
                                         </ul>
                                     </span>
