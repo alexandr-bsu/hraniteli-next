@@ -86,12 +86,13 @@ export const ApplicationForm = () => {
                                 <hr className="w-full border-t-[2px] border-dotted mt-[30px]  #000;" />
                             </>
                         } 
-                        {
-                            application_stage === 'psychologist' && <PsychologistStageTop /> 
-                        }
+                       
 
                         {
                             ["psychologist", "diseases_psychologist"].includes(application_stage) && <hr className="w-full border-t-[2px] border-dotted my-[20px]  #000;" />
+                        }
+                         {
+                            application_stage === 'psychologist' && <PsychologistStageTop /> 
                         }
                     </div>
                     }
