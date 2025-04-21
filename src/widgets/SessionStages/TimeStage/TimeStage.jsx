@@ -98,7 +98,7 @@ export const TimeStage = () => {
             </ul>
                        
             <DialogFooter>
-                <Button onClick={() => {}} className="cursor-pointer w-full hover:bg-[#116466] bg-[#116466] rounded-[50px] text-[white] py-[25px] font-normal  text-[18px] leading-[25px]" type="button">Далее</Button>
+                <Button onClick={callback} className="cursor-pointer w-full hover:bg-[#116466] bg-[#116466] rounded-[50px] text-[white] py-[25px] font-normal  text-[18px] leading-[25px]" type="button">Далее</Button>
             </DialogFooter>
         </ModalWindow>
     );

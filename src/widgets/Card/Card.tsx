@@ -5,7 +5,7 @@ import Image from "next/image";
 import { ProfileCard } from "../ProfileCard/ProfileCard";
 import { useEffect, useState } from "react";
 import { FavoritesButton } from "../FavoritesButton/FavoritesButton";
-import { TimeStage } from "../SessionStages/TimeStage/TimeStage.jsx";
+import { TimeStage } from "../SessionStages/TimeStage/ETimeStage";
 import { ContactStage } from "../SessionStages/ContactStage/ContactStage";
 import { Button } from "@/components/ui/button";
 import { useDispatch, useSelector } from "react-redux";
@@ -16,6 +16,7 @@ import { IPsychologist } from "@/entities/IPsychologist";
 
 import axios from "axios";
 import { IEducation } from "@/entities/IEducation";
+import React from "react";
 
 type Props =  {
     data: IPsychologist
@@ -56,12 +57,13 @@ export const Card:React.FC<Props> = ({data}) => {
 
     useEffect(() => {
         const apiUrl = `https://n8n-v2.hrani.live/webhook/download-psychologist-education-test-contur?psychologist_id=${data.telegram_id}`;
-
         axios.get(apiUrl).then((resp) => {
             const data = resp.data;
             setEducation(data[0]);
         });
     },[])
+
+    console.log('tlegram_id',data.link_photo)
 
     return (
         <>
@@ -78,6 +80,7 @@ export const Card:React.FC<Props> = ({data}) => {
                                     </h2>
 
                                     <h3 className=" flex max-lg:text-[16px] leading-[22px] gap-[10px]">
+                                        {/* 6 месяцев в сообществе {data.verified ? (<Image src={'/card/check.svg'} alt="check" height={23} width={23} />) : ''} */}
                                         6 месяцев в сообществе <Image src={'/card/check.svg'} alt="check" height={23} width={23} />
                                     </h3>
                                 </div>
@@ -106,9 +109,39 @@ export const Card:React.FC<Props> = ({data}) => {
                                 <div className="w-full max-lg:mt-[20px]">
                                     <span className="text-[#9A9A9A] font-normal flex-col flex gap-[10px] text-[16px] leading-[22px] max-lg:text-[14px] w-full">
                                         Дополнительные подходы:
-                                        <ul className="font-normal  leading-[25px] text-[18px]  max-lg:text-[14px] gap-[0px] gap-[10px] flex text-[#151515] mt-[5px]">
+                                        <ul className="font-normal  leading-[25px] text-[18px]  max-lg:text-[14px] gap-[10px] flex text-[#151515] mt-[5px]">
                                             {                                        
-                                                <li className="flex w-fit gap-[5px]">{data.additional_modals} <Image src={'/card/hint.svg'} alt="hint" height={23} width={23} /></li>
+                                               <li className="flex items-center gap-[10px] flex-wrap">
+                                               {typeof data.additional_modals === 'string' ? (
+                                                 <>
+                                                   {data.additional_modals.split(';').map((item: string, index: number) => (
+                                                     <span key={index} className="flex items-center">
+                                                       {item.trim()}
+                                                       <Image 
+                                                         src="/card/hint.svg" 
+                                                         alt="hint" 
+                                                         width={23}
+                                                         height={23}
+                                                         className="ml-1"
+                                                       />
+                                                     </span>
+                                                   ))}
+                                                 </>
+                                               ) : Array.isArray(data.additional_modals) ? (
+                                                data.additional_modals.map((item: string, index: number) => (
+                                                   <span key={index} className="flex items-center">
+                                                     {item}
+                                                     <Image 
+                                                       src="/card/hint.svg" 
+                                                       alt="hint" 
+                                                       width={23}
+                                                       height={23}
+                                                       className="ml-1"
+                                                     />
+                                                   </span>
+                                                 ))
+                                               ) : null}
+                                             </li>
                                             }
                                         </ul>
                                     </span>
@@ -118,22 +151,14 @@ export const Card:React.FC<Props> = ({data}) => {
                                     <span className="text-[#9A9A9A] flex flex-col gap-[10px] font-normal text-[16px] leading-[22px] w-full max-lg:text-[14px] max-lg:mt-[5px]">
                                         Ближайшая запись:
                                         
-                                        <ul className="flex gap-[14px] mt-[5px] overflow-auto min-w-full">
-                                            <li className="max-lg:text-[14px] relative shrink-0 rounded-[50px] w-[132px]  border-[1px] border-[#D4D4D4]  text-[#116466] font-normal leading-[25px] text-[18px]  flex justify-center items-center">
-                                                <button className="relative h-full w-full cursor-pointer p-[8px] py-[8px]">
-                                                    28.01/ 13:00
-                                                </button> 
+                                        <ul className="flex gap-[10px] overflow-x-auto pb-2">
+                                        {[1, 2, 3].map((_, i) => (
+                                            <li key={i} className="shrink-0 rounded-[50px] w-[132px] max-lg:w-[109px] max-lg:text-[14px] border-[1px] border-[#D4D4D4] text-[#116466] font-normal leading-[25px] text-[18px] flex justify-center items-center">
+                                            <button className="w-full h-full py-[8px] px-[12px]">
+                                                28.01/ 13:00
+                                            </button>
                                             </li>
-                                            <li className="max-lg:text-[14px] relative shrink-0 rounded-[50px] w-[132px border-[1px] border-[#D4D4D4]  text-[#116466] font-normal leading-[25px] text-[18px] flex justify-center items-center">
-                                                <button className="relative h-full w-full cursor-pointer p-[8px] py-[8px]">
-                                                    28.01/ 13:00
-                                                </button> 
-                                            </li>
-                                            <li className="max-lg:text-[14px] relative shrink-0 rounded-[50px] w-[132px] border-[1px] border-[#D4D4D4]  text-[#116466] font-normal leading-[25px] text-[18px] flex justify-center items-center">
-                                                <button className="relative h-full w-full cursor-pointer p-[8px] py-[8px]">
-                                                    28.01/ 13:00
-                                                </button> 
-                                            </li>
+                                        ))}
                                         </ul>
                                     </span>
                                 </div>
@@ -144,18 +169,45 @@ export const Card:React.FC<Props> = ({data}) => {
                             <span className="text-[#9A9A9A] font-normal text-[16px] leading-[22px] max-lg:text-[14px]">
                                 Запросы:
                             </span>   
-                            <ul className="  min-w-fit gap-[10px] max-[425px]:gap-x-[120px]  grid-cols-[repeat(auto-full,_minmax(100px,_1fr))] w-initial mt-[5px] flex-wrap max-lg:grid-cols-[repeat(2,_minmax(100px,_1fr))] inline-grid w-fit overflow-auto">
-                                {
-                                    queries.map((item, i ) => <li key={i} className="max-lg:text-[14px] h-fit min-w-[200px] shrink-0 rounded-[20px]   max-lg:max-w-[300px] text-[18px] font-semibold w-fit  border-[1px] border-[#D4D4D4]  text-[#116466] leading-[25px] ">
-                                        <button className="relative h-full w-full cursor-pointer p-[8px] flex justify-start">
-                                        {
-                                            item
-                                        }
-                                        </button>    
-                                    </li>)
-                                }
-                                
+                            <div className="w-full">
+                            {/* Мобильная версия (горизонтальный скролл) */}
+                            <div className="lg:hidden overflow-x-auto pb-2 hide-scrollbar">
+                                <ul className="flex gap-[10px] mt-[5px] w-max">
+                                {queries.map((item, i) => (
+                                    <li 
+                                    key={i}
+                                    className="
+                                        min-w-[200px] text-[14px]
+                                        rounded-[20px] border-[1px] border-[#D4D4D4]
+                                        text-[#116466] font-semibold leading-[25px]
+                                    "
+                                    >
+                                    <button className="w-full h-full p-[8px] text-left whitespace-normal">
+                                        {item}
+                                    </button>
+                                    </li>
+                                ))}
+                                </ul>
+                            </div>
+
+                            {/* Десктоп версия (2 колонки) */}
+                            <ul className="hidden lg:grid grid-cols-2 gap-[10px] mt-[5px]">
+                                {queries.map((item, i) => (
+                                <li 
+                                    key={i}
+                                    className="
+                                    text-[18px] rounded-[20px]
+                                    border-[1px] border-[#D4D4D4]
+                                    text-[#116466] font-semibold leading-[25px]
+                                    "
+                                >
+                                    <button className="w-full h-full p-[8px] text-left whitespace-normal">
+                                    {item}
+                                    </button>
+                                </li>
+                                ))}
                             </ul>
+                            </div>
                         </div>
                     </div>
                 
@@ -183,26 +235,28 @@ export const Card:React.FC<Props> = ({data}) => {
 
                 {
                     isShow &&  <div className="flex gap-[5px] flex-col w-full mt-[30px]">
-                        <div>
-                            <span className="text-[#9A9A9A] font-normal text-[16px] leading-[22px] max-lg:text-[14px]">
+                       <div className="flex flex-col">
+                            <span className="text-[#9A9A9A] text-[16px] leading-[22px] max-lg:text-[14px]">
                                 О хранителе
-                            </span> 
-
-                            <span className="overflow-hidden text-[#151515] max-lg:text-[14px] flex-col w-full justify-between font-normal text-[18px] leading-[25px] flex gap-[10px] mt-[5px]">
-                                {data.short_description}
-                                {
-                                    isShowInfo && <span className="block max-lg:text-[14px]">
-                                        ..................
-                                    </span>
-                                }
                             </span>
 
-                            <button onClick={() => setShowInfo(prev => !prev)} className="text-[#116466] w-full flex justify-start cursor-pointer">
-                                {
-                                    isShowInfo ? 'Свернуть' : "Читать ещё"
-                                }     
-                            </button>       
-                        </div>
+                            <div className="relative">
+                                <p className={`text-[#151515] max-lg:text-[14px] font-normal text-[18px] leading-[25px] mt-[5px] ${isShowInfo ? '' : 'line-clamp-2'}`}>
+                                {data.short_description}
+                                </p>
+                                
+                                {!isShowInfo && (
+                                <div className="absolute bottom-0 right-0 h-[25px] w-[80px] bg-gradient-to-l from-white to-transparent" />
+                                )}
+                            </div>
+
+                            <button 
+                                onClick={() => setShowInfo(prev => !prev)} 
+                                className="text-[#116466] mt-1 text-left cursor-pointer hover:underline"
+                            >
+                                {isShowInfo ? 'Свернуть' : 'Читать ещё'}
+                            </button>
+                            </div>
 
                         <div className="mt-[30px]">
                             <span className="text-[#9A9A9A] font-normal text-[16px] leading-[22px] max-lg:text-[14px]">
@@ -226,7 +280,7 @@ export const Card:React.FC<Props> = ({data}) => {
                                 Подробнее о хранителе
                             </span> 
 
-                            <ul className="flex w-full font-normal text-[14px] mt-[10px] overflow-auto gap-[20px]">
+                            <ul className="flex w-full font-normal text-[16px] max-lg:text-[14px] mt-[10px] overflow-auto gap-[20px] hide-scrollbar">
                                 <li className="shrink-0 flex items-center justify-center gap-[15px]">
                                     <Image src={'/card/favorites_icon.svg'} alt="favorites" height={40} width={40} />
                                     <span>
@@ -254,65 +308,48 @@ export const Card:React.FC<Props> = ({data}) => {
                             </ul>       
                         </div>
 
-                        <ul className="mt-[30px] w-fit flex grid-cols-4 font-normal text-[18px] leading-[25px] gap-[30px] max-[425px]:grid-cols-2 max-[425px]:gap-[30px]">
-                            <li>
-                                <span className="text-[#9A9A9A] text-[16px] leading-[22px] max-lg:text-[12px]">
-                                    Личная терапия:
-                                </span>
-                                
-                                <span className="flex text-[#151515] gap-[10px] mt-[10px] max-lg:text-[14px]">
-                                    Да
-                                    <Image src={'/card/hint.svg'} alt="hint" height={23} width={23} />
 
-                                </span>
-                            </li>
+                        <ul className="mt-[30px] flex flex-wrap gap-x-[30px] gap-y-[20px] font-normal text-[18px] leading-[25px] max-lg:grid max-lg:grid-cols-2">
+                        <li className="flex flex-col items-start whitespace-nowrap w-fit">
+                            <span className="text-[#9A9A9A] text-[16px] leading-[22px] max-lg:text-[12px]">
+                            Личная терапия:
+                            </span>
+                            <span className="flex text-[#151515] gap-[10px] mt-[10px] max-lg:text-[14px] items-center">
+                            Да
+                            <Image src={'/card/hint.svg'} alt="hint" height={23} width={23} />
+                            </span>
+                        </li>
 
-                            <li className="w-[200px]">
-                                <span className="text-[#9A9A9A] text-[16px] leading-[22px] max-lg:text-[12px]">
-                                Посещает супервизию:
-                                </span>
-                                
-                                <span className="flex text-[#151515] gap-[10px] mt-[10px] max-lg:text-[14px]">
-                                    Да
-                                    <Image src={'/card/hint.svg'} alt="hint" height={23} width={23} />
+                        <li className="flex flex-col items-start whitespace-nowrap w-fit">
+                            <span className="text-[#9A9A9A] text-[16px] leading-[22px] max-lg:text-[12px]">
+                            Посещает супервизию:
+                            </span>
+                            <span className="flex text-[#151515] gap-[10px] mt-[10px] max-lg:text-[14px] items-center">
+                            Да
+                            <Image src={'/card/hint.svg'} alt="hint" height={23} width={23} />
+                            </span>
+                        </li>
 
-                                </span>
-                            </li>
-                            <li>
-                                <span className="text-[#9A9A9A] text-[16px] leading-[22px] max-lg:text-[12px]">
-                                    Семейное положение
-                                </span>
-                                
-                                <span className="flex text-[#151515] gap-[10px] mt-[10px] max-lg:text-[14px]">
-                                    {
-                                            data.sex === 'Мужчина' &&
-                                            (data.is_married && data.has_children) && 'Женат, дети' 
-                                    }
-                                    {
-                                            data.sex === 'Женщина' &&
-                                            (data.is_married && data.has_children) && 'Замужем, дети' 
-                                    }
-                                    {
-                                            data.sex === 'Мужчина' &&
-                                            (data.is_married === false) && 'Не женат' 
-                                    }
-                                    {
-                                            data.sex === 'Женщина' &&
-                                            (data.is_married === false) && 'Не женат' 
-                                    }
-                                </span>
-                            </li>
-                            <li>
-                                <span className="text-[#9A9A9A] text-[16px] leading-[22px] max-lg:text-[12px]">
-                                    Есть дети:
-                                </span>
-                                
-                                <span className="flex text-[#151515] gap-[10px] mt-[10px] max-lg:text-[14px]">
-                                    {
-                                        data.has_children ? 'Да' : 'Нет'
-                                    }
-                                </span>
-                            </li>
+                        <li className="flex flex-col items-start whitespace-nowrap w-fit">
+                            <span className="text-[#9A9A9A] text-[16px] leading-[22px] max-lg:text-[12px]">
+                            Семейное положение:
+                            </span>
+                            <span className="flex text-[#151515] gap-[10px] mt-[10px] max-lg:text-[14px] items-center">
+                            {data.sex === 'Мужчина' && (data.is_married && data.has_children) && 'Женат, дети'}
+                            {data.sex === 'Женщина' && (data.is_married && data.has_children) && 'Замужем, дети'}
+                            {data.sex === 'Мужчина' && (data.is_married === false) && 'Не женат'}
+                            {data.sex === 'Женщина' && (data.is_married === false) && 'Не замужем'}
+                            </span>
+                        </li>
+
+                        <li className="flex flex-col items-start whitespace-nowrap w-fit">
+                            <span className="text-[#9A9A9A] text-[16px] leading-[22px] max-lg:text-[12px]">
+                            Есть дети:
+                            </span>
+                            <span className="flex text-[#151515] gap-[10px] mt-[10px] max-lg:text-[14px] items-center">
+                            {data.has_children ? 'Да' : 'Нет'}
+                            </span>
+                        </li>
                         </ul>
                     </div> 
                 }

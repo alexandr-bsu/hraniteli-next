@@ -9,6 +9,7 @@ import { ModalState } from '@/redux/store';
 import { getTimeDifference } from '@/features/utils';
 import clsx from 'clsx';
 import { selectSlots, selectSlotsObjects } from '@/redux/slices/modal';
+import TimezoneIndicator from '@/components/timezone';
 
 type Props = {
     callback: () => void;
@@ -66,6 +67,8 @@ export const TimeStage:React.FC<Props> = ({callback}) => {
             getData();
         }
     },[isOpen, selectedPsychologist])
+
+    console.log('selected psychologist', selectedPsychologist)
 
     const getData = useCallback(() => {
         
@@ -228,6 +231,7 @@ export const TimeStage:React.FC<Props> = ({callback}) => {
     },[todayTabs, tomorrowTabs, isOpen])
 
 
+
     return (
         <ModalWindow onOpenChange={getData} type='Time'>
             <DialogHeader className="flex flex-row">
@@ -237,7 +241,7 @@ export const TimeStage:React.FC<Props> = ({callback}) => {
             <span className="text-[18px] leading-[25px] font-normal text-[#151515] flex gap-[10px] max-lg:flex-col max-lg:text-[14px]">
                 Часовой пояс:
                 <span className="text-[#116466]">
-                    Asia/Yekaterinburg ( MSK + 2)
+                    <TimezoneIndicator/>
                 </span>
             </span>
 
@@ -254,7 +258,7 @@ export const TimeStage:React.FC<Props> = ({callback}) => {
                                 ['border-none bg-[#116466] text-[white]']: todayTabs?.[key]?.select === true
                             }
                         )}>
-                            <button onClick={() => handleClickToday({findIndex:key,value:val})} className="relative h-full w-full cursor-pointer p-[8px] py-[8px]">
+                            <button onClick={() => {console.log('Today slots data:', today?.slots);}} className="relative h-full w-full cursor-pointer p-[8px] py-[8px]">
                                 {
                                     val?.time
                                 }

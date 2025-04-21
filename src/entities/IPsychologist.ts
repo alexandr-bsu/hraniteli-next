@@ -26,7 +26,7 @@ export interface IPsychologist {
     in_community: boolean
     psychologist_contact: any
     main_modal: string
-    additional_modals: []
+    additional_modals: string | string[]
     vk: string
     site: string
     telegram: string

@@ -16,6 +16,7 @@ const filterSlice = createSlice({
         dates_psychologists: [],
         hour_dates: [],
         IsMental_Illness: false,
+        IsMental_Illness2: false,
         filtered_by_automatch_psy: []
     },
     
@@ -60,6 +61,9 @@ const filterSlice = createSlice({
         findByMental_Illness(state) {
             state.IsMental_Illness = !state.IsMental_Illness;
         },
+        findByMental_Illness2(state) {
+            state.IsMental_Illness2 = !state.IsMental_Illness2;
+        },
        
     },
 });
@@ -68,6 +72,7 @@ const filterSlice = createSlice({
 export const  { 
     findByGender,
     findByMental_Illness,
+    findByMental_Illness2,
     findByBasicApproach,findByTimes, 
     findByDates, 
     findByPrice, 

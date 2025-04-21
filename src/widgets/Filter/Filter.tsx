@@ -15,7 +15,7 @@ import { FilterGender } from "./FilterGender";
 import { FilterPrice } from "./FilterPrice";
 import { FilterDate } from "./FilterDate";
 import { FilterTime } from "./FilterTime";
-import { findByDates, findByGender, findByMental_Illness, findByPrice, findByRequests, findByTimes, findByVideo } from "@/redux/slices/filter";
+import { findByDates, findByGender, findByMental_Illness, findByMental_Illness2, findByPrice, findByRequests, findByTimes, findByVideo } from "@/redux/slices/filter";
 
 export const Filter = () => {
     const [isShow, setShow] = useState(true);
@@ -183,12 +183,28 @@ export const Filter = () => {
                             Есть видеовизитка
                         </label>
                     </div>
+
+                    <div className="flex items-center gap-[15px] mt-[15px]">
+                        <Checkbox className="w-[30px] h-[30px]" id="mental_illnesses"
+                            defaultChecked={false}
+                            onClickCapture={() => {
+                                dispatch(findByMental_Illness())
+                            }}
+                        />
+                        <label
+                            htmlFor="mental_illnesses"
+                            className="font-normal text-[16px] leading-[22px]"
+                        >
+                            Работает с психическими заболеваниями (РПП, СДВГ и др)
+                        </label>
+
+                    </div>
                     
                     <div className="flex items-center gap-[15px] mt-[15px]">
                         <Checkbox className="w-[30px] h-[30px]" id="mental_illnesses2"
-                            defaultChecked={true}
+                            defaultChecked={false}
                             onClickCapture={() => {
-                                dispatch(findByMental_Illness())
+                                dispatch(findByMental_Illness2())
                             }}
                         />
                         <label
@@ -197,6 +213,7 @@ export const Filter = () => {
                         >
                             Работает с психиатрическими заболеваниями (ПРЛ, БАР, ПТСР и др)
                         </label>
+
                     </div>
                     </>   
                 }   

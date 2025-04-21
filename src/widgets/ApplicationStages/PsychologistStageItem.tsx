@@ -113,7 +113,7 @@ const PsychologistStageItem = ({data, index, onSubmit} : Props) => {
                 <ul className="max-lg:flex max-lg:w-full grid grid-cols-5 gap-[14px] mt-[10px] overflow-auto  w-fit">
                     {
                         timeFilter?.map((item: FilterSelectButtonTime, i: number) =>
-                        <li key={i} onClick={() => handleClick(i)} className={clsx("max-lg:text-[14px] relative shrink-0 rounded-[50px] w-[132px]  border-[1px] border-[#D4D4D4]  text-[#116466] font-normal leading-[25px] text-[18px] leading-[25px] flex justify-center items-center",
+                        <li key={i} onClick={() => handleClick(i)} className={clsx("max-lg:text-[14px] relative shrink-0 rounded-[50px] w-[132px]  border-[1px] border-[#D4D4D4]  text-[#116466] font-normal text-[18px] leading-[25px] flex justify-center items-center",
                             {
                                 ['border-none bg-[#116466] text-[white]']: timeFilter?.[i].select === true
                             }

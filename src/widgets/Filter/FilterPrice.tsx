@@ -31,7 +31,7 @@ export const FilterPrice:React.FC<Props> = ({onSubmit, type }) => {
     const { handleSubmit, watch, control, ...form } = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            price: '1500'
+            price: '3000'
         }
     })
      

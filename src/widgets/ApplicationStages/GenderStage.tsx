@@ -33,19 +33,30 @@ export const GenderStageApplication = () => {
 
     const dispatch = useDispatch();
 
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
-    })
+      // 1. Загружаем сохраненное имя при инициализации
+      const savedGender = typeof window !== 'undefined' 
+      ? localStorage.getItem('app_gender') || 'male'
+      : 'female'
+    
+      //Настраиваем форму
+        const form = useForm<z.infer<typeof FormSchema>>({
+            resolver: zodResolver(FormSchema),
+            defaultValues: {
+                gender: savedGender as 'male' | 'female' || undefined,
+            }
+        })
+    
+         const handleSubmit = (data: { gender: string }) => {
+            localStorage.setItem('app_gender', data.gender) // Сохраняем в localStorage
+            dispatch(fill_gender(data.gender)) // Сохраняем в Redux (если нужно)
+            dispatch(toNextStage('preferences')) // Переход на следующую страницу
 
-    function handleSubmit(data: z.infer<typeof FormSchema>) {
-        dispatch(toNextStage('preferences')) 
-        dispatch(fill_gender(sex_data[data.gender]))
-    }
+         }
 
   return (
     <div className='px-[50px] max-lg:px-[20px]  flex w-full grow'>
         <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col mt-[20px]">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col mt-[30px]">
             <FormField
             control={form.control}
             name="gender"
@@ -66,7 +77,7 @@ export const GenderStageApplication = () => {
                                 <FormControl>
                                 <RadioGroupItem className="h-[30px] w-[30px]" value="male" />
                                 </FormControl>
-                                <FormLabel className="font-normal text-[18px]">
+                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
                                     Мужской
                                 </FormLabel>
                             </FormItem>
@@ -74,7 +85,7 @@ export const GenderStageApplication = () => {
                                 <FormControl> 
                                 <RadioGroupItem className="h-[30px] w-[30px]" value="female" />
                                 </FormControl>
-                                <FormLabel className="font-normal text-[18px]">
+                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
                                     Женский
                                 </FormLabel>
                             </FormItem>
@@ -82,10 +93,10 @@ export const GenderStageApplication = () => {
                     </FormControl>
                     { !form.formState.errors.gender && 
                         <span className='mt-[10px] max-lg:text-[12px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
-                        ! Поле обязательное для заполнения
+                         Это обязательное поле
                         </span>
                     }
-                    <FormMessage />
+                    <FormMessage className="mt-[10px]"/>
                 </FormItem>
                 </div>
             )}

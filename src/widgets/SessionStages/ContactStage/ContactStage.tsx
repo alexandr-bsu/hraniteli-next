@@ -12,6 +12,7 @@ import axios from 'axios';
 import { ModalState } from '@/redux/store';
 import { redirect } from 'next/navigation';
 import { string } from 'zod';
+import PhoneInput from '@/components/phoneimput';
 
 type Props = {
     callback: () => void;
@@ -27,6 +28,7 @@ export const ContactStage:React.FC<Props> = ({callback}) => {
     const slots_objects = useSelector<ModalState>(state => state.modal.slots_objects);
     const requests = useSelector<ModalState>(state => state.filter.requests);
     const hasMentalIllness = useSelector<ModalState>(state => state.filter.IsMental_Illness);
+    const selectedPsychologist = useSelector<ModalState>(state => state.modal.selectedPsychologist) as any;
     
     const filterClientQueries = (list: string[], mode: 'traumatic' | 'states'): string[] => {
         const eventsList: readonly string[] = [
@@ -50,6 +52,7 @@ export const ContactStage:React.FC<Props> = ({callback}) => {
             "Сложности в сексуальной сфере",
             "Проблемы с раскрытием женственности и сексуальности",
         ];
+
         
         if (mode === 'traumatic') {
             return list.filter(l => eventsList.includes(l.label)).map(l => l.label);
@@ -181,7 +184,7 @@ export const ContactStage:React.FC<Props> = ({callback}) => {
                 <Image className='rounded-full object-cover  max-md:h-[52px]  max-md:w-[52px]' src={'/images/person.png'} alt='person' height={80} width={80} />
 
                 <div className='flex flex-col gap-[5px]'>
-                    <h2 className='font-semibold text-[18px] leading-[25px] max-md:text-[14px]'>Мария Ломакина, 26 лет</h2>
+                    <h2 className='font-semibold text-[18px] leading-[25px] max-md:text-[14px]'>{selectedPsychologist}</h2>
 
                     <span className='font-normal text-[16px] leading-[22px] max-md:text-[14px]'>
                         6 месяцев в хранителях
@@ -194,8 +197,8 @@ export const ContactStage:React.FC<Props> = ({callback}) => {
                 
                 <div className='mt-[25px] focus-within:outline-2 focus-within:outline-[#D4D4D4] px-[20px] max-md:placeholder:text-[14px]  flex max-md:h-[47px] w-full h-[65px] bg-[#FAFAFA]  rounded-[10px] font-normal text-[18px] leading-[25px]'>
                     <Image src={'/flag.svg'} alt='flag' height={23} width={23} />
-                    
-                    <input value={telephone} onChange={e => setTelephone(e.target.value)} className='h-full px-[20px] grow focus-within:outline-none' type="tel"  placeholder='+7' />
+                    <PhoneInput/>
+                    {/* <input value={telephone} onChange={e => setTelephone(e.target.value)} className='h-full px-[20px] grow focus-within:outline-none' type="tel"  placeholder='+7' /> */}
                 </div>
             </form>
 
