@@ -30,7 +30,21 @@ export interface RootState {
     isOpen: boolean;
     content: React.ReactNode;
     type: string | null;
+    selectedSlots: string[];
+    slots_objects: any[];
+    selectedPsychologist: string;
   };
+}
+
+export type ModalType = 'FilterRequest' | 'Contact' | 'Slots' | null;
+
+export interface ModalState {
+    isOpen: boolean;
+    type: ModalType;
+    content: React.ReactNode;
+    selectedSlots?: string[];
+    slots_objects?: any[];
+    selectedPsychologist?: string;
 }
 
 export const store = configureStore({

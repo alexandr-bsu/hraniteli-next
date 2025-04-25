@@ -1,28 +1,66 @@
 .card {
+  position: relative;
   width: 100%;
-  display: flex;
-  flex-direction: column;
   background: #FFFFFF;
   border-radius: 20px;
   padding: 20px;
 }
 
+.bestMatch {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: #116466;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 1;
+}
+
 .header {
   display: flex;
   gap: 30px;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+}
+
+.avatarSection {
+  flex-shrink: 0;
+  width: 214px;
 }
 
 .avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
+  position: relative;
+  width: 214px;
+  height: 351px;
+  border-radius: 20px;
   overflow: hidden;
+  cursor: pointer;
   
-  img {
+  img, video {
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+}
+
+.playButton {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  img {
+    width: 24px;
+    height: 24px;
   }
 }
 
@@ -30,45 +68,338 @@
   flex: 1;
 }
 
+.nameRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
 .name {
-  font-size: 20px;
-  line-height: 27px;
+  font-size: 24px;
   font-weight: 600;
-  margin-bottom: 10px;
-  cursor: pointer;
+  color: #000;
+  margin: 0;
   
   &:hover {
     color: #116466;
   }
 }
 
-.approaches {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.content {
-  margin-bottom: 20px;
-}
-
-.education {
-  margin-bottom: 15px;
+.favoriteButton {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
   
-  ul {
-    list-style: none;
-    padding: 0;
-    margin: 10px 0 0;
+  &:hover {
+    opacity: 0.8;
   }
 }
 
-.footer {
+.experience {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: 8px;
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 16px;
 }
 
-.price {
+.approach {
+  margin-bottom: 16px;
+  display: flex;
+  gap: 12px;
+}
+
+.approachBlock {
+  display: flex;
+  flex-direction: column;
+  margin-right: 50px;
+  gap: 4px;
+}
+
+.label {
+  color: #666;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 100%;
+}
+
+.value {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 100%;
+}
+
+.infoButton {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #D4D4D4;
+  border-radius: 50%;
+  background: none;
+  color: #666;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:hover {
+    background: #F5F5F5;
+  }
+}
+
+.additionalApproaches {
+  margin-bottom: 16px;
+
+  .approaches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .approachItem {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    background: #F5F5F5;
+    border-radius: 16px;
+    font-size: 14px;
+  }
+}
+
+.nextSession {
+  .dates {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .dateButton {
+    padding: 8px 16px;
+    border: 1px solid #D4D4D4;
+    border-radius: 20px;
+    background: white;
+    color: #116466;
+    font-weight: 500;
+    cursor: pointer;
+
+    &:hover {
+      background: #F5F5F5;
+    }
+
+    &.active {
+      background: #116466;
+      color: white;
+      border-color: #116466;
+    }
+  }
+}
+
+.sectionTitle {
+  font-size: 16px;
   font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.queries {
+  margin-bottom: 24px;
+}
+
+.queriesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.queryButton {
+  width: 227px;
+  height: 45px;
+  padding: 10px;
+  border: 1px solid #D4D4D4;
+  border-radius: 20px;
+  background: white;
+  color: #116466;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+
+  &:hover {
+    background: #F5F5F5;
+  }
+}
+
+.diagnoses {
+  margin-bottom: 24px;
+}
+
+.diagnosesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.diagnosisItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+}
+
+.detailsButton {
+  flex: 1;
+  padding: 12px 24px;
+  border: 1px solid #116466;
+  border-radius: 30px;
+  background: white;
+  color: #116466;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    background: #F5F5F5;
+  }
+}
+
+.appointmentButton {
+  flex: 1;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 30px;
+  background: #116466;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    background: darken(#116466, 5%);
+  }
+}
+
+.expandedContent {
+    margin-top: 20px;
+    border-top: 1px solid var(--color-border);
+    padding-top: 20px;
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+
+    &.expanded {
+        max-height: 2000px;
+        opacity: 1;
+    }
+}
+
+.section {
+    margin-bottom: 24px;
+
+    &:last-child {
+        margin-bottom: 0;
+    }
+}
+
+.sectionTitle {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.description {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    line-height: 150%;
+    color: #333;
+}
+
+.education {
+    .educationItem {
+        margin-bottom: 12px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
+
+        h4 {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        p {
+            font-family: 'Open Sans', sans-serif;
+            font-size: 14px;
+            color: #666;
+        }
+    }
+}
+
+.links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+}
+
+.socialLink {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid #D4D4D4;
+    border-radius: 20px;
+    color: #333;
+    text-decoration: none;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+
+    &:hover {
+        background: #F5F5F5;
+    }
+}
+
+.personalInfo {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    flex-wrap: wrap;
+
+    .infoRow {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .infoLabel {
+        color: #666;
+        font-family: 'Open Sans', sans-serif;
+        font-size: 14px;
+    }
+
+    .infoValue {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: 'Open Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 500;
+        color: #000;
+    }
 } 

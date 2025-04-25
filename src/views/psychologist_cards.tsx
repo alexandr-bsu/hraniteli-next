@@ -9,301 +9,172 @@ import { IPsychologist } from "@/shared/types/psychologist.types";
 import { setDataNamePsychologist } from "@/redux/slices/filter";
 
 type Props = {
-    data: any;
+    data: IPsychologist[];
 }
 
 export const Psychologist_cards = ({data} : Props) => { 
     const filter = useSelector<RootState>(state => state.filter) as any;
-    
-    const [ dataCard, setDataCard] = useState<IPsychologist[]>([]);
-
+    const [dataCard, setDataCard] = useState<IPsychologist[]>([]);
     const [isLoading, setLoading] = useState(true);
-
     const dispatch = useDispatch();
 
-    // useEffect(() => {
-    //     try
-    //     {
-    //         setLoading(true);
-    //         const apiUrl = 'https://n8n-v2.hrani.live/webhook/get-filtered-psychologists-test-contur';
-
-    //         axios.get(apiUrl).then((resp) => {
-    //             const allPsychologist = resp.data;
-
-    //         });
-    //     }
-    //     catch {
-    //         setLoading(false)
-    //         throw new Error('Something went wrong.' as any)
-    //     }
-    //     finally {
-    //         setLoading(false)
-    //     }
-    // },[]);
-
+    // Инициализация данных
     useEffect(() => {
-        console.log('data',data)
+        setLoading(true);
+        if (!data) {
+            console.error('No data provided to Psychologist_cards');
+            setLoading(false);
+            return;
+        }
 
-        dispatch(setDataNamePsychologist(data.map((item: IPsychologist) => {
-            return item.name
-        })))
+        if (!Array.isArray(data)) {
+            console.error('Data is not an array:', data);
+            setLoading(false);
+            return;
+        }
+        
+        dispatch(setDataNamePsychologist(data.map(item => item.name)));
         setDataCard(data);
-    },[data])
+        setLoading(false);
+    }, [data, dispatch]);
 
+    // Фильтрация при изменении фильтров
     useEffect(() => {
-        try
-        {
-            setLoading(true);
-            FilterData(data)
-        }
-        catch {
-            setLoading(false)
-            throw new Error('Something went wrong.' as any)
-        }
-        finally {
-            setLoading(false)
-        }
-    },[filter]);
-
-
-    // useEffect(() => {
-    //     try
-    //     {
-    //         setLoading(true);
-    //         const apiUrl = 'https://n8n-v2.hrani.live/webhook/get-filtered-psychologists-test-contur';
-
-    //         console.log(filter)
-    //         axios.get(apiUrl).then((resp) => {
-    //             const allPsychologist = resp.data;
-    //             FilterData(allPsychologist)
-    //         });
-    //     }
-    //     catch {
-    //         setLoading(false)
-    //         throw new Error('Something went wrong.' as any)
-    //     }
-    //     finally {
-    //         setLoading(false)
-    //     }
-    // },[filter]);
-    
-
-    //Метод фильтрации данных 
-    const FilterData = async(data: any) => {
-        if (!data) return;
+        if (!data?.length) return;
         
-        const gender = filter.gender;
-        const price = filter.price;
-        let requests = filter.requests;
-        const dates = filter.dates || [];
-        const times = filter.times || [];
-        const hour_dates = filter.hour_dates || [];
-        const isVideo = filter.isVideo;
-        const mental_Illness = filter.IsMental_Illness;
-        const mental_Illness2 = filter.IsMental_Illness2;
+        setLoading(true);
+        try {
+            const filteredData = FilterData(data);
+            setDataCard(filteredData);
+        } catch (error) {
+            console.error('Filtering error:', error);
+            setDataCard([]);
+        } finally {
+            setLoading(false);
+        }
+    }, [filter, data]);
 
-        let filterData = [...data];
+    const FilterData = (inputData: IPsychologist[]) => {
+        let filteredData = [...inputData];
 
-        // Фильтрация по стоимости
-        if(filterData !== null && filterData !== undefined && price !== 1500) {  
-            if (filterData.length > 1) {
-                filterData = filterData.filter((item : any) => Number(item.min_session_price) <= price);
-            }
+        // Фильтрация по цене
+        if (filter.price > 0 && filter.price !== 1500) {
+            filteredData = filteredData.filter(item => 
+                Number(item.min_session_price) <= filter.price
+            );
         }
 
-        // Фильтрация по видео визитки 
-        if(filterData !== null && filterData !== undefined && isVideo) {  
-            const result = filterData.filter((item: any) => item.link_video !== null);
-            filterData = result;
+        // Фильтрация по видео
+        if (filter.isVideo) {
+            filteredData = filteredData.filter(item => item.is_video || item.video);
         }
 
-// Фильтрация по психическим заболеваниям
-if (filterData) {
-    filterData = filterData.filter((psychologist: IPsychologist) => {
-        if (!psychologist.works_with) return false;
-        
-        const conditions = psychologist.works_with
-            .split(';')
-            .map(item => item.trim());
-        
-        // Проверяем "содержит" вместо точного соответствия
-        const hasMental = conditions.some(condition => 
-            condition.includes('психическое заболевание') || 
-            condition.includes('РПП') ||
-            condition.includes('СДВГ')
-        );
-        
-        const hasPsychiatric = conditions.some(condition =>
-            condition.includes('психиатрическое заболевание') ||
-            condition.includes('ПРЛ') ||
-            condition.includes('БАР') ||
-            condition.includes('ПТСР')
-        );
-        
-        // Определяем, нужно ли применять каждый фильтр
-        const applyMentalFilter = mental_Illness !== false;
-        const applyPsychiatricFilter = mental_Illness2 !== false;
-        
-        // Если ни один фильтр не применяется - показываем всех
-        if (!applyMentalFilter && !applyPsychiatricFilter) {
-            return true;
-        }
-        
-        // Проверяем соответствие включенным фильтрам
-        let matchesMental = true;
-        let matchesPsychiatric = true;
-        
-        if (applyMentalFilter) {
-            matchesMental = (mental_Illness === hasMental);
-        }
-        
-        if (applyPsychiatricFilter) {
-            matchesPsychiatric = (mental_Illness2 === hasPsychiatric);
-        }
-        
-        return matchesMental && matchesPsychiatric;
-    });
-}
-        
+        // Фильтрация по заболеваниям
+        if (filter.IsMental_Illness === true || filter.IsMental_Illness2 === true) {
+            filteredData = filteredData.filter(psychologist => {
+                if (!psychologist.works_with) return false;
+                
+                const conditions = psychologist.works_with.split(';').map(item => item.trim());
+                
+                const hasMental = conditions.some(condition => 
+                    condition.includes('психическое заболевание') || 
+                    condition.includes('РПП') ||
+                    condition.includes('СДВГ')
+                );
+                
+                const hasPsychiatric = conditions.some(condition =>
+                    condition.includes('психиатрическое заболевание') ||
+                    condition.includes('ПРЛ') ||
+                    condition.includes('БАР') ||
+                    condition.includes('ПТСР')
+                );
 
-        // Фильтрация по запросу
-        if(filterData !== null && filterData !== undefined && requests.length > 0) {
-            const result = []
-            requests = requests.map(function(item: any){
-                return item?.label;
-            })
-            for (let index = 0; index <= filterData.length - 1; index++) {
-                const queries = filterData[index].queries.split(';').map(function(item: any){
-                    return item.trimStart();
-                });
-
-                let isInclude = true;
-                for (let index = 0; index < requests.length; index++) {
-                    if(!queries.includes(requests[index])) {
-                        isInclude = false;
-                        break;
-                    }
+                if (filter.IsMental_Illness === true && filter.IsMental_Illness2 === true) {
+                    return filter.IsMental_Illness === hasMental && filter.IsMental_Illness2 === hasPsychiatric;
+                }
+                
+                if (filter.IsMental_Illness === true) {
+                    return filter.IsMental_Illness === hasMental;
+                }
+                
+                if (filter.IsMental_Illness2 === true) {
+                    return filter.IsMental_Illness2 === hasPsychiatric;
                 }
 
-                if(isInclude) {
-                    result.push(filterData[index]);
-                }              
-            }
-            if (result.length === 0) {
-                setDataCard([])
-                return;
-            }
-            filterData = result;  
+                return true;
+            });
         }
 
+        // Фильтрация по запросам
+        if (filter.requests?.length) {
+            const requestLabels = filter.requests.map((item: any) => item?.label);
+            
+            filteredData = filteredData.filter(item => {
+                if (!item.queries) return false;
+                const queries = item.queries.split(';').map(q => q.trimStart());
+                return requestLabels.every((label: string) => queries.includes(label));
+            });
+        }
 
         // Фильтрация по полу
-        if(gender !== 'none' && gender !== 'Не имеет значения'  && gender !== '' && gender !== null && gender !== undefined) {
-            filterData = filterData.filter((item: any) => item.sex === gender);       
+        if (filter.gender && filter.gender !== 'none' && filter.gender !== 'Не имеет значения') {   
+            const genderMap = {
+                'male': 'Мужчина',
+                'female': 'Женщина'
+            };
+            
+            filteredData = filteredData.filter(item => item.sex === genderMap[filter.gender as keyof typeof genderMap]);
+        
         }
 
-        // Фильтрация по дате и  часам 
-        if(filterData !== null && filterData !== undefined && dates.length > 0) {
-            const result = []  as any
-            if (filterData != null && filterData != undefined) {
-                dates.forEach((element: any )=> {
-                    const persons = hour_dates.filter((item: any) => item.pretty_date === element.text)
-                    result.push(persons);
-                }); 
-            }
-    
-            const names = new Set();
-    
-            result.forEach((item: any) => {
-                item.forEach((element: any ) => {
-                    names.add(element.element1)
+        // Фильтрация по датам и времени
+        if (filter.dates?.length || filter.times?.length) {
+            const availableNames = new Set<string>();
+
+            // Обработка дат
+            if (filter.dates?.length) {
+                filter.dates.forEach((date: any) => {
+                    const persons = filter.hour_dates
+                        .filter((item: any) => item.pretty_date === date.text)
+                        .map((item: any) => item.element1);
+                    persons.forEach((name: string) => availableNames.add(name));
                 });
-            })
-
-            const newData = [] as any
-
-            names.forEach((res) => {
-                let findItem = data;
-                console.log(res)
-                findItem = data.find((item : any) => item.name === res);
-                if (findItem != undefined && findItem != null) {
-                    newData.push(findItem);
-                }
-            })
-
-            filterData = newData;
-        }
-
-        // Фильтрация по дате и  часам 
-        if(filterData !== null && filterData !== undefined && times.length > 0) {
-            const result = [] as any
-            if (filterData != null && filterData != undefined) {
-                times.forEach((element : any ) => {
-                    console.log(hour_dates)
-                    const persons = hour_dates.filter((item: any) => item.hour === element.text)
-                    result.push(persons);
-                }); 
             }
-    
-            const names = new Set();
-    
-            result.forEach((item: any ) => {
-                item.forEach((element : any) => {
-                    names.add(element.element1)
+
+            // Обработка времени
+            if (filter.times?.length) {
+                filter.times.forEach((time: any) => {
+                    const persons = filter.hour_dates
+                        .filter((item: any) => item.hour === time.text)
+                        .map((item: any) => item.element1);
+                    persons.forEach((name: string) => availableNames.add(name));
                 });
-            })
-
-            const newData = [] as any
-
-            names.forEach((res) => {
-                let findItem = data;
-                findItem = data.find((item : any ) => item.name === res);
-                if (findItem != undefined && findItem != null) {
-                    newData.push(findItem);
-                }
-            })
-
-            filterData = newData;
-        }
-
-        if (filterData !== null && filterData !== undefined) {
-            if(filterData.length === 0) {
-                setDataCard([])
-                return;
             }
-            if (Object.keys(dataCard)?.length === 1) {{
-                setDataCard(filterData)
-                return;
-            }}
-            setDataCard(filterData)
+
+            filteredData = filteredData.filter(item => availableNames.has(item.name));
         }
-    }
+
+        return filteredData;
+    };
 
     if (isLoading) {
         return (
-            <div className="mt-[50px] max-lg:mt-[20px] mb-[50px] max-lg:w-[100%] max-lg:px-[20px] w-full flex max-w-[1204px] max-lg:flex-col justify-center max-lg:gap-[20px] gap-[31px]  ">
-            <aside className="w-full min-lg:max-w-[383px]">
-                <Filter />
-            </aside>
-
-                <main className="min-lg:max-w-[790px] w-full">
-                    <h1>Загрузка...</h1> 
-                </main>
+            <div className="w-full h-[calc(100vh-80px)] flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full border-4 border-[#116466] border-t-transparent animate-spin" />
             </div>
-        )
+        );
     }
-    
+
     return (
-        <div className="mt-[50px] max-lg:mt-[20px] mb-[50px] max-lg:w-[100%] max-lg:px-[20px] w-full flex max-w-[1204px] max-lg:flex-col justify-center max-lg:gap-[20px] gap-[31px]  ">
+        <div className="mt-[50px] max-lg:mt-[20px] mb-[50px] max-lg:w-[100%] max-lg:px-[20px] w-full flex max-w-[1204px] max-lg:flex-col justify-center max-lg:gap-[20px] gap-[31px]">
             <aside className="w-full min-lg:max-w-[383px]">
                 <Filter />
             </aside>
-
             <main className="min-lg:max-w-[790px] w-full">
                 <div className="flex flex-col gap-[20px]">
                     {dataCard?.length > 0 ? (
-                        dataCard.map((item: IPsychologist, i) => (
-                            <Card key={i} psychologist={item} />
+                        dataCard.map((item: IPsychologist) => (
+                            <Card key={item.id} psychologist={item} />
                         ))
                     ) : (
                         <h1>Ничего не найдено</h1>

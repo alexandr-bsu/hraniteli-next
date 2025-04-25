@@ -47,6 +47,10 @@ export interface IPsychologist {
   telegram?: string;
   is_married?: boolean;
   has_children?: boolean;
+  link_video: string | null;
+  personal_therapy?: boolean;
+  supervision?: boolean;
+  marital_status?: string;
 }
 
 // Типы для фильтрации психологов

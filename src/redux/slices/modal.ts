@@ -12,15 +12,17 @@ interface ModalState {
   isOpen: boolean;
   type: ModalType;
   selectedSlots?: string[];
+  content: any;
 }
 
 const initialState: ModalState = {
   isOpen: false,
   type: null,
   selectedSlots: [],
+  content: null,
 };
 
-export const modalSlice = createSlice({
+const modalSlice = createSlice({
   name: 'modal',
   initialState,
   reducers: {
@@ -31,12 +33,17 @@ export const modalSlice = createSlice({
     closeModal: (state) => {
       state.isOpen = false;
       state.type = null;
+      state.content = null;
     },
     selectSlots: (state, action: PayloadAction<string[]>) => {
       state.selectedSlots = action.payload;
     },
+    openNext: (state, action) => {
+      state.isOpen = true;
+      state.type = action.payload;
+    }
   },
 });
 
-export const { openModal, closeModal, selectSlots } = modalSlice.actions;
+export const { openModal, closeModal, selectSlots, openNext } = modalSlice.actions;
 export const modalReducer = modalSlice.reducer;
