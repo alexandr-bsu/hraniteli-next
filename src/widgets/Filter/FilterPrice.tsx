@@ -1,4 +1,3 @@
-
 import { DialogClose, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ModalWindow } from '@/widgets/ModalWindow/ModalWindow';
 import {
@@ -31,22 +30,22 @@ export const FilterPrice:React.FC<Props> = ({onSubmit, type }) => {
     const { handleSubmit, watch, control, ...form } = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            price: '3000'
+            price: undefined
         }
     })
      
     const handleCheckboxCheck = watch('price'); 
 
     useEffect(() => {
-        onSubmit(handleCheckboxCheck)
-        console.log(handleCheckboxCheck);
-        
+        if (handleCheckboxCheck) {
+            onSubmit([handleCheckboxCheck]);
+        }
     },[handleCheckboxCheck])
 
     return (
         <ModalWindow closeButton={false} type={type}>
             <DialogHeader className="flex flex-row items-center">
-                <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[16px] max-lg:leading-[22px]">С психологом какого пола вы готовы работать?</DialogTitle>
+                <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[16px] max-lg:leading-[22px]">Выберите максимальную стоимость сессии</DialogTitle>
                 <DialogClose className="w-[40px] h-[40px] shrink-0 flex justify-center items-center border-2 border-[#D4D4D4] rounded-full">
                     <Image src={'/modal/cross.svg'} alt="cross" height={15} width={15} />
                 </DialogClose>

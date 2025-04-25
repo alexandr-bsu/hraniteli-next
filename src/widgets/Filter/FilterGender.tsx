@@ -1,4 +1,3 @@
-
 import { DialogClose, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ModalWindow } from '@/widgets/ModalWindow/ModalWindow';
 import {
@@ -20,9 +19,10 @@ type Props = {
     callback: () => void;
     onSubmit: (data: any) => void;
     type: string;
+    open: boolean;
 }
 
-export const FilterGender:React.FC<Props> = ({onSubmit, type }) => {
+export const FilterGender:React.FC<Props> = ({onSubmit, type, open }) => {
 
     const items =
     {
@@ -38,7 +38,7 @@ export const FilterGender:React.FC<Props> = ({onSubmit, type }) => {
     const { handleSubmit, watch, control, ...form }  = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            gender: 'none'
+            gender: undefined
         }
     })
 
@@ -51,7 +51,7 @@ export const FilterGender:React.FC<Props> = ({onSubmit, type }) => {
     },[handleCheckboxCheck])
 
     return (
-        <ModalWindow closeButton={false} type={type}>
+        <ModalWindow className='max-[425px]:h-[400px]' open={open} closeButton={false} type={type}>
 
             <DialogHeader className="flex flex-row items-center">
                 <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[16px] max-lg:leading-[22px]">С психологом какого пола вы готовы работать?</DialogTitle>

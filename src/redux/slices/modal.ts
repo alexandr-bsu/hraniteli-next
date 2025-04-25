@@ -1,45 +1,42 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { ModalState } from "../store";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-const clickSlice = createSlice({
-    name: 'modal',
-    
+export type ModalType = 
+  | 'FilterRequest'
+  | 'FilterGender'
+  | 'FilterPrice'
+  | 'FilterDate'
+  | 'FilterTime'
+  | null;
 
-    initialState:{
-        isOpenType: '',
-        isOpen: false,
-        selectedPsychologist: '',
+interface ModalState {
+  isOpen: boolean;
+  type: ModalType;
+  selectedSlots?: string[];
+}
 
-        telephone: '',
-        slotsSelect: [],
-        slots_objects: []
+const initialState: ModalState = {
+  isOpen: false,
+  type: null,
+  selectedSlots: [],
+};
+
+export const modalSlice = createSlice({
+  name: 'modal',
+  initialState,
+  reducers: {
+    openModal: (state, action: PayloadAction<ModalType>) => {
+      state.isOpen = true;
+      state.type = action.payload;
     },
-    
-    reducers: {
-        open(state) {
-            state.isOpen = true;
-        },
-        close(state) {
-            state.isOpen = false;
-        },
-        openNext(state, action) {
-            state.isOpenType = action.payload;
-        },
-        selectPsychologist(state,action) {
-            state.selectedPsychologist = action.payload
-        },
-        selectSlots(state,action) {
-            state.slotsSelect = action.payload
-        },
-        selectSlotsObjects(state,action) {
-            state.slots_objects = action.payload
-        }
+    closeModal: (state) => {
+      state.isOpen = false;
+      state.type = null;
     },
+    selectSlots: (state, action: PayloadAction<string[]>) => {
+      state.selectedSlots = action.payload;
+    },
+  },
 });
 
-export const  { open, close, openNext,selectPsychologist,selectSlotsObjects, selectSlots } = clickSlice.actions;
-
-export const isOpenType = ( state: ModalState ) => state.modal.isOpenType;
-export const isOpen = ( state:ModalState ) => state.modal.isOpen;
-
-export default clickSlice.reducer;
+export const { openModal, closeModal, selectSlots } = modalSlice.actions;
+export const modalReducer = modalSlice.reducer;

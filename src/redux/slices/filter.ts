@@ -1,93 +1,129 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { ModalState } from "../store";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { IPsychologist } from '@/shared/types/psychologist.types';
+import { Gender } from '@/shared/types/application.types';
 
-const filterSlice = createSlice({
-    name: 'filter',
+interface FilterState {
+  filtered_by_automatch_psy: IPsychologist[];
+  filtered_by_gender: IPsychologist[];
+  filtered_by_requests: IPsychologist[];
+  filtered_by_price: IPsychologist[];
+  filtered_by_time: IPsychologist[];
+  filtered_by_date: IPsychologist[];
+  filtered_by_video: IPsychologist[];
+  filtered_by_mental_illness: IPsychologist[];
+  filtered_by_mental_illness2: IPsychologist[];
+  dates_psychologists: IPsychologist[];
+  hour_dates: string[];
+  gender: Gender;
+  price: number;
+  time: string[];
+  date: string[];
+  video: boolean;
+  mental_illness: boolean;
+  mental_illness2: boolean;
+  requests: string[];
+  data_name_psychologist: string[];
+}
 
-    initialState:{
-        gender: '',
-        requests: [],
-        basic_approach: '',
-        dates: [],
-        times: [],
-        price: 0,
-        isVideo: false,
-        data_name_psychologist: [],
-        dates_psychologists: [],
-        hour_dates: [],
-        IsMental_Illness: false,
-        IsMental_Illness2: false,
-        filtered_by_automatch_psy: []
+const initialState: FilterState = {
+  filtered_by_automatch_psy: [],
+  filtered_by_gender: [],
+  filtered_by_requests: [],
+  filtered_by_price: [],
+  filtered_by_time: [],
+  filtered_by_date: [],
+  filtered_by_video: [],
+  filtered_by_mental_illness: [],
+  filtered_by_mental_illness2: [],
+  dates_psychologists: [],
+  hour_dates: [],
+  gender: 'male',
+  price: 0,
+  time: [],
+  date: [],
+  video: false,
+  mental_illness: false,
+  mental_illness2: false,
+  requests: [],
+  data_name_psychologist: [],
+};
+
+export const filterSlice = createSlice({
+  name: 'filter',
+  initialState,
+  reducers: {
+    fill_filtered_by_automatch_psy: (state, action: PayloadAction<IPsychologist[]>) => {
+      state.filtered_by_automatch_psy = action.payload;
     },
-    
-    reducers: {
-        findByGender(state, action) {
-            state.gender = action.payload;
-        },
-        findByRequests(state, action) {
-            state.requests = action.payload;
-        },
-        findByBasicApproach(state, action) {
-            state.basic_approach = action.payload;
-        },
-        findByPrice(state,action) {          
-            state.price = action.payload;
-        },
-        findByDates(state,action) {
-            state.dates = action.payload
-        },
-        findByTimes(state,action) {
-            state.times = action.payload
-        },
-        fillDataNamePsycho(state,action) {
-            state.data_name_psychologist = action.payload;
-        },
-        fillDatesPsychologists(state,action) {
-            state.dates_psychologists = action.payload;
-
-            console.log(action.payload)
-        },
-
-        fillHourAndDate(state,action) {
-            state.hour_dates = action.payload;
-        },
-        findByVideo(state) {
-            state.isVideo = !state.isVideo;
-        },
-
-        fill_filtered_by_automatch_psy(state, action) {
-            state.filtered_by_automatch_psy = action.payload;
-        },
-        findByMental_Illness(state) {
-            state.IsMental_Illness = !state.IsMental_Illness;
-        },
-        findByMental_Illness2(state) {
-            state.IsMental_Illness2 = !state.IsMental_Illness2;
-        },
-       
+    findByGender: (state, action: PayloadAction<Gender>) => {
+      state.gender = action.payload;
+      state.filtered_by_gender = state.filtered_by_automatch_psy.filter(psy => psy.gender === action.payload);
     },
+    findByRequests: (state, action: PayloadAction<string[]>) => {
+      state.requests = action.payload;
+      state.filtered_by_requests = state.filtered_by_automatch_psy.filter(psy => 
+        action.payload.every(request => psy.requests?.includes(request))
+      );
+    },
+    findByPrice: (state, action: PayloadAction<number>) => {
+      state.price = action.payload;
+      state.filtered_by_price = state.filtered_by_automatch_psy.filter(psy => 
+        (psy.price ?? 0) <= action.payload
+      );
+    },
+    findByTime: (state, action: PayloadAction<string[]>) => {
+      state.time = action.payload;
+      state.filtered_by_time = state.filtered_by_automatch_psy.filter(psy => 
+        action.payload.every(time => psy.available_times?.includes(time))
+      );
+    },
+    findByDate: (state, action: PayloadAction<string[]>) => {
+      state.date = action.payload;
+      state.filtered_by_date = state.filtered_by_automatch_psy.filter(psy => 
+        action.payload.every(date => psy.available_dates?.includes(date))
+      );
+    },
+    findByVideo: (state, action: PayloadAction<boolean>) => {
+      state.video = action.payload;
+      state.filtered_by_video = state.filtered_by_automatch_psy.filter(psy => psy.is_video === action.payload);
+    },
+    findByMental_Illness: (state, action: PayloadAction<boolean>) => {
+      state.mental_illness = action.payload;
+      state.filtered_by_mental_illness = state.filtered_by_automatch_psy.filter(psy => 
+        (psy.mental_illness?.length ?? 0) > 0
+      );
+    },
+    findByMental_Illness2: (state, action: PayloadAction<boolean>) => {
+      state.mental_illness2 = action.payload;
+      state.filtered_by_mental_illness2 = state.filtered_by_automatch_psy.filter(psy => 
+        (psy.mental_illness2?.length ?? 0) > 0
+      );
+    },
+    setDatesPsychologists: (state, action: PayloadAction<IPsychologist[]>) => {
+      state.dates_psychologists = action.payload;
+    },
+    setHourDates: (state, action: PayloadAction<string[]>) => {
+      state.hour_dates = action.payload;
+    },
+    setDataNamePsychologist: (state, action: PayloadAction<string[]>) => {
+      state.data_name_psychologist = action.payload;
+    },
+  },
 });
 
-
-export const  { 
-    findByGender,
-    findByMental_Illness,
-    findByMental_Illness2,
-    findByBasicApproach,findByTimes, 
-    findByDates, 
-    findByPrice, 
-    findByRequests,
-    fillDataNamePsycho,
-    fillDatesPsychologists,
-    fillHourAndDate,
-    findByVideo,
-    fill_filtered_by_automatch_psy
+export const {
+  fill_filtered_by_automatch_psy,
+  findByGender,
+  findByRequests,
+  findByPrice,
+  findByTime,
+  findByDate,
+  findByVideo,
+  findByMental_Illness,
+  findByMental_Illness2,
+  setDatesPsychologists,
+  setHourDates,
+  setDataNamePsychologist,
 } = filterSlice.actions;
-
-export const price = ( state: ModalState ) => state.filter.price;
-export const gender = ( state: ModalState ) => state.filter.gender;
-export const requests = ( state: ModalState ) => state.filter.requests;
-export const times = ( state: ModalState ) => state.filter.times;
-export const dates = ( state: ModalState ) => state.filter.dates;
 
 export default filterSlice.reducer;

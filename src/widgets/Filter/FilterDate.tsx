@@ -3,11 +3,11 @@ import { ModalWindow } from '@/widgets/ModalWindow/ModalWindow';
 import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { open, openNext } from '@/redux/slices/modal';
+import { openModal } from '@/redux/slices/modal';
 import clsx from 'clsx';
 import axios from 'axios'
-import { ModalState } from '@/redux/store';
-import { fillDatesPsychologists, fillHourAndDate } from '@/redux/slices/filter';
+import { RootState } from '@/redux/store';
+import { setDatesPsychologists, setHourDates } from '@/redux/slices/filter';
 import { getTimeDifference } from '@/features/utils';
 
 type Props = {
@@ -27,7 +27,7 @@ export const FilterDate:React.FC<Props> = ({ type, onSubmit }) => {
 
     const [ dateFilter, setDateFilter ] = useState<FilterSelectButtonDate[]>();
 
-    const psychologists = useSelector<ModalState>(state => state.filter.data_name_psychologist) as [];
+    const psychologists = useSelector<RootState>(state => state.filter.data_name_psychologist) as [];
 
     const [ datePsychologists, setDatePsychologists ] = useState<any[]>();
 
@@ -80,22 +80,20 @@ export const FilterDate:React.FC<Props> = ({ type, onSubmit }) => {
     useEffect(() => {
         const timeDifference = getTimeDifference();
 
-        for (let index = 0; index < [psychologists]?.length; index++) {
+        if (!psychologists) return;
+
+        for (let index = 0; index < psychologists.length; index++) {
             const apiUrl = `https://n8n-v2.hrani.live/webhook/get-aggregated-schedule-by-psychologist-test-contur?utm_psy=${psychologists[index]}&userTimeOffsetMsk=${timeDifference}`;
             
             axios.get(apiUrl).then((resp) => {
                 const allData = resp.data;
-                setDatePsychologists((prev: any) => 
-                    {
-                        if (prev === undefined || prev === null) {
-                            return [...allData[0].items]
-                        }
-                        return [...prev, ...allData[0].items].filter(item => item != undefined)
-                    }
-                )
+                setDatePsychologists((prev: any) => {
+                    if (!prev) return allData[0].items;
+                    return [...prev, ...allData[0].items].filter(Boolean);
+                });
             });
         }
-    },[psychologists])
+    }, [psychologists]);
 
     useEffect(() => {
         console.log(datePsychologists)
@@ -134,9 +132,10 @@ export const FilterDate:React.FC<Props> = ({ type, onSubmit }) => {
                 })
         })
 
-
-        dispatch(fillHourAndDate(result))
-        dispatch(fillDatesPsychologists(datePsychologists));
+        if (datePsychologists && result) {
+            dispatch(setHourDates(result));
+            dispatch(setDatesPsychologists(datePsychologists));
+        }
 
     },[datePsychologists])
 
@@ -180,8 +179,7 @@ export const FilterDate:React.FC<Props> = ({ type, onSubmit }) => {
             </ul>
 
             <button onClick={() => {
-                dispatch(open())
-                dispatch(openNext('FilterTime'));
+                dispatch(openModal('FilterTime'));
             }} className='w-[81px] h-[53px] bg-[#116466] p-[14px] rounded-[50px] text-[#FFFFFF]'>
                 Далее
             </button>

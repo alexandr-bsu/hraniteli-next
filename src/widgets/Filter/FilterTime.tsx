@@ -3,11 +3,12 @@ import { ModalWindow } from '@/widgets/ModalWindow/ModalWindow';
 import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { open, openNext } from '@/redux/slices/modal';
+import { openModal } from '@/redux/slices/modal';
 import clsx from 'clsx';
 import axios from 'axios'
-import { ModalState } from '@/redux/store';
-import { fillDatesPsychologists, fillHourAndDate } from '@/redux/slices/filter';
+import { RootState } from '@/redux/store';
+import { setDatesPsychologists, setHourDates } from '@/redux/slices/filter';
+import { IPsychologist } from '@/shared/types/psychologist.types';
 
 type Props = {
     callback: () => void;
@@ -26,9 +27,9 @@ export const FilterTime:React.FC<Props> = ({ type, onSubmit }) => {
 
     const [ timeFilter, setTimeFilter ] = useState<FilterSelectButtonDate[]>();
 
-    const psychologists = useSelector<ModalState>(state => state.filter.data_name_psychologist) as any;
+    const psychologists = useSelector<RootState>(state => state.filter.data_name_psychologist) as any;
 
-    const [ datePsychologists, setDatePsychologists ] = useState<any[]>();
+    const [ datePsychologists, setDatePsychologists ] = useState<IPsychologist[]>([]);
 
     const hours = [
         '00:00',
@@ -77,59 +78,62 @@ export const FilterTime:React.FC<Props> = ({ type, onSubmit }) => {
     },[])
 
     useEffect(() => {
-        for (let index = 0; index < [psychologists].length; index++) {
-            const apiUrl = `https://n8n-v2.hrani.live/webhook/get-aggregated-schedule-by-psychologist-test-contur?utm_psy=${psychologists[index]}&userTimeOffsetMsk=-2`;
-            
-            axios.get(apiUrl).then((resp) => {
-                const allData = resp.data;
-                setDatePsychologists((prev: any) => 
-                    {
-                        if (prev === undefined || prev === null) {
-                            return [...allData[0].items]
-                        }
-                        return [...prev, ...allData[0].items].filter(item => item != undefined)
-                    }
-                )
+        if (!psychologists?.length) return;
+
+        const fetchData = async () => {
+            const timeDifference = -2; // Хардкод временной зоны убрать потом
+            const promises = psychologists.map(psychologist => {
+                const apiUrl = `https://n8n-v2.hrani.live/webhook/get-aggregated-schedule-by-psychologist-test-contur?utm_psy=${psychologist}&userTimeOffsetMsk=${timeDifference}`;
+                return axios.get(apiUrl);
             });
-        }
-    },[psychologists])
+
+            try {
+                const responses = await Promise.all(promises);
+                const allData = responses.flatMap(resp => resp.data[0].items).filter(Boolean);
+                setDatePsychologists(allData);
+            } catch (error) {
+                console.error('Error fetching psychologist schedules:', error);
+            }
+        };
+
+        fetchData();
+    }, [psychologists]);
 
     useEffect(() => {
-        console.log(datePsychologists)
+        if (datePsychologists && datePsychologists.length > 0) {
+            const notDublicate: string[] = [];
+            const result: any[] = [];
 
-        const notDublicate = [] as any;
-        
-        const result = [] as any;
-        psychologists?.forEach((element1 : any ) => {
-            datePsychologists?.map((item) => {
-                hours.forEach((hour) => {
-                    [item.slots[hour]].forEach((element: any) => {
-                        if (element[0]?.psychologist === element1)
-                        {
-                            if(!notDublicate.includes(hour)) {
-                                notDublicate.push(hour);         
-                            }                
-                            result.push({
-                                element1,
-                                hour,
-                                pretty_date:item.pretty_date})
+            psychologists?.forEach((element1: any) => {
+                datePsychologists.forEach((item) => {
+                    hours.forEach((hour) => {
+                        const slots = item.slots?.[hour] || [];
+                        slots.forEach((element: any) => {
+                            if (element?.psychologist === element1) {
+                                if (!notDublicate.includes(hour)) {
+                                    notDublicate.push(hour);
+                                }
+                                result.push({
+                                    element1,
+                                    hour,
+                                    pretty_date: item.pretty_date
+                                });
                             }
-                        })
-                    }) 
-                })
-        })
+                        });
+                    });
+                });
+            });
 
-        setTimeFilter(notDublicate?.map((item: any) => {
-            return {
+            setTimeFilter(notDublicate.map((item) => ({
                 select: false,
                 id: '',
                 text: item,
-            } 
-        }))
+            })));
 
-        dispatch(fillHourAndDate(result))
-        dispatch(fillDatesPsychologists(datePsychologists));
-    },[datePsychologists])
+            dispatch(setHourDates(result));
+            dispatch(setDatesPsychologists(datePsychologists));
+        }
+    }, [datePsychologists, psychologists, dispatch]);
 
     useEffect(() => {
         if(timeFilter !== undefined && timeFilter !== null) {
@@ -171,8 +175,7 @@ export const FilterTime:React.FC<Props> = ({ type, onSubmit }) => {
             </ul>
 
             <button onClick={() => {
-                dispatch(open())
-                dispatch(openNext('FilterTime'));
+                dispatch(openModal('FilterTime'));
             }} className='w-[81px] h-[53px] bg-[#116466] p-[14px] rounded-[50px] text-[#FFFFFF]'>
                 Далее
             </button>

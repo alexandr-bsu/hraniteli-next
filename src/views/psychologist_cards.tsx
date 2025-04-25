@@ -1,19 +1,19 @@
 'use client'
-import { ModalState } from "@/redux/store";
+import { RootState } from "@/redux/store";
 import { Card, Filter } from "@/widgets";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from 'axios';
 import Error from "next/error";
-import { IPsychologist } from "@/entities/IPsychologist";
-import { fillDataNamePsycho } from "@/redux/slices/filter";
+import { IPsychologist } from "@/shared/types/psychologist.types";
+import { setDataNamePsychologist } from "@/redux/slices/filter";
 
 type Props = {
     data: any;
 }
 
 export const Psychologist_cards = ({data} : Props) => { 
-    const filter = useSelector<ModalState>(state => state.filter) as any;
+    const filter = useSelector<RootState>(state => state.filter) as any;
     
     const [ dataCard, setDataCard] = useState<IPsychologist[]>([]);
 
@@ -44,7 +44,7 @@ export const Psychologist_cards = ({data} : Props) => {
     useEffect(() => {
         console.log('data',data)
 
-        dispatch(fillDataNamePsycho(data.map((item: IPsychologist) => {
+        dispatch(setDataNamePsychologist(data.map((item: IPsychologist) => {
             return item.name
         })))
         setDataCard(data);
@@ -90,17 +90,19 @@ export const Psychologist_cards = ({data} : Props) => {
 
     //Метод фильтрации данных 
     const FilterData = async(data: any) => {
+        if (!data) return;
+        
         const gender = filter.gender;
         const price = filter.price;
         let requests = filter.requests;
-        const dates = filter.dates;
-        const times = filter.times;
-        const hour_dates = filter.hour_dates;
+        const dates = filter.dates || [];
+        const times = filter.times || [];
+        const hour_dates = filter.hour_dates || [];
         const isVideo = filter.isVideo;
         const mental_Illness = filter.IsMental_Illness;
         const mental_Illness2 = filter.IsMental_Illness2;
 
-        let filterData = data;
+        let filterData = [...data];
 
         // Фильтрация по стоимости
         if(filterData !== null && filterData !== undefined && price !== 1500) {  
@@ -299,20 +301,14 @@ if (filterData) {
 
             <main className="min-lg:max-w-[790px] w-full">
                 <div className="flex flex-col gap-[20px]">
-                    {
-                        dataCard?.length > 1 && dataCard?.map((item: IPsychologist, i) => 
-                        <Card key={i} data={item} />)                    
-                    }
+                    {dataCard?.length > 0 ? (
+                        dataCard.map((item: IPsychologist, i) => (
+                            <Card key={i} psychologist={item} />
+                        ))
+                    ) : (
+                        <h1>Ничего не найдено</h1>
+                    )}
                 </div>
-                {
-                    Object.keys(dataCard)?.length === 0 && <h1>
-                        Ничего не найдено
-                    </h1>
-                }
-                {
-                    Object.keys(dataCard)?.length === 1 && dataCard?.map((item: IPsychologist, i) => 
-                        <Card key={i} data={item} />) 
-                }  
             </main>
         </div>
     );

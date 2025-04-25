@@ -1,4 +1,3 @@
-
 import { Checkbox } from '@/components/ui/checkbox';
 import { DialogClose, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ModalWindow } from '@/widgets/ModalWindow/ModalWindow';
@@ -16,13 +15,21 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod"
 import Image from 'next/image';
 import { useCallback, useEffect } from 'react';
-type Props = {
-    callback: () => void;
-    onSubmit: (data: any) => void;
-    type: string;
+import { ModalType } from '@/redux/slices/modal';
+
+interface FilterData {
+    label: string;
+    id?: string;
 }
 
-export const FilterRequest:React.FC<Props> = ({onSubmit, type }) => {
+interface Props {
+    type: ModalType;
+    callback: () => void;
+    onSubmit: (data: FilterData[]) => void;
+    open: boolean;
+}
+
+export const FilterRequest:React.FC<Props> = ({onSubmit, type, callback, open }) => {
 
     const items = [
         {
@@ -81,7 +88,7 @@ export const FilterRequest:React.FC<Props> = ({onSubmit, type }) => {
     },[handleCheckboxCheck])
     
     return (
-        <ModalWindow className='max-[425px]:h-[400px]'  closeButton={false} type={type}>
+        <ModalWindow className='max-[425px]:h-[400px]' open={open} closeButton={false} type={type}>
             <DialogHeader className="flex flex-row items-center">
                 <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[16px] max-lg:leading-[22px]">Выберите запросы:</DialogTitle>
                 <DialogClose className="w-[40px] h-[40px] shrink-0 flex justify-center items-center border-2 border-[#D4D4D4] rounded-full">

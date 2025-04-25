@@ -2,53 +2,55 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { toNextStage } from '@/redux/slices/application_form';
-import { fill_actions } from '@/redux/slices/application_form_data';
+import { setActions } from '@/redux/slices/application_form_data';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { z } from 'zod'
+import { COLORS } from '@/shared/constants/colors';
 
+const ACTIONS = [
+    {
+      id: "recents",
+      label: "Утрата близкого",
+    },
+    {
+        id: "recents1",
+        label: "Болезни близкого",
+    },
+    {
+        id: "recents2",
+        label: "Диагностированное смертельное заболевание",
+    },
+    {
+        id: "recents3",
+        label: "Сексуальное насилие во взрослом возрасте",
+    },
+    {
+        id: "recents4",
+        label: "Сексуальное насилие в детстве",
+    },
+    {
+        id: "recents5",
+        label: "Ничего из вышеперечисленного",
+    },
+] as const
 
-        const actions = [
-        {
-          id: "recents",
-          label: "Утрата близкого",
-        },
-        {
-            id: "recents1",
-            label: "Болезни близкого",
-        },
-        {
-            id: "recents2",
-            label: "Диагностированное смертельное заболевание",
-        },
-        {
-            id: "recents3",
-            label: "Сексуальное насилие во взрослом возрасте",
-        },
-        {
-            id: "recents4",
-            label: "Сексуальное насилие в детстве",
-        },
-        {
-            id: "recents5",
-            label: "Ничего из вышеперечисленного",
-        },
-    ] as const
+const FormSchema = z.object({
+    actions: z.array(z.string())
+});
 
-    const FormSchema = z.object({
-        actions: z.array(z.string())
-    });
+type FormData = z.infer<typeof FormSchema>;
 
-    const ActionStage = () => {
-        const dispatch = useDispatch();
+const ActionStage = () => {
+    const dispatch = useDispatch();
 
-        const savedActions = typeof window !== 'undefined' 
-        ? JSON.parse(localStorage.getItem('app_actions') || '[]')
-        : []    
+    const savedActions = typeof window !== 'undefined' 
+    ? JSON.parse(localStorage.getItem('app_actions') || '[]')
+    : []    
 
-    const form = useForm<z.infer<typeof FormSchema>>({
+    const form = useForm<FormData>({
             resolver: zodResolver(FormSchema),
             defaultValues: {
               actions: savedActions
@@ -62,18 +64,14 @@ import { z } from 'zod'
               return () => subscription.unsubscribe()
             }, [form.watch])
 
-  function handleSubmit(data: z.infer<typeof FormSchema>) {
+  const handleSubmit = (data: FormData) => {
           dispatch(toNextStage('diseases')) 
   
-          const result = []
+          const selectedActions = data.actions
+            .map(actionId => ACTIONS.find(item => item.id === actionId)?.label)
+            .filter(Boolean) as string[];
   
-          for (let index = 0; index < data.actions.length; index++) {
-              const findElements = actions.find(item => item.id === data.actions[index])
-              result.push(findElements?.label);
-          }
-  
-  
-          dispatch(fill_actions(result))
+          dispatch(setActions(selectedActions))
       }
 
     return (
@@ -83,21 +81,21 @@ import { z } from 'zod'
                     <FormField
                         control={form.control}
                         name="actions"
-                        render={({  }) => (
+                        render={() => (
                             <div className='grow h-[360px]'>
                                 <FormItem className='grow p-[30px] h-full max-lg:p-[15px] max-lg:max-h-none border-[1px] rounded-[25px]  max-h-[390px]'>
-                                    <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px] max-lg:w-full'>Беспокоит ли вас травмирующее событие, с которым сложно справиться самостоятельно?</FormLabel>
-                                    <FormDescription className='max-lg:text-[14px] max-lg:w-full font-normal text-[18px]  leading-[25px] mt-[10px]  '>
+                                    <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px] text-[${COLORS.text.primary}]'>Беспокоит ли вас травмирующее событие, с которым сложно справиться самостоятельно?</FormLabel>
+                                    <FormDescription className='max-lg:text-[14px] max-lg:w-full font-normal text-[18px]  leading-[25px] mt-[10px] text-[${COLORS.text.secondary}]'>
                                         Выберите все подходящие пункты или пропустите вопрос, если ничего из этого не беспокоит
                                     </FormDescription>
                                     <div className='flex justify-between mt-[10px] max-lg:flex-col  max-h-[150px] max-lg:max-h-none overflow-hidden'>
                                     <div className='flex flex-col gap-[15px] w-full max-h-[150px]  max-lg:max-h-[200px] pb-[50px] overflow-x-auto'>
-                                            {actions.map((item) => (
+                                            {ACTIONS.map((item) => (
                                                 <FormField
                                                 key={item.id}
                                                 control={form.control}
                                                 name="actions"
-                                                render={({ field } : any) => {
+                                                render={({ field }) => {
                                                     return (
                                                     <FormItem
                                                         key={item.id}
@@ -111,14 +109,14 @@ import { z } from 'zod'
                                                             return checked
                                                                 ? field.onChange([...field.value, item.id])
                                                                 : field.onChange(
-                                                                    field?.value?.filter(
-                                                                    (value: any) => value !== item.id
+                                                                    field.value?.filter(
+                                                                    (value: string) => value !== item.id
                                                                     )
                                                                 )
                                                             }}
                                                         />
                                                         </FormControl>
-                                                        <FormLabel className="text-[18px] leading-[25px] max-lg:text-[14px]  font-normal">
+                                                        <FormLabel className={`text-[18px] leading-[25px] max-lg:text-[14px] font-normal text-[${COLORS.text.primary}]`}>
                                                         {item.label}
                                                         </FormLabel>
                                                     </FormItem>
@@ -134,11 +132,11 @@ import { z } from 'zod'
                         )}
                     />
                     <div className="shrink-0  pb-[50px] flex gap-[10px]  mt-[30px]">
-                        <button onClick={() => dispatch(toNextStage('condition'))} className="cursor-pointer shrink-0 w-[81px] border-[1px] border-[#116466] p-[12px] text-[#116466] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]">
+                        <button type='button' onClick={() => dispatch(toNextStage('condition'))} className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}>
                             Назад
                         </button>
 
-                        <button type='submit' className="cursor-pointer grow border-[1px]  bg-[#116466] p-[12px] text-[white] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]">
+                        <button type='submit' className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}>
                             Продолжить
                         </button>
                     </div>
