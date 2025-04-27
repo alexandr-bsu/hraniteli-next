@@ -49,8 +49,12 @@ export interface IPsychologist {
   has_children?: boolean;
   link_video: string | null;
   personal_therapy?: boolean;
+  personal_therapy_duration?: string;
   supervision?: boolean;
   marital_status?: string;
+  verified?: boolean;
+  is_verified?: boolean;
+  in_community?: boolean;
 }
 
 // Типы для фильтрации психологов

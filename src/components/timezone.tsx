@@ -1,26 +1,39 @@
 import { useState, useEffect } from 'react';
 
-const TimezoneIndicator = () => {
-  const [offset, setOffset] = useState('');
+interface TimezoneIndicatorProps {
+    className?: string;
+}
 
-  useEffect(() => {
-    // Московское время всегда UTC+3
+const calculateMskOffset = (): number => {
     const mskTime = new Date().toLocaleString('en-US', {
-      timeZone: 'Europe/Moscow',
-      hour12: false
+        timeZone: 'Europe/Moscow',
+        hour12: false
     });
     
-    // Локальное время пользователя
     const localTime = new Date();
-    
-    // Вычисляем разницу в часах
     const mskDate = new Date(mskTime);
-    const diffHours = Math.round((localTime.getTime() - mskDate.getTime()) / (1000 * 60 * 60));
     
-    setOffset(diffHours === 0 ? '+0' : (diffHours > 0 ? `+${diffHours}` : `${diffHours}`));
-  }, []);
+    return Math.round((localTime.getTime() - mskDate.getTime()) / (1000 * 60 * 60));
+};
 
-  return <span>МСК ({offset})</span>;
+const formatOffset = (offset: number): string => {
+    if (offset === 0) return '+0';
+    return offset > 0 ? `+${offset}` : `${offset}`;
+};
+
+export const TimezoneIndicator: React.FC<TimezoneIndicatorProps> = ({ className = '' }) => {
+    const [offset, setOffset] = useState<string>('');
+
+    useEffect(() => {
+        const mskOffset = calculateMskOffset();
+        setOffset(formatOffset(mskOffset));
+    }, []);
+
+    return (
+        <span className={className}>
+            МСК ({offset})
+        </span>
+    );
 };
 
 export default TimezoneIndicator;

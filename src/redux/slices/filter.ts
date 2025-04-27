@@ -93,7 +93,9 @@ export const filterSlice = createSlice({
     },
     findByVideo: (state, action: PayloadAction<boolean>) => {
       state.video = action.payload;
-      state.filtered_by_video = state.filtered_by_automatch_psy.filter(psy => psy.is_video === action.payload);
+      state.filtered_by_video = state.filtered_by_automatch_psy.filter(psy => 
+        action.payload ? Boolean(psy.is_video || psy.video || psy.link_video) : true
+      );
     },
     findByMental_Illness: (state, action: PayloadAction<boolean>) => {
       state.mental_illness = action.payload;

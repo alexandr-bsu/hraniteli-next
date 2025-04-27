@@ -19,12 +19,12 @@ export interface RootState {
     dates: IPsychologist[];
     times: IPsychologist[];
     price: number;
-    isVideo: boolean;
+    video: boolean;
     data_name_psychologist: IPsychologist[];
     dates_psychologists: IPsychologist[];
     hour_dates: IPsychologist[];
-    IsMental_Illness: boolean;
-    IsMental_Illness2: boolean;
+    mental_illness: boolean;
+    mental_illness2: boolean;
   };
   modal: {
     isOpen: boolean;

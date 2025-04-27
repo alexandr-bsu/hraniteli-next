@@ -21,6 +21,14 @@ export async function getPsychologistAll() {
             return [];
         }
 
+        // TODO: Добавляем тестовое видео для первого психолога
+        if (data.length > 0) {
+            data[0] = {
+                ...data[0],
+                link_video: 'https://cache-eggstv.cdnvideo.ru/fs/pub/hrani.live/video/svetalana_avk.mp4'
+            };
+        }
+
         return data;
     } catch (error) {
         console.error('Error fetching psychologists:', error);

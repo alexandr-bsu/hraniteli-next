@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { FC, useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { openModal, closeModal } from "@/redux/slices/modal";
+import { openModal, closeModal, setSelectedPsychologist } from "@/redux/slices/modal";
 import { IPsychologist } from "@/shared/types/psychologist.types";
 import { Button } from '@/shared/ui/Button';
 import { Chip } from '@/shared/ui/Chip';
@@ -15,12 +15,39 @@ import Link from 'next/link';
 import { RootState } from "@/redux/store";
 import styles from './Card.module.scss';
 import { getPsychologistEducation, getPsychologistFullInfo } from '@/shared/api/psychologist';
+import axios from 'axios';
+import { getTimeDifference } from '@/features/utils';
+
+const getAgeWord = (age: number): string => {
+    const lastDigit = age % 10;
+    const lastTwoDigits = age % 100;
+    
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 19) return 'лет';
+    if (lastDigit === 1) return 'год';
+    if (lastDigit >= 2 && lastDigit <= 4) return 'года';
+    return 'лет';
+};
 
 const getGoogleDriveImageUrl = (url: string | undefined) => {
-    if (!url) return '/images/default-avatar.png';
-    if (!url.includes('drive.google.com')) return url;
+    if (!url) return '/card/214х351.jpg';
     
-    const fileId = url.match(/\/d\/(.+?)\//)?.[1];
+    // Убираем @ в начале ссылки если есть
+    const cleanUrl = url.startsWith('@') ? url.slice(1) : url;
+    
+    // Если это не гугл драйв ссылка - возвращаем как есть
+    if (!cleanUrl.includes('drive.google.com')) return cleanUrl;
+    
+    // Если ссылка уже в нужном формате - возвращаем как есть
+    if (cleanUrl.includes('/uc?')) return cleanUrl;
+    
+    // Извлекаем ID файла из разных форматов ссылок
+    let fileId = '';
+    if (cleanUrl.includes('/d/')) {
+        fileId = cleanUrl.match(/\/d\/(.+?)(?:\/|$)/)?.[1] || '';
+    } else if (cleanUrl.includes('id=')) {
+        fileId = cleanUrl.match(/id=(.+?)(?:&|$)/)?.[1] || '';
+    }
+    
     if (!fileId) return '/images/default-avatar.png';
     
     return `https://drive.google.com/uc?export=view&id=${fileId}`;
@@ -48,7 +75,8 @@ export const Card: FC<CardProps> = ({ psychologist }) => {
     const [isFavorite, setIsFavorite] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [education, setEducation] = useState<any[]>([]);
-    const [fullInfo, setFullInfo] = useState<Partial<IPsychologist>>({});
+    const [showVideo, setShowVideo] = useState(false);
+    const [availableSlots, setAvailableSlots] = useState<{date: string, time: string}[]>([]);
 
     const [isShow, setShow] = useState(false);
     const [isShowInfo, setShowInfo] = useState(false);
@@ -56,26 +84,66 @@ export const Card: FC<CardProps> = ({ psychologist }) => {
     const works_with = psychologist.works_with?.split(';').map(item => item.trimStart()) || [];
     const queries = psychologist.queries?.split(';').map(item => item.trimStart()) || [];
     const imageUrl = getGoogleDriveImageUrl(psychologist.link_photo);
-    const videoUrl = getGoogleDriveVideoUrl(psychologist.link_video);
+    const videoUrl = psychologist.link_video;
 
     useEffect(() => {
         const loadExpandedData = async () => {
             if (isExpanded && psychologist.id) {
-                const [educationData, fullInfoData] = await Promise.all([
-                    getPsychologistEducation(psychologist.id),
-                    getPsychologistFullInfo(psychologist.id)
-                ]);
-                
+                const educationData = await getPsychologistEducation(psychologist.id);
                 setEducation(educationData);
-                setFullInfo(fullInfoData);
             }
         };
 
         loadExpandedData();
     }, [isExpanded, psychologist.id]);
 
+    useEffect(() => {
+        const loadSlots = async () => {
+            try {
+                const timeDifference = getTimeDifference();
+                const url = `https://n8n-v2.hrani.live/webhook/get-aggregated-schedule-by-psychologist-test-contur?utm_psy=${encodeURIComponent(psychologist.name)}&userTimeOffsetMsk=${timeDifference}`;
+                
+                const response = await axios.get(url);
+                
+                if (!response.data?.items?.length) {
+                    setAvailableSlots([]);
+                    return;
+                }
+
+                const slots: { date: string; time: string }[] = [];
+
+                response.data.items.forEach((item: any) => {
+                    if (item.slots) {
+                        Object.entries(item.slots).forEach(([hour, slotArray]: [string, any]) => {
+                            if (Array.isArray(slotArray) && slotArray.length > 0) {
+                                slots.push({ 
+                                    date: item.pretty_date, 
+                                    time: hour 
+                                });
+                            }
+                        });
+                    }
+                });
+
+                
+                const sortedSlots = slots.sort((a, b) => {
+                    const dateA = new Date(a.date + ' ' + a.time);
+                    const dateB = new Date(b.date + ' ' + b.time);
+                    return dateA.getTime() - dateB.getTime();
+                });
+
+                setAvailableSlots(sortedSlots.slice(0, 3));
+            } catch (error) {
+                console.error('Error loading slots:', error);
+            }
+        };
+
+        loadSlots();
+    }, [psychologist.name]);
+
     const handleOpenModal = () => {
-        dispatch(openModal('FilterRequest'));
+        dispatch(setSelectedPsychologist(psychologist.name));
+        dispatch(openModal('Time'));
     };
 
     const handleTimeStageComplete = () => {
@@ -84,18 +152,25 @@ export const Card: FC<CardProps> = ({ psychologist }) => {
     };
 
     const handleVideoClick = () => {
-        if (!videoRef.current) return;
+        if (!videoUrl) return;
         
-        if (isPlaying) {
-            videoRef.current.pause();
-        } else {
-            videoRef.current.play();
-        }
-        setIsPlaying(!isPlaying);
+        setShowVideo(true);
+        setIsPlaying(true);
+        
+        // Даем немного времени для рендера видео
+        setTimeout(() => {
+            if (videoRef.current) {
+                videoRef.current.play();
+            }
+        }, 100);
     };
 
     const handleFavoriteClick = () => {
         setIsFavorite(!isFavorite);
+    };
+
+    const handleSlotClick = () => {
+        dispatch(openModal('FilterTime'));
     };
 
     return (
@@ -109,38 +184,41 @@ export const Card: FC<CardProps> = ({ psychologist }) => {
             <div className={styles.header}>
                 <div className={styles.avatarSection}>
                     <div className={styles.avatar} onClick={videoUrl ? handleVideoClick : undefined}>
-                        {videoUrl ? (
-                            <>
-                                <video
-                                    ref={videoRef}
-                                    src={videoUrl}
-                                    poster={imageUrl}
-                                    playsInline
-                                    loop
-                                />
-                                {!isPlaying && (
-                                    <div className={styles.playButton}>
-                                        <Image
-                                            src="/images/play-button.svg"
-                                            alt="Play"
-                                            width={24}
-                                            height={24}
-                                            unoptimized
-                                        />
-                                    </div>
-                                )}
-                            </>
+                        {showVideo && videoUrl ? (
+                            <video
+                                ref={videoRef}
+                                src={videoUrl}
+                                playsInline
+                                loop
+                                muted
+                                preload="metadata"
+                                className={styles.video}
+                                autoPlay
+                            />
                         ) : (
                             <Image
                                 src={imageUrl}
                                 alt={psychologist.name}
-                                width={160}
-                                height={160}
+                                width={214}
+                                height={351}
+                                className={styles.image}
                                 onError={(e) => {
                                     const target = e.target as HTMLImageElement;
                                     target.src = '/images/default-avatar.png';
                                 }}
                             />
+                        )}
+                        
+                        {videoUrl && !showVideo && (
+                            <div className={styles.playButton}>
+                                <Image
+                                    src="/card/PlayVideo.svg"
+                                    alt="Play"
+                                    width={42}
+                                    height={42}
+                                    unoptimized
+                                />
+                            </div>
                         )}
                     </div>
                 </div>
@@ -148,7 +226,10 @@ export const Card: FC<CardProps> = ({ psychologist }) => {
                 <div className={styles.info}>
                     <div className={styles.nameRow}>
                         <Link href={`${ROUTES.PSYCHOLOGIST}/${psychologist.id}`}>
-                            <h2 className={styles.name}>{psychologist.name}, {psychologist.age} лет</h2>
+                            <h2 className={styles.name}>
+                                {psychologist.name}
+                                {psychologist.age !== undefined && `, ${psychologist.age} ${getAgeWord(psychologist.age)}`}
+                            </h2>
                         </Link>
                         <button 
                             className={styles.favoriteButton} 
@@ -166,14 +247,25 @@ export const Card: FC<CardProps> = ({ psychologist }) => {
                     </div>
 
                     <div className={styles.experience}>
-                        {psychologist.experience} в сообществе
-                        <Image 
-                            src="/card/verified.svg" 
-                            alt="Verified" 
-                            width={16} 
-                            height={16}
-                            unoptimized
-                        />
+                        {psychologist.experience && (
+                            <span className={styles.experience}>
+                                {psychologist.experience}
+                            </span>
+                        )}
+                        {psychologist.in_community && (
+                            <span className={styles.experience}>
+                                в сообществе
+                            </span>
+                        )}
+                        {psychologist.verified && (
+                            <Image 
+                                src="/card/verified.svg" 
+                                alt="Verified" 
+                                width={16} 
+                                height={16}
+                                unoptimized
+                            />
+                        )}
                     </div>
 
                     <div className={styles.approach}>
@@ -211,9 +303,15 @@ export const Card: FC<CardProps> = ({ psychologist }) => {
                     <div className={styles.nextSession}>
                         <span className={styles.label}>Ближайшая запись:</span>
                         <div className={styles.dates}>
-                            <button className={styles.dateButton}>28.01/ 13:00</button>
-                            <button className={styles.dateButton}>28.01/ 13:00</button>
-                            <button className={styles.dateButton}>28.01/ 13:00</button>
+                            {availableSlots.map((slot, index) => (
+                                <button 
+                                    key={index} 
+                                    className={styles.dateButton}
+                                    onClick={handleSlotClick}
+                                >
+                                    {slot.date.split('.').slice(0, 2).join('.')}/{slot.time}
+                                </button>
+                            ))}
                         </div>
                     </div>
                 </div>
@@ -283,7 +381,7 @@ export const Card: FC<CardProps> = ({ psychologist }) => {
                                     target="_blank"
                                 >
                                     <Image 
-                                        src={`/card/${platform}-icon.svg`} 
+                                        src={`/card/heart-outline.svg`} 
                                         alt={platform} 
                                         width={24} 
                                         height={24}
@@ -298,29 +396,28 @@ export const Card: FC<CardProps> = ({ psychologist }) => {
 
                 {/* Личная информация */}
                 <div className={styles.section}>
-                    <h3 className={styles.sectionTitle}>Личная информация</h3>
                     <div className={styles.personalInfo}>
                         <div className={styles.infoRow}>
                             <span className={styles.infoLabel}>Личная терапия:</span>
                             <span className={styles.infoValue}>
-                                {fullInfo.personal_therapy ? 'Да' : 'Нет'}
+                                {psychologist.personal_therapy_duration ? 'Да' : 'Нет'}
                                 <button className={styles.infoButton}>?</button>
                             </span>
                         </div>
                         <div className={styles.infoRow}>
                             <span className={styles.infoLabel}>Посещает супервизию:</span>
                             <span className={styles.infoValue}>
-                                {fullInfo.supervision ? 'Да' : 'Нет'}
+                                {psychologist.supervision ? 'Да' : 'Нет'}
                                 <button className={styles.infoButton}>?</button>
                             </span>
                         </div>
                         <div className={styles.infoRow}>
                             <span className={styles.infoLabel}>Семейное положение:</span>
-                            <span className={styles.infoValue}>{fullInfo.marital_status || 'Не указано'}</span>
+                            <span className={styles.infoValue}>{psychologist.is_married ? 'В браке' : 'Не в браке'}</span>
                         </div>
                         <div className={styles.infoRow}>
                             <span className={styles.infoLabel}>Есть дети:</span>
-                            <span className={styles.infoValue}>{fullInfo.has_children ? 'Да' : 'Нет'}</span>
+                            <span className={styles.infoValue}>{psychologist.has_children ? 'Да' : 'Нет'}</span>
                         </div>
                     </div>
                 </div>
@@ -334,7 +431,7 @@ export const Card: FC<CardProps> = ({ psychologist }) => {
                 >
                     {isExpanded ? 'Свернуть' : 'Подробнее о хранителе'}
                 </button>
-                <button className={styles.appointmentButton} onClick={() => dispatch(openModal('FilterRequest'))}>
+                <button className={styles.appointmentButton} onClick={handleOpenModal}>
                     Оставить заявку
                 </button>
             </div>

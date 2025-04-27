@@ -69,12 +69,12 @@ export const Psychologist_cards = ({data} : Props) => {
             }
 
             // Фильтрация по видео
-            if (filter.isVideo) {
-                filteredData = filteredData.filter(item => item.is_video || item.video);
+            if (filter.video) {
+                filteredData = filteredData.filter(item => Boolean(item.is_video || item.video || item.link_video));
             }
 
             // Фильтрация по заболеваниям
-            if (filter.IsMental_Illness === true || filter.IsMental_Illness2 === true) {
+            if (filter.mental_illness === true || filter.mental_illness2 === true) {
                 filteredData = filteredData.filter(psychologist => {
                     if (!psychologist.works_with) return false;
                     
@@ -93,16 +93,16 @@ export const Psychologist_cards = ({data} : Props) => {
                         condition.includes('ПТСР')
                     );
 
-                    if (filter.IsMental_Illness === true && filter.IsMental_Illness2 === true) {
-                        return filter.IsMental_Illness === hasMental && filter.IsMental_Illness2 === hasPsychiatric;
+                    if (filter.mental_illness === true && filter.mental_illness2 === true) {
+                        return filter.mental_illness === hasMental && filter.mental_illness2 === hasPsychiatric;
                     }
                     
-                    if (filter.IsMental_Illness === true) {
-                        return filter.IsMental_Illness === hasMental;
+                    if (filter.mental_illness === true) {
+                        return filter.mental_illness === hasMental;
                     }
                     
-                    if (filter.IsMental_Illness2 === true) {
-                        return filter.IsMental_Illness2 === hasPsychiatric;
+                    if (filter.mental_illness2 === true) {
+                        return filter.mental_illness2 === hasPsychiatric;
                     }
 
                     return true;
@@ -192,9 +192,9 @@ export const Psychologist_cards = ({data} : Props) => {
             filter.price || 
             filter.dates?.length || 
             filter.times?.length || 
-            filter.isVideo || 
-            filter.IsMental_Illness || 
-            filter.IsMental_Illness2
+            filter.video || 
+            filter.mental_illness || 
+            filter.mental_illness2
         );
 
         return (
