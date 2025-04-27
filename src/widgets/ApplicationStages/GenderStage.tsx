@@ -15,7 +15,8 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useDispatch } from "react-redux"
 import { toNextStage } from "@/redux/slices/application_form"
-import { fill_gender } from "@/redux/slices/application_form_data"
+import { setGenderUser } from "@/redux/slices/application_form_data"
+import { Gender } from "@/shared/types/application.types"
 
 const FormSchema = z.object({
     gender: z.enum(["male", "female"], {
@@ -46,11 +47,10 @@ export const GenderStageApplication = () => {
             }
         })
     
-         const handleSubmit = (data: { gender: string }) => {
+         const handleSubmit = (data: { gender: 'male' | 'female' }) => {
             localStorage.setItem('app_gender', data.gender) // Сохраняем в localStorage
-            dispatch(fill_gender(data.gender)) // Сохраняем в Redux (если нужно)
+            dispatch(setGenderUser(data.gender)) // Сохраняем в Redux (если нужно)
             dispatch(toNextStage('preferences')) // Переход на следующую страницу
-
          }
 
   return (

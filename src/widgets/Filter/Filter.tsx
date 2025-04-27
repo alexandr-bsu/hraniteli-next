@@ -6,7 +6,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { openModal, closeModal, ModalType } from "@/redux/slices/modal";
@@ -40,13 +40,22 @@ interface DateFilterData {
 export const Filter = () => {
     const [isShow, setShow] = useState(true);
     const { isOpen, type: modalType } = useSelector((state: RootState) => state.modal);
+    const currentGender = useSelector((state: RootState) => state.filter.gender) as Gender;
 
     const [filterData, setFilterDate] = useState<DateFilterData[]>([]);
     const [filterPrice, setFilterPrice] = useState<string[]>([]);
     const [filterRequest, setFilterRequest] = useState<FilterData[]>([]);
-    const [filterGender, setFilterGender] = useState<string>('');
+    const [filterGender, setFilterGender] = useState<Gender | ''>('');
 
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        if (currentGender !== 'other') {
+            setFilterGender(currentGender);
+        } else {
+            setFilterGender('');
+        }
+    }, [currentGender]);
 
     const handleModalOpen = (type: ModalType) => {
         dispatch(openModal(type));
@@ -91,7 +100,8 @@ export const Filter = () => {
                                     setFilterRequest(data);
                                     dispatch(findByRequests(data.map(item => item.label)));
                                 }}
-                                open={isOpen && modalType === 'FilterRequest'}
+                                open={[isOpen && modalType === 'FilterRequest', () => dispatch(closeModal())]}
+                                selectedFilters={filterRequest}
                             />        
                             <Select 
                                 onOpenChange={() => handleModalOpen('FilterRequest')} 
@@ -101,22 +111,37 @@ export const Filter = () => {
                                     <SelectValue placeholder="Выберите запросы" />
                                 </SelectTrigger>
                             </Select>
-                            {filterRequest?.map((item, i) => (
-                                <div key={i}>
-                                    <p>{item.label}</p>      
-                                </div>
-                            ))}
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {filterRequest?.map((item, i) => (
+                                    <div 
+                                        key={i} 
+                                        className="flex items-center gap-2 px-4 py-2 bg-[#116466] text-white rounded-[10px] text-sm"
+                                    >
+                                        <span>{item.label}</span>
+                                        <button 
+                                            onClick={() => {
+                                                const newFilters = filterRequest.filter((_, index) => index !== i);
+                                                setFilterRequest(newFilters);
+                                                dispatch(findByRequests(newFilters.map(item => item.label)));
+                                            }}
+                                            className="w-4 h-4 flex items-center justify-center hover:opacity-80 cursor-pointer"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
 
                         <div className="w-full mt-[20px]">
                             <FilterGender 
-                                type="FilterGender" 
-                                callback={handleModalClose}
+                                type={'FilterGender' as ModalType}
+                                open={isOpen && modalType === 'FilterGender'}
+                                currentGender={currentGender}
                                 onSubmit={(data: Gender) => {
                                     setFilterGender(data);
                                     dispatch(findByGender(data));
                                 }}
-                                open={isOpen && modalType === 'FilterGender'}
                             />        
                             <Select 
                                 onOpenChange={() => handleModalOpen('FilterGender')} 
@@ -126,7 +151,22 @@ export const Filter = () => {
                                     <SelectValue placeholder="Выберите пол хранителя" />
                                 </SelectTrigger>
                             </Select>
-                            {filterGender}
+                            {filterGender && filterGender !== 'other' && (
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    <div className="flex items-center gap-2 px-4 py-2 bg-[#116466] text-white rounded-[10px] text-sm">
+                                        <span>{filterGender === 'male' ? 'Мужской' : filterGender === 'female' ? 'Женский' : 'Не имеет значения'}</span>
+                                        <button 
+                                            onClick={() => {
+                                                setFilterGender('other');
+                                                dispatch(findByGender('other'));
+                                            }}
+                                            className="w-4 h-4 flex items-center justify-center hover:opacity-80 cursor-pointer"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="w-full mt-[20px]">
@@ -137,7 +177,6 @@ export const Filter = () => {
                                     setFilterPrice([price.toString()]);
                                     dispatch(findByPrice(price));
                                 }}
-                                open={isOpen && modalType === 'FilterPrice'}
                             />        
                             <Select 
                                 onOpenChange={() => handleModalOpen('FilterPrice')} 
@@ -147,18 +186,33 @@ export const Filter = () => {
                                     <SelectValue placeholder="Выберите стоимость" />
                                 </SelectTrigger>
                             </Select>
-                            {filterPrice}
+                            {filterPrice.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    <div className="flex items-center gap-2 px-4 py-2 bg-[#116466] text-white rounded-[10px] text-sm">
+                                        <span>До {filterPrice[0]} ₽</span>
+                                        <button 
+                                            onClick={() => {
+                                                setFilterPrice([]);
+                                                dispatch(findByPrice(0));
+                                            }}
+                                            className="w-4 h-4 flex items-center justify-center hover:opacity-80 cursor-pointer"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="w-full mt-[20px]">
                             <FilterDate 
                                 type="FilterDate" 
                                 callback={handleModalClose}
-                                onSubmit={(dates: DateFilterData[]) => {
+                                open={isOpen && modalType === 'FilterDate'}
+                                onSubmit={(dates) => {
                                     setFilterDate(dates);
                                     dispatch(findByDate(dates.map(d => d.date)));
                                 }}
-                                open={isOpen && modalType === 'FilterDate'}
                             />        
                             <Select 
                                 onOpenChange={() => handleModalOpen('FilterDate')} 
@@ -168,19 +222,37 @@ export const Filter = () => {
                                     <SelectValue placeholder="Выберите дату сессии" />
                                 </SelectTrigger>
                             </Select>
-                            {filterData?.map((item, i) => (
-                                <div key={i}>{item.date}</div>
-                            ))}
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {filterData?.map((item, i) => (
+                                    <div 
+                                        key={i} 
+                                        className="flex items-center gap-2 px-4 py-2 bg-[#116466] text-white rounded-[10px] text-sm"
+                                    >
+                                        <span>{item.date}</span>
+                                        <button 
+                                            onClick={() => {
+                                                const newDates = filterData.filter((_, index) => index !== i);
+                                                setFilterDate(newDates);
+                                                dispatch(findByDate(newDates.map(d => d.date)));
+                                            }}
+                                            className="w-4 h-4 flex items-center justify-center hover:opacity-80 cursor-pointer"
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
 
                         <div className="w-full mt-[20px]">
                             <FilterTime 
                                 type="FilterTime" 
-                                callback={handleModalClose}
+                                onBack={handleModalClose}
+                                selectedDate=""
+                                open={isOpen && modalType === 'FilterTime'}
                                 onSubmit={(times: string[]) => {
                                     dispatch(findByTime(times));
                                 }}
-                                open={isOpen && modalType === 'FilterTime'}
                             />        
                         </div>
 

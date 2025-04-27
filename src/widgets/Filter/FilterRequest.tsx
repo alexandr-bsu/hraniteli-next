@@ -14,7 +14,7 @@ import { z } from "zod";
 import { useForm } from 'react-hook-form';
 import { zodResolver } from "@hookform/resolvers/zod"
 import Image from 'next/image';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { ModalType } from '@/redux/slices/modal';
 
 interface FilterData {
@@ -22,16 +22,17 @@ interface FilterData {
     id?: string;
 }
 
-interface Props {
+interface FilterRequestProps {
     type: ModalType;
-    callback: () => void;
+    callback: (e?: React.MouseEvent) => void;
     onSubmit: (data: FilterData[]) => void;
-    open: boolean;
+    open: [boolean, () => void];
+    selectedFilters?: FilterData[];
 }
 
-export const FilterRequest:React.FC<Props> = ({onSubmit, type, callback, open }) => {
+export const FilterRequest:React.FC<FilterRequestProps> = ({onSubmit, type, callback, open: [isOpen, setOpen], selectedFilters }) => {
 
-    const items = [
+    const items = useMemo(() => [
         {
           id: "query",
           label: "Принимаете ли вы медикаменты по назначению психиатра",
@@ -56,90 +57,102 @@ export const FilterRequest:React.FC<Props> = ({onSubmit, type, callback, open })
             id: "query6",
             label: "Беременность, родительство, послеродовая депрессия, проблемы в отношениях с детьми до 18 лет",
         },
-    ] as const
+    ] as const, []);
 
     const FormSchema = z.object({
         items: z.array(z.string()),
     })
 
-    const { handleSubmit, watch, ...form } = useForm<z.infer<typeof FormSchema>>({
+    const methods = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
-            defaultValues: {
-                items: []
-            },
+        defaultValues: {
+            items: selectedFilters?.map(filter => items.find(item => item.label === filter.label)?.id || '') || []
+        },
     })
 
-    const handleSubmitData = useCallback((data: z.infer<typeof FormSchema>) => {
-        const result: any = []
-        for (let index = 0; index < data.items.length; index++) {
-            const findItems = items.find(item => item.id === data.items[index]);  
-            result.push(findItems) 
-        }
+    const { handleSubmit: formHandleSubmit, watch, setValue, control } = methods;
 
-        return result;
-    },[])
+    useEffect(() => {
+        const newItems = selectedFilters?.map(filter => items.find(item => item.label === filter.label)?.id || '') || [];
+        if (JSON.stringify(methods.getValues('items')) !== JSON.stringify(newItems)) {
+            setValue('items', newItems);
+        }
+    }, [selectedFilters, items, setValue, methods]);
+
+    const onFormSubmit = useCallback((data: z.infer<typeof FormSchema>) => {
+        const selectedItems: FilterData[] = [];
+        data.items.forEach((id) => {
+            const match = items.find(item => item.id === id);
+            if (match) {
+                selectedItems.push({ label: match.label, id: match.id });
+            }
+        });
+        onSubmit(selectedItems);
+        setOpen();
+        callback();
+    }, [items, onSubmit, setOpen, callback]);
 
     const handleCheckboxCheck = watch('items');
 
-    useEffect(() => {
-        const filterData = handleSubmitData({items: handleCheckboxCheck})
-
-        onSubmit(filterData)
-    },[handleCheckboxCheck])
-    
     return (
-        <ModalWindow className='max-[425px]:h-[400px]' open={open} closeButton={false} type={type}>
+        <ModalWindow className='max-[425px]:h-[400px]' open={isOpen} closeButton={false} type={type}>
             <DialogHeader className="flex flex-row items-center">
                 <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[16px] max-lg:leading-[22px]">Выберите запросы:</DialogTitle>
-                <DialogClose className="w-[40px] h-[40px] shrink-0 flex justify-center items-center border-2 border-[#D4D4D4] rounded-full">
+                <DialogClose onClick={callback} className="w-[40px] h-[40px] shrink-0 flex justify-center items-center border-2 border-[#D4D4D4] rounded-full">
                     <Image src={'/modal/cross.svg'} alt="cross" height={15} width={15} />
                 </DialogClose>
             </DialogHeader>
 
-            <Form {...form} watch={watch} handleSubmit={handleSubmit}>
-                <form  className="flex flex-col gap-[20px]">
+            <Form {...methods}>
+                <form onSubmit={formHandleSubmit(onFormSubmit)} className="flex flex-col gap-[20px]">
                     <FormField
-                    control={form.control}
-                    name="items"
-                    render={() => (
-                        <FormItem className='gap-[20px] overflow-auto max-lg:max-h-[200px]'>
-                        {items.map((item) => (
-                            <FormField
-                            key={item.id}
-                            control={form.control}
-                            name="items"
-                            render={({ field }) => {
-                                return (
-                                <FormItem
-                                    key={item.id}
-                                    className="flex flex-row items-center gap-[14px]"
-                                >
-                                    <FormControl>
-                                    <Checkbox 
-                                        className='h-[30px] w-[30px]'
-                                        checked={field.value?.includes(item.id)}
-                                        onCheckedChange={(checked) => {
-                                            return checked
-                                            ?  field.onChange([...field.value, item.id])
-                                            :  field.onChange(
-                                                field.value?.filter(
-                                                (value) => value !== item.id
-                                                ))
-                                        }}
-                                    />
-                                    </FormControl>
-                                    <FormLabel className="text-[18px] max-lg:text-[14px]  font-normal">
-                                    {item.label}
-                                    </FormLabel>
-                                </FormItem>
-                                )
-                            }}
-                            />
-                        ))}
-                        <FormMessage />
-                        </FormItem>
-                    )}
-                    />
+                        control={control}
+                        name="items"
+                        render={() => (
+                            <FormItem className='gap-[20px] overflow-auto max-lg:max-h-[200px]'>
+                            {items.map((item) => (
+                                <FormField
+                                key={item.id}
+                                control={control}
+                                name="items"
+                                render={({ field }) => {
+                                    return (
+                                    <FormItem
+                                        key={item.id}
+                                        className="flex flex-row items-center gap-[14px]"
+                                    >
+                                        <FormControl>
+                                        <Checkbox 
+                                            className='h-[30px] w-[30px]'
+                                            checked={field.value?.includes(item.id)}
+                                            onCheckedChange={(checked) => {
+                                                const newValue = checked
+                                                    ? [...(field.value || []), item.id]
+                                                    : (field.value || []).filter((value) => value !== item.id);
+                                                field.onChange(newValue);
+                                                const result: FilterData[] = [];
+                                                newValue.forEach((id) => {
+                                                    const match = items.find(item => item.id === id);
+                                                    if (match) {
+                                                        result.push({ label: match.label, id: match.id });
+                                                    }
+                                                });
+                                                onSubmit(result);
+                                            }}
+                                        />
+                                        </FormControl>
+                                        <FormLabel className="text-[18px] max-lg:text-[14px]  font-normal">
+                                        {item.label}
+                                        </FormLabel>
+                                    </FormItem>
+                                    )
+                                }}
+                                />
+                            ))}
+                            <FormMessage />
+                            </FormItem>
+                        )}
+                        />
                 </form>
             </Form>
         </ModalWindow>

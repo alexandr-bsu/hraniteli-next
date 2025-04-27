@@ -37,7 +37,7 @@ const initialState: FilterState = {
   filtered_by_mental_illness2: [],
   dates_psychologists: [],
   hour_dates: [],
-  gender: 'male',
+  gender: 'other',
   price: 0,
   time: [],
   date: [],
@@ -54,10 +54,18 @@ export const filterSlice = createSlice({
   reducers: {
     fill_filtered_by_automatch_psy: (state, action: PayloadAction<IPsychologist[]>) => {
       state.filtered_by_automatch_psy = action.payload;
+      state.filtered_by_gender = action.payload;
     },
     findByGender: (state, action: PayloadAction<Gender>) => {
       state.gender = action.payload;
-      state.filtered_by_gender = state.filtered_by_automatch_psy.filter(psy => psy.gender === action.payload);
+      if (action.payload === 'other' || action.payload === 'none') {
+        state.filtered_by_gender = [...state.filtered_by_automatch_psy];
+      } else {
+        state.filtered_by_gender = state.filtered_by_automatch_psy.filter(psy => {
+          const matches = psy.sex === (action.payload === 'male' ? 'Мужчина' : 'Женщина');
+          return matches;
+        });
+      }
     },
     findByRequests: (state, action: PayloadAction<string[]>) => {
       state.requests = action.payload;

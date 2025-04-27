@@ -4,185 +4,275 @@ import Image from 'next/image';
 import { useCallback, useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { openModal } from '@/redux/slices/modal';
-import clsx from 'clsx';
 import axios from 'axios'
 import { RootState } from '@/redux/store';
 import { setDatesPsychologists, setHourDates } from '@/redux/slices/filter';
 import { getTimeDifference } from '@/features/utils';
+import { ModalType } from '@/redux/slices/modal';
+import { FilterTime } from './FilterTime';
 
-type Props = {
-    callback: () => void;
-    onSubmit: (data: any) => void;
-    type: string;
+interface DateSlot {
+  psychologist: string;
+  time: string;
+  date: string;
 }
 
-type FilterSelectButtonDate = {
-    select: boolean;
-    id: string,
-    text: string,
+interface DateItem {
+  pretty_date: string;
+  slots: {
+    [hour: string]: DateSlot[];
+  };
 }
 
-export const FilterDate:React.FC<Props> = ({ type, onSubmit }) => {
-    const dispatch = useDispatch();
+interface ScheduleResponse {
+  items: DateItem[];
+}
 
-    const [ dateFilter, setDateFilter ] = useState<FilterSelectButtonDate[]>();
+interface FilterDateProps {
+  open?: boolean;
+  type: ModalType;
+  callback: () => void;
+  onSubmit: (dates: { date: string; slots?: string[] }[]) => void;
+  selectedDates?: string[];
+}
 
-    const psychologists = useSelector<RootState>(state => state.filter.data_name_psychologist) as [];
+export const FilterDate: React.FC<FilterDateProps> = ({ open, type, callback, onSubmit }) => {
+  const dispatch = useDispatch();
 
-    const [ datePsychologists, setDatePsychologists ] = useState<any[]>();
+  const [availableDates, setAvailableDates] = useState<DateItem[]>([]);
+  const [selectedDates, setSelectedDates] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showTimeModal, setShowTimeModal] = useState(false);
+  const [currentDate, setCurrentDate] = useState<string>('');
 
-    const hours = [
-        '00:00',
-        '01:00',
-        '02:00',
-        '03:00',
-        '04:00',
-        '05:00',
-        '06:00',
-        '07:00',
-        '08:00',
-        '09:00',
-        '10:00',
-        '11:00',
-        '12:00',
-        '13:00',
-        '14:00',
-        '15:00',
-        '16:00',
-        '17:00',
-        '18:00',
-        '19:00',
-        '20:00',
-        '21:00',
-        '22:00',
-        '23:00',
-    ]
+  const psychologists = useSelector<RootState>(state => state.filter.data_name_psychologist) as string[];
 
-    const handleClick = useCallback((findIndex: number = 0) => {
-        setDateFilter((prev: any) => prev?.map((item: any, i: any) => {
-            if (i === findIndex) {
-                return {
-                    select: !item.select,
-                    id: item.id,
-                    text: item.text,
-                }
-            }
-            else {
-                return {
-                    select: item.select,
-                    id: item.id,
-                    text: item.text,
-                }
-            }
-        }))
-    },[])
+  const [datePsychologists, setDatePsychologists] = useState<DateItem[]>();
 
-    useEffect(() => {
+  const hours = [
+    '00:00',
+    '01:00',
+    '02:00',
+    '03:00',
+    '04:00',
+    '05:00',
+    '06:00',
+    '07:00',
+    '08:00',
+    '09:00',
+    '10:00',
+    '11:00',
+    '12:00',
+    '13:00',
+    '14:00',
+    '15:00',
+    '16:00',
+    '17:00',
+    '18:00',
+    '19:00',
+    '20:00',
+    '21:00',
+    '22:00',
+    '23:00',
+  ]
+
+  useEffect(() => {
+    const fetchDates = async () => {
+      try {
+        setLoading(true);
         const timeDifference = getTimeDifference();
 
-        if (!psychologists) return;
-
-        for (let index = 0; index < psychologists.length; index++) {
-            const apiUrl = `https://n8n-v2.hrani.live/webhook/get-aggregated-schedule-by-psychologist-test-contur?utm_psy=${psychologists[index]}&userTimeOffsetMsk=${timeDifference}`;
-            
-            axios.get(apiUrl).then((resp) => {
-                const allData = resp.data;
-                setDatePsychologists((prev: any) => {
-                    if (!prev) return allData[0].items;
-                    return [...prev, ...allData[0].items].filter(Boolean);
-                });
-            });
+        if (!psychologists?.length) {
+          return;
         }
-    }, [psychologists]);
 
-    useEffect(() => {
-        console.log(datePsychologists)
-
-        const notDublicate = [] as any
-
-        datePsychologists?.forEach(element => {
-            console.log(element.slots)
-            if(!notDublicate.includes(element.pretty_date)) {
-                notDublicate.push(element.pretty_date);         
-            }
-        }); 
-
-        setDateFilter(notDublicate?.map((item: any) => {
-            return {
-                select: false,
-                id: '',
-                text: item,
-            } 
-        }))
-        const result = [] as any;
+        const allDates: DateItem[] = [];
         
-        [psychologists]?.forEach((element1: any) => {
-            datePsychologists?.map((item) => {
-                hours.forEach((hour) => {
-                    [item.slots[hour]].forEach((element: any) => {
-                        if (element[0]?.psychologist === element1)
-                        {
-                            result.push({
-                                element1,
-                                hour,
-                                pretty_date:item.pretty_date})
-                            }
-                        })
-                    }) 
-                })
-        })
-
-        if (datePsychologists && result) {
-            dispatch(setHourDates(result));
-            dispatch(setDatesPsychologists(datePsychologists));
+        for (const psychologist of psychologists) {
+          const encodedName = encodeURIComponent(psychologist.trim());
+          
+          try {
+            const requestUrl = `https://n8n-v2.hrani.live/webhook/get-aggregated-schedule-by-psychologist-test-contur`;
+            const requestParams = {
+              psychologist: encodedName,
+              userTimeOffsetMsk: timeDifference || 0,
+              utm_psy: encodedName
+            };
+            
+            const response = await axios.get(requestUrl, { params: requestParams });
+            
+            if (response.data?.[0]?.items?.length > 0) {
+              allDates.push(...response.data[0].items.filter((item: any) => 
+                // Проверяем, что в слотах есть хотя бы один час с данными
+                Object.values(item.slots || {}).some((slot: any) => slot && slot.length > 0)
+              ));
+            }
+          } catch (error) {
+            if (axios.isAxiosError(error)) {
+              console.error('Ошибка при запросе дат для психолога', psychologist, ':', {
+                message: error.message,
+                status: error.response?.status,
+                data: error.response?.data,
+                config: {
+                  url: error.config?.url,
+                  params: error.config?.params
+                }
+              });
+            } else {
+              console.error('Неизвестная ошибка при запросе дат для психолога', psychologist, ':', error);
+            }
+          }
         }
 
-    },[datePsychologists])
+        // Убираем дубликаты дат
+        const uniqueDates = allDates.filter((item, index, self) =>
+          index === self.findIndex((t) => t.pretty_date === item.pretty_date)
+        );
 
-    useEffect(() => {
-        if(dateFilter !== undefined && dateFilter !== null) {
-            onSubmit(dateFilter.filter(item => item.select === true).map((item: any) =>
-            {
-                return {
-                    id: item.id,
-                    text: item.text,
-                }
-            }))
-        }
-    },[dateFilter])
+        setAvailableDates(uniqueDates);
+        setDatePsychologists(uniqueDates);
 
+      } catch (error) {
+        console.error('Общая ошибка при загрузке дат:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    return (
-        <ModalWindow className='max-[425px]:h-[519px]' maxWidth='max-w-[960px]' closeButton={false} type={type}>
-            <DialogHeader className="flex flex-row items-center">
-                <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[16px] max-lg:leading-[22px]">Выберите подходящую для Вас дату:</DialogTitle>
-                <DialogClose className="w-[40px] h-[40px] shrink-0 flex justify-center items-center border-2 border-[#D4D4D4] rounded-full">
-                    <Image src={'/modal/cross.svg'} alt="cross" height={15} width={15} />
-                </DialogClose>
-            </DialogHeader>
+    if (open) {
+      fetchDates();
+    }
+  }, [open, psychologists]);
 
-            <ul className="max-lg:w-full max-lg:grid-cols-[repeat(auto-fit,_minmax(64px,_1fr))] grid gap-[10px] grid-cols-10 mt-[5px] w-fit overflow-auto ">
-                {
-                    dateFilter != undefined && dateFilter?.map((item: FilterSelectButtonDate, i: number) => 
-                        <li key={i} className={
-                            clsx(`max-lg:text-[14px] relative shrink-0 rounded-[50px] w-[74px]  border-[1px] border-[#D4D4D4]  text-[#116466] font-normal text-[18px] leading-[25px] flex justify-center items-center`,
-                            {
-                                ['border-none bg-[#116466] text-[white]']: dateFilter?.[i].select === true
-                            }
-                        )}>
-                            <button onClick={() => handleClick(i)} className="relative h-full w-full cursor-pointer p-[8px] py-[8px]">
-                                {item.text}
-                            </button> 
-                        </li>
-                    )
-                }
-            </ul>
+  useEffect(() => {
+    if (!datePsychologists?.length) return;
 
-            <button onClick={() => {
-                dispatch(openModal('FilterTime'));
-            }} className='w-[81px] h-[53px] bg-[#116466] p-[14px] rounded-[50px] text-[#FFFFFF]'>
-                Далее
-            </button>
-        </ModalWindow>
-    );
+    const notDublicate = [] as string[];
+    datePsychologists.forEach(element => {
+      if (!notDublicate.includes(element.pretty_date)) {
+        notDublicate.push(element.pretty_date);         
+      }
+    }); 
+
+    setSelectedDates(notDublicate);
+
+    const result = [] as any[];
+    
+    psychologists.forEach((psychologist: string) => {
+      datePsychologists.forEach((item) => {
+        Object.entries(item.slots || {}).forEach(([hour, slots]: [string, any]) => {
+          if (Array.isArray(slots) && slots.some(slot => slot.psychologist === psychologist)) {
+            result.push({
+              element1: psychologist,
+              hour,
+              pretty_date: item.pretty_date
+            });
+          }
+        });
+      });
+    });
+
+    if (result.length > 0) {
+      dispatch(setHourDates(result));
+      // Преобразуем DateItem[] в IPsychologist[] для Redux
+      const psychologistsData = psychologists.map(name => ({
+        name,
+        link_video: null,
+        available_dates: datePsychologists
+          .filter(item => 
+            Object.values(item.slots || {})
+              .flat()
+              .some(slot => slot.psychologist === name)
+          )
+          .map(item => item.pretty_date)
+      }));
+      dispatch(setDatesPsychologists(psychologistsData));
+    }
+
+  }, [datePsychologists, psychologists, dispatch]);
+
+  const handleDateClick = (date: string) => {
+    setCurrentDate(date);
+    const newSelectedDates = selectedDates.includes(date)
+      ? selectedDates.filter(d => d !== date)
+      : [...selectedDates, date];
+    
+    setSelectedDates(newSelectedDates);
+  };
+
+  const handleTimeSubmit = (times: string[]) => {
+    const selectedDateItems = availableDates
+      .filter(item => item.pretty_date === currentDate)
+      .map(item => ({
+        date: item.pretty_date,
+        slots: times
+      }));
+
+    onSubmit(selectedDateItems);
+    setShowTimeModal(false);
+    callback();
+  };
+
+  return (
+    <>
+      <ModalWindow className='max-[425px]:h-[400px]' open={open && !showTimeModal} closeButton={false} type={type}>
+        <DialogHeader className="flex flex-row items-center">
+          <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[16px] max-lg:leading-[22px]">
+            Выберите подходящую для Вас дату:
+          </DialogTitle>
+          <DialogClose 
+            onClick={callback}
+            className="w-[40px] h-[40px] shrink-0 flex justify-center items-center border-2 border-[#D4D4D4] rounded-full"
+          >
+            <Image src={'/modal/cross.svg'} alt="cross" height={15} width={15} />
+          </DialogClose>
+        </DialogHeader>
+
+        {loading ? (
+          <div className="flex justify-center items-center p-8">
+            <div className="w-8 h-8 border-4 border-[#116466] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-5 gap-4 mt-6 max-lg:grid-cols-3">
+            {availableDates.map((item, index) => (
+              <button
+                key={index}
+                onClick={() => handleDateClick(item.pretty_date)}
+                className={`
+                  px-4 py-2 rounded-full text-center transition-colors
+                  ${selectedDates.includes(item.pretty_date)
+                    ? 'bg-[#116466] text-white'
+                    : 'border border-[#116466] text-[#116466] hover:bg-[#116466] hover:text-white'
+                  }
+                `}
+              >
+                {item.pretty_date}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="flex justify-end mt-6">
+          <button
+            onClick={() => {
+              if (selectedDates.length > 0) {
+                setShowTimeModal(true);
+              }
+            }}
+            className="px-6 py-2 bg-[#116466] text-white rounded-full hover:opacity-90 transition-opacity"
+          >
+            Далее
+          </button>
+        </div>
+      </ModalWindow>
+
+      <FilterTime
+        open={showTimeModal}
+        type="FilterTime"
+        onBack={() => setShowTimeModal(false)}
+        onSubmit={handleTimeSubmit}
+        selectedDate={currentDate}
+      />
+    </>
+  );
 };

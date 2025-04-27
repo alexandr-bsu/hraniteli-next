@@ -14,7 +14,7 @@ export type ApplicationStage =
   | 'gratitude'
   | 'error';
 
-export type Gender = 'male' | 'female' | 'other';
+export type Gender = 'male' | 'female' | 'other' | 'none';
 export type ContactType = 'Telegram' | 'WhatsApp' | 'Phone';
 
 export interface IApplicationFormData {

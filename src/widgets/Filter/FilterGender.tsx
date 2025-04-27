@@ -15,19 +15,21 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import Image from 'next/image';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useEffect } from 'react';
-type Props = {
-    callback: () => void;
-    onSubmit: (data: any) => void;
-    type: string;
-    open: boolean;
+import { Gender } from '@/shared/types/application.types';
+import { ModalType } from '@/redux/slices/modal';
+
+interface FilterGenderProps {
+  open?: boolean;
+  type: ModalType;
+  onSubmit: (data: Gender) => void;
+  currentGender: Gender;
 }
 
-export const FilterGender:React.FC<Props> = ({onSubmit, type, open }) => {
+export const FilterGender:React.FC<FilterGenderProps> = ({onSubmit, type, open, currentGender }) => {
 
-    const items =
-    {
-        ['male']: 'Мужчина',
-        ['female']: 'Женщина',
+    const items = {
+        ['male']: 'Мужской',
+        ['female']: 'Женский',
         ['none']: 'Не имеет значения',
     } as const
 
@@ -35,20 +37,23 @@ export const FilterGender:React.FC<Props> = ({onSubmit, type, open }) => {
         gender: z.enum(["male", "female", "none"]).optional(),
     })
 
-    const { handleSubmit, watch, control, ...form }  = useForm<z.infer<typeof FormSchema>>({
+    const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            gender: undefined
+            gender: currentGender === 'other' ? 'none' : currentGender === 'none' ? 'none' : currentGender
         }
     })
 
-    const handleCheckboxCheck = watch('gender'); 
-    
+    const { control, setValue } = form;
+
     useEffect(() => {
-        if(handleCheckboxCheck !== undefined) {
-            onSubmit(items[handleCheckboxCheck] as any)
-        }
-    },[handleCheckboxCheck])
+        setValue('gender', currentGender === 'other' ? 'none' : currentGender === 'none' ? 'none' : currentGender);
+    }, [currentGender, setValue]);
+    
+    const handleRadioChange = (value: string) => {
+        const genderValue = value === 'none' ? 'other' : value as Gender;
+        onSubmit(genderValue);
+    }
 
     return (
         <ModalWindow className='max-[425px]:h-[400px]' open={open} closeButton={false} type={type}>
@@ -60,7 +65,7 @@ export const FilterGender:React.FC<Props> = ({onSubmit, type, open }) => {
                 </DialogClose>
             </DialogHeader>
 
-            <Form {...form} control={control} watch={watch} handleSubmit={handleSubmit}>
+            <Form {...form}>
                 <form className="w-2/3 space-y-6">
                     <FormField
                     control={control}
@@ -70,7 +75,7 @@ export const FilterGender:React.FC<Props> = ({onSubmit, type, open }) => {
                         <FormControl >
                             <RadioGroup
                             defaultValue={field.value}
-                            onValueChange={field.onChange}
+                            onValueChange={handleRadioChange}
                             className="flex flex-col gap-[40px] max-lg:gap-[20px]"
                             >
                             <FormItem className="flex items-center space-x-3 space-y-0">
