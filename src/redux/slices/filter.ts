@@ -23,6 +23,7 @@ interface FilterState {
   mental_illness2: boolean;
   requests: string[];
   data_name_psychologist: string[];
+  selected_psychologist: IPsychologist | null;
 }
 
 const initialState: FilterState = {
@@ -46,6 +47,7 @@ const initialState: FilterState = {
   mental_illness2: false,
   requests: [],
   data_name_psychologist: [],
+  selected_psychologist: null,
 };
 
 export const filterSlice = createSlice({
@@ -118,6 +120,9 @@ export const filterSlice = createSlice({
     setDataNamePsychologist: (state, action: PayloadAction<string[]>) => {
       state.data_name_psychologist = action.payload;
     },
+    setSelectedPsychologist: (state, action: PayloadAction<IPsychologist>) => {
+      state.selected_psychologist = action.payload;
+    },
   },
 });
 
@@ -134,6 +139,7 @@ export const {
   setDatesPsychologists,
   setHourDates,
   setDataNamePsychologist,
+  setSelectedPsychologist,
 } = filterSlice.actions;
 
 export default filterSlice.reducer;

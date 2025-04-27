@@ -1,7 +1,7 @@
 'use client'
 import { Form, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { toNextStage } from '@/redux/slices/application_form';
+import { setApplicationStage } from '@/redux/slices/application_form';
 import { setAge } from '@/redux/slices/application_form_data';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React from 'react';
@@ -41,7 +41,7 @@ const AgeStageApplication = () => {
     const handleSubmit = (data: FormData) => {
         localStorage.setItem('app_age', data.age) // Сохраняем в localStorage
         dispatch(setAge(data.age)) // Сохраняем в Redux (если нужно)
-        dispatch(toNextStage('gender')) // Переход на следующую страницу
+        dispatch(setApplicationStage('gender')) // Переход на следующую страницу
     }
 
     return (
@@ -84,11 +84,18 @@ const AgeStageApplication = () => {
                         )}
                     />
                     <div className="shrink-0  pb-[50px] flex gap-[10px]">
-                        <button type='button' onClick={() => dispatch(toNextStage('name'))} className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}>
+                        <button 
+                            type='button' 
+                            onClick={() => dispatch(setApplicationStage('name'))} 
+                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+                        >
                             Назад
                         </button>
 
-                        <button type='submit' className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}>
+                        <button 
+                            type='submit' 
+                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+                        >
                             Продолжить
                         </button>
                     </div>

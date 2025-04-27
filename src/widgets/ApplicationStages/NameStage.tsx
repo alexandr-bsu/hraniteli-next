@@ -1,12 +1,12 @@
 'use client'
 import { Form, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { toNextStage } from '@/redux/slices/application_form'
+import { setApplicationStage } from '@/redux/slices/application_form'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useDispatch } from 'react-redux'
-import { fill_username } from '@/redux/slices/application_form_data'
+import { setUsername } from '@/redux/slices/application_form_data'
 
 const FormSchema = z.object({
   username: z.string().nonempty("Вы не заполнили обязательное поле")
@@ -31,8 +31,8 @@ export default function NameStageApplication() {
   // 3. Сохраняем данные
   const handleSubmit = (data: { username: string }) => {
     localStorage.setItem('app_username', data.username) // Сохраняем в localStorage
-    dispatch(fill_username(data.username)) // Сохраняем в Redux (если нужно)
-    dispatch(toNextStage('age')) // Переход на следующую страницу
+    dispatch(setUsername(data.username)) // Сохраняем в Redux (если нужно)
+    dispatch(setApplicationStage('age')) // Переход на следующую страницу
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       console.log('Данные локалстореж')

@@ -14,8 +14,10 @@ import {
 } from "@/components/ui/form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useDispatch } from "react-redux"
-import { toNextStage } from "@/redux/slices/application_form"
-import { fill_gender_psychologist } from "@/redux/slices/application_form_data"
+import { setApplicationStage } from "@/redux/slices/application_form"
+import { setGenderPsychologist } from "@/redux/slices/application_form_data"
+import { Gender } from "@/shared/types/application.types"
+import { COLORS } from '@/shared/constants/colors'
 
 const FormSchema = z.object({
     gender: z.enum(["male", "female", 'no_matter'], {
@@ -23,10 +25,10 @@ const FormSchema = z.object({
   }),
 })
 
-const sex_data = {
-    ['male']: 'Мужчина',
-    ['female']: 'Женщина',
-    ['no_matter']: 'Не имеет значения',
+const sex_data: Record<string, Gender> = {
+    ['male']: 'male',
+    ['female']: 'female',
+    ['no_matter']: 'other',
 } 
 
 export const GenderStagePsychologist = () => {
@@ -54,8 +56,8 @@ export const GenderStagePsychologist = () => {
     // 4. Отправка формы
     const handleSubmit = (data: z.infer<typeof FormSchema>) => {
       localStorage.setItem('app_psychologist_gender', data.gender) // Дублируем сохранение
-      dispatch(fill_gender_psychologist(sex_data[data.gender]))
-      dispatch(toNextStage('request')) 
+      dispatch(setGenderPsychologist(sex_data[data.gender]))
+      dispatch(setApplicationStage('request')) 
     }
   
 
@@ -116,11 +118,18 @@ export const GenderStagePsychologist = () => {
             )}
             />
             <div className="shrink-0  pb-[50px] flex gap-[10px]">
-                <button type='submit' onClick={() => dispatch(toNextStage('preferences'))} className="cursor-pointer shrink-0 w-[81px] border-[1px] border-[#116466] p-[12px] text-[#116466] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]">
+                <button 
+                    type='button'
+                    onClick={() => dispatch(setApplicationStage('preferences'))} 
+                    className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+                >
                     Назад
                 </button>
 
-                <button type='submit' className="cursor-pointer grow border-[1px] bg-[#116466] p-[12px] text-[white] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]">
+                <button 
+                    type='submit' 
+                    className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+                >
                     Продолжить
                 </button>
             </div>

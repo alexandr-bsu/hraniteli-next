@@ -14,9 +14,10 @@ import {
 } from "@/components/ui/form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useDispatch } from "react-redux"
-import { toNextStage } from "@/redux/slices/application_form" // Добавлен импорт toPrevStage
-import { fill_diseases } from "@/redux/slices/application_form_data"
+import { setApplicationStage } from "@/redux/slices/application_form"
+import { setDiseases } from "@/redux/slices/application_form_data"
 import { useEffect, useState } from "react"
+import { COLORS } from '@/shared/constants/colors'
 
 const FormSchema = z.object({
     diseases: z.enum(["diseases2", 'nothing', 'no'], {
@@ -41,52 +42,48 @@ export const DiseasesStage = () => {
         ['diseases2']: ['Есть диагностированное психиатрическое заболевание'],
         ['no']: ['Нет'],
         ['nothing']: ['Не имеет значения']
-    } as const
+    }
 
+    // 1. Загружаем сохраненные данные из localStorage
+    const savedData = typeof window !== 'undefined' 
+        ? JSON.parse(localStorage.getItem('app_diseases') || '{}')
+        : {}
+
+    // 2. Настраиваем форму
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
-        defaultValues: JSON.parse(localStorage.getItem('diseasesForm') || '{}')
+        defaultValues: savedData
     })
 
     const diseasesValue = form.watch("diseases");
 
+    // 3. Сохраняем данные при изменении
     useEffect(() => {
         setShowAdditionalQuestion(diseasesValue === "diseases2");
         if (diseasesValue !== "diseases2") {
             form.setValue("isUnderTreatment", undefined);
         }
         
-        // Сохраняем текущие значения формы в localStorage при каждом изменении
         const subscription = form.watch((value) => {
-            localStorage.setItem('diseasesForm', JSON.stringify(value));
+            localStorage.setItem('app_diseases', JSON.stringify(value));
         });
         
         return () => subscription.unsubscribe();
     }, [diseasesValue, form]);
 
-    function handleSubmit(data: z.infer<typeof FormSchema>) {
-        let diseasesData: readonly ["Есть диагностированное психиатрическое заболевание"] | readonly ["Нет"] | readonly ["Не имеет значения"];
+    // 4. Отправка формы
+    const handleSubmit = (data: z.infer<typeof FormSchema>) => {
+        localStorage.setItem('app_diseases', JSON.stringify(data));
         
-        if (data.diseases === "diseases2") {
-            diseasesData = ["Есть диагностированное психиатрическое заболевание"] as const;
+        const diseasesData = [...diseases[data.diseases]];
+        
+        if (data.diseases === "diseases2" && data.isUnderTreatment) {
             const treatmentStatus = data.isUnderTreatment === "yes" ? "Принимаю медикаменты" : "Не принимаю медикаменты";
-            localStorage.setItem('treatmentStatus', treatmentStatus);
-        } else if (data.diseases === "no") {
-            diseasesData = ["Нет"] as const;
-        } else {
-            diseasesData = ["Не имеет значения"] as const;
+            diseasesData.push(treatmentStatus);
         }
         
-        dispatch(fill_diseases(diseasesData));
-        dispatch(toNextStage('promocode'));
-        // Убрали удаление данных из localStorage при отправке
-    }
-
-    function handleBack() {
-        // Сохраняем данные перед переходом назад
-        const formData = form.getValues();
-        localStorage.setItem('diseasesForm', JSON.stringify(formData));
-        dispatch(toNextStage('action'));
+        dispatch(setDiseases(diseasesData));
+        dispatch(setApplicationStage('promocode'));
     }
 
     return (
@@ -188,14 +185,17 @@ export const DiseasesStage = () => {
 
                 <div className="shrink-0 mt-[30px] pb-[50px] flex gap-[10px]">
                     <button 
-                        type="button" // Изменили type на button
-                        onClick={handleBack} // Используем новую функцию для обработки возврата
-                        className="cursor-pointer shrink-0 w-[81px] border-[1px] border-[#116466] p-[12px] text-[#116466] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]"
+                        type="button"
+                        onClick={() => dispatch(setApplicationStage('action'))}
+                        className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
                     >
                         Назад
                     </button>
 
-                    <button type='submit' className="cursor-pointer grow border-[1px] bg-[#116466] p-[12px] text-[white] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]">
+                    <button 
+                        type='submit' 
+                        className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+                    >
                         Продолжить
                     </button>
                 </div>

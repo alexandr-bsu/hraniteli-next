@@ -13,47 +13,19 @@ import { COLORS } from '@/shared/constants/colors';
 const CONDITIONS = [
     {
       id: "condition",
-      label: "Физические недомогания: постоянная усталость, бессонница, проблемы с питанием, проблемы с памятью, психосоматические реакции",
+      label: "Опыт семейной жизни, собственные дети",
     },
     {
-        id: "condition1",
-        label: "Подавленное настроение, прокрастинация, ощущение бессмысленности существования, опустошенность, отверженность",
+      id: "condition1",
+      label: "Опыт семейной жизни, собственные дети",
     },
     {
-        id: "condition2",
-        label: "Беременность, родительство, послеродовая депрессия, проблемы в отношениях с детьми до 18 лет",
+      id: "condition2",
+      label: "Опыт семейной жизни, собственные дети",
     },
     {
-        id: "condition3",
-        label: "Абьюзивные отношения, домашнее насилие",
-    },
-    {
-        id: "condition4",
-        label: "Психологические зависимости: игровые, любовные, виртуальные и прочие",
-    },
-    {
-        id: "condition5",
-        label: "Состояние ужаса, панические атаки",
-    },
-    {
-        id: "condition6",
-        label: "Намерения или попытки суицида",
-    },
-    {
-        id: "condition7",
-        label: "Повышенная эмоциональность, эмоциональные всплески, приступы агрессии, поступки под действием эмоций, частые смены настроения",
-    },
-    {
-        id: "condition8",
-        label: "Сложности в сексуальной сфере",
-    },
-    {
-        id: "condition9",
-        label: "Проблемы с раскрытием женственности и сексуальности",
-    },
-    {
-        id: "condition10",
-        label: "Ничего из вышеперечисленного",
+      id: "condition3",
+      label: "Опыт семейной жизни, собственные дети",
     },
 ] as const
 
@@ -63,7 +35,7 @@ const FormSchema = z.object({
 
 type FormData = z.infer<typeof FormSchema>;
 
-export const ConditionStage = () => {
+export const TraumaticStage = () => {
     const dispatch = useDispatch();
 
     const savedConditions = typeof window !== 'undefined' 
@@ -77,12 +49,13 @@ export const ConditionStage = () => {
         }
       })
 
-      useEffect(() => {
-    const subscription = form.watch((value) => {
-      localStorage.setItem('app_conditions', JSON.stringify(value.condition || []))
-    })
-    return () => subscription.unsubscribe()
-  }, [form.watch])
+    useEffect(() => {
+        const subscription = form.watch((value) => {
+            localStorage.setItem('app_conditions', JSON.stringify(value.condition || []))
+        })
+        
+        return () => subscription.unsubscribe()
+    }, [form.watch])
     
 
     const handleSubmit = (data: FormData) => {
@@ -95,7 +68,7 @@ export const ConditionStage = () => {
             return acc;
           }, []);
         dispatch(setActions(selectedConditions));
-        dispatch(setApplicationStage('traumatic'));
+        dispatch(setApplicationStage('diseases_psychologist'));
     };
 
     return (
@@ -109,16 +82,16 @@ export const ConditionStage = () => {
                                <div className='grow h-[360px]'>
                                     <FormItem
                                         className='grow p-[30px] h-full max-h-[390px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
-                                    <FormLabel
-                                        className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px] text-[${COLORS.text.primary}]'
-                                    >
-                                        Что из описанного ниже вы наблюдаете в своём состоянии в последнее время?
-                                    </FormLabel>
-                                    <FormDescription
-                                        className='max-lg:text-[14px] font-normal text-[18px]  leading-[25px] mt-[10px] text-[${COLORS.text.secondary}]'
-                                    >
-                                       Выберите все подходящие пункты или пропустите вопрос, если ничего из этого не наблюдается
-                                    </FormDescription>
+                                        <FormLabel
+                                            className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px] text-[${COLORS.text.primary}]'
+                                        >
+                                            Беспокоит ли вас травмирующее событие, с которым сложно справиться самостоятельно?
+                                        </FormLabel>
+                                        <FormDescription
+                                            className='max-lg:text-[14px] font-normal text-[18px]  leading-[25px] mt-[10px] text-[${COLORS.text.secondary}]'
+                                        >
+                                            Выберите все подходящие пункты или пропустите вопрос, если ничего из этого не беспокоит
+                                        </FormDescription>
                                         <div className='flex justify-between mt-[10px] max-lg:flex-col  max-h-[150px] max-lg:max-h-none overflow-hidden'>
                                            <div className='flex flex-col gap-[15px] w-full max-h-[150px]  max-lg:max-h-[200px] pb-[50px] overflow-x-auto'>
                                             {CONDITIONS.map((item) => (
@@ -163,7 +136,7 @@ export const ConditionStage = () => {
                         )}
                     />
                     <div className="shrink-0 mt-[30px]  pb-[50px] flex gap-[10px]">
-                        <button onClick={() => dispatch(setApplicationStage('request'))} className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}>
+                        <button onClick={() => dispatch(setApplicationStage('condition'))} className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}>
                             Назад
                         </button>
 
@@ -177,4 +150,4 @@ export const ConditionStage = () => {
     );
 };
 
-export default ConditionStage;
+export default TraumaticStage;

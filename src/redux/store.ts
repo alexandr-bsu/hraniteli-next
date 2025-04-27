@@ -1,14 +1,16 @@
 import { configureStore } from '@reduxjs/toolkit';
-import { applicationFormReducer } from './slices/application_form';
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import { applicationFormReducer, ApplicationStage } from './slices/application_form';
 import { applicationFormDataReducer } from './slices/application_form_data';
 import filterReducer from './slices/filter';
 import { modalReducer } from './slices/modal';
+import { psychologistsReducer } from './slices/psychologists';
 import { IApplicationFormData } from '@/shared/types/application.types';
 import { IPsychologist } from '@/shared/types/psychologist.types';
 
 export interface RootState {
   applicationForm: {
-    application_stage: string;
+    application_stage: ApplicationStage;
   };
   applicationFormData: IApplicationFormData;
   filter: {
@@ -34,6 +36,7 @@ export interface RootState {
     slots_objects: any[];
     selectedPsychologist: string;
   };
+  psychologists: IPsychologist[];
 }
 
 export type ModalType = 'FilterRequest' | 'Contact' | 'Slots' | null;
@@ -53,6 +56,7 @@ export const store = configureStore({
     applicationFormData: applicationFormDataReducer,
     filter: filterReducer,
     modal: modalReducer,
+    psychologists: psychologistsReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -61,3 +65,6 @@ export const store = configureStore({
 });
 
 export type AppDispatch = typeof store.dispatch;
+
+export const useAppDispatch = () => useDispatch<AppDispatch>();
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;

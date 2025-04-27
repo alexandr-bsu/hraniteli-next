@@ -1,4 +1,5 @@
-import { ModalState } from '@/redux/store';
+import { RootState } from '@/redux/store';
+import { IPsychologist } from '@/shared/types/psychologist.types';
 import clsx from 'clsx';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -6,19 +7,29 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 
 type Props = {
-    data : any,
+    data: IPsychologist,
     index: number,
-    onSubmit: (data: any) => void;
+    onSubmit: (data: { id: string, text: string }[]) => void;
 }
+
 type FilterSelectButtonTime = {
     select: boolean,
     time: string,
-    id?:'',
+    id: string,
 }
+
 const PsychologistStageItem = ({data, index, onSubmit} : Props) => {
     const [ timeFilter, setTimeFilter ] = useState<FilterSelectButtonTime[]>();
+    const activeIndex = useSelector((state: RootState) => state.applicationFormData.index_phyc);
+    const requests = useSelector((state: RootState) => state.applicationFormData.requests);
+    const gender = useSelector((state: RootState) => state.applicationFormData.gender_psychologist);
+    const diseases = useSelector((state: RootState) => state.applicationFormData.diseases);
 
-    const activeIndex = useSelector<ModalState>(state => state.applicationFormData.index_phyc);
+    const getFilterUrl = () => {
+        const params = new URLSearchParams();
+
+        return `/?${params.toString()}`;
+    };
 
     const handleClick = useCallback((findIndex: number = 0) => {
         setTimeFilter((prev: any) => prev?.map((item: any, i: any) => {
@@ -79,7 +90,14 @@ const PsychologistStageItem = ({data, index, onSubmit} : Props) => {
                     </div>
                 </div>
 
-                <Link href="/" className="text-[#116466] text-[18px] font-normal max-lg:hidden">Перейти на карточку психолога</Link>
+                <Link 
+                    href={getFilterUrl()} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-[#116466] text-[18px] font-normal max-lg:hidden hover:opacity-80 transition-opacity"
+                >
+                    Перейти на карточку психолога
+                </Link>
             </div>
 
             <div className="grid grid-cols-[repeat(auto-fit,_minmax(150px,_1fr))]  gap-[30px] mt-[30px]">
@@ -100,7 +118,7 @@ const PsychologistStageItem = ({data, index, onSubmit} : Props) => {
                 <span className="text-[#9A9A9A] font-normal text-[16px] leading-[22px] max-lg:text-[14px]">
                     Стоимость:
                     <span className="text-[#151515] leading-[25px] font-semibold text-[18px] max-lg:text-[14px] flex gap-[10px] mt-[5px]">
-                        От {data.main_modal} ₽
+                        От {data.min_session_price} ₽
 
                         <Image src={'/card/hint.svg'} alt="hint" height={23} width={23} />
                     </span>

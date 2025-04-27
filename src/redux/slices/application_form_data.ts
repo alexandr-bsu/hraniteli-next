@@ -15,6 +15,8 @@ const initialState: IApplicationFormData = {
   promocode: '',
   selected_slots: [],
   selected_slots_objects: [],
+  index_phyc: 0,
+  has_matching_error: false
 };
 
 export const applicationFormDataSlice = createSlice({
@@ -60,6 +62,12 @@ export const applicationFormDataSlice = createSlice({
     setSelectedSlotsObjects: (state, action: PayloadAction<string[]>) => {
       state.selected_slots_objects = action.payload;
     },
+    setHasMatchingError: (state, action: PayloadAction<boolean>) => {
+      state.has_matching_error = action.payload;
+    },
+    setIndexPhyc: (state, action: PayloadAction<number>) => {
+      state.index_phyc = action.payload;
+    }
   },
 });
 
@@ -77,6 +85,8 @@ export const {
   setPromocode,
   setSelectedSlots,
   setSelectedSlotsObjects,
+  setHasMatchingError,
+  setIndexPhyc
 } = applicationFormDataSlice.actions;
 
 export const applicationFormDataReducer = applicationFormDataSlice.reducer;

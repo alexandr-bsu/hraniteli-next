@@ -1,18 +1,4 @@
-export type ApplicationStage = 
-  | 'name'
-  | 'age'
-  | 'gender'
-  | 'preferences'
-  | 'gender_psychologist'
-  | 'request'
-  | 'condition'
-  | 'action'
-  | 'diseases'
-  | 'diseases_psychologist'
-  | 'psychologist'
-  | 'promocode'
-  | 'gratitude'
-  | 'error';
+import { ApplicationStage } from '@/redux/slices/application_form';
 
 export type Gender = 'male' | 'female' | 'other' | 'none';
 export type ContactType = 'Telegram' | 'WhatsApp' | 'Phone';
@@ -31,6 +17,8 @@ export interface IApplicationFormData {
   promocode: string;
   selected_slots: string[];
   selected_slots_objects: string[];
+  index_phyc: number;
+  has_matching_error: boolean;
 }
 
 // Состояние формы заявки в Redux

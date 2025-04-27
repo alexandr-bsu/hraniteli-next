@@ -2,13 +2,14 @@
 import { Form, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { toNextStage } from '@/redux/slices/application_form';
-import { fill_requests } from '@/redux/slices/application_form_data';
+import { setApplicationStage } from '@/redux/slices/application_form';
+import { setRequests } from '@/redux/slices/application_form_data';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
-import { z } from 'zod'
+import { z } from 'zod';
+import { COLORS } from '@/shared/constants/colors';
 
 const FormSchema = z.object({
     request: z.string(),
@@ -47,9 +48,8 @@ const RequestStage = () => {
    
      // 4. Отправка формы
      const handleSubmit = (data: z.infer<typeof FormSchema>) => {
-       
-       dispatch(fill_requests(data.request))
-       dispatch(toNextStage('condition'))
+        dispatch(setRequests([data.request]))
+        dispatch(setApplicationStage('condition'))
     }
 
     return (
@@ -83,11 +83,18 @@ const RequestStage = () => {
                         )}
                     />
                     <div className="shrink-0  pb-[50px] flex gap-[10px]">
-                        <button type='submit' onClick={() => dispatch(toNextStage('gender_psychologist'))} className="cursor-pointer shrink-0 w-[81px] border-[1px] border-[#116466] p-[12px] text-[#116466] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]">
+                        <button 
+                            type='button'
+                            onClick={() => dispatch(setApplicationStage('gender_psychologist'))} 
+                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+                        >
                             Назад
                         </button>
 
-                        <button type='submit' className="cursor-pointer grow border-[1px] bg-[#116466] p-[12px] text-[white] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]">
+                        <button 
+                            type='submit' 
+                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+                        >
                             Продолжить
                         </button>
                     </div>

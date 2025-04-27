@@ -1,26 +1,43 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ApplicationStage } from '@/shared/types/application.types';
 import { RootState } from '../store';
+
+export type ApplicationStage = 
+    | 'name'
+    | 'age'
+    | 'gender'
+    | 'preferences'
+    | 'gender_psychologist'
+    | 'request'
+    | 'condition'
+    | 'traumatic'
+    | 'psycho'
+    | 'action'
+    | 'diseases'
+    | 'diseases_psychologist'
+    | 'psychologist'
+    | 'promocode'
+    | 'gratitude'
+    | 'error';
 
 interface ApplicationFormState {
     application_stage: ApplicationStage;
 }
 
 const initialState: ApplicationFormState = {
-    application_stage: 'name',
+    application_stage: 'name'
 };
 
 export const applicationFormSlice = createSlice({
     name: 'applicationForm',
     initialState,
     reducers: {
-        toNextStage: (state, action: PayloadAction<ApplicationStage>) => {
+        setApplicationStage: (state, action: PayloadAction<ApplicationStage>) => {
             state.application_stage = action.payload;
-        },
-    },
+        }
+    }
 });
 
-export const { toNextStage } = applicationFormSlice.actions;
+export const { setApplicationStage } = applicationFormSlice.actions;
 export const applicationFormReducer = applicationFormSlice.reducer;
 
 // Селектор для получения текущего этапа

@@ -2,13 +2,14 @@
 import { Checkbox } from '@/components/ui/checkbox'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form'
 import { Textarea } from '@/components/ui/textarea'
-import { toNextStage } from '@/redux/slices/application_form'
-import { fill_custom_preferences, fill_preferences } from '@/redux/slices/application_form_data'
+import { setApplicationStage } from '@/redux/slices/application_form'
+import { setPreferences, setCustomPreferences } from '@/redux/slices/application_form_data'
 import { zodResolver } from '@hookform/resolvers/zod'
 import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useDispatch } from 'react-redux'
 import { z } from 'zod'
+import { COLORS } from '@/shared/constants/colors'
 
 // Данные чекбоксов
 const preferences = [
@@ -80,9 +81,9 @@ export const PreferencesStage = () => {
       .filter(pref => data.preferences.includes(pref.id))
       .map(pref => pref.label)
     
-    dispatch(fill_preferences(selectedLabels))
-    dispatch(fill_custom_preferences(data.customPreferences))
-    dispatch(toNextStage('gender_psychologist'))
+    dispatch(setPreferences(selectedLabels))
+    dispatch(setCustomPreferences(data.customPreferences))
+    dispatch(setApplicationStage('gender_psychologist'))
   }
 
     return (
@@ -106,8 +107,7 @@ export const PreferencesStage = () => {
                                                 key={item.id}
                                                 control={form.control}
                                                 name="preferences"
-                                                render={({  } : any) => {
-                                                    return (
+                                                render={() => (
                                                     <FormItem
                                                         key={item.id}
                                                         className="flex flex-row items-center space-x-3 space-y-0"
@@ -129,8 +129,7 @@ export const PreferencesStage = () => {
                                                         {item.label}
                                                         </FormLabel>
                                                     </FormItem>
-                                                    )
-                                                }}
+                                                )}
                                                 />
                                             ))}
                                         </div>
@@ -154,11 +153,18 @@ export const PreferencesStage = () => {
                         )}
                     />
                     <div className="shrink-0  pb-[50px] flex gap-[10px] mt-[30px]  max-lg:mt-[30px]">
-                        <button onClick={() => dispatch(toNextStage('gender'))} className="cursor-pointer shrink-0 w-[81px] border-[1px] border-[#116466] p-[12px] text-[#116466] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]">
+                        <button 
+                            type='button'
+                            onClick={() => dispatch(setApplicationStage('gender'))} 
+                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+                        >
                             Назад
                         </button>
 
-                        <button type='submit' className="cursor-pointer grow border-[1px] bg-[#116466] p-[12px] text-[white] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]">
+                        <button 
+                            type='submit' 
+                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+                        >
                             Продолжить
                         </button>
                     </div>

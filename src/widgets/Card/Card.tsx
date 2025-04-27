@@ -65,9 +65,11 @@ const getGoogleDriveVideoUrl = (url: string | null | undefined) => {
 
 interface CardProps {
     psychologist: IPsychologist;
+    id?: string;
+    isSelected?: boolean;
 }
 
-export const Card: FC<CardProps> = ({ psychologist }) => {
+export const Card: FC<CardProps> = ({ psychologist, id, isSelected }) => {
     const dispatch = useDispatch();
     const modal = useSelector((state: RootState) => state.modal);
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -174,7 +176,7 @@ export const Card: FC<CardProps> = ({ psychologist }) => {
     };
 
     return (
-        <div className={styles.card}>
+        <div id={id} className={`${styles.card} ${isSelected ? 'animate-pulse-highlight' : ''}`}>
             {/* Плашка "Подходит больше всего" */}
             <div className={styles.bestMatch}>
                 Подходит больше всего
