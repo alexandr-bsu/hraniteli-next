@@ -95,21 +95,22 @@ export const FilterRequest:React.FC<FilterRequestProps> = ({onSubmit, type, call
     const handleCheckboxCheck = watch('items');
 
     return (
-        <ModalWindow className='max-[425px]:h-[400px]' open={isOpen} closeButton={false} type={type}>
-            <DialogHeader className="flex flex-row items-center">
-                <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[16px] max-lg:leading-[22px]">Выберите запросы:</DialogTitle>
+        <ModalWindow className='max-[425px]:h-[400px] max-lg:p-[16px]' open={isOpen} closeButton={false} type={type}>
+            <DialogHeader className="flex flex-row items-center max-lg:mb-[16px]">
+                <DialogTitle className="grow font-semibold text-[20px] leading-[27px] lg:text-[20px] md:text-[16px] max-lg:text-[14px] max-lg:leading-[22px]">Выберите запросы:</DialogTitle>
                 <DialogClose onClick={callback} className="w-[40px] h-[40px] shrink-0 flex justify-center items-center border-2 border-[#D4D4D4] rounded-full">
                     <Image src={'/modal/cross.svg'} alt="cross" height={15} width={15} />
                 </DialogClose>
             </DialogHeader>
 
             <Form {...methods}>
-                <form onSubmit={formHandleSubmit(onFormSubmit)} className="flex flex-col gap-[20px]">
+                <form onSubmit={formHandleSubmit(onFormSubmit)} className="flex flex-col gap-[20px] max-lg:gap-[16px]">
                     <FormField
                         control={control}
                         name="items"
                         render={() => (
-                            <FormItem className='gap-[20px] overflow-auto max-lg:max-h-[200px]'>
+                            <FormItem className='flex flex-col gap-[20px] max-lg:gap-[16px] h-[400px] max-lg:h-[300px] overflow-y-auto pr-[10px]'>
+                            <div className='flex flex-col gap-[20px] max-lg:gap-[16px]'>
                             {items.map((item) => (
                                 <FormField
                                 key={item.id}
@@ -119,11 +120,11 @@ export const FilterRequest:React.FC<FilterRequestProps> = ({onSubmit, type, call
                                     return (
                                     <FormItem
                                         key={item.id}
-                                        className="flex flex-row items-center gap-[14px]"
+                                        className="flex flex-row items-start gap-[14px] max-lg:gap-[12px]"
                                     >
                                         <FormControl>
                                         <Checkbox 
-                                            className='h-[30px] w-[30px]'
+                                            className='h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px] shrink-0'
                                             checked={field.value?.includes(item.id)}
                                             onCheckedChange={(checked) => {
                                                 const newValue = checked
@@ -141,7 +142,7 @@ export const FilterRequest:React.FC<FilterRequestProps> = ({onSubmit, type, call
                                             }}
                                         />
                                         </FormControl>
-                                        <FormLabel className="text-[18px] max-lg:text-[14px]  font-normal">
+                                        <FormLabel className="text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] font-normal cursor-pointer">
                                         {item.label}
                                         </FormLabel>
                                     </FormItem>
@@ -149,12 +150,37 @@ export const FilterRequest:React.FC<FilterRequestProps> = ({onSubmit, type, call
                                 }}
                                 />
                             ))}
-                            <FormMessage />
+                            </div>
+                            <FormMessage className="text-[14px]" />
                             </FormItem>
                         )}
                         />
                 </form>
             </Form>
+
+            <style jsx global>{`
+                .overflow-y-auto::-webkit-scrollbar {
+                    width: 4px;
+                }
+                
+                .overflow-y-auto::-webkit-scrollbar-track {
+                    background: #F5F5F5;
+                    border-radius: 2px;
+                }
+                
+                .overflow-y-auto::-webkit-scrollbar-thumb {
+                    background: #D4D4D4;
+                    border-radius: 2px;
+                }
+                
+                .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+                    background: #116466;
+                }
+
+                .overflow-x-auto::-webkit-scrollbar {
+                    display: none;
+                }
+            `}</style>
         </ModalWindow>
     );
 };

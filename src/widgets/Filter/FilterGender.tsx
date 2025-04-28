@@ -56,23 +56,22 @@ export const FilterGender:React.FC<FilterGenderProps> = ({onSubmit, type, open, 
     }
 
     return (
-        <ModalWindow className='max-[425px]:h-[400px]' open={open} closeButton={false} type={type}>
-
-            <DialogHeader className="flex flex-row items-center">
-                <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[16px] max-lg:leading-[22px]">С психологом какого пола вы готовы работать?</DialogTitle>
+        <ModalWindow className='max-[425px]:h-[240px] max-lg:p-[16px]' open={open} closeButton={false} type={type}>
+            <DialogHeader className="flex flex-row items-center max-lg:mb-[16px]">
+                <DialogTitle className="grow font-semibold text-[20px] leading-[27px] lg:text-[20px] md:text-[16px] max-lg:text-[14px] max-lg:leading-[22px]">С психологом какого пола вы готовы работать?</DialogTitle>
                 <DialogClose className="w-[40px] h-[40px] shrink-0 flex justify-center items-center border-2 border-[#D4D4D4] rounded-full">
                     <Image src={'/modal/cross.svg'} alt="cross" height={15} width={15} />
                 </DialogClose>
             </DialogHeader>
 
             <Form {...form}>
-                <form className="w-2/3 space-y-6">
+                <form className="w-2/3 space-y-6 max-lg:w-full max-lg:space-y-4">
                     <FormField
                     control={control}
                     name="gender"
                     render={({ field }) => (
                         <FormItem className="space-y-3">
-                        <FormControl >
+                        <FormControl>
                             <RadioGroup
                             defaultValue={field.value}
                             onValueChange={handleRadioChange}
@@ -80,31 +79,31 @@ export const FilterGender:React.FC<FilterGenderProps> = ({onSubmit, type, open, 
                             >
                             <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                <RadioGroupItem colorRadio={'#116466'} className='w-[30px] h-[30px]' value="male" />
+                                <RadioGroupItem colorRadio={'#116466'} className='w-[30px] h-[30px] max-lg:w-[24px] max-lg:h-[24px]' value="male" />
                                 </FormControl>
-                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
+                                <FormLabel className="font-normal text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px]">
                                 Мужской
                                 </FormLabel>
                             </FormItem>
                             <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                <RadioGroupItem colorRadio='#116466' className='w-[30px] h-[30px]' value="female" />
+                                <RadioGroupItem colorRadio='#116466' className='w-[30px] h-[30px] max-lg:w-[24px] max-lg:h-[24px]' value="female" />
                                 </FormControl>
-                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
+                                <FormLabel className="font-normal text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px]">
                                 Женский
                                 </FormLabel>
                             </FormItem>
                             <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                <RadioGroupItem colorRadio='#116466' className='w-[30px] h-[30px]' value="none" />
+                                <RadioGroupItem colorRadio='#116466' className='w-[30px] h-[30px] max-lg:w-[24px] max-lg:h-[24px]' value="none" />
                                 </FormControl>
-                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
+                                <FormLabel className="font-normal text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px]">
                                     Не имеет значения
                                 </FormLabel>
                             </FormItem>
                             </RadioGroup>
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[14px]" />
                         </FormItem>
                     )}
                     />

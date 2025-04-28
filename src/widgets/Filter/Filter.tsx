@@ -81,7 +81,7 @@ export const Filter = () => {
         <>
             <div className="w-[100%] bg-[#FFFFFF] rounded-[20px] p-[20px]">
                 <div className="max-lg:hidden w-full flex justify-between">
-                    <h2 className="font-semibold text-[20px] leading-[27px]">
+                    <h2 className="font-semibold text-[20px] lg:text-[20px] md:text-[16px] leading-[27px]">
                         Фильтры
                     </h2>
                     <Image src='/filter.svg' height={18} width={18} alt="filter" />
@@ -90,13 +90,13 @@ export const Filter = () => {
                 <div className="min-lg:hidden w-full flex justify-between">
                     <div className="flex gap-[15px]">
                         <Image src='/filter.svg' height={18} width={18} alt="filter" />
-                        <h2 className="font-semibold text-[20px] leading-[27px]">
+                        <h2 className="font-semibold text-[20px] lg:text-[20px] md:text-[16px] leading-[27px]">
                             Фильтры
                         </h2>
                     </div>
                     <button 
                         onClick={() => setShow(prev => !prev)} 
-                        className="text-[#116466]"
+                        className="text-[#116466] font-normal text-[14px] leading-[22px]"
                     >
                         {isShow ? 'Свернуть' : 'Развернуть'}
                     </button>
@@ -119,7 +119,7 @@ export const Filter = () => {
                                 onOpenChange={() => handleModalOpen('FilterRequest')} 
                                 open={isOpen && modalType === 'FilterRequest'}
                             >
-                                <SelectTrigger className="w-full min-h-[65px] font-normal border-none bg-[#FAFAFA] text-[18px] leading-[25px]">
+                                <SelectTrigger className="w-full min-h-[65px] font-normal border-none bg-[#FAFAFA] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px]">
                                     <SelectValue placeholder="Выберите запросы" />
                                 </SelectTrigger>
                             </Select>
@@ -127,7 +127,7 @@ export const Filter = () => {
                                 {filterRequest?.map((item, i) => (
                                     <div 
                                         key={i} 
-                                        className="flex items-center gap-2 px-4 py-2 bg-[#116466] text-white rounded-[10px] text-sm"
+                                        className="flex items-center gap-2 px-4 py-2 bg-[#116466] text-white rounded-[10px] text-[14px]"
                                     >
                                         <span>{item.label}</span>
                                         <button 
@@ -159,13 +159,13 @@ export const Filter = () => {
                                 onOpenChange={() => handleModalOpen('FilterGender')} 
                                 open={isOpen && modalType === 'FilterGender'}
                             >
-                                <SelectTrigger className="w-full min-h-[65px] font-normal border-none bg-[#FAFAFA] text-[18px] leading-[25px]">
+                                <SelectTrigger className="w-full min-h-[65px] font-normal border-none bg-[#FAFAFA] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px]">
                                     <SelectValue placeholder="Выберите пол хранителя" />
                                 </SelectTrigger>
                             </Select>
                             {filterGender && filterGender !== 'other' && (
                                 <div className="flex flex-wrap gap-2 mt-2">
-                                    <div className="flex items-center gap-2 px-4 py-2 bg-[#116466] text-white rounded-[10px] text-sm">
+                                    <div className="flex items-center gap-2 px-4 py-2 bg-[#116466] text-white rounded-[10px] text-[14px]">
                                         <span>{filterGender === 'male' ? 'Мужской' : filterGender === 'female' ? 'Женский' : 'Не имеет значения'}</span>
                                         <button 
                                             onClick={() => {
@@ -194,13 +194,13 @@ export const Filter = () => {
                                 onOpenChange={() => handleModalOpen('FilterPrice')} 
                                 open={isOpen && modalType === 'FilterPrice'}
                             >
-                                <SelectTrigger className="w-full min-h-[65px] font-normal border-none bg-[#FAFAFA] text-[18px] leading-[25px]">
+                                <SelectTrigger className="w-full min-h-[65px] font-normal border-none bg-[#FAFAFA] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px]">
                                     <SelectValue placeholder="Выберите стоимость" />
                                 </SelectTrigger>
                             </Select>
                             {filterPrice.length > 0 && (
                                 <div className="flex flex-wrap gap-2 mt-2">
-                                    <div className="flex items-center gap-2 px-4 py-2 bg-[#116466] text-white rounded-[10px] text-sm">
+                                    <div className="flex items-center gap-2 px-4 py-2 bg-[#116466] text-white rounded-[10px] text-[14px]">
                                         <span>До {filterPrice[0]} ₽</span>
                                         <button 
                                             onClick={() => {
@@ -230,7 +230,7 @@ export const Filter = () => {
                                 onOpenChange={() => handleModalOpen('FilterDate')} 
                                 open={isOpen && modalType === 'FilterDate'}
                             >
-                                <SelectTrigger className="w-full min-h-[65px] font-normal border-none bg-[#FAFAFA] text-[18px] leading-[25px]">
+                                <SelectTrigger className="w-full min-h-[65px] font-normal border-none bg-[#FAFAFA] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px]">
                                     <SelectValue placeholder="Выберите дату сессии" />
                                 </SelectTrigger>
                             </Select>
@@ -278,7 +278,7 @@ export const Filter = () => {
                             />
                             <label
                                 htmlFor="video"
-                                className="font-normal text-[16px] leading-[22px]"
+                                className="font-normal text-[16px] lg:text-[16px] md:text-[13px] max-lg:text-[13px] leading-[22px]"
                             >
                                 Есть видеовизитка
                             </label>
@@ -295,7 +295,7 @@ export const Filter = () => {
                             />
                             <label
                                 htmlFor="mental_illnesses"
-                                className="font-normal text-[16px] leading-[22px]"
+                                className="font-normal text-[16px] lg:text-[16px] md:text-[13px] max-lg:text-[13px] leading-[22px]"
                             >
                                 Работает с психическими заболеваниями (РПП, СДВГ и др)
                             </label>
@@ -312,7 +312,7 @@ export const Filter = () => {
                             />
                             <label
                                 htmlFor="mental_illnesses2"
-                                className="font-normal text-[16px] leading-[22px]"
+                                className="font-normal text-[16px] lg:text-[16px] md:text-[13px] max-lg:text-[13px] leading-[22px]"
                             >
                                 Принимаете ли вы медикаменты по назначению психиатра
                             </label>
@@ -333,7 +333,7 @@ export const Filter = () => {
                             />
                             <label
                                 htmlFor="favorites"
-                                className="font-normal text-[16px] leading-[22px] flex items-center gap-2"
+                                className="font-normal text-[16px] lg:text-[16px] md:text-[13px] max-lg:text-[13px] leading-[22px] flex items-center gap-2"
                             >
                                 Только избранные
                                 <Image 

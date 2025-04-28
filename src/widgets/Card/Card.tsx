@@ -197,7 +197,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                             <div className={styles.videoWrapper}>
                                 <video
                                     ref={videoRef}
-                                    src={videoUrl}
+                                    src={getGoogleDriveVideoUrl(videoUrl) || undefined}
                                     playsInline
                                     loop
                                     muted
@@ -213,7 +213,16 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                                             if (isPlaying) {
                                                 videoRef.current.pause();
                                             } else {
-                                                videoRef.current.play();
+                                                const playPromise = videoRef.current.play();
+                                                if (playPromise !== undefined) {
+                                                    playPromise
+                                                        .then(() => {
+                                                            setIsPlaying(true);
+                                                        })
+                                                        .catch(error => {
+                                                            console.error("Error playing video:", error);
+                                                        });
+                                                }
                                             }
                                             setIsPlaying(!isPlaying);
                                         }

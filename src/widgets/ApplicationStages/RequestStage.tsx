@@ -69,7 +69,7 @@ const RequestStage = () => {
                                     <div className='input__text_container mt-[30px] relative bg-[#FAFAFA] w-full h-[246px] max-lg:h-[177px]'>
                                     <Textarea
                                         className='input__text placeholder:text-[18px] placeholder:text-[#9A9A9A] rounded-[10px] border-none w-full h-full p-[20px] text-left align-top
-                                                max-lg:text-[14px] max-lg:placeholder:text-[14px]'
+                                                max-lg:text-[16px] max-lg:placeholder:text-[16px]'
                                         style={{
                                         resize: 'none',
                                         lineHeight: '1.5'
@@ -86,14 +86,14 @@ const RequestStage = () => {
                         <button 
                             type='button'
                             onClick={() => dispatch(setApplicationStage('gender_psychologist'))} 
-                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px]`}
                         >
                             Назад
                         </button>
 
                         <button 
                             type='submit' 
-                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px]`}
                         >
                             Продолжить
                         </button>

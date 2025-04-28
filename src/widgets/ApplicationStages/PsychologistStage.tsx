@@ -49,7 +49,6 @@ export const PsychologistStage = () => {
   const getFilterQueryParams = () => {
     const params = new URLSearchParams();
     
-    // Добавляем ID текущего психолога
     if (currentPsychologist?.id) {
       params.append('selected_psychologist', currentPsychologist.id);
     }
@@ -59,7 +58,6 @@ export const PsychologistStage = () => {
 
   const handleOpenPsychologistCard = () => {
     const url = getFilterQueryParams();
-
     window.open(url, '_blank');
   };
 
@@ -89,7 +87,7 @@ export const PsychologistStage = () => {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
-        <span className="mt-4 text-[18px] text-[#116466]">Загрузка психологов...</span>
+        <span className="mt-4 text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[14px] text-[#116466]">Загрузка психологов...</span>
       </div>
     );
   }
@@ -99,29 +97,29 @@ export const PsychologistStage = () => {
 
   return (
     <div className="flex flex-col w-full pr-[50px] pl-[50px] pb-[50px] pt-[30px] max-lg:p-[20px] h-full">
-      <div className="flex justify-between items-center mb-[20px]">
+      <div className="flex justify-between items-center mb-[20px] max-lg:flex-col max-lg:gap-[15px]">
         <button 
           onClick={handlePrevious} 
           disabled={currentIndex === 0}
-          className={`flex items-center gap-[10px] cursor-pointer text-[#116466] ${currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ${currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
-          <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} />
+          <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
           <span>Предыдущий психолог</span>
         </button>
         <button 
           onClick={handleNext}
           disabled={currentIndex >= filtered_by_automatch_psy.length - 1}
-          className={`flex items-center gap-[10px] cursor-pointer text-[#116466] ${currentIndex >= filtered_by_automatch_psy.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
+          className={`flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ${currentIndex >= filtered_by_automatch_psy.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
         >
           <span>Показать еще {remainingPsychologists} психологов</span>
-          <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} />
+          <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
         </button>
       </div>
 
-      <div className="flex flex-col grow p-[25px] max-lg:p-[15px] mb-[57px] border-[1px] rounded-[25px]">
-        <div className="flex justify-between items-start mb-[30px]">
-          <div className="flex gap-[20px] items-center">
-            <div className="w-[80px] h-[80px] rounded-full overflow-hidden">
+      <div className="flex flex-col grow p-[25px] max-lg:p-[15px] mb-[30px] max-lg:mb-[20px] border-[1px] rounded-[25px]">
+        <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-lg:flex-col max-lg:gap-[15px]">
+          <div className="flex gap-[20px] items-center max-lg:gap-[15px]">
+            <div className="w-[80px] h-[80px] max-lg:w-[60px] max-lg:h-[60px] rounded-full overflow-hidden">
               <Image 
                 src={getGoogleDriveImageUrl(currentPsychologist.link_photo)}
                 alt={currentPsychologist.name}
@@ -131,8 +129,8 @@ export const PsychologistStage = () => {
               />
             </div>
             <div>
-              <h3 className="text-[18px] font-semibold">{currentPsychologist.name}, {currentPsychologist.age} лет</h3>
-              <span className="text-[16px] text-[#9A9A9A]">
+              <h3 className="text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] font-semibold">{currentPsychologist.name}, {currentPsychologist.age} лет</h3>
+              <span className="text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#9A9A9A]">
                 {currentPsychologist.experience && (
                   <span>{currentPsychologist.experience}{' '}</span>
                 )}
@@ -144,41 +142,41 @@ export const PsychologistStage = () => {
           </div>
           <button 
             onClick={handleOpenPsychologistCard}
-            className="hover:opacity-80 transition-opacity cursor-pointer"
+            className="hover:opacity-80 transition-opacity cursor-pointer text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#116466] max-lg:w-full max-lg:text-center max-lg:py-[8px] max-lg:border max-lg:border-[#116466] max-lg:rounded-[50px]"
           >
             Перейти на карточку психолога
           </button>
         </div>
 
-        <div className="grid grid-cols-3 gap-[30px] mb-[30px]">
+        <div className="grid grid-cols-3 gap-[30px] mb-[30px] max-lg:grid-cols-1 max-lg:gap-[20px] max-lg:mb-[20px]">
           <div>
-            <span className="text-[#9A9A9A] text-[16px]">Основной подход:</span>
+            <span className="text-[#9A9A9A] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]">Основной подход:</span>
             <div className="flex items-center gap-[10px] mt-[5px]">
-              <p className="font-semibold text-[18px]">{currentPsychologist.main_modal}</p>
+              <p className="font-semibold text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px]">{currentPsychologist.main_modal}</p>
               <Tooltip text="Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов." />
             </div>
           </div>
           <div>
-            <span className="text-[#9A9A9A] text-[16px]">Формат встречи:</span>
-            <p className="font-semibold text-[18px] mt-[5px]">Онлайн</p>
+            <span className="text-[#9A9A9A] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]">Формат встречи:</span>
+            <p className="font-semibold text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] mt-[5px]">Онлайн</p>
           </div>
           <div>
-            <span className="text-[#9A9A9A] text-[16px]">Стоимость:</span>
+            <span className="text-[#9A9A9A] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]">Стоимость:</span>
             <div className="flex items-center gap-[10px] mt-[5px]">
-              <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p>
+              <p className="font-semibold text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px]">От {currentPsychologist.min_session_price || 0} ₽</p>
               <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
             </div>
           </div>
         </div>
 
-        <div className="mb-[30px]">
-          <h4 className="font-semibold text-[18px] mb-[10px]">Ближайшая запись:</h4>
+        <div className="mb-[30px] max-lg:mb-[20px]">
+          <h4 className="font-semibold text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] mb-[10px]">Ближайшая запись:</h4>
           <div className="flex gap-[10px] overflow-x-auto pb-[10px]">
             {availableSlots.map((slot, index) => (
               <button
                 key={index}
                 onClick={() => handleSlotSelect(slot)}
-                className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap min-w-[132px] ${
+                className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap min-w-[132px] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ${
                   selectedSlot === slot 
                     ? 'bg-[#116466] text-white border-[#116466]' 
                     : 'border-[#D4D4D4] text-[#116466]'
@@ -191,18 +189,18 @@ export const PsychologistStage = () => {
         </div>
       </div>
 
-      <div className="shrink-0 pb-[50px] flex gap-[10px]">
+      <div className="shrink-0 pb-[50px] max-lg:pb-[30px] flex gap-[10px]">
           <button
               type='button'
-              onClick={() => dispatch(setApplicationStage('promocode'))}
-              className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+              onClick={() => dispatch(setApplicationStage('age'))}
+              className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px]`}
           >
               Назад
           </button>
 
           <button
               type='submit'
-              className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+              className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px]`}
               onClick={handleSubmit}
           >
               Продолжить

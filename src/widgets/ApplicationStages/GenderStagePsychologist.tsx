@@ -72,7 +72,7 @@ export const GenderStagePsychologist = () => {
                 <div className='grow'>
                 <FormItem className='grow max-[425px]:mb-[30px]'>
                     <FormLabel className=' max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px]  leading-[27px] '>С психологом какого пола вы готовы работать?</FormLabel>
-                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
+                    <FormDescription className='max-lg:text-[16px] font-normal text-[18px] leading-[25px]'>
                         Выберите один вариант ответа
                     </FormDescription>
                     <FormControl className="mt-[20px]">
@@ -85,7 +85,7 @@ export const GenderStagePsychologist = () => {
                                 <FormControl>
                                 <RadioGroupItem className="h-[30px] w-[30px]" value="male" />
                                 </FormControl>
-                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
+                                <FormLabel className="font-normal text-[18px] max-lg:text-[16px]">
                                     Мужской
                                 </FormLabel>
                             </FormItem>
@@ -93,7 +93,7 @@ export const GenderStagePsychologist = () => {
                                 <FormControl> 
                                 <RadioGroupItem className="h-[30px] w-[30px]" value="female" />
                                 </FormControl>
-                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
+                                <FormLabel className="font-normal text-[18px] max-lg:text-[16px]">
                                     Женский
                                 </FormLabel>
                             </FormItem>
@@ -101,18 +101,18 @@ export const GenderStagePsychologist = () => {
                                 <FormControl> 
                                 <RadioGroupItem className="h-[30px] w-[30px]" value="no_matter" />
                                 </FormControl>
-                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
+                                <FormLabel className="font-normal text-[18px] max-lg:text-[16px]">
                                     Не имеет значения
                                 </FormLabel>
                             </FormItem>
                         </RadioGroup>
                     </FormControl>
                     {
-                        !form.formState.errors.gender && <span className='mt-[10px] max-lg:text-[12px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
+                        !form.formState.errors.gender && <span className='mt-[10px] max-lg:text-[16px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
                              ! Поле обязательное для заполнения
                         </span>
                     }
-                    <FormMessage className="mt-[10px]"/>
+                    <FormMessage className="mt-[10px] max-lg:text-[16px]"/>
                 </FormItem>
                 </div>
             )}
@@ -121,14 +121,14 @@ export const GenderStagePsychologist = () => {
                 <button 
                     type='button'
                     onClick={() => dispatch(setApplicationStage('preferences'))} 
-                    className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+                    className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px]`}
                 >
                     Назад
                 </button>
 
                 <button 
                     type='submit' 
-                    className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+                    className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px]`}
                 >
                     Продолжить
                 </button>

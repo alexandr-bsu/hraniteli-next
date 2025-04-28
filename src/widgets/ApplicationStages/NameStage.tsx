@@ -49,43 +49,45 @@ export default function NameStageApplication() {
             render={({ field }) => (
               <div className='grow max-h-[100%]'>
                 <FormItem className='grow max-[425px]:mb-[30px]'>
-                  <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>
+                  <FormLabel className='text-[20px] lg:text-[20px] md:text-[16px] max-lg:text-[16px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                     Как вас зовут?
                   </FormLabel>
-                  <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
+                  <FormDescription className='text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] leading-[25px] max-lg:leading-[20px] font-normal mt-[10px] max-lg:mt-[8px]'>
                     Вы можете не указывать имя, если пока не готовы
                   </FormDescription>
-                  <div className='input__text_container max-lg:mt-[10px] mt-[30px] relative bg-[#FAFAFA] w-full h-[65px]'>
+                  <div className='input__text_container mt-[30px] max-lg:mt-[16px] relative bg-[#FAFAFA] w-full h-[65px] max-lg:h-[50px]'>
                     <Input
                       {...field}
-                      className='input__text placeholder:text-[#9A9A9A] rounded-[10px] border-none w-full h-full'
+                      className='input__text placeholder:text-[#9A9A9A] text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[10px] border-none w-full h-full'
                       onChange={(e) => {
-                        field.onChange(e) // Обновляем значение в форме
-                        localStorage.setItem('app_username', e.target.value) // Сразу сохраняем
+                        field.onChange(e)
+                        localStorage.setItem('app_username', e.target.value)
                       }}
                     />
-                    <label className='input__text_label'>Введите ваше имя или псевдоним</label>
+                    <label className='input__text_label text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px]'>
+                      Введите ваше имя или псевдоним
+                    </label>
                   </div>
                   {!form.formState.errors.username && (
-                    <span className='mt-[10px] max-lg:text-[12px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
+                    <span className='mt-[10px] max-lg:mt-[8px] text-[14px] lg:text-[14px] md:text-[16px] max-lg:text-[16px] leading-[100%] text-[#9A9A9A] font-normal'>
                       ! Поле обязательное для заполнения
                     </span>
                   )}
-                  <FormMessage className='mt-[10px]'/>
+                  <FormMessage className='mt-[10px] max-lg:mt-[8px]'/>
                 </FormItem>
               </div>
             )}
           />
-          <div className="shrink-0 pb-[50px] flex gap-[10px]">
+          <div className="shrink-0 pb-[50px] max-lg:pb-[30px] flex gap-[10px]">
             <button 
               type="button" 
-              className="cursor-pointer shrink-0 w-[81px] border-[1px] border-[#116466] p-[12px] text-[#116466] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]"
+              className="cursor-pointer shrink-0 w-[81px] border-[1px] border-[#116466] p-[12px] text-[#116466] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px]"
             >
               Назад
             </button>
             <button 
               type="submit" 
-              className="cursor-pointer grow border-[1px] bg-[#116466] p-[12px] text-[white] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]"
+              className="cursor-pointer grow border-[1px] bg-[#116466] p-[12px] text-[white] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px]"
             >
               Продолжить
             </button>

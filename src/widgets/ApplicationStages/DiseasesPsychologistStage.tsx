@@ -81,61 +81,61 @@ export const DiseasesPsychologistStage = () => {
                         render={({ field }) => (
                             <div className='flex-1 mb-[20px]'>
                                 <FormItem className='p-[25px] max-lg:p-[15px] border-[1px] rounded-[25px]'>
-                                    <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>
+                                    <FormLabel className='text-[20px] lg:text-[20px] md:text-[16px] max-lg:text-[16px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                                         Есть ли у вас диагностированные психические/
-                                        <br />
+                                        <br className="max-lg:hidden" />
                                         психиатрические заболевания?
                                     </FormLabel>
-                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
+                                    <FormDescription className='text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] leading-[25px] max-lg:leading-[20px] font-normal mt-[10px] max-lg:mt-[8px]'>
                                         Выберите один вариант ответа
                                     </FormDescription>
-                                    <FormControl className="mt-[20px]">
+                                    <FormControl className="mt-[20px] max-lg:mt-[16px]">
                                         <RadioGroup
                                             onValueChange={field.onChange}
                                             defaultValue={field.value}
-                                            className="flex flex-col gap-[15px]"
+                                            className="flex flex-col gap-[40px] max-lg:gap-[20px]"
                                         >
-                                            <FormItem className="flex items-center gap-[15px]">
+                                            <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px]" value="diseases1" />
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="diseases1" />
                                                 </FormControl>
-                                                <FormLabel className="font-normal text-[18px]">
+                                                <FormLabel className="text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] font-normal">
                                                     Есть диагностированное психическое заболевание
                                                 </FormLabel>
                                             </FormItem>
-                                            <FormItem className="flex items-center gap-[15px]">
+                                            <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px]" value="diseases2" />
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="diseases2" />
                                                 </FormControl>
-                                                <FormLabel className="font-normal text-[18px]">
+                                                <FormLabel className="text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] font-normal">
                                                     Есть диагностированное психиатрическое заболевание
                                                 </FormLabel>
                                             </FormItem>
-                                            <FormItem className="flex items-center gap-[15px]">
+                                            <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px]" value="nothing" />
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="nothing" />
                                                 </FormControl>
-                                                <FormLabel className="font-normal text-[18px]">
+                                                <FormLabel className="text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] font-normal">
                                                     Не имеет значения
                                                 </FormLabel>
                                             </FormItem>
                                         </RadioGroup>
                                     </FormControl>
                                     {!form.formState.errors.diseases && (
-                                        <span className='mt-[10px] max-lg:text-[12px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
+                                        <span className='mt-[10px] max-lg:mt-[8px] text-[14px] lg:text-[14px] md:text-[16px] max-lg:text-[16px] leading-[100%] text-[#9A9A9A] font-normal'>
                                             ! Поле обязательное для заполнения
                                         </span>
                                     )}
-                                    <FormMessage />
+                                    <FormMessage className="text-[16px]" />
                                 </FormItem>
                             </div>
                         )}
                     />
-                    <div className="shrink-0 pb-[50px] flex gap-[10px]">
+                    <div className="shrink-0 pb-[50px] max-lg:pb-[30px] flex gap-[10px]">
                         <button
                             type='button'
                             onClick={() => dispatch(setApplicationStage('traumatic'))}
-                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}
+                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px]`}
                         >
                             Назад
                         </button>
@@ -143,7 +143,7 @@ export const DiseasesPsychologistStage = () => {
                         <button
                             type='submit'
                             disabled={hasError}
-                            className={`grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] ${hasError ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                            className={`grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px] ${hasError ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                         >
                             Продолжить
                         </button>

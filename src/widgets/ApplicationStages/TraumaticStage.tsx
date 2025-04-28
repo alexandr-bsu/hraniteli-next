@@ -120,7 +120,7 @@ export const TraumaticStage = () => {
                                                             }}
                                                         />
                                                         </FormControl>
-                                                        <FormLabel className={`text-[18px] leading-[25px] max-lg:text-[14px] font-normal text-[${COLORS.text.primary}]`}>
+                                                        <FormLabel className={`text-[18px] leading-[25px] max-lg:text-[16px] font-normal text-[${COLORS.text.primary}]`}>
                                                         {item.label}
                                                         </FormLabel>
                                                     </FormItem>
@@ -136,11 +136,11 @@ export const TraumaticStage = () => {
                         )}
                     />
                     <div className="shrink-0 mt-[30px]  pb-[50px] flex gap-[10px]">
-                        <button onClick={() => dispatch(setApplicationStage('condition'))} className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}>
+                        <button onClick={() => dispatch(setApplicationStage('condition'))} className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px]`}>
                             Назад
                         </button>
 
-                        <button type='submit' className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]`}>
+                        <button type='submit' className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px]`}>
                             Продолжить
                         </button>
                     </div>
