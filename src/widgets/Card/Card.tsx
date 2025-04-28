@@ -4,12 +4,8 @@ import Image from "next/image";
 import { FC, useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { openModal, closeModal, setSelectedPsychologist } from "@/redux/slices/modal";
+import { addFavorite, removeFavorite } from "@/redux/slices/favorites";
 import { IPsychologist } from "@/shared/types/psychologist.types";
-import { Button } from '@/shared/ui/Button';
-import { Chip } from '@/shared/ui/Chip';
-import { Text } from '@/shared/ui/Text';
-import { Title } from '@/shared/ui/Title';
-import { COLORS } from '@/shared/constants/colors';
 import { ROUTES } from '@/shared/constants/routes';
 import Link from 'next/link';
 import { RootState } from "@/redux/store";
@@ -17,6 +13,8 @@ import styles from './Card.module.scss';
 import { getPsychologistEducation, getPsychologistFullInfo } from '@/shared/api/psychologist';
 import axios from 'axios';
 import { getTimeDifference } from '@/features/utils';
+import { toast } from "sonner";
+import { Tooltip } from '@/shared/ui/Tooltip';
 
 const getAgeWord = (age: number): string => {
     const lastDigit = age % 10;
@@ -67,24 +65,23 @@ interface CardProps {
     psychologist: IPsychologist;
     id?: string;
     isSelected?: boolean;
+    showBestMatch?: boolean;
 }
 
-export const Card: FC<CardProps> = ({ psychologist, id, isSelected }) => {
+export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatch = false }) => {
     const dispatch = useDispatch();
     const modal = useSelector((state: RootState) => state.modal);
+    const favorites = useSelector((state: RootState) => state.favorites.items);
     const videoRef = useRef<HTMLVideoElement>(null);
     const [isPlaying, setIsPlaying] = useState(false);
-    const [isFavorite, setIsFavorite] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
     const [education, setEducation] = useState<any[]>([]);
     const [showVideo, setShowVideo] = useState(false);
     const [availableSlots, setAvailableSlots] = useState<{date: string, time: string}[]>([]);
 
-    const [isShow, setShow] = useState(false);
-    const [isShowInfo, setShowInfo] = useState(false);
+    // Проверяем, находится ли психолог в избранном
+    const isFavorite = favorites.some(item => item.id === psychologist.id);
 
-    const works_with = psychologist.works_with?.split(';').map(item => item.trimStart()) || [];
-    const queries = psychologist.queries?.split(';').map(item => item.trimStart()) || [];
     const imageUrl = getGoogleDriveImageUrl(psychologist.link_photo);
     const videoUrl = psychologist.link_video;
 
@@ -168,7 +165,15 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected }) => {
     };
 
     const handleFavoriteClick = () => {
-        setIsFavorite(!isFavorite);
+        if (!psychologist.id) return;
+        
+        if (isFavorite) {
+            dispatch(removeFavorite(psychologist.id));
+            toast.success('Психолог удален из избранного');
+        } else {
+            dispatch(addFavorite(psychologist));
+            toast.success('Психолог добавлен в избранное');
+        }
     };
 
     const handleSlotClick = () => {
@@ -177,26 +182,52 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected }) => {
 
     return (
         <div id={id} className={`${styles.card} ${isSelected ? 'animate-pulse-highlight' : ''}`}>
-            {/* Плашка "Подходит больше всего" */}
-            <div className={styles.bestMatch}>
-                Подходит больше всего
-            </div>
-
             {/* Верхняя часть с фото и основной инфой */}
             <div className={styles.header}>
                 <div className={styles.avatarSection}>
                     <div className={styles.avatar} onClick={videoUrl ? handleVideoClick : undefined}>
+                        {/* Плашка "Подходит больше всего" */}
+                        {showBestMatch && (
+                            <div className={styles.bestMatch}>
+                                Подходит больше всего
+                            </div>
+                        )}
+                        
                         {showVideo && videoUrl ? (
-                            <video
-                                ref={videoRef}
-                                src={videoUrl}
-                                playsInline
-                                loop
-                                muted
-                                preload="metadata"
-                                className={styles.video}
-                                autoPlay
-                            />
+                            <div className={styles.videoWrapper}>
+                                <video
+                                    ref={videoRef}
+                                    src={videoUrl}
+                                    playsInline
+                                    loop
+                                    muted
+                                    preload="metadata"
+                                    className={styles.video}
+                                    autoPlay
+                                />
+                                <button 
+                                    className={styles.playPauseButton}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (videoRef.current) {
+                                            if (isPlaying) {
+                                                videoRef.current.pause();
+                                            } else {
+                                                videoRef.current.play();
+                                            }
+                                            setIsPlaying(!isPlaying);
+                                        }
+                                    }}
+                                >
+                                    <Image
+                                        src={isPlaying ? "/card/pause.svg" : "/card/play.svg"}
+                                        alt={isPlaying ? "Пауза" : "Воспроизвести"}
+                                        width={42}
+                                        height={43}
+                                        unoptimized
+                                    />
+                                </button>
+                            </div>
                         ) : (
                             <Image
                                 src={imageUrl}
@@ -212,15 +243,18 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected }) => {
                         )}
                         
                         {videoUrl && !showVideo && (
-                            <div className={styles.playButton}>
+                            <button
+                                className={styles.playButton}
+                                onClick={() => setShowVideo(true)}
+                            >
                                 <Image
-                                    src="/card/PlayVideo.svg"
+                                    src="/card/play.svg"
                                     alt="Play"
                                     width={42}
-                                    height={42}
+                                    height={43}
                                     unoptimized
                                 />
-                            </div>
+                            </button>
                         )}
                     </div>
                 </div>
@@ -248,7 +282,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected }) => {
                         </button>
                     </div>
 
-                    <div className={styles.experience}>
+                    <div className={styles.experienceWrapper}>
                         {psychologist.experience && (
                             <span className={styles.experience}>
                                 {psychologist.experience}
@@ -263,8 +297,9 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected }) => {
                             <Image 
                                 src="/card/verified.svg" 
                                 alt="Verified" 
-                                width={16} 
-                                height={16}
+                                width={23} 
+                                height={23}
+                                style={{ marginLeft: '6px' }}
                                 unoptimized
                             />
                         )}
@@ -275,14 +310,14 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected }) => {
                             <span className={styles.label}>Основной подход:</span>
                             <div className={styles.value}>
                                 {psychologist.main_modal}
-                                <button className={styles.infoButton}>?</button>
+                                <Tooltip text="Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов." />
                             </div>
                         </div>
                         <div className={styles.approachBlock}>
                             <span className={styles.label}>Стоимость:</span>
                             <div className={styles.value}>
-                                От {psychologist.min_session_price} ₽
-                                <button className={styles.infoButton}>?</button>
+                                От {psychologist.min_session_price || 0} ₽
+                                <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
                             </div>
                         </div>
                     </div>
@@ -296,7 +331,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected }) => {
                             ).map((approach: string, index: number) => (
                                 <div key={index} className={styles.approachItem}>
                                     {approach.trim()}
-                                    <button className={styles.infoButton}>?</button>
+                                    <Tooltip text="Дополнительные подходы, которые психолог использует в своей работе для более эффективной помощи клиентам." />
                                 </div>
                             ))}
                         </div>
@@ -338,7 +373,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected }) => {
                     {psychologist.works_with?.split(';').map((diagnosis, index) => (
                         <div key={index} className={styles.diagnosisItem}>
                             {diagnosis.trim()}
-                            <button className={styles.infoButton}>?</button>
+                            <Tooltip text="Психолог имеет опыт работы с данным диагнозом и может помочь в его коррекции или адаптации." />
                         </div>
                     ))}
                 </div>
@@ -403,14 +438,14 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected }) => {
                             <span className={styles.infoLabel}>Личная терапия:</span>
                             <span className={styles.infoValue}>
                                 {psychologist.personal_therapy_duration ? 'Да' : 'Нет'}
-                                <button className={styles.infoButton}>?</button>
+                                <Tooltip text="Личная терапия - важный опыт для психолога, позволяющий лучше понимать клиентов и работать над собой." />
                             </span>
                         </div>
                         <div className={styles.infoRow}>
                             <span className={styles.infoLabel}>Посещает супервизию:</span>
                             <span className={styles.infoValue}>
                                 {psychologist.supervision ? 'Да' : 'Нет'}
-                                <button className={styles.infoButton}>?</button>
+                                <Tooltip text="Супервизия - профессиональная поддержка психолога более опытным коллегой, что обеспечивает качество работы." />
                             </span>
                         </div>
                         <div className={styles.infoRow}>

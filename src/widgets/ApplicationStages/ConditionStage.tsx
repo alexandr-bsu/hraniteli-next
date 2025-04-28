@@ -115,12 +115,12 @@ export const ConditionStage = () => {
                                         Что из описанного ниже вы наблюдаете в своём состоянии в последнее время?
                                     </FormLabel>
                                     <FormDescription
-                                        className='max-lg:text-[14px] font-normal text-[18px]  leading-[25px] mt-[10px] text-[${COLORS.text.secondary}]'
+                                        className='max-lg:text-[14px] font-normal text-[18px] leading-[25px] text-[${COLORS.text.secondary}]'
                                     >
                                        Выберите все подходящие пункты или пропустите вопрос, если ничего из этого не наблюдается
                                     </FormDescription>
                                         <div className='flex justify-between mt-[10px] max-lg:flex-col  max-h-[150px] max-lg:max-h-none overflow-hidden'>
-                                           <div className='flex flex-col gap-[15px] w-full max-h-[150px]  max-lg:max-h-[200px] pb-[50px] overflow-x-auto'>
+                                           <div className='flex flex-col gap-[10px] w-full max-h-[150px] max-lg:max-h-[200px] pb-[50px] overflow-x-auto'>
                                             {CONDITIONS.map((item) => (
                                                 <FormField
                                                 key={item.id}

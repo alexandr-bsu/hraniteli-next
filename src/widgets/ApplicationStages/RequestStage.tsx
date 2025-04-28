@@ -63,7 +63,7 @@ const RequestStage = () => {
                             <div className='grow max-[425px]:mb-[30px]'>
                                 <FormItem className='grow gap-0'>
                                     <FormLabel className='max-lg:text-[16px] font-semibold text-[20px] leading-[27px]'>Опишите свой запрос к психологу: что беспокоит,<br></br> чего ожидаете, к чему хотите прийти?</FormLabel>
-                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px] mt-[10px]'>
+                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
                                         Не знаете ответов — это нормально, напишите, как <br></br> чувствуете. Можете пропустить если не готовы
                                     </FormDescription>
                                     <div className='input__text_container mt-[30px] relative bg-[#FAFAFA] w-full h-[246px] max-lg:h-[177px]'>

@@ -63,7 +63,7 @@ export const GenderStageApplication = () => {
                                     <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>
                                         Какой у вас пол?
                                     </FormLabel>
-                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px] mt-[10px]'>
+                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
                                         Мы учитываем ваш пол при подборе психолога
                                     </FormDescription>
                                     <FormControl className="mt-[20px]">
@@ -92,7 +92,7 @@ export const GenderStageApplication = () => {
                                     </FormControl>
                                     {!form.formState.errors.gender && 
                                         <span className='mt-[10px] max-lg:text-[12px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
-                                            Это обязательное поле
+                                            ! Поле обязательное для заполнения
                                         </span>
                                     }
                                     <FormMessage className="mt-[10px]"/>

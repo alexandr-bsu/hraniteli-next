@@ -101,7 +101,7 @@ export const DiseasesStage = () => {
                             <br />
                             психиатрические заболевания?
                         </FormLabel>
-                        <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px] mt-[10px]'>
+                        <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
                             Выберите один вариант ответа
                         </FormDescription>
                         <FormControl className="mt-[20px]">
@@ -146,7 +146,7 @@ export const DiseasesStage = () => {
                                     <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] mt-[30px] font-semibold text-[20px] leading-[27px]'>
                                         Принимаете ли вы медикаменты <br></br> по назначению психиатра?
                                     </FormLabel>
-                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px] mt-[10px]'>
+                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
                                         Выберите один вариант ответа
                                     </FormDescription>
                                     <FormControl className="mt-[20px]">

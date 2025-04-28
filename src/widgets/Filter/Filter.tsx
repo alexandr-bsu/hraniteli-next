@@ -23,7 +23,8 @@ import {
     findByPrice, 
     findByRequests, 
     findByTime, 
-    findByVideo 
+    findByVideo,
+    findByFavorites
 } from "@/redux/slices/filter";
 import { Gender } from "@/shared/types/application.types";
 
@@ -41,11 +42,13 @@ export const Filter = () => {
     const [isShow, setShow] = useState(true);
     const { isOpen, type: modalType } = useSelector((state: RootState) => state.modal);
     const currentGender = useSelector((state: RootState) => state.filter.gender) as Gender;
+    const favorites = useSelector((state: RootState) => state.favorites.items);
 
     const [filterData, setFilterDate] = useState<DateFilterData[]>([]);
     const [filterPrice, setFilterPrice] = useState<string[]>([]);
     const [filterRequest, setFilterRequest] = useState<FilterData[]>([]);
     const [filterGender, setFilterGender] = useState<Gender | ''>('');
+    const [showFavorites, setShowFavorites] = useState(false);
 
     const dispatch = useDispatch();
 
@@ -56,6 +59,15 @@ export const Filter = () => {
             setFilterGender('');
         }
     }, [currentGender]);
+
+    useEffect(() => {
+        if (showFavorites) {
+            dispatch(findByFavorites({ 
+                favoriteIds: favorites.map(item => item.id || '').filter(Boolean), 
+                enabled: true 
+            }));
+        }
+    }, [favorites, showFavorites, dispatch]);
 
     const handleModalOpen = (type: ModalType) => {
         dispatch(openModal(type));
@@ -303,6 +315,33 @@ export const Filter = () => {
                                 className="font-normal text-[16px] leading-[22px]"
                             >
                                 Принимаете ли вы медикаменты по назначению психиатра
+                            </label>
+                        </div>
+                        
+                        <div className="flex items-center gap-[15px] mt-[20px]">
+                            <Checkbox 
+                                className="w-[30px] h-[30px]" 
+                                id="favorites"
+                                checked={showFavorites}
+                                onCheckedChange={(checked: boolean) => {
+                                    setShowFavorites(checked);
+                                    dispatch(findByFavorites({ 
+                                        favoriteIds: favorites.map(item => item.id || '').filter(Boolean), 
+                                        enabled: checked 
+                                    }));
+                                }}
+                            />
+                            <label
+                                htmlFor="favorites"
+                                className="font-normal text-[16px] leading-[22px] flex items-center gap-2"
+                            >
+                                Только избранные
+                                <Image 
+                                    src={'/card/heart-filled.svg'} 
+                                    alt="Избранное" 
+                                    height={18} 
+                                    width={18}
+                                />
                             </label>
                         </div>
                     </>

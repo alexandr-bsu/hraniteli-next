@@ -12,6 +12,7 @@ interface FilterState {
   filtered_by_video: IPsychologist[];
   filtered_by_mental_illness: IPsychologist[];
   filtered_by_mental_illness2: IPsychologist[];
+  filtered_by_favorites: IPsychologist[];
   dates_psychologists: IPsychologist[];
   hour_dates: string[];
   gender: Gender;
@@ -21,6 +22,7 @@ interface FilterState {
   video: boolean;
   mental_illness: boolean;
   mental_illness2: boolean;
+  favorites: boolean;
   requests: string[];
   data_name_psychologist: string[];
   selected_psychologist: IPsychologist | null;
@@ -36,6 +38,7 @@ const initialState: FilterState = {
   filtered_by_video: [],
   filtered_by_mental_illness: [],
   filtered_by_mental_illness2: [],
+  filtered_by_favorites: [],
   dates_psychologists: [],
   hour_dates: [],
   gender: 'other',
@@ -45,6 +48,7 @@ const initialState: FilterState = {
   video: false,
   mental_illness: false,
   mental_illness2: false,
+  favorites: false,
   requests: [],
   data_name_psychologist: [],
   selected_psychologist: null,
@@ -111,6 +115,16 @@ export const filterSlice = createSlice({
         (psy.mental_illness2?.length ?? 0) > 0
       );
     },
+    findByFavorites: (state, action: PayloadAction<{ favoriteIds: string[], enabled: boolean }>) => {
+      state.favorites = action.payload.enabled;
+      if (action.payload.enabled) {
+        state.filtered_by_favorites = state.filtered_by_automatch_psy.filter(psy => 
+          psy.id && action.payload.favoriteIds.includes(psy.id)
+        );
+      } else {
+        state.filtered_by_favorites = [...state.filtered_by_automatch_psy];
+      }
+    },
     setDatesPsychologists: (state, action: PayloadAction<IPsychologist[]>) => {
       state.dates_psychologists = action.payload;
     },
@@ -136,6 +150,7 @@ export const {
   findByVideo,
   findByMental_Illness,
   findByMental_Illness2,
+  findByFavorites,
   setDatesPsychologists,
   setHourDates,
   setDataNamePsychologist,

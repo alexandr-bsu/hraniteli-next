@@ -88,7 +88,7 @@ export const TraumaticStage = () => {
                                             Беспокоит ли вас травмирующее событие, с которым сложно справиться самостоятельно?
                                         </FormLabel>
                                         <FormDescription
-                                            className='max-lg:text-[14px] font-normal text-[18px]  leading-[25px] mt-[10px] text-[${COLORS.text.secondary}]'
+                                            className='max-lg:text-[14px] font-normal text-[18px] leading-[25px] text-[${COLORS.text.secondary}]'
                                         >
                                             Выберите все подходящие пункты или пропустите вопрос, если ничего из этого не беспокоит
                                         </FormDescription>

@@ -10,6 +10,7 @@ import { COLORS } from '@/shared/constants/colors';
 import Link from 'next/link';
 import { RootState } from '@/redux/store';
 import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
+import { Tooltip } from '@/shared/ui/Tooltip';
 
 const getGoogleDriveImageUrl = (url: string | undefined) => {
   if (!url) return '/card/214х351.jpg';
@@ -154,7 +155,7 @@ export const PsychologistStage = () => {
             <span className="text-[#9A9A9A] text-[16px]">Основной подход:</span>
             <div className="flex items-center gap-[10px] mt-[5px]">
               <p className="font-semibold text-[18px]">{currentPsychologist.main_modal}</p>
-              <Image src="/card/hint.svg" alt="hint" width={24} height={24} />
+              <Tooltip text="Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов." />
             </div>
           </div>
           <div>
@@ -165,7 +166,7 @@ export const PsychologistStage = () => {
             <span className="text-[#9A9A9A] text-[16px]">Стоимость:</span>
             <div className="flex items-center gap-[10px] mt-[5px]">
               <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p>
-              <Image src="/card/hint.svg" alt="hint" width={24} height={24} />
+              <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
             </div>
           </div>
         </div>

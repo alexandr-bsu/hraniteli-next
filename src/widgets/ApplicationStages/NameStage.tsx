@@ -52,7 +52,7 @@ export default function NameStageApplication() {
                   <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>
                     Как вас зовут?
                   </FormLabel>
-                  <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px] mt-[10px]'>
+                  <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
                     Вы можете не указывать имя, если пока не готовы
                   </FormDescription>
                   <div className='input__text_container max-lg:mt-[10px] mt-[30px] relative bg-[#FAFAFA] w-full h-[65px]'>
@@ -68,7 +68,7 @@ export default function NameStageApplication() {
                   </div>
                   {!form.formState.errors.username && (
                     <span className='mt-[10px] max-lg:text-[12px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
-                      Это обязательное поле
+                      ! Поле обязательное для заполнения
                     </span>
                   )}
                   <FormMessage className='mt-[10px]'/>

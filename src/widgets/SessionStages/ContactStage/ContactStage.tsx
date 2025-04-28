@@ -405,7 +405,7 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
                 </Button>
 
                 <span className='font-normal text-[14px] text-[#151515] max-md:text-[10px]'>
-                    Нажимая на «Забронировать», я соглашаюсь с условиями{' '}
+                    Нажимая на «Перейти в телеграм бот», я соглашаюсь с условиями{' '}
                     <span className='text-[#116466]'>
                         обработки персональных данных, пользовательского соглашения и Оферты
                     </span>

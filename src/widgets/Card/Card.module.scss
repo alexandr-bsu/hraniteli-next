@@ -4,19 +4,23 @@
   background: #FFFFFF;
   border-radius: 20px;
   padding: 20px;
+  padding-right: calc(20px + var(--scrollbar-compensation, 0px));
 }
 
 .bestMatch {
   position: absolute;
-  top: 20px;
-  left: 20px;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
   background: #116466;
   color: white;
   padding: 8px 16px;
   border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
-  z-index: 1;
+  z-index: 5;
+  width: max-content;
+  text-align: center;
 }
 
 .header {
@@ -38,6 +42,12 @@
   overflow: hidden;
   cursor: pointer;
   
+  &:hover {
+    .playButton {
+      opacity: 1;
+    }
+  }
+  
   .image, .video {
     width: 100%;
     height: 100%;
@@ -45,19 +55,38 @@
   }
 }
 
-.playButton {
+.videoWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  &:hover {
+    .playPauseButton {
+      opacity: 1;
+    }
+  }
+}
+
+.playButton, .playPauseButton {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  z-index: 2;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: opacity 0.2s;
-  
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  z-index: 10;
+  opacity: 0;
+
   &:hover {
-    opacity: 0.8;
+    background: rgba(0, 0, 0, 0.7);
+    opacity: 1;
   }
 }
 
@@ -69,13 +98,13 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: 10px;
 }
 
 .name {
   font-size: 24px;
   font-weight: 600;
-  color: #000;
+  color: #151515;
   margin: 0;
   
   &:hover {
@@ -94,12 +123,12 @@
   }
 }
 
-.experience {
+.experienceWrapper {
   display: flex;
   align-items: center;
   gap: 4px;
   color: #666;
-  font-size: 14px;
+  font-size: 16px;
   margin-bottom: 16px;
 }
 
@@ -113,7 +142,7 @@
   display: flex;
   flex-direction: column;
   margin-right: 50px;
-  gap: 4px;
+  gap: 10px;
 }
 
 .label {
@@ -127,7 +156,7 @@
 .value {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 10px;
   font-family: 'Open Sans', sans-serif;
   font-weight: 400;
   font-size: 18px;
@@ -205,6 +234,7 @@
   font-size: 16px;
   font-weight: 600;
   margin-bottom: 16px;
+  color: #9A9A9A;
 }
 
 .queries {
@@ -251,7 +281,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: 18px;
+  color: #151515;
 }
 
 .actions {
@@ -290,9 +321,7 @@
 }
 
 .expandedContent {
-    margin-top: 20px;
     border-top: 1px solid var(--color-border);
-    padding-top: 20px;
     overflow: hidden;
     max-height: 0;
     opacity: 0;
@@ -306,10 +335,6 @@
 
 .section {
     margin-bottom: 24px;
-
-    &:last-child {
-        margin-bottom: 0;
-    }
 }
 
 .sectionTitle {
@@ -385,9 +410,9 @@
     }
 
     .infoLabel {
-        color: #666;
+        color: #9A9A9A;
         font-family: 'Open Sans', sans-serif;
-        font-size: 14px;
+        font-size: 16px;
     }
 
     .infoValue {
@@ -395,8 +420,8 @@
         align-items: center;
         gap: 4px;
         font-family: 'Open Sans', sans-serif;
-        font-size: 14px;
+        font-size: 18px;
         font-weight: 500;
-        color: #000;
+        color: #151515;
     }
 } 

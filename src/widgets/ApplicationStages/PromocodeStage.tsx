@@ -68,7 +68,7 @@ const PromocodeStage = () => {
                                     <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>
                                         Введите промокод или номер подарочного сертификата
                                     </FormLabel>
-                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px] mt-[10px]'>
+                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
                                         Вы можете не указывать код, если у вас его нет
                                     </FormDescription>
                                     <div className='input__text_container mt-[30px] relative bg-[#FAFAFA] w-full h-[65px]'>

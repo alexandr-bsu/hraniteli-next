@@ -1,7 +1,7 @@
 'use client'
 import { RootState } from "@/redux/store";
 import { Card, Filter } from "@/widgets";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from 'axios';
 import Error from "next/error";
@@ -21,7 +21,90 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
     const [isLoading, setLoading] = useState(!isLoaded);
     const [error, setError] = useState<string | null>(null);
     const dispatch = useDispatch();
-    const filtered_persons = useSelector((state: RootState) => state.filter.filtered_by_automatch_psy);
+    
+    // Проверка активности фильтров по цене или запросам
+    const hasActiveFilters = filter.price > 0 || (filter.requests && filter.requests.length > 0);
+    
+    // Определяем отображаемый список карточек с учётом всех фильтров
+    const filtered_persons = useMemo(() => {
+        let result = filter.filtered_by_automatch_psy as IPsychologist[];
+        
+        // Применяем фильтр по избранным, если он активен
+        if (filter.favorites && filter.filtered_by_favorites.length > 0) {
+            result = filter.filtered_by_favorites as IPsychologist[];
+        }
+        
+        // Применяем другие активные фильтры
+        if (filter.gender !== 'other' && filter.filtered_by_gender.length > 0) {
+            result = result.filter((item: IPsychologist) => 
+                filter.filtered_by_gender.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
+        
+        if (filter.requests.length > 0 && filter.filtered_by_requests.length > 0) {
+            result = result.filter((item: IPsychologist) => 
+                filter.filtered_by_requests.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
+        
+        if (filter.price > 0 && filter.filtered_by_price.length > 0) {
+            result = result.filter((item: IPsychologist) => 
+                filter.filtered_by_price.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
+        
+        if (filter.time.length > 0 && filter.filtered_by_time.length > 0) {
+            result = result.filter((item: IPsychologist) => 
+                filter.filtered_by_time.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
+        
+        if (filter.date.length > 0 && filter.filtered_by_date.length > 0) {
+            result = result.filter((item: IPsychologist) => 
+                filter.filtered_by_date.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
+        
+        if (filter.video && filter.filtered_by_video.length > 0) {
+            result = result.filter((item: IPsychologist) => 
+                filter.filtered_by_video.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
+        
+        if (filter.mental_illness && filter.filtered_by_mental_illness.length > 0) {
+            result = result.filter((item: IPsychologist) => 
+                filter.filtered_by_mental_illness.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
+        
+        if (filter.mental_illness2 && filter.filtered_by_mental_illness2.length > 0) {
+            result = result.filter((item: IPsychologist) => 
+                filter.filtered_by_mental_illness2.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
+        
+        return result;
+    }, [
+        filter.filtered_by_automatch_psy,
+        filter.filtered_by_favorites,
+        filter.filtered_by_gender,
+        filter.filtered_by_requests,
+        filter.filtered_by_price,
+        filter.filtered_by_time,
+        filter.filtered_by_date,
+        filter.filtered_by_video,
+        filter.filtered_by_mental_illness,
+        filter.filtered_by_mental_illness2,
+        filter.gender,
+        filter.requests,
+        filter.price,
+        filter.time,
+        filter.date,
+        filter.video,
+        filter.mental_illness,
+        filter.mental_illness2,
+        filter.favorites
+    ]);
     
     // Инициализация данных
     useEffect(() => {
@@ -104,7 +187,8 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
             filter.times?.length || 
             filter.video || 
             filter.mental_illness || 
-            filter.mental_illness2
+            filter.mental_illness2 ||
+            filter.favorites
         );
 
         return (
@@ -135,10 +219,16 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
                 <Filter />
             </aside>
             <main className="min-lg:max-w-[790px] w-full">
-                <div className="flex flex-col gap-[20px]">
+                <div className="flex flex-col gap-[20px] pb-[50px]">
                     {filtered_persons?.length > 0 ? (
-                        filtered_persons.map((item: IPsychologist) => (
-                            <Card key={item.id} psychologist={item} id={`psychologist-card-${item.id}`} isSelected={filter.selected_psychologist?.id === item.id} />
+                        filtered_persons.map((item: IPsychologist, index: number) => (
+                            <Card 
+                                key={item.id} 
+                                psychologist={item} 
+                                id={`psychologist-card-${item.id}`} 
+                                isSelected={filter.selected_psychologist?.id === item.id} 
+                                showBestMatch={hasActiveFilters && index < 3}
+                            />
                         ))
                     ) : (
                         <EmptyState />

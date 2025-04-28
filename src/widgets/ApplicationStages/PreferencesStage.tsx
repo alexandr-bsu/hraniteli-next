@@ -97,11 +97,11 @@ export const PreferencesStage = () => {
                             <div className='grow h-[360px]'>
                                 <FormItem className='grow p-[30px] h-full max-h-[390px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]  '>
                                     <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>Что вам важно в психологе?</FormLabel>
-                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px]  leading-[25px] mt-[10px]'>
+                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
                                         Опыт, образование и личная терапия - по умолчанию. Если предпочтений нет - можете пропустить
                                     </FormDescription>
-                                    <div className='flex justify-between mt-[10px] max-lg:flex-col  max-h-[150px] max-lg:max-h-none overflow-hidden'>
-                                        <div className='flex flex-col gap-[15px] w-full max-h-[150px]  max-lg:max-h-[200px] pb-[50px] overflow-x-auto'>
+                                    <div className='flex justify-between max-lg:flex-col max-h-[160px] max-lg:max-h-none overflow-hidden'>
+                                        <div className='flex flex-col mt-[10px] gap-[10px] w-full max-h-[160px] max-lg:max-h-[200px] pb-[50px] overflow-x-auto'>
                                             {preferences.map((item) => (
                                                 <FormField
                                                 key={item.id}
@@ -133,18 +133,18 @@ export const PreferencesStage = () => {
                                                 />
                                             ))}
                                         </div>
-                                        <div>
-                                        <FormField
-                                            control={form.control}
-                                            name="customPreferences"
-                                            render={({ field }) => (
-                                            <FormControl>
-                                               <Textarea
-                                                {...field}
-                                                placeholder="Введите свой вариант ответа"
-                                                className="textarea__text"
-                                                />
-                                            </FormControl>
+                                        <div className='ml-[30px]'>
+                                          <FormField
+                                              control={form.control}
+                                              name="customPreferences"
+                                              render={({ field }) => (
+                                              <FormControl>
+                                                <Textarea
+                                                    {...field}
+                                                    placeholder="Введите свой вариант ответа"
+                                                    className="textarea__text"
+                                                  />
+                                              </FormControl>
                                             )}/>
                                         </div>
                                     </div>

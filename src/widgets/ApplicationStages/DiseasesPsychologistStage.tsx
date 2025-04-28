@@ -86,7 +86,7 @@ export const DiseasesPsychologistStage = () => {
                                         <br />
                                         психиатрические заболевания?
                                     </FormLabel>
-                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px] mt-[10px]'>
+                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
                                         Выберите один вариант ответа
                                     </FormDescription>
                                     <FormControl className="mt-[20px]">
@@ -123,7 +123,7 @@ export const DiseasesPsychologistStage = () => {
                                     </FormControl>
                                     {!form.formState.errors.diseases && (
                                         <span className='mt-[10px] max-lg:text-[12px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
-                                            Это обязательное поле
+                                            ! Поле обязательное для заполнения
                                         </span>
                                     )}
                                     <FormMessage />

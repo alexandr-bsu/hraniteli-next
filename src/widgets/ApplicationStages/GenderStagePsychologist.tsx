@@ -72,7 +72,7 @@ export const GenderStagePsychologist = () => {
                 <div className='grow'>
                 <FormItem className='grow max-[425px]:mb-[30px]'>
                     <FormLabel className=' max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px]  leading-[27px] '>С психологом какого пола вы готовы работать?</FormLabel>
-                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px] mt-[10px]'>
+                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
                         Выберите один вариант ответа
                     </FormDescription>
                     <FormControl className="mt-[20px]">
@@ -109,7 +109,7 @@ export const GenderStagePsychologist = () => {
                     </FormControl>
                     {
                         !form.formState.errors.gender && <span className='mt-[10px] max-lg:text-[12px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
-                             Это обязательное поле
+                             ! Поле обязательное для заполнения
                         </span>
                     }
                     <FormMessage className="mt-[10px]"/>

@@ -5,6 +5,7 @@ import { applicationFormDataReducer } from './slices/application_form_data';
 import filterReducer from './slices/filter';
 import { modalReducer } from './slices/modal';
 import { psychologistsReducer } from './slices/psychologists';
+import favoritesReducer from './slices/favorites';
 import { IApplicationFormData } from '@/shared/types/application.types';
 import { IPsychologist } from '@/shared/types/psychologist.types';
 
@@ -37,6 +38,9 @@ export interface RootState {
     selectedPsychologist: string;
   };
   psychologists: IPsychologist[];
+  favorites: {
+    items: IPsychologist[];
+  };
 }
 
 export type ModalType = 'FilterRequest' | 'Contact' | 'Slots' | null;
@@ -57,6 +61,7 @@ export const store = configureStore({
     filter: filterReducer,
     modal: modalReducer,
     psychologists: psychologistsReducer,
+    favorites: favoritesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
