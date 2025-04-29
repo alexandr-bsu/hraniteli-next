@@ -7,9 +7,10 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useDispatch } from 'react-redux'
 import { setUsername } from '@/redux/slices/application_form_data'
+import styles from './NameStage.module.scss'
 
 const FormSchema = z.object({
-  username: z.string().nonempty("Вы не заполнили обязательное поле")
+  username: z.string().optional()
 })
 
 export default function NameStageApplication() {
@@ -29,10 +30,12 @@ export default function NameStageApplication() {
   })
 
   // 3. Сохраняем данные
-  const handleSubmit = (data: { username: string }) => {
-    localStorage.setItem('app_username', data.username) // Сохраняем в localStorage
-    dispatch(setUsername(data.username)) // Сохраняем в Redux (если нужно)
-    dispatch(setApplicationStage('age')) // Переход на следующую страницу
+  const handleSubmit = (data: { username?: string }) => {
+    if (data.username) {
+      localStorage.setItem('app_username', data.username)
+      dispatch(setUsername(data.username))
+    }
+    dispatch(setApplicationStage('age'))
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       console.log('Данные локалстореж')
@@ -55,24 +58,20 @@ export default function NameStageApplication() {
                   <FormDescription className='text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] leading-[25px] max-lg:leading-[20px] font-normal mt-[10px] max-lg:mt-[8px]'>
                     Вы можете не указывать имя, если пока не готовы
                   </FormDescription>
-                  <div className='input__text_container mt-[30px] max-lg:mt-[16px] relative bg-[#FAFAFA] w-full h-[65px] max-lg:h-[50px]'>
+                  <div className={styles.input__text_container}>
                     <Input
                       {...field}
-                      className='input__text placeholder:text-[#9A9A9A] text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[10px] border-none w-full h-full'
+                      placeholder=" "
+                      className={`${styles.input__text} placeholder:text-[#9A9A9A] text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[10px] border-none w-full h-full`}
                       onChange={(e) => {
                         field.onChange(e)
                         localStorage.setItem('app_username', e.target.value)
                       }}
                     />
-                    <label className='input__text_label text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px]'>
+                    <label className={styles.input__text_label}>
                       Введите ваше имя или псевдоним
                     </label>
                   </div>
-                  {!form.formState.errors.username && (
-                    <span className='mt-[10px] max-lg:mt-[8px] text-[14px] lg:text-[14px] md:text-[16px] max-lg:text-[16px] leading-[100%] text-[#9A9A9A] font-normal'>
-                      ! Поле обязательное для заполнения
-                    </span>
-                  )}
                   <FormMessage className='mt-[10px] max-lg:mt-[8px]'/>
                 </FormItem>
               </div>

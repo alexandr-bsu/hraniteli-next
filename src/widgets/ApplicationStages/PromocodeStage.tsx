@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { z } from 'zod';
 import { COLORS } from '@/shared/constants/colors';
+import styles from './PromocodeStage.module.scss';
 
 const FormSchema = z.object({
     promocode: z.string()
@@ -71,12 +72,13 @@ const PromocodeStage = () => {
                                     <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
                                         Вы можете не указывать код, если у вас его нет
                                     </FormDescription>
-                                    <div className='input__text_container mt-[30px] relative bg-[#FAFAFA] w-full h-[65px]'>
+                                    <div className={styles.input__text_container}>
                                         <Input 
-                                            className='input__text placeholder:text-[18px] placeholder:text-[#9A9A9A] placeholder:max-lg:text-[14px] rounded-[10px] border-none w-full h-full' 
-                                            {...field} 
+                                            {...field}
+                                            placeholder=" "
+                                            className={`${styles.input__text} placeholder:text-[#9A9A9A] text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[10px] border-none w-full h-full`}
                                         />
-                                        <label className='input__text_label'>
+                                        <label className={styles.input__text_label}>
                                             Введите промокод или номер подарочного сертификата
                                         </label>
                                     </div>

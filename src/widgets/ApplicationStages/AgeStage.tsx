@@ -9,6 +9,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { z } from 'zod'
 import { COLORS } from '@/shared/constants/colors';
+import styles from './AgeStage.module.scss'
 
 const FormSchema = z.object({
     age: z.string()
@@ -60,16 +61,17 @@ const AgeStageApplication = () => {
                                     <FormDescription className={`max-lg:text-[16px] font-normal text-[18px] leading-[25px] text-[${COLORS.text.secondary}]`}>
                                         Мы учитываем ваш возраст при подборе психолога
                                     </FormDescription>
-                                    <div className={`input__text_container max-lg:mt-[10px] mt-[30px] relative bg-[${COLORS.background}] w-full h-[65px] max-lg:h-[50px]`}>
+                                    <div className={styles.input__text_container}>
                                         <Input
                                             {...field}
-                                            className={`input__text max-lg:text-[16px] placeholder:text-[${COLORS.text.secondary}] rounded-[10px] border-[${COLORS.border}] w-full h-full`}
+                                            placeholder=" "
+                                            className={`${styles.input__text} placeholder:text-[#9A9A9A] text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[10px] border-none w-full h-full`}
                                             onChange={(e) => {
                                                 field.onChange(e)
                                                 localStorage.setItem('app_age', e.target.value)
                                             }}
                                         />
-                                        <label className={`input__text_label max-lg:text-[16px] text-[${COLORS.text.secondary}]`}>
+                                        <label className={styles.input__text_label}>
                                             Введите ваш возраст
                                         </label>
                                     </div>
