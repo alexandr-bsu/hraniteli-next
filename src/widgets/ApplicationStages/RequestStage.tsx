@@ -10,6 +10,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { z } from 'zod';
 import { COLORS } from '@/shared/constants/colors';
+import styles from '@/styles/input.module.scss'
 
 const FormSchema = z.object({
     request: z.string(),
@@ -62,21 +63,27 @@ const RequestStage = () => {
                         render={({ field }) => (
                             <div className='grow max-[425px]:mb-[30px]'>
                                 <FormItem className='grow gap-0'>
-                                    <FormLabel className='max-lg:text-[16px] font-semibold text-[20px] leading-[27px]'>Опишите свой запрос к психологу: что беспокоит,<br></br> чего ожидаете, к чему хотите прийти?</FormLabel>
+                                    <FormLabel className='max-lg:text-[16px] font-semibold text-[20px] leading-[27px]'>Опишите свой запрос к психологу: что беспокоит, чего ожидаете, к чему хотите прийти?</FormLabel>
                                     <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
-                                        Не знаете ответов — это нормально, напишите, как <br></br> чувствуете. Можете пропустить если не готовы
+                                        Не знаете ответов — это нормально, напишите, как чувствуете. Можете пропустить если не готовы
                                     </FormDescription>
-                                    <div className='input__text_container mt-[30px] relative bg-[#FAFAFA] w-full h-[246px] max-lg:h-[177px]'>
-                                    <Textarea
-                                        className='input__text placeholder:text-[18px] placeholder:text-[#9A9A9A] rounded-[10px] border-none w-full h-full p-[20px] text-left align-top
-                                                max-lg:text-[16px] max-lg:placeholder:text-[16px]'
-                                        style={{
-                                        resize: 'none',
-                                        lineHeight: '1.5'
-                                        }}
-                                        {...field}
-                                        placeholder="Введите свой вариант ответа"
-                                    />
+                                    <div className={styles.input__text_container}>
+                                        <Textarea
+                                            {...field}
+                                            placeholder=" "
+                                            className={`${styles.input__text} text-[18px] w-full h-full px-[20px] bg-[#FAFAFA] rounded-[10px] border-none`}
+                                            style={{
+                                                resize: 'none',
+                                                lineHeight: '1.5'
+                                            }}
+                                            onChange={(e) => {
+                                                field.onChange(e)
+                                                localStorage.setItem('app_request', e.target.value)
+                                            }}
+                                        />
+                                        <label className={styles.input__text_label}>
+                                            Опишите вашу просьбу
+                                        </label>
                                     </div>
                                 </FormItem>
                             </div>

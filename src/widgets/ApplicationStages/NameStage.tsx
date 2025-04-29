@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useDispatch } from 'react-redux'
 import { setUsername } from '@/redux/slices/application_form_data'
-import styles from './NameStage.module.scss'
+import styles from '@/styles/input.module.scss'
 
 const FormSchema = z.object({
   username: z.string().optional()
@@ -55,14 +55,14 @@ export default function NameStageApplication() {
                   <FormLabel className='text-[20px] lg:text-[20px] md:text-[16px] max-lg:text-[16px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                     Как вас зовут?
                   </FormLabel>
-                  <FormDescription className='text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] leading-[25px] max-lg:leading-[20px] font-normal mt-[10px] max-lg:mt-[8px]'>
+                  <FormDescription className='text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] leading-[25px] max-lg:leading-[20px] font-normal max-lg:mt-[8px]'>
                     Вы можете не указывать имя, если пока не готовы
                   </FormDescription>
                   <div className={styles.input__text_container}>
                     <Input
                       {...field}
                       placeholder=" "
-                      className={`${styles.input__text} placeholder:text-[#9A9A9A] text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[10px] border-none w-full h-full`}
+                      className={`${styles.input__text} text-[18px] w-full h-full px-[20px] bg-[#FAFAFA] rounded-[10px] border-none`}
                       onChange={(e) => {
                         field.onChange(e)
                         localStorage.setItem('app_username', e.target.value)
@@ -78,12 +78,6 @@ export default function NameStageApplication() {
             )}
           />
           <div className="shrink-0 pb-[50px] max-lg:pb-[30px] flex gap-[10px]">
-            <button 
-              type="button" 
-              className="cursor-pointer shrink-0 w-[81px] border-[1px] border-[#116466] p-[12px] text-[#116466] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px]"
-            >
-              Назад
-            </button>
             <button 
               type="submit" 
               className="cursor-pointer grow border-[1px] bg-[#116466] p-[12px] text-[white] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px]"

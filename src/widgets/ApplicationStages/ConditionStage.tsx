@@ -2,13 +2,15 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { setApplicationStage } from '@/redux/slices/application_form';
-import { setActions } from '@/redux/slices/application_form_data';
-import { useDispatch } from 'react-redux';
+import { setActions, setHasMatchingError } from '@/redux/slices/application_form_data';
+import { useDispatch, useSelector } from 'react-redux';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { COLORS } from '@/shared/constants/colors';
+import { findByConditions } from '@/redux/slices/filter';
+import { RootState } from '@/redux/store';
 
 const CONDITIONS = [
     {
@@ -65,6 +67,8 @@ type FormData = z.infer<typeof FormSchema>;
 
 export const ConditionStage = () => {
     const dispatch = useDispatch();
+    const filtered_persons = useSelector((state: RootState) => state.filter.filtered_by_automatch_psy);
+    const hasError = useSelector((state: RootState) => state.applicationFormData.has_matching_error);
 
     const savedConditions = typeof window !== 'undefined' 
     ? JSON.parse(localStorage.getItem('app_conditions') || '[]')
@@ -77,12 +81,12 @@ export const ConditionStage = () => {
         }
       })
 
-      useEffect(() => {
-    const subscription = form.watch((value) => {
-      localStorage.setItem('app_conditions', JSON.stringify(value.condition || []))
-    })
-    return () => subscription.unsubscribe()
-  }, [form.watch])
+    useEffect(() => {
+        const subscription = form.watch((value) => {
+            localStorage.setItem('app_conditions', JSON.stringify(value.condition || []));
+        });
+        return () => subscription.unsubscribe();
+    }, [form.watch]);
     
 
     const handleSubmit = (data: FormData) => {
@@ -94,6 +98,10 @@ export const ConditionStage = () => {
             }
             return acc;
           }, []);
+
+        // Сначала проверяем подходящих психологов
+        dispatch(findByConditions(selectedConditions));
+        
         dispatch(setActions(selectedConditions));
         dispatch(setApplicationStage('traumatic'));
     };
@@ -163,7 +171,7 @@ export const ConditionStage = () => {
                         )}
                     />
                     <div className="shrink-0 mt-[30px]  pb-[50px] flex gap-[10px]">
-                        <button onClick={() => dispatch(setApplicationStage('age'))} className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px]`}>
+                        <button onClick={() => dispatch(setApplicationStage('request'))} className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px]`}>
                             Назад
                         </button>
 

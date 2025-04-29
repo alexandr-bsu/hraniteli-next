@@ -4,6 +4,16 @@ export interface ISlot {
   text: string;
   time: string;
   date: string;
+  isAvailable?: boolean;
+}
+
+export interface IScheduleDay {
+  date: string;
+  slots: ISlot[];
+}
+
+export interface ISchedule {
+  days: IScheduleDay[];
 }
 
 export type Experience = '1-3' | '3-5' | '5-10' | '10+';
@@ -55,6 +65,33 @@ export interface IPsychologist {
   verified?: boolean;
   is_verified?: boolean;
   in_community?: boolean;
+  schedule?: {
+    days: {
+      date: string;
+      slots: {
+        [key: string]: {
+          id: string;
+          psychologist: string;
+          date: string;
+          time: string;
+          state: string;
+          ticket: string | null;
+          client_id: string | null;
+          meeting_link: string | null;
+          meeting_id: string | null;
+          calendar_meeting_id: string | null;
+          confirmed: boolean;
+          auto_assigned: boolean;
+          auto_canceled: boolean;
+          is_helpful_hand: boolean | null;
+          "Дата Локальная": string;
+          "Время Локальное": string;
+        }[];
+      };
+      day_name: string;
+      pretty_date: string;
+    }[];
+  };
 }
 
 // Типы для фильтрации психологов

@@ -1,9 +1,10 @@
 .input__text_container {
   position: relative;
+  margin-top: 20px;
   
   .input__text {
     background: #FAFAFA;
-    padding: 20px 16px;
+    padding: 25px 20px 15px;
     font-size: 18px;
     
     &:focus + .input__text_label,
@@ -15,7 +16,7 @@
   
   .input__text_label {
     position: absolute;
-    left: 16px;
+    left: 20px;
     top: 50%;
     transform: translateY(-50%);
     transition: all 0.2s;

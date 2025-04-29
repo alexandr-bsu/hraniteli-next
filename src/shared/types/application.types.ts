@@ -15,6 +15,7 @@ export interface IApplicationFormData {
   diseases: string[];
   requests: string[];
   promocode: string;
+  phone: string;
   selected_slots: string[];
   selected_slots_objects: string[];
   index_phyc: number;

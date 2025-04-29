@@ -27,6 +27,11 @@ interface FilterState {
   available_requests: string[];
   data_name_psychologist: string[];
   selected_psychologist: IPsychologist | null;
+  blocking_questions_changed: {
+    gender: boolean;
+    conditions: boolean;
+    traumatic: boolean;
+  };
 }
 
 const initialState: FilterState = {
@@ -54,6 +59,11 @@ const initialState: FilterState = {
   available_requests: [],
   data_name_psychologist: [],
   selected_psychologist: null,
+  blocking_questions_changed: {
+    gender: false,
+    conditions: false,
+    traumatic: false
+  }
 };
 
 export const filterSlice = createSlice({
@@ -66,91 +76,34 @@ export const filterSlice = createSlice({
     },
     findByGender: (state, action: PayloadAction<Gender>) => {
       state.gender = action.payload;
-      if (action.payload === 'other' || action.payload === 'none') {
-        state.filtered_by_gender = [...state.filtered_by_automatch_psy];
-      } else {
-        state.filtered_by_gender = state.filtered_by_automatch_psy.filter(psy => {
-          const matches = psy.sex === (action.payload === 'male' ? 'Мужчина' : 'Женщина');
-          return matches;
-        });
-      }
+      state.blocking_questions_changed.gender = true;
     },
     findByRequests: (state, action: PayloadAction<string[]>) => {
       state.requests = action.payload;
-      if (action.payload.length === 0) {
-        state.filtered_by_requests = [...state.filtered_by_automatch_psy];
-      } else {
-        state.filtered_by_requests = state.filtered_by_automatch_psy.filter(psy => {
-          if (!psy.queries || psy.queries.trim() === '') return false;
-          
-          // Разбиваем запросы психолога на массив
-          const psychQueries = psy.queries.split(';').map(q => q.trim());
-
-          // Проверяем есть ли точное совпадение с запросом пользователя
-          const hasMatch = action.payload.some(request => 
-            psychQueries.includes(request)
-          );
-          return hasMatch;
-        });
-      }
+    },
+    findByConditions: (state, action: PayloadAction<string[]>) => {
+      state.blocking_questions_changed.conditions = true;
+    },
+    findByTraumatic: (state, action: PayloadAction<string[]>) => {
+      state.blocking_questions_changed.traumatic = true;
     },
     findByPrice: (state, action: PayloadAction<number>) => {
       state.price = action.payload;
-      state.filtered_by_price = state.filtered_by_automatch_psy.filter(psy => 
-        (psy.min_session_price ?? 0) <= action.payload
-      );
     },
     findByTime: (state, action: PayloadAction<string[]>) => {
       state.time = action.payload;
-      if (action.payload.length === 0) {
-        state.filtered_by_time = [...state.filtered_by_automatch_psy];
-        return;
-      }
-
-      state.filtered_by_time = state.filtered_by_automatch_psy.filter(psy => {
-        if (!psy.available_times) return false;
-        return action.payload.every(time => psy.available_times?.includes(time));
-      });
     },
     findByDate: (state, action: PayloadAction<string[]>) => {
       state.date = action.payload;
-      if (action.payload.length === 0) {
-        state.filtered_by_date = [...state.filtered_by_automatch_psy];
-        return;
-      }
-      
-      state.filtered_by_date = state.filtered_by_automatch_psy.filter(psy => {
-        if (!psy.available_dates) return false;
-        return action.payload.every(date => psy.available_dates?.includes(date));
-      });
     },
     findByVideo: (state, action: PayloadAction<boolean>) => {
       state.video = action.payload;
-      state.filtered_by_video = state.filtered_by_automatch_psy.filter(psy => 
-        action.payload ? Boolean(psy.is_video || psy.video || psy.link_video) : true
-      );
     },
     findByMental_Illness: (state, action: PayloadAction<boolean>) => {
       state.mental_illness = action.payload;
-      if (!action.payload) {
-        state.filtered_by_mental_illness = [...state.filtered_by_automatch_psy];
-        return;
-      }
-      const filtered = state.filtered_by_automatch_psy.filter(psy => {
-        return psy.works_with?.includes('Есть диагностированное психическое заболевание (РПП, СДВГ и др)');
-      });
-      state.filtered_by_mental_illness = filtered;
     },
     findByMental_Illness2: (state, action: PayloadAction<boolean>) => {
       state.mental_illness2 = action.payload;
-      if (!action.payload) {
-        state.filtered_by_mental_illness2 = [...state.filtered_by_automatch_psy];
-        return;
-      }
-      const filtered = state.filtered_by_automatch_psy.filter(psy => {
-        return psy.works_with?.includes('Прохожу/назначено медикаментозное лечение от невролога/психиатра');
-      });
-      state.filtered_by_mental_illness2 = filtered;
     },
     findByFavorites: (state, action: PayloadAction<{ favoriteIds: string[], enabled: boolean }>) => {
       state.favorites = action.payload.enabled;
@@ -177,6 +130,13 @@ export const filterSlice = createSlice({
     setAvailableRequests: (state, action: PayloadAction<string[]>) => {
       state.available_requests = action.payload;
     },
+    resetBlockingQuestions: (state) => {
+      state.blocking_questions_changed = {
+        gender: false,
+        conditions: false,
+        traumatic: false
+      };
+    }
   },
 });
 
@@ -196,6 +156,9 @@ export const {
   setDataNamePsychologist,
   setSelectedPsychologist,
   setAvailableRequests,
+  findByConditions,
+  findByTraumatic,
+  resetBlockingQuestions
 } = filterSlice.actions;
 
 export default filterSlice.reducer;

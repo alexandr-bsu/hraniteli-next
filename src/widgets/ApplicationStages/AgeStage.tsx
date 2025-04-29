@@ -9,7 +9,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { z } from 'zod'
 import { COLORS } from '@/shared/constants/colors';
-import styles from './AgeStage.module.scss'
+import styles from '@/styles/input.module.scss'
 
 const FormSchema = z.object({
     age: z.string()
@@ -55,17 +55,17 @@ const AgeStageApplication = () => {
                         render={({ field }) => (
                             <div className='grow'>
                                 <FormItem className='grow max-[425px]:mb-[30px]'>
-                                    <FormLabel className={`text-[18px] leading-[25px] max-lg:text-[16px] font-normal text-[${COLORS.text.primary}]`}>
+                                    <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>
                                         Сколько вам лет?
                                     </FormLabel>
-                                    <FormDescription className={`max-lg:text-[16px] font-normal text-[18px] leading-[25px] text-[${COLORS.text.secondary}]`}>
+                                    <FormDescription className='text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] leading-[25px] max-lg:leading-[20px] font-normal max-lg:mt-[8px]'>
                                         Мы учитываем ваш возраст при подборе психолога
                                     </FormDescription>
                                     <div className={styles.input__text_container}>
                                         <Input
                                             {...field}
                                             placeholder=" "
-                                            className={`${styles.input__text} placeholder:text-[#9A9A9A] text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[10px] border-none w-full h-full`}
+                                            className={`${styles.input__text} text-[18px] w-full h-full px-[20px] bg-[#FAFAFA] rounded-[10px] border-none`}
                                             onChange={(e) => {
                                                 field.onChange(e)
                                                 localStorage.setItem('app_age', e.target.value)
@@ -77,7 +77,7 @@ const AgeStageApplication = () => {
                                     </div>
                                     {!form.formState.errors.age &&
                                         <span className={`mt-[10px] max-lg:text-[16px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]`}>
-                                            ! Поле обязательное для заполнения
+                                            Поле обязательное для заполнения
                                         </span>
                                     }
                                     <FormMessage className='mt-[10px] max-lg:text-[16px]'/>

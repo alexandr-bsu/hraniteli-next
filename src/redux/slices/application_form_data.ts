@@ -13,6 +13,7 @@ const initialState: IApplicationFormData = {
   diseases: [],
   requests: [],
   promocode: '',
+  phone: '',
   selected_slots: [],
   selected_slots_objects: [],
   index_phyc: 0,
@@ -56,6 +57,9 @@ export const applicationFormDataSlice = createSlice({
     setPromocode: (state, action: PayloadAction<string>) => {
       state.promocode = action.payload;
     },
+    setPhone: (state, action: PayloadAction<string>) => {
+      state.phone = action.payload;
+    },
     setSelectedSlots: (state, action: PayloadAction<string[]>) => {
       state.selected_slots = action.payload;
     },
@@ -83,6 +87,7 @@ export const {
   setDiseases,
   setRequests,
   setPromocode,
+  setPhone,
   setSelectedSlots,
   setSelectedSlotsObjects,
   setHasMatchingError,

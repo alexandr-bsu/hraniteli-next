@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setApplicationStage } from '@/redux/slices/application_form';
-import { setIndexPhyc } from '@/redux/slices/application_form_data';
+import { setIndexPhyc, setHasMatchingError, setSelectedSlots, setSelectedSlotsObjects } from '@/redux/slices/application_form_data';
 import { IPsychologist } from '@/shared/types/psychologist.types';
 import { Button } from '@/shared/ui/Button';
 import { getPsychologistAll } from '@/features/actions/getPsychologistAll';
@@ -11,6 +11,36 @@ import Link from 'next/link';
 import { RootState } from '@/redux/store';
 import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
 import { Tooltip } from '@/shared/ui/Tooltip';
+import { NoMatchError } from './NoMatchError';
+import { EmergencyContacts } from './EmergencyContacts';
+
+interface Slot {
+  id: string;
+  psychologist: string;
+  date: string;
+  time: string;
+  state: string;
+  ticket: string | null;
+  client_id: string | null;
+  meeting_link: string | null;
+  meeting_id: string | null;
+  calendar_meeting_id: string | null;
+  confirmed: boolean;
+  auto_assigned: boolean;
+  auto_canceled: boolean;
+  is_helpful_hand: boolean | null;
+  "Дата Локальная": string;
+  "Время Локальное": string;
+}
+
+interface ScheduleDay {
+  date: string;
+  slots: {
+    [key: string]: Slot[];
+  };
+  day_name: string;
+  pretty_date: string;
+}
 
 const getGoogleDriveImageUrl = (url: string | undefined) => {
   if (!url) return '/card/214х351.jpg';
@@ -23,26 +53,65 @@ const getGoogleDriveImageUrl = (url: string | undefined) => {
 
 export const PsychologistStage = () => {
   const dispatch = useDispatch();
-  const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
+  const [showNoMatch, setShowNoMatch] = useState(false);
+  const [showEmergency, setShowEmergency] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [availableDays, setAvailableDays] = useState<ScheduleDay[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   const filtered_by_automatch_psy = useSelector((state: RootState) => state.filter.filtered_by_automatch_psy);
   const currentIndex = useSelector((state: RootState) => state.applicationFormData.index_phyc);
   const filters = useSelector((state: RootState) => state.filter);
+  const hasError = useSelector((state: RootState) => state.applicationFormData.has_matching_error);
 
   useEffect(() => {
     const fetchPsychologists = async () => {
+      setIsLoading(true);
       try {
         const data = await getPsychologistAll();
         if (data?.length) {
           dispatch(fill_filtered_by_automatch_psy(data));
+          if (filtered_by_automatch_psy.length === 0) {
+            dispatch(setHasMatchingError(true));
+            setShowNoMatch(true);
+          } else {
+            dispatch(setHasMatchingError(false));
+          }
         }
       } catch (error) {
         console.error('Failed to fetch psychologists:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchPsychologists();
   }, [dispatch]);
+
+  useEffect(() => {
+    if (filtered_by_automatch_psy.length === 0) {
+      dispatch(setHasMatchingError(true));
+      setShowNoMatch(true);
+    } else {
+      dispatch(setHasMatchingError(false));
+      setShowNoMatch(false);
+    }
+  }, [filtered_by_automatch_psy, dispatch]);
+
+  useEffect(() => {
+    if (filtered_by_automatch_psy.length === 0 && retryCount > 0) {
+      setShowEmergency(true);
+    }
+  }, [filtered_by_automatch_psy.length, retryCount]);
+
+  useEffect(() => {
+    // Обновляем доступные дни при изменении текущего психолога
+    if (filtered_by_automatch_psy[currentIndex]?.schedule?.days) {
+        setAvailableDays(filtered_by_automatch_psy[currentIndex].schedule.days);
+    }
+  }, [currentIndex, filtered_by_automatch_psy]);
 
   const currentPsychologist = filtered_by_automatch_psy[currentIndex];
 
@@ -61,6 +130,15 @@ export const PsychologistStage = () => {
     window.open(url, '_blank');
   };
 
+  const handleCloseNoMatch = () => {
+    setShowNoMatch(false);
+    setRetryCount(prev => prev + 1);
+  };
+
+  const handleCloseEmergency = () => {
+    setShowEmergency(false);
+  };
+
   const handlePrevious = () => {
     if (currentIndex > 0) {
       dispatch(setIndexPhyc(currentIndex - 1));
@@ -75,13 +153,42 @@ export const PsychologistStage = () => {
     }
   };
 
-  const handleSubmit = () => {
-    dispatch(setApplicationStage('gratitude'));
+  const handleSubmit = async () => {
+    if (selectedSlot) {
+      setIsSubmitting(true);
+      try {
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Имитация задержки
+        dispatch(setSelectedSlots([`${selectedSlot["Дата Локальная"]} ${selectedSlot["Время Локальное"]}`]));
+        dispatch(setSelectedSlotsObjects([JSON.stringify(selectedSlot)]));
+        dispatch(setApplicationStage('gratitude'));
+      } catch (error) {
+        console.error('Error submitting form:', error);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
   };
 
-  const handleSlotSelect = (slot: string) => {
+  const handleSlotSelect = (slot: Slot) => {
     setSelectedSlot(slot);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
+        <span className="mt-4 text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[14px] text-[#116466]">Загрузка психологов...</span>
+      </div>
+    );
+  }
+
+  if (showEmergency) {
+    return <EmergencyContacts onClose={handleCloseEmergency} />;
+  }
+
+  if (showNoMatch) {
+    return <NoMatchError onClose={handleCloseNoMatch} />;
+  }
 
   if (!filtered_by_automatch_psy.length) {
     return (
@@ -93,27 +200,37 @@ export const PsychologistStage = () => {
   }
 
   const remainingPsychologists = filtered_by_automatch_psy.length - (currentIndex + 1);
-  const availableSlots = ['28.01/ 13:00'];
 
   return (
-    <div className="flex flex-col w-full pr-[50px] pl-[50px] pb-[50px] pt-[30px] max-lg:p-[20px] h-full">
+    <div className="flex flex-col w-full pr-[50px] pl-[50px] pb-[50px] pt-[30px] max-lg:p-[20px] h-full relative">
+      {isSubmitting && (
+        <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50">
+          <div className="flex flex-col items-center gap-[10px]">
+            <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-[18px] text-[#116466]">Отправка заявки...</span>
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-between items-center mb-[20px] max-lg:flex-col max-lg:gap-[15px]">
-        <button 
-          onClick={handlePrevious} 
-          disabled={currentIndex === 0}
-          className={`flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ${currentIndex === 0 ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-          <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
-          <span>Предыдущий психолог</span>
-        </button>
-        <button 
-          onClick={handleNext}
-          disabled={currentIndex >= filtered_by_automatch_psy.length - 1}
-          className={`flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ${currentIndex >= filtered_by_automatch_psy.length - 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-          <span>Показать еще {remainingPsychologists} психологов</span>
-          <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
-        </button>
+        {currentIndex > 0 && (
+          <button 
+            onClick={handlePrevious} 
+            className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]"
+          >
+            <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
+            <span>Предыдущий психолог</span>
+          </button>
+        )}
+        {currentIndex < filtered_by_automatch_psy.length - 1 && remainingPsychologists > 0 && (
+          <button 
+            onClick={handleNext}
+            className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ml-auto"
+          >
+            <span>Показать еще {remainingPsychologists} психологов</span>
+            <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
+          </button>
+        )}
       </div>
 
       <div className="flex flex-col grow p-[25px] max-lg:p-[15px] mb-[30px] max-lg:mb-[20px] border-[1px] rounded-[25px]">
@@ -171,20 +288,35 @@ export const PsychologistStage = () => {
 
         <div className="mb-[30px] max-lg:mb-[20px]">
           <h4 className="font-semibold text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] mb-[10px]">Ближайшая запись:</h4>
-          <div className="flex gap-[10px] overflow-x-auto pb-[10px]">
-            {availableSlots.map((slot, index) => (
-              <button
-                key={index}
-                onClick={() => handleSlotSelect(slot)}
-                className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap min-w-[132px] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ${
-                  selectedSlot === slot 
-                    ? 'bg-[#116466] text-white border-[#116466]' 
-                    : 'border-[#D4D4D4] text-[#116466]'
-                }`}
-              >
-                {slot}
-              </button>
-            ))}
+          <div className="flex flex-col gap-[15px] max-h-[300px] overflow-y-auto">
+            {availableDays.map((day) => {
+              const availableSlots = Object.entries(day.slots)
+                .filter(([_, slots]) => slots.length > 0)
+                .map(([time, slots]) => slots[0]);
+
+              if (availableSlots.length === 0) return null;
+
+              return (
+                <div key={day.date} className="border-b pb-[15px]">
+                  <h5 className="font-semibold mb-[10px]">{day.day_name}, {day.pretty_date}</h5>
+                  <div className="flex gap-[10px] flex-wrap">
+                    {availableSlots.map((slot) => (
+                      <button
+                        key={slot.id}
+                        onClick={() => handleSlotSelect(slot)}
+                        className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ${
+                          selectedSlot?.id === slot.id 
+                            ? 'bg-[#116466] text-white border-[#116466]' 
+                            : 'border-[#D4D4D4] text-[#116466]'
+                        }`}
+                      >
+                        {slot["Время Локальное"]}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -192,18 +324,27 @@ export const PsychologistStage = () => {
       <div className="shrink-0 pb-[50px] max-lg:pb-[30px] flex gap-[10px]">
           <button
               type='button'
-              onClick={() => dispatch(setApplicationStage('age'))}
-              className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px]`}
+              onClick={() => dispatch(setApplicationStage('phone'))}
+              disabled={isSubmitting}
+              className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
               Назад
           </button>
 
           <button
               type='submit'
-              className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px]`}
+              disabled={!selectedSlot || isSubmitting}
+              className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px] flex justify-center items-center gap-[10px] ${!selectedSlot || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
               onClick={handleSubmit}
           >
-              Продолжить
+              {isSubmitting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Отправка...</span>
+                </>
+              ) : (
+                'Продолжить'
+              )}
           </button>
       </div>
     </div>

@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/redux/store';
 import { z } from 'zod';
 import { COLORS } from '@/shared/constants/colors';
-import styles from './PromocodeStage.module.scss';
+import styles from '@/styles/input.module.scss';
 
 const FormSchema = z.object({
     promocode: z.string()
@@ -45,15 +45,7 @@ const PromocodeStage = () => {
     const handleSubmit = (data: z.infer<typeof FormSchema>) => {
         localStorage.setItem('app_promocode', JSON.stringify(data));
         dispatch(setPromocode(data.promocode));
-
-        // Проверяем, есть ли подходящие психологи
-        if (filtered_persons.length !== 0) {
-            dispatch(setHasMatchingError(true));
-            dispatch(setApplicationStage('diseases_psychologist'));
-        } else {
-            dispatch(setHasMatchingError(false));
-            dispatch(setApplicationStage('psychologist'));
-        }
+        dispatch(setApplicationStage('phone'));
     }
 
     return (

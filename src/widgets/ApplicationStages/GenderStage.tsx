@@ -92,7 +92,7 @@ export const GenderStageApplication = () => {
                                     </FormControl>
                                     {!form.formState.errors.gender && 
                                         <span className='mt-[10px] max-lg:text-[16px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
-                                            ! Поле обязательное для заполнения
+                                            Поле обязательное для заполнения
                                         </span>
                                     }
                                     <FormMessage className="mt-[10px] max-lg:text-[16px]"/>

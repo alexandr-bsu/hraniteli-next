@@ -41,7 +41,6 @@ export const FilterDate: React.FC<FilterDateProps> = ({
       setLoading(true);
       const data = await getSchedule();
       if (data && data[0]?.items) {
-        console.log('Schedule data:', data[0].items);
         setSchedule(data[0].items);
       }
     } catch (error) {

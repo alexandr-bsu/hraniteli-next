@@ -2,12 +2,10 @@
 
 import { generateTicketId } from "@/redux/slices/application_form_data";
 import { RootState } from "@/redux/store";
-import { ActionStage } from "@/widgets/ApplicationStages/ActionStage";
 import AgeStageApplication from "@/widgets/ApplicationStages/AgeStage";
 import ConditionStage from "@/widgets/ApplicationStages/ConditionStage";
 import TraumaticStage from "@/widgets/ApplicationStages/TraumaticStage";
 import { DiseasesPsychologistStage } from "@/widgets/ApplicationStages/DiseasesPsychologistStage";
-import { DiseasesStage } from "@/widgets/ApplicationStages/DiseasesStage";
 import { FailStage } from "@/widgets/ApplicationStages/FailStage";
 import { FinalStage } from "@/widgets/ApplicationStages/FinalStage";
 import { GenderStageApplication } from "@/widgets/ApplicationStages/GenderStage";
@@ -22,6 +20,9 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ApplicationStage } from '@/redux/slices/application_form';
+import { PhoneStage } from "@/widgets/ApplicationStages/PhoneStage";
+import { getPsychologistAll } from "@/features/actions/getPsychologistAll";
+import { fill_filtered_by_automatch_psy } from "@/redux/slices/filter";
 
 const STAGES_WITH_PROGRESS = [
     'name',
@@ -32,10 +33,9 @@ const STAGES_WITH_PROGRESS = [
     'request',
     'condition',
     'traumatic',
-    'action',
-    'diseases',
     'diseases_psychologist',
-    'promocode'
+    'promocode',
+    'phone'
 ] as const satisfies readonly ApplicationStage[];
 
 export default function ApplicationForm() {
@@ -60,6 +60,22 @@ export default function ApplicationForm() {
             dispatch(generateTicketId());
         }
     }, [dispatch, ticketID]);
+
+    // Загружаем психологов при первой загрузке формы
+    useEffect(() => {
+        const loadPsychologists = async () => {
+            try {
+                const psychologists = await getPsychologistAll();
+                if (psychologists?.length) {
+                    dispatch(fill_filtered_by_automatch_psy(psychologists));
+                }
+            } catch (error) {
+                console.error('Failed to fetch psychologists:', error);
+            }
+        };
+
+        loadPsychologists();
+    }, [dispatch]);
 
     const handleClose = () => {
         router.push('/');
@@ -90,12 +106,10 @@ export default function ApplicationForm() {
                 return <ConditionStage />;
             case 'traumatic':
                 return <TraumaticStage />;
-            case 'action':
-                return <ActionStage />;
-            case 'diseases':
-                return <DiseasesStage />;
             case 'promocode':
                 return <PromocodeStage />;
+            case 'phone':
+                return <PhoneStage />;
             case 'gratitude':
                 return <FinalStage />;
             case 'error':

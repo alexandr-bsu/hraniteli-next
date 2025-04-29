@@ -16,6 +16,7 @@ export type ApplicationStage =
     | 'diseases_psychologist'
     | 'psychologist'
     | 'promocode'
+    | 'phone'
     | 'gratitude'
     | 'error';
 

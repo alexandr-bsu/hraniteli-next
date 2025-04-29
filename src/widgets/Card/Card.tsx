@@ -125,14 +125,9 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                 const { startDate, endDate } = getStartAndEndDates();
                 const url = `https://n8n-v2.hrani.live/webhook/get-aggregated-schedule-by-psychologist-test-contur?utm_psy=${encodeURIComponent(psychologist.name)}&userTimeOffsetMsk=${timeDifference}`;
                 
-                console.log('Loading slots for:', psychologist.name);
-                console.log('Date range:', { startDate, endDate });
-                
                 const response = await axios.get(url);
-                console.log('Slots response:', response.data);
                 
                 if (!response.data?.[0]?.items?.length) {
-                    console.log('No slots available');
                     setAvailableSlots([]);
                     return;
                 }
@@ -151,8 +146,6 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                         });
                     }
                 });
-
-                console.log('Processed slots:', slots);
                 
                 const sortedSlots = slots.sort((a, b) => {
                     const dateA = new Date(a.date.split('.').reverse().join('-') + ' ' + a.time);
@@ -160,7 +153,6 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                     return dateA.getTime() - dateB.getTime();
                 });
 
-                console.log('Final slots to display:', sortedSlots.slice(0, 3));
                 setAvailableSlots(sortedSlots.slice(0, 3));
             } catch (error) {
                 console.error('Error loading slots:', error);
