@@ -1,15 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useAppDispatch } from '@/redux/store'
 import { getPsychologistAll } from '@/features/actions/getPsychologistAll'
-import { Psychologist_cards } from '@/views'
+import { Psychologist_cards, ApplicationForm } from '@/views'
 import { fill_filtered_by_automatch_psy, setSelectedPsychologist } from '@/redux/slices/filter'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, usePathname } from 'next/navigation'
 
-export default function Home() {
+const MainContent = () => {
   const dispatch = useAppDispatch()
   const searchParams = useSearchParams()
+  const pathname = usePathname()
   const [isLoaded, setIsLoaded] = useState(false)
   
   useEffect(() => {
@@ -48,9 +49,25 @@ export default function Home() {
     fetchData()
   }, [dispatch, searchParams])
 
+  // Показываем анкету только на странице /application_form
+  if (pathname === '/application_form') {
+    return <ApplicationForm />
+  }
+
+  // На главной и других страницах показываем карточки психологов
   return (
     <div className="w-full h-full flex max-lg:items-center max-lg:flex-col min-lg:justify-center">
       <Psychologist_cards isLoaded={isLoaded} />
     </div>
+  )
+}
+
+export default function Home() {
+  return (
+    <main className='main'>
+      <Suspense fallback={<div>Loading...</div>}>
+        <MainContent />
+      </Suspense>
+    </main>
   )
 }

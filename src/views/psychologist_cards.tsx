@@ -6,10 +6,10 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from 'axios';
 import Error from "next/error";
 import { IPsychologist } from "@/shared/types/psychologist.types";
-import { setDataNamePsychologist } from "@/redux/slices/filter";
+import { setDataNamePsychologist, fill_filtered_by_automatch_psy, setAvailableRequests } from "@/redux/slices/filter";
 import Image from "next/image";
-import { fill_filtered_by_automatch_psy } from "@/redux/slices/filter";
 import { getPsychologistAll } from '@/features/actions/getPsychologistAll';
+import { getAvailableRequests } from '@/shared/api/requests';
 
 type Props = {
     data?: IPsychologist[];
@@ -42,9 +42,7 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
         }
         
         if (filter.requests.length > 0 && filter.filtered_by_requests.length > 0) {
-            result = result.filter((item: IPsychologist) => 
-                filter.filtered_by_requests.some((f: IPsychologist) => f.id === item.id)
-            );
+            result = filter.filtered_by_requests;
         }
         
         if (filter.price > 0 && filter.filtered_by_price.length > 0) {
@@ -117,7 +115,10 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
         const loadData = async () => {
             try {
                 setLoading(true);
-                const psychologists = await getPsychologistAll();
+                const [psychologists, availableRequests] = await Promise.all([
+                    getPsychologistAll(),
+                    getAvailableRequests()
+                ]);
                 
                 if (!psychologists?.length) {
                     setError('Не удалось загрузить данные психологов');
@@ -125,9 +126,10 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
                 }
 
                 dispatch(fill_filtered_by_automatch_psy(psychologists));
+                dispatch(setAvailableRequests(availableRequests));
             } catch (err) {
                 setError('Произошла ошибка при загрузке данных');
-                console.error('Error loading psychologists:', err);
+                console.error('Error loading data:', err);
             } finally {
                 setLoading(false);
             }

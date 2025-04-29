@@ -16,10 +16,18 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import Image from 'next/image';
 import { useCallback, useEffect, useMemo } from 'react';
 import { ModalType } from '@/redux/slices/modal';
+import { useDispatch, useSelector } from 'react-redux';
+import { findByRequests } from '@/redux/slices/filter';
+import { RootState } from '@/redux/store';
 
 interface FilterData {
     label: string;
-    id?: string;
+    id: string;
+}
+
+interface FilterItem {
+    id: string;
+    label: string;
 }
 
 interface FilterRequestProps {
@@ -31,33 +39,15 @@ interface FilterRequestProps {
 }
 
 export const FilterRequest:React.FC<FilterRequestProps> = ({onSubmit, type, callback, open: [isOpen, setOpen], selectedFilters }) => {
+    const dispatch = useDispatch();
+    const availableRequests = useSelector((state: RootState) => state.filter.available_requests);
 
-    const items = useMemo(() => [
-        {
-          id: "query",
-          label: "Принимаете ли вы медикаменты по назначению психиатра",
-        },
-        {
-          id: "query2",
-          label: "Физические недомогания: постоянная усталость, бессонница, проблемы с питанием, проблемы с памятью, психосоматические реакции",
-        },
-        {
-          id: "query3",
-          label: "Подавленное настроение, прокрастинация, ощущение бессмысленности существования, опустошенность, отверженность",
-        },
-        {
-          id: "query4",
-          label: "Странные, кошмарные, повторяющиеся сны",
-        },
-        {
-            id: "query5",
-            label: "Страх будущего и неопределенности",
-        },
-        {
-            id: "query6",
-            label: "Беременность, родительство, послеродовая депрессия, проблемы в отношениях с детьми до 18 лет",
-        },
-    ] as const, []);
+    const items = useMemo(() => 
+        availableRequests.map((request: string, index: number): FilterItem => ({
+            id: `query${index + 1}`,
+            label: request,
+        }))
+    , [availableRequests]);
 
     const FormSchema = z.object({
         items: z.array(z.string()),
@@ -87,10 +77,29 @@ export const FilterRequest:React.FC<FilterRequestProps> = ({onSubmit, type, call
                 selectedItems.push({ label: match.label, id: match.id });
             }
         });
+
         onSubmit(selectedItems);
+        dispatch(findByRequests(selectedItems.map(item => item.label)));
         setOpen();
         callback();
-    }, [items, onSubmit, setOpen, callback]);
+    }, [items, onSubmit, setOpen, callback, dispatch]);
+
+    const handleCheckboxChange = (checked: boolean | string, item: FilterItem, field: any) => {
+        const newValue = Boolean(checked)
+            ? [...(field.value || []), item.id]
+            : (field.value || []).filter((value: string) => value !== item.id);
+        field.onChange(newValue);
+        const result: FilterData[] = [];
+        newValue.forEach((id: string) => {
+            const match = items.find(item => item.id === id);
+            if (match) {
+                result.push({ label: match.label, id: match.id });
+            }
+        });
+        
+        onSubmit(result);
+        dispatch(findByRequests(result.map(item => item.label)));
+    };
 
     const handleCheckboxCheck = watch('items');
 
@@ -127,18 +136,7 @@ export const FilterRequest:React.FC<FilterRequestProps> = ({onSubmit, type, call
                                             className='h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px] shrink-0'
                                             checked={field.value?.includes(item.id)}
                                             onCheckedChange={(checked) => {
-                                                const newValue = checked
-                                                    ? [...(field.value || []), item.id]
-                                                    : (field.value || []).filter((value) => value !== item.id);
-                                                field.onChange(newValue);
-                                                const result: FilterData[] = [];
-                                                newValue.forEach((id) => {
-                                                    const match = items.find(item => item.id === id);
-                                                    if (match) {
-                                                        result.push({ label: match.label, id: match.id });
-                                                    }
-                                                });
-                                                onSubmit(result);
+                                                handleCheckboxChange(checked, item, field);
                                             }}
                                         />
                                         </FormControl>

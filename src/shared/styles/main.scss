@@ -42,51 +42,32 @@ body {
   }
 
 .input__text_container {
-    width: 100%;
-    border-radius: 10px;
     position: relative;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.input__text:not([value=""]) + .input__text_label{
-    top:10px;
-    font-size: 10px;
-}
-.input__text {
-    width: 100%;
-    height: 100%;
-    padding-left: 15px;
-    padding-right: 15px;
-    font-size: 18px;
-    position: absolute;
-    padding-top: 20px;
-    &:focus + .input__text_label{
-        top:10px;
-        font-size: 12px;
-        @media (max-width: 1024px) {
-            font-size: 10px;
+    z-index: 10;
+    
+    .input__text {
+        height: 100%;
+        padding: 20px;
+        background: #FAFAFA;
+        
+        &:focus ~ .input__text_label,
+        &:not(:placeholder-shown) ~ .input__text_label {
+            transform: translateY(-50%);
+            background: white;
+            padding: 0 4px;
+            color: #116466;
         }
     }
-    @media (max-width: 1024px) {
-        font-size: 14px;
-    }
-
-    z-index: 10;
-
-}
-.input__text_label {
-    transition: 0.4s;
-    left: 15px;
-    position: absolute;
-    z-index: 1;
-    font-weight: 400;
-    font-size: 18px;
-    color: #9A9A9A;
-
-    @media (max-width: 1024px) {
-        font-size: 14px;
+    
+    .input__text_label {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: transparent;
+        transition: all 0.3s ease;
+        pointer-events: none;
+        color: #9A9A9A;
     }
 }
 

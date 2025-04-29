@@ -97,21 +97,49 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
     }, [isExpanded, psychologist.id]);
 
     useEffect(() => {
+        const getStartAndEndDates = () => {
+            const today = new Date();
+            const monday = new Date(today);
+            monday.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1)); // Получаем понедельник текущей недели
+            
+            const endDate = new Date(monday);
+            endDate.setDate(monday.getDate() + 28); // +4 недели
+            
+            // Форматируем даты в формате DD.MM.YYYY
+            const formatDate = (date: Date) => {
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}.${month}.${year}`;
+            };
+            
+            return {
+                startDate: formatDate(monday),
+                endDate: formatDate(endDate)
+            };
+        };
+
         const loadSlots = async () => {
             try {
                 const timeDifference = getTimeDifference();
+                const { startDate, endDate } = getStartAndEndDates();
                 const url = `https://n8n-v2.hrani.live/webhook/get-aggregated-schedule-by-psychologist-test-contur?utm_psy=${encodeURIComponent(psychologist.name)}&userTimeOffsetMsk=${timeDifference}`;
                 
-                const response = await axios.get(url);
+                console.log('Loading slots for:', psychologist.name);
+                console.log('Date range:', { startDate, endDate });
                 
-                if (!response.data?.items?.length) {
+                const response = await axios.get(url);
+                console.log('Slots response:', response.data);
+                
+                if (!response.data?.[0]?.items?.length) {
+                    console.log('No slots available');
                     setAvailableSlots([]);
                     return;
                 }
 
                 const slots: { date: string; time: string }[] = [];
 
-                response.data.items.forEach((item: any) => {
+                response.data[0].items.forEach((item: any) => {
                     if (item.slots) {
                         Object.entries(item.slots).forEach(([hour, slotArray]: [string, any]) => {
                             if (Array.isArray(slotArray) && slotArray.length > 0) {
@@ -124,13 +152,15 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                     }
                 });
 
+                console.log('Processed slots:', slots);
                 
                 const sortedSlots = slots.sort((a, b) => {
-                    const dateA = new Date(a.date + ' ' + a.time);
-                    const dateB = new Date(b.date + ' ' + b.time);
+                    const dateA = new Date(a.date.split('.').reverse().join('-') + ' ' + a.time);
+                    const dateB = new Date(b.date.split('.').reverse().join('-') + ' ' + b.time);
                     return dateA.getTime() - dateB.getTime();
                 });
 
+                console.log('Final slots to display:', sortedSlots.slice(0, 3));
                 setAvailableSlots(sortedSlots.slice(0, 3));
             } catch (error) {
                 console.error('Error loading slots:', error);

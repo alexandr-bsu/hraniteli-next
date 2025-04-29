@@ -12,7 +12,6 @@ export async function getPsychologistAll() {
         console.log('API Response:', {
             status: res.status,
             data: data,
-            isArray: Array.isArray(data)
         });
         
         // Убедимся что данные - это массив

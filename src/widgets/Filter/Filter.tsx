@@ -44,7 +44,7 @@ export const Filter = () => {
     const currentGender = useSelector((state: RootState) => state.filter.gender) as Gender;
     const favorites = useSelector((state: RootState) => state.favorites.items);
 
-    const [filterData, setFilterDate] = useState<DateFilterData[]>([]);
+    const [filterData, setFilterDate] = useState<{ date: string; slots?: string[] }[]>([]);
     const [filterPrice, setFilterPrice] = useState<string[]>([]);
     const [filterRequest, setFilterRequest] = useState<FilterData[]>([]);
     const [filterGender, setFilterGender] = useState<Gender | ''>('');
@@ -225,6 +225,7 @@ export const Filter = () => {
                                     setFilterDate(dates);
                                     dispatch(findByDate(dates.map(d => d.date)));
                                 }}
+                                selectedDateInfo={filterData[0]}
                             />        
                             <Select 
                                 onOpenChange={() => handleModalOpen('FilterDate')} 
@@ -234,26 +235,27 @@ export const Filter = () => {
                                     <SelectValue placeholder="Выберите дату сессии" />
                                 </SelectTrigger>
                             </Select>
-                            <div className="flex flex-wrap gap-2 mt-2">
-                                {filterData?.map((item, i) => (
-                                    <div 
-                                        key={i} 
-                                        className="flex items-center gap-2 px-4 py-2 bg-[#116466] text-white rounded-[10px] text-sm"
-                                    >
-                                        <span>{item.date}</span>
+                            {filterData.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    <div className="flex items-center gap-2 px-4 py-2 bg-[#116466] text-white rounded-[10px] text-[14px]">
+                                        <span>
+                                            {filterData[0].date}
+                                            {filterData[0].slots && filterData[0].slots.length > 0 && (
+                                                <> - {filterData[0].slots.join(', ')}</>
+                                            )}
+                                        </span>
                                         <button 
                                             onClick={() => {
-                                                const newDates = filterData.filter((_, index) => index !== i);
-                                                setFilterDate(newDates);
-                                                dispatch(findByDate(newDates.map(d => d.date)));
+                                                setFilterDate([]);
+                                                dispatch(findByDate([]));
                                             }}
                                             className="w-4 h-4 flex items-center justify-center hover:opacity-80 cursor-pointer"
                                         >
                                             ✕
                                         </button>
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="w-full mt-[20px]">

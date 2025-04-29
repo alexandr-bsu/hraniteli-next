@@ -28,6 +28,7 @@ export interface RootState {
     hour_dates: IPsychologist[];
     mental_illness: boolean;
     mental_illness2: boolean;
+    available_requests: string[];
   };
   modal: {
     isOpen: boolean;

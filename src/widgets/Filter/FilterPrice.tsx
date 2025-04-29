@@ -39,7 +39,7 @@ export const FilterPrice:React.FC<Props> = ({onSubmit, type }) => {
 
     useEffect(() => {
         if (handleCheckboxCheck) {
-            onSubmit([handleCheckboxCheck]);
+            onSubmit(Number(handleCheckboxCheck));
         }
     },[handleCheckboxCheck])
 
