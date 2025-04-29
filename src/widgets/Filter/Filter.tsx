@@ -10,7 +10,7 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { openModal, closeModal, ModalType } from "@/redux/slices/modal";
-import { FilterRequest } from "./FilterRequest";
+import { FilterRequest, FilterData } from "./FilterRequest";
 import { FilterGender } from "./FilterGender";
 import { FilterPrice } from "./FilterPrice";
 import { FilterDate } from "./FilterDate";
@@ -27,11 +27,6 @@ import {
     findByFavorites
 } from "@/redux/slices/filter";
 import { Gender } from "@/shared/types/application.types";
-
-interface FilterData {
-    label: string;
-    id?: string;
-}
 
 interface DateFilterData {
     date: string;

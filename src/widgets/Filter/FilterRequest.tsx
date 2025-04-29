@@ -20,15 +20,12 @@ import { useDispatch, useSelector } from 'react-redux';
 import { findByRequests } from '@/redux/slices/filter';
 import { RootState } from '@/redux/store';
 
-interface FilterData {
+export interface FilterData {
     label: string;
     id: string;
 }
 
-interface FilterItem {
-    id: string;
-    label: string;
-}
+type FilterItem = FilterData;
 
 interface FilterRequestProps {
     type: ModalType;
