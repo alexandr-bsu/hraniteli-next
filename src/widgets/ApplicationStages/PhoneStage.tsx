@@ -22,6 +22,33 @@ const FormSchema = z.object({
     phone: z.string().regex(phoneRegex, 'Введите корректный номер телефона').or(z.literal(''))
 });
 
+interface Slot {
+    id: string;
+    psychologist: string;
+    date: string;
+    time: string;
+    state: string;
+    ticket: string | null;
+    client_id: string | null;
+    meeting_link: string | null;
+    meeting_id: string | null;
+    calendar_meeting_id: string | null;
+    confirmed: boolean;
+    auto_assigned: boolean;
+    auto_canceled: boolean;
+    is_helpful_hand: boolean | null;
+    "Дата Локальная": string;
+    "Время Локальное": string;
+}
+
+interface DaySlots {
+    [time: string]: Slot[];
+}
+
+interface Schedule {
+    [date: string]: DaySlots;
+}
+
 export const PhoneStage = () => {
     const dispatch = useDispatch();
     const formData = useSelector((state: RootState) => state.applicationFormData);
@@ -127,10 +154,12 @@ export const PhoneStage = () => {
                     schedule: schedule
                 };
             }).filter((psy: any) => {
-                const schedule = psychologistSchedules.get(psy.name);
+                const schedule = psychologistSchedules.get(psy.name) as Schedule | undefined;
                 if (!schedule) return false;
-                return Object.values(schedule).some((daySlots: any) => 
-                    Object.values(daySlots).some(slot => slot && slot.state === 'Свободен')
+                return Object.entries(schedule).some(([_, daySlots]) => 
+                    Object.entries(daySlots).some(([_, slots]) => 
+                        slots.some(slot => slot.state === 'Свободен')
+                    )
                 );
             });
 
