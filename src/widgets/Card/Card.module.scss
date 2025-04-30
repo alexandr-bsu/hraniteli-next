@@ -539,39 +539,95 @@
 }
 
 .description {
-    font-family: 'Open Sans', sans-serif;
-    font-size: 14px;
-    line-height: 150%;
+    position: relative;
+    max-height: none;
+    overflow: visible;
+    font-size: 18px;
+    line-height: 22px;
     color: #333;
+    margin: 0;
+
+    &.expanded {
+        max-height: none;
+    }
+
+    &:not(.expanded) {
+        &[style*="height"] {
+            max-height: 44px;
+            overflow: hidden;
+
+            &::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                width: 100%;
+                height: 22px;
+                background: linear-gradient(180deg, transparent, #fff);
+                pointer-events: none;
+            }
+        }
+    }
 }
 
 .education {
     .educationItem {
-        margin-bottom: 12px;
-
-        @include mobile {
-            margin-bottom: 16px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid #F5F5F5;
-        }
-
-        &:last-child {
-            margin-bottom: 0;
-            border-bottom: none;
-        }
+        margin-bottom: 15px;
+        padding: 15px;
+        background: #FAFAFA;
+        border-radius: 10px;
 
         h4 {
-            font-family: 'Open Sans', sans-serif;
-            font-size: 14px;
             font-weight: 600;
-            margin-bottom: 4px;
+            font-size: 16px;
+            line-height: 22px;
+            margin-bottom: 10px;
+            color: #151515;
         }
+    }
+}
 
-        p {
-            font-family: 'Open Sans', sans-serif;
-            font-size: 14px;
-            color: #666;
-        }
+.educationText {
+    position: relative;
+    max-height: 44px; // Высота двух строк
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+
+    p {
+        font-size: 14px;
+        line-height: 22px;
+        color: #151515;
+        margin: 0;
+    }
+
+    &.expanded {
+        max-height: 1000px; // Достаточно большое значение
+    }
+
+    &:not(.expanded)::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 22px; // Высота одной строки
+        background: linear-gradient(180deg, transparent, #FAFAFA);
+    }
+}
+
+.readMoreButton {
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 19px;
+    color: #116466;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: opacity 0.2s;
+
+    &:hover {
+        opacity: 0.8;
     }
 }
 

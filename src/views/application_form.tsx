@@ -64,18 +64,21 @@ export default function ApplicationForm() {
     // Загружаем психологов при первой загрузке формы
     useEffect(() => {
         const loadPsychologists = async () => {
-            try {
-                const psychologists = await getPsychologistAll();
-                if (psychologists?.length) {
-                    dispatch(fill_filtered_by_automatch_psy(psychologists));
+            // Загружаем психологов только если мы не на этапе phone или psychologist
+            if (currentStage !== 'phone' && currentStage !== 'psychologist' && currentStage !== 'promocode') {
+                try {
+                    const psychologists = await getPsychologistAll();
+                    if (psychologists?.length) {
+                        dispatch(fill_filtered_by_automatch_psy(psychologists));
+                    }
+                } catch (error) {
+                    console.error('Failed to fetch psychologists:', error);
                 }
-            } catch (error) {
-                console.error('Failed to fetch psychologists:', error);
             }
         };
 
         loadPsychologists();
-    }, [dispatch]);
+    }, [dispatch, currentStage]);
 
     const handleClose = () => {
         router.push('/');

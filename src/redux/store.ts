@@ -3,7 +3,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 import { applicationFormReducer, ApplicationStage } from './slices/application_form';
 import { applicationFormDataReducer } from './slices/application_form_data';
 import filterReducer from './slices/filter';
-import { modalReducer } from './slices/modal';
+import { modalReducer, ModalState } from './slices/modal';
 import { psychologistsReducer } from './slices/psychologists';
 import favoritesReducer from './slices/favorites';
 import { IApplicationFormData } from '@/shared/types/application.types';
@@ -30,29 +30,11 @@ export interface RootState {
     mental_illness2: boolean;
     available_requests: string[];
   };
-  modal: {
-    isOpen: boolean;
-    content: React.ReactNode;
-    type: string | null;
-    selectedSlots: string[];
-    slots_objects: any[];
-    selectedPsychologist: string;
-  };
+  modal: ModalState;
   psychologists: IPsychologist[];
   favorites: {
     items: IPsychologist[];
   };
-}
-
-export type ModalType = 'FilterRequest' | 'Contact' | 'Slots' | null;
-
-export interface ModalState {
-    isOpen: boolean;
-    type: ModalType;
-    content: React.ReactNode;
-    selectedSlots?: string[];
-    slots_objects?: any[];
-    selectedPsychologist?: string;
 }
 
 export const store = configureStore({

@@ -23,61 +23,55 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
     const dispatch = useDispatch();
     
     // Проверка активности фильтров по цене или запросам
-    const hasActiveFilters = filter.price > 0 || (filter.requests && filter.requests.length > 0);
+    const hasActiveFilters = filter.price > 0 || (filter.requests?.length > 0);
     
     // Определяем отображаемый список карточек с учётом всех фильтров
     const filtered_persons = useMemo(() => {
         let result = filter.filtered_by_automatch_psy as IPsychologist[];
         
         // Применяем фильтр по избранным, если он активен
-        if (filter.favorites && filter.filtered_by_favorites.length > 0) {
+        if (filter.favorites && filter.filtered_by_favorites?.length > 0) {
             result = filter.filtered_by_favorites as IPsychologist[];
         }
         
         // Применяем другие активные фильтры
-        if (filter.gender !== 'other' && filter.filtered_by_gender.length > 0) {
+        if (filter.gender !== 'other' && filter.filtered_by_gender?.length > 0) {
             result = result.filter((item: IPsychologist) => 
                 filter.filtered_by_gender.some((f: IPsychologist) => f.id === item.id)
             );
         }
         
-        if (filter.requests.length > 0 && filter.filtered_by_requests.length > 0) {
+        if (filter.requests?.length > 0 && filter.filtered_by_requests?.length > 0) {
             result = filter.filtered_by_requests;
         }
         
-        if (filter.price > 0 && filter.filtered_by_price.length > 0) {
+        if (filter.price > 0 && filter.filtered_by_price?.length > 0) {
             result = result.filter((item: IPsychologist) => 
                 filter.filtered_by_price.some((f: IPsychologist) => f.id === item.id)
             );
         }
         
-        if (filter.time.length > 0 && filter.filtered_by_time.length > 0) {
+        if (filter.time?.length > 0 && filter.filtered_by_time?.length > 0) {
             result = result.filter((item: IPsychologist) => 
                 filter.filtered_by_time.some((f: IPsychologist) => f.id === item.id)
             );
         }
         
-        if (filter.date.length > 0 && filter.filtered_by_date.length > 0) {
+        if (filter.date?.length > 0 && filter.filtered_by_date?.length > 0) {
             result = result.filter((item: IPsychologist) => 
                 filter.filtered_by_date.some((f: IPsychologist) => f.id === item.id)
             );
         }
         
-        if (filter.video && filter.filtered_by_video.length > 0) {
+        if (filter.video && filter.filtered_by_video?.length > 0) {
             result = result.filter((item: IPsychologist) => 
                 filter.filtered_by_video.some((f: IPsychologist) => f.id === item.id)
             );
         }
         
-        if (filter.mental_illness && filter.filtered_by_mental_illness.length > 0) {
+        if (filter.mental_illness && filter.filtered_by_mental_illness?.length > 0) {
             result = result.filter((item: IPsychologist) => 
                 filter.filtered_by_mental_illness.some((f: IPsychologist) => f.id === item.id)
-            );
-        }
-        
-        if (filter.mental_illness2 && filter.filtered_by_mental_illness2.length > 0) {
-            result = result.filter((item: IPsychologist) => 
-                filter.filtered_by_mental_illness2.some((f: IPsychologist) => f.id === item.id)
             );
         }
         
@@ -92,7 +86,6 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
         filter.filtered_by_date,
         filter.filtered_by_video,
         filter.filtered_by_mental_illness,
-        filter.filtered_by_mental_illness2,
         filter.gender,
         filter.requests,
         filter.price,
@@ -100,7 +93,6 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
         filter.date,
         filter.video,
         filter.mental_illness,
-        filter.mental_illness2,
         filter.favorites
     ]);
     
@@ -189,7 +181,6 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
             filter.times?.length || 
             filter.video || 
             filter.mental_illness || 
-            filter.mental_illness2 ||
             filter.favorites
         );
 
@@ -222,7 +213,7 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
             </aside>
             <main className="min-lg:max-w-[790px] w-full">
                 <div className="flex flex-col gap-[20px] pb-[50px]">
-                    {filtered_persons?.length > 0 ? (
+                    {filtered_persons && filtered_persons.length > 0 ? (
                         filtered_persons.map((item: IPsychologist, index: number) => (
                             <Card 
                                 key={item.id} 

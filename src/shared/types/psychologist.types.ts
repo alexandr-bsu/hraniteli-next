@@ -4,7 +4,6 @@ export interface ISlot {
   text: string;
   time: string;
   date: string;
-  isAvailable?: boolean;
 }
 
 export interface IScheduleDay {

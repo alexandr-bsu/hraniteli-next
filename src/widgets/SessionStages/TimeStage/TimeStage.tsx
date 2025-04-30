@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { getTimeDifference } from '@/features/utils';
-import { closeModal, openModal, setSelectedSlots } from '@/redux/slices/modal';
+import { closeModal, openModal, setSelectedSlots, setSelectedSlot } from '@/redux/slices/modal';
 import { ModalWindow } from '@/widgets/ModalWindow/ModalWindow';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,13 +15,18 @@ interface Slot {
     time: string;
 }
 
+interface GroupedSlots {
+    [date: string]: Slot[];
+}
+
 export const TimeStage = () => {
     const dispatch = useDispatch();
     const selectedPsychologist = useSelector((state: RootState) => state.modal.selectedPsychologist);
+    const selectedSlot = useSelector((state: RootState) => state.modal.selectedSlot);
     const isOpen = useSelector((state: RootState) => state.modal.isOpen);
     const modalType = useSelector((state: RootState) => state.modal.type);
     const timeDifference = getTimeDifference();
-    const [slots, setSlots] = useState<Slot[]>([]);
+    const [groupedSlots, setGroupedSlots] = useState<GroupedSlots>({});
     const [isLoading, setIsLoading] = useState(false);
 
     const loadSlots = async () => {
@@ -29,29 +34,31 @@ export const TimeStage = () => {
 
         setIsLoading(true);
         try {
-            const response = await axios.post(
-                'https://n8n-v2.hrani.live/webhook/get-agregated-schedule-v2-test-contur',
-                {
-                    psychologist: selectedPsychologist,
-                    userTimeOffsetMsk: timeDifference
-                }
+            const response = await axios.get(
+                `https://n8n-v2.hrani.live/webhook/get-aggregated-schedule-by-psychologist-test-contur?utm_psy=${encodeURIComponent(selectedPsychologist)}&userTimeOffsetMsk=${timeDifference}`
             );
 
-            if (response.data?.items?.length) {
-                const availableSlots: Slot[] = [];
-                response.data.items.forEach((item: any) => {
+            if (response.data?.[0]?.items?.length) {
+                const grouped: GroupedSlots = {};
+                
+                response.data[0].items.forEach((item: any) => {
                     if (item.slots) {
+                        const slots: Slot[] = [];
                         Object.entries(item.slots).forEach(([hour, slotArray]: [string, any]) => {
                             if (Array.isArray(slotArray) && slotArray.length > 0) {
-                                availableSlots.push({
+                                slots.push({
                                     date: item.pretty_date,
                                     time: hour
                                 });
                             }
                         });
+                        if (slots.length > 0) {
+                            grouped[item.pretty_date] = slots;
+                        }
                     }
                 });
-                setSlots(availableSlots);
+                
+                setGroupedSlots(grouped);
             }
         } catch (error) {
             console.error('Ошибка при загрузке слотов:', error);
@@ -65,14 +72,15 @@ export const TimeStage = () => {
     }, [isOpen, selectedPsychologist, timeDifference, modalType]);
 
     const handleSlotSelect = (slot: Slot) => {
-        dispatch(setSelectedSlots([`${slot.date} ${slot.time}`]));
-        dispatch(closeModal());
-        dispatch(openModal('ContactForm'));
+        dispatch(setSelectedSlot(slot));
     };
 
     const handleNext = () => {
-        dispatch(closeModal());
-        dispatch(openModal('ContactForm'));
+        if (selectedSlot) {
+            dispatch(setSelectedSlots([`${selectedSlot.date} ${selectedSlot.time}`]));
+            dispatch(closeModal());
+            dispatch(openModal('ContactForm'));
+        }
     };
 
     const renderTimeZone = () => (
@@ -84,30 +92,69 @@ export const TimeStage = () => {
         </span>
     );
 
-    const renderSlots = () => (
-        <div className="mt-[20px]">
-            <h3 className="font-semibold text-[18px] leading-[25px] mb-[10px] max-lg:text-[14px]">
-                Сегодня:
-            </h3>
-            <div className="flex flex-wrap gap-[10px]">
-                {slots.length > 0 ? (
-                    slots.map((slot, index) => (
-                        <button
-                            key={index}
-                            onClick={() => handleSlotSelect(slot)}
-                            className="px-[15px] py-[10px] bg-[#FAFAFA] rounded-[10px] text-[16px] leading-[22px] hover:bg-[#116466] hover:text-white transition-colors"
-                        >
-                            {slot.date.split('.').slice(0, 2).join('.')}/{slot.time}
-                        </button>
-                    ))
-                ) : (
+    const renderSlots = () => {
+        const dates = Object.keys(groupedSlots).sort((a, b) => {
+            const dateA = new Date(a.split('.').reverse().join('-'));
+            const dateB = new Date(b.split('.').reverse().join('-'));
+            return dateA.getTime() - dateB.getTime();
+        });
+
+        if (dates.length === 0) {
+            return (
+                <div className="mt-[20px]">
                     <span className="text-[18px] leading-[25px] font-normal text-[#151515]">
                         У психолога пока нет свободного времени для записи
                     </span>
-                )}
-            </div>
-        </div>
-    );
+                </div>
+            );
+        }
+
+        const today = new Date();
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+
+        const formatDate = (date: Date) => {
+            return date.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit' });
+        };
+
+        return (
+            <>
+                {dates.map((date) => {
+                    const dateObj = new Date(date.split('.').reverse().join('-'));
+                    const isToday = formatDate(today) === formatDate(dateObj);
+                    const isTomorrow = formatDate(tomorrow) === formatDate(dateObj);
+                    
+                    const title = isToday ? 'Сегодня:' : isTomorrow ? 'Завтра:' : date;
+
+                    return (
+                        <div key={date} className="mt-[20px]">
+                            <h3 className="font-semibold text-[18px] leading-[25px] mb-[10px] max-lg:text-[14px]">
+                                {title}
+                            </h3>
+                            <div className="flex flex-wrap gap-[10px]">
+                                {groupedSlots[date].map((slot, index) => {
+                                    const isSelected = selectedSlot?.date === slot.date && selectedSlot?.time === slot.time;
+                                    return (
+                                        <button
+                                            key={index}
+                                            onClick={() => handleSlotSelect(slot)}
+                                            className={`px-[15px] py-[10px] rounded-[10px] text-[16px] leading-[22px] transition-colors ${
+                                                isSelected 
+                                                    ? 'bg-[#116466] text-white' 
+                                                    : 'bg-[#FAFAFA] hover:bg-[#116466] hover:text-white'
+                                            }`}
+                                        >
+                                            {slot.time}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    );
+                })}
+            </>
+        );
+    };
 
     return (
         <ModalWindow type="Time">
@@ -130,7 +177,12 @@ export const TimeStage = () => {
             <DialogFooter className="sm:justify-start">
                 <Button
                     onClick={handleNext}
-                    className="cursor-pointer w-full hover:bg-[#116466] bg-[#116466] rounded-[50px] text-[white] py-[25px] font-normal text-[18px] leading-[25px]"
+                    disabled={!selectedSlot}
+                    className={`cursor-pointer w-full rounded-[50px] py-[25px] font-normal text-[18px] leading-[25px] ${
+                        selectedSlot 
+                            ? 'hover:bg-[#116466] bg-[#116466] text-white' 
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
                 >
                     Далее
                 </Button>

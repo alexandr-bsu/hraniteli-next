@@ -11,20 +11,31 @@ export type ModalType =
   | 'ContactForm'
   | null;
 
-interface ModalState {
+interface Slot {
+  date: string;
+  time: string;
+}
+
+export interface ModalState {
   isOpen: boolean;
-  type: ModalType;
+  type: string | null;
   selectedSlots: string[];
   slots_objects: any[];
   selectedPsychologist: string;
+  selectedDate: string | null;
+  selectedSlot: Slot | null;
+  content: React.ReactNode;
 }
 
 const initialState: ModalState = {
   isOpen: false,
   type: null,
+  content: null,
   selectedSlots: [],
   slots_objects: [],
-  selectedPsychologist: ''
+  selectedPsychologist: '',
+  selectedDate: '',
+  selectedSlot: null
 };
 
 const modalSlice = createSlice({
@@ -47,9 +58,23 @@ const modalSlice = createSlice({
     },
     setSelectedPsychologist: (state, action: PayloadAction<string>) => {
       state.selectedPsychologist = action.payload;
+    },
+    setSelectedDate: (state, action: PayloadAction<string>) => {
+      state.selectedDate = action.payload;
+    },
+    setSelectedSlot: (state, action: PayloadAction<Slot | null>) => {
+      state.selectedSlot = action.payload;
     }
   },
 });
 
-export const { openModal, closeModal, setSelectedSlots, setSlotsObjects, setSelectedPsychologist } = modalSlice.actions;
+export const { 
+  openModal, 
+  closeModal, 
+  setSelectedSlots, 
+  setSlotsObjects, 
+  setSelectedPsychologist,
+  setSelectedDate,
+  setSelectedSlot
+} = modalSlice.actions;
 export const modalReducer = modalSlice.reducer;

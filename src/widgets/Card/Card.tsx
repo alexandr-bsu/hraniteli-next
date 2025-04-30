@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { FC, useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
-import { openModal, closeModal, setSelectedPsychologist } from "@/redux/slices/modal";
+import { openModal, closeModal, setSelectedPsychologist, setSelectedDate, setSelectedSlot } from "@/redux/slices/modal";
 import { addFavorite, removeFavorite } from "@/redux/slices/favorites";
 import { IPsychologist } from "@/shared/types/psychologist.types";
 import { ROUTES } from '@/shared/constants/routes';
@@ -30,6 +30,9 @@ const getAgeWord = (age: number): string => {
 const getGoogleDriveImageUrl = (url: string | undefined) => {
     if (!url) return '/card/214х351.jpg';
     
+    // Если это cdnvideo.ru, возвращаем как есть
+    if (url.includes('cdnvideo.ru')) return url;
+    
     // Убираем @ в начале ссылки если есть
     const cleanUrl = url.startsWith('@') ? url.slice(1) : url;
     
@@ -54,6 +57,10 @@ const getGoogleDriveImageUrl = (url: string | undefined) => {
 
 const getGoogleDriveVideoUrl = (url: string | null | undefined) => {
     if (!url) return null;
+    
+    // Если это cdnvideo.ru, возвращаем как есть
+    if (url.includes('cdnvideo.ru')) return url;
+    
     if (!url.includes('drive.google.com')) return url;
     
     const fileId = url.match(/\/d\/(.+?)\//)?.[1];
@@ -79,6 +86,10 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
     const [education, setEducation] = useState<any[]>([]);
     const [showVideo, setShowVideo] = useState(false);
     const [availableSlots, setAvailableSlots] = useState<{date: string, time: string}[]>([]);
+    const [expandedEducationItems, setExpandedEducationItems] = useState<{[key: number]: boolean}>({});
+    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+    const descriptionRef = useRef<HTMLParagraphElement>(null);
+    const [shouldShowGradient, setShouldShowGradient] = useState(false);
 
     // Проверяем, находится ли психолог в избранном
     const isFavorite = favorites.some(item => item.id === psychologist.id);
@@ -89,8 +100,13 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
     useEffect(() => {
         const loadExpandedData = async () => {
             if (isExpanded && psychologist.id) {
-                const educationData = await getPsychologistEducation(psychologist.id);
-                setEducation(educationData);
+                try {
+                    const educationData = await getPsychologistEducation(psychologist.id);
+                    setEducation(educationData || []);
+                } catch (error) {
+                    console.error('Error loading education data:', error);
+                    setEducation([]);
+                }
             }
         };
 
@@ -98,49 +114,22 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
     }, [isExpanded, psychologist.id]);
 
     useEffect(() => {
-        const getStartAndEndDates = () => {
-            const today = new Date();
-            const monday = new Date(today);
-            monday.setDate(today.getDate() - today.getDay() + (today.getDay() === 0 ? -6 : 1)); // Получаем понедельник текущей недели
-            
-            const endDate = new Date(monday);
-            endDate.setDate(monday.getDate() + 28); // +4 недели
-            
-            // Форматируем даты в формате DD.MM.YYYY
-            const formatDate = (date: Date) => {
-                const day = String(date.getDate()).padStart(2, '0');
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const year = date.getFullYear();
-                return `${day}.${month}.${year}`;
-            };
-            
-            return {
-                startDate: formatDate(monday),
-                endDate: formatDate(endDate)
-            };
-        };
-
         const loadSlots = async () => {
             try {
-                const timeDifference = getTimeDifference();
-                const { startDate, endDate } = getStartAndEndDates();
-                const url = `https://n8n-v2.hrani.live/webhook/get-aggregated-schedule-by-psychologist-test-contur?utm_psy=${encodeURIComponent(psychologist.name)}&userTimeOffsetMsk=${timeDifference}`;
-                
-                const response = await axios.get(url);
-                
-                if (!response.data?.[0]?.items?.length) {
+                if (!psychologist.schedule?.days) {
                     setAvailableSlots([]);
                     return;
                 }
 
                 const slots: { date: string; time: string }[] = [];
-
-                response.data[0].items.forEach((item: any) => {
-                    if (item.slots) {
-                        Object.entries(item.slots).forEach(([hour, slotArray]: [string, any]) => {
-                            if (Array.isArray(slotArray) && slotArray.length > 0) {
+                
+                psychologist.schedule.days.forEach((day: any) => {
+                    if (day.slots) {
+                        Object.entries(day.slots).forEach(([hour, slotArray]) => {
+                            if (Array.isArray(slotArray) && slotArray.length > 0 && slotArray.some((slot: any) => slot.state === 'Свободен')) {
+                                console.log('Card - Found available slot at:', hour);
                                 slots.push({ 
-                                    date: item.pretty_date, 
+                                    date: day.pretty_date, 
                                     time: hour 
                                 });
                             }
@@ -148,20 +137,35 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                     }
                 });
                 
+                console.log('Card - Final slots:', slots);
+                
                 const sortedSlots = slots.sort((a, b) => {
                     const dateA = new Date(a.date.split('.').reverse().join('-') + ' ' + a.time);
                     const dateB = new Date(b.date.split('.').reverse().join('-') + ' ' + b.time);
                     return dateA.getTime() - dateB.getTime();
                 });
 
+                console.log('Card - Sorted and filtered slots:', sortedSlots.slice(0, 3));
                 setAvailableSlots(sortedSlots.slice(0, 3));
+
             } catch (error) {
                 console.error('Error loading slots:', error);
+                setAvailableSlots([]);
             }
         };
 
         loadSlots();
-    }, [psychologist.name]);
+    }, [psychologist.schedule]);
+
+    useEffect(() => {
+        if (descriptionRef.current) {
+            const height = descriptionRef.current.scrollHeight;
+            setShouldShowGradient(height > 44); // 44px - это высота двух строк
+            if (height > 44) {
+                descriptionRef.current.style.height = '44px';
+            }
+        }
+    }, [psychologist.short_description]);
 
     const handleOpenModal = () => {
         dispatch(setSelectedPsychologist(psychologist.name));
@@ -199,8 +203,18 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
         }
     };
 
-    const handleSlotClick = () => {
-        dispatch(openModal('FilterTime'));
+    const handleSlotClick = (slot: { date: string; time: string }) => {
+        dispatch(setSelectedPsychologist(psychologist.name));
+        dispatch(setSelectedDate(slot.date));
+        dispatch(setSelectedSlot(slot));
+        dispatch(openModal('Time'));
+    };
+
+    const toggleEducationItem = (index: number) => {
+        setExpandedEducationItems(prev => ({
+            ...prev,
+            [index]: !prev[index]
+        }));
     };
 
     return (
@@ -375,11 +389,8 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                             {availableSlots.map((slot, index) => (
                                 <button 
                                     key={index} 
-                                    className={`${styles.dateButton} bg-[#FAFAFA] hover:bg-[#116466] hover:text-white transition-colors rounded-[50px] px-[15px] py-[10px]`}
-                                    onClick={() => {
-                                        dispatch(setSelectedPsychologist(psychologist.name));
-                                        dispatch(openModal('Time'));
-                                    }}
+                                    className={`${styles.dateButton} bg-[#FAFAFA] cursor-pointer hover:bg-[#116466] hover:text-white transition-colors rounded-[50px] px-[15px] py-[10px]`}
+                                    onClick={() => handleSlotClick(slot)}
                                 >
                                     {slot.date.split('.').slice(0, 2).join('.')}/{slot.time}
                                 </button>
@@ -404,17 +415,17 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
             </div>
 
             {/* Диагностированные заболевания */}
-            <div className={styles.diagnoses}>
-                <h3 className={styles.sectionTitle}>Диагностированные заболевания:</h3>
-                <div className={styles.diagnosesList}>
-                    {psychologist.works_with?.split(';').map((diagnosis, index) => (
-                        <div key={index} className={styles.diagnosisItem}>
-                            {diagnosis.trim()}
+            {psychologist.works_with?.includes('Есть диагностированное психиатрическое заболевание (ПРЛ, БАР, ПТСР и др)') && (
+                <div className={styles.diagnoses}>
+                    <h3 className={styles.sectionTitle}>Диагностированные заболевания:</h3>
+                    <div className={styles.diagnosesList}>
+                        <div className={styles.diagnosisItem}>
+                            Работает с психиатрическими заболеваниями (ПРЛ, БАР, ПТСР и др)
                             <Tooltip text="Психолог имеет опыт работы с данным диагнозом и может помочь в его коррекции или адаптации." />
                         </div>
-                    ))}
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Дополнительная информация (показывается при раскрытии) */}
             <div className={`${styles.expandedContent} ${isExpanded ? styles.expanded : ''}`}>
@@ -422,24 +433,47 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                 {psychologist.short_description && (
                     <div className={styles.section}>
                         <h3 className={styles.sectionTitle}>О хранителе</h3>
-                        <p className={styles.description}>
+                        <p 
+                            ref={descriptionRef}
+                            className={`${styles.description} ${isDescriptionExpanded ? styles.expanded : ''}`}
+                            style={shouldShowGradient ? { height: isDescriptionExpanded ? 'auto' : '44px' } : undefined}
+                        >
                             {psychologist.short_description}
                         </p>
+                        {shouldShowGradient && (
+                            <button
+                                className={styles.readMoreButton}
+                                onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                            >
+                                {isDescriptionExpanded ? 'Свернуть' : 'Читать еще'}
+                            </button>
+                        )}
                     </div>
                 )}
 
                 {/* Образование */}
                 <div className={styles.section}>
                     <h3 className={styles.sectionTitle}>Образование</h3>
-                    <div className={styles.education}>
-                        {education.map((item, index) => (
-                            <div key={index} className={styles.educationItem}>
-                                <h4>{item.educationItemType}, {item.educationItemYear}</h4>
-                                <p>{item.educationItemTitle}</p>
-                                <p>{item.educationItemProgramTitle}</p>
-                            </div>
-                        ))}
-                    </div>
+                    {education && education.length > 0 && (
+                        <div className={styles.education}>
+                            {education.map((item, index) => (
+                                <div key={index} className={styles.educationItem}>
+                                    <h4>{item.name}</h4>
+                                    <div className={`${styles.educationText} ${expandedEducationItems[index] ? styles.expanded : ''}`}>
+                                        <p>{item.description}</p>
+                                    </div>
+                                    {item.description.length > 100 && (
+                                        <button
+                                            className={styles.readMoreButton}
+                                            onClick={() => toggleEducationItem(index)}
+                                        >
+                                            {expandedEducationItems[index] ? 'Свернуть' : 'Смотреть все'}
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 {/* Подробнее о хранителе */}

@@ -15,6 +15,8 @@ import { NoMatchError } from './NoMatchError';
 import { EmergencyContacts } from './EmergencyContacts';
 import { getTimeDifference } from '@/features/utils';
 import axios from 'axios';
+import { toast } from 'sonner';
+import styles from './PsychologistStage.module.scss';
 
 interface Slot {
   id: string;
@@ -35,6 +37,14 @@ interface Slot {
   "Время Локальное": string;
 }
 
+interface DaySlots {
+  [time: string]: Slot;
+}
+
+interface Schedule {
+  [date: string]: DaySlots;
+}
+
 interface ScheduleDay {
   date: string;
   slots: {
@@ -45,12 +55,33 @@ interface ScheduleDay {
 }
 
 const getGoogleDriveImageUrl = (url: string | undefined) => {
-  if (!url) return '/card/214х351.jpg';
-  if (url.includes('drive.google.com')) {
-    const id = url.match(/[-\w]{25,}/);
-    return id ? `https://drive.google.com/uc?export=view&id=${id[0]}` : '/card/214х351.jpg';
-  }
-  return url;
+    if (!url) return '/images/default-avatar.png';
+    
+    // Если это cdnvideo.ru, возвращаем как есть
+    if (url.includes('cdnvideo.ru')) return url;
+    
+    // Убираем @ в начале ссылки если есть
+    const cleanUrl = url.startsWith('@') ? url.slice(1) : url;
+    
+    // Если это не гугл драйв ссылка - возвращаем как есть
+    if (!cleanUrl.includes('drive.google.com')) return cleanUrl;
+    
+    // Если ссылка уже в нужном формате - возвращаем как есть
+    if (cleanUrl.includes('/uc?')) return cleanUrl;
+    
+    // Извлекаем ID файла из разных форматов ссылок
+    let fileId = '';
+    if (cleanUrl.includes('/d/')) {
+        fileId = cleanUrl.match(/\/d\/(.+?)(?:\/|$)/)?.[1] || '';
+    } else if (cleanUrl.includes('id=')) {
+        fileId = cleanUrl.match(/id=(.+?)(?:&|$)/)?.[1] || '';
+    } else if (cleanUrl.includes('/file/d/')) {
+        fileId = cleanUrl.match(/\/file\/d\/([^/]+)/)?.[1] || '';
+    }
+    
+    if (!fileId) return '/images/default-avatar.png';
+    
+    return `https://drive.google.com/uc?export=view&id=${fileId}`;
 };
 
 export const PsychologistStage = () => {
@@ -62,9 +93,11 @@ export const PsychologistStage = () => {
   const [availableDays, setAvailableDays] = useState<ScheduleDay[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [availableSlots, setAvailableSlots] = useState<{date: string, time: string}[]>([]);
+  const [availableSlots, setAvailableSlots] = useState<Slot[]>([]);
 
-  const filtered_by_automatch_psy = useSelector((state: RootState) => state.filter.filtered_by_automatch_psy);
+  const filtered_by_automatch_psy = useSelector<RootState, any[]>(
+    state => state.filter.filtered_by_automatch_psy
+  );
   const currentIndex = useSelector((state: RootState) => state.applicationFormData.index_phyc);
   const filters = useSelector((state: RootState) => state.filter);
   const hasError = useSelector((state: RootState) => state.applicationFormData.has_matching_error);
@@ -72,176 +105,72 @@ export const PsychologistStage = () => {
 
   useEffect(() => {
     const fetchPsychologists = async () => {
+      if (filtered_by_automatch_psy.length > 0) {
+        setIsLoading(false);
+        return;
+      }
+
       setIsLoading(true);
       try {
         const data = await getPsychologistAll();
         if (data?.length) {
           dispatch(fill_filtered_by_automatch_psy(data));
-          if (filtered_by_automatch_psy.length === 0) {
-            dispatch(setHasMatchingError(true));
-            setShowNoMatch(true);
-          } else {
-            dispatch(setHasMatchingError(false));
-          }
+          dispatch(setHasMatchingError(false));
+        } else {
+          dispatch(setHasMatchingError(true));
+          setShowNoMatch(true);
         }
       } catch (error) {
         console.error('Failed to fetch psychologists:', error);
+        dispatch(setHasMatchingError(true));
+        setShowNoMatch(true);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchPsychologists();
-  }, [dispatch]);
+  }, []);
 
   useEffect(() => {
-    if (filtered_by_automatch_psy.length === 0) {
-      dispatch(setHasMatchingError(true));
+    if (!isLoading && filtered_by_automatch_psy.length === 0) {
       setShowNoMatch(true);
-    } else {
-      dispatch(setHasMatchingError(false));
-      setShowNoMatch(false);
     }
-  }, [filtered_by_automatch_psy, dispatch]);
+  }, [filtered_by_automatch_psy.length, isLoading]);
 
   useEffect(() => {
-    if (filtered_by_automatch_psy.length === 0 && retryCount > 0) {
+    if (!isLoading && filtered_by_automatch_psy.length === 0 && retryCount > 0) {
       setShowEmergency(true);
     }
-  }, [filtered_by_automatch_psy.length, retryCount]);
+  }, [filtered_by_automatch_psy.length, retryCount, isLoading]);
 
   useEffect(() => {
-    const loadSlots = async () => {
-      try {
-        const timeDifference = getTimeDifference();
-        const startDate = new Date();
-        const endDate = new Date();
-        endDate.setMonth(endDate.getMonth() + 1);
+    const loadSlots = (schedule: { [date: string]: { [time: string]: Slot } } | null) => {
+      if (!schedule) {
+        setAvailableSlots([]);
+        return;
+      }
 
-        const requestData = {
-          startDate: startDate.toISOString().split('T')[0],
-          endDate: endDate.toISOString().split('T')[0],
-          ageFilter: formData.age,
-          formPsyClientInfo: {
-            age: formData.age,
-            city: '',
-            sex: formData.gender_user === 'male' ? 'Мужской' : 'Женский',
-            psychoEducated: '',
-            anxieties: [],
-            customAnexiety: '',
-            hasPsychoExperience: '',
-            meetType: '',
-            selectionСriteria: '',
-            custmCreteria: '',
-            importancePsycho: formData.preferences,
-            customImportance: formData.custom_preferences,
-            agePsycho: '',
-            sexPsycho: formData.gender_psychologist === 'male' ? 'Мужчина' : 
-                      formData.gender_psychologist === 'female' ? 'Женщина' : 'Не имеет значения',
-            priceLastSession: '',
-            durationSession: '',
-            reasonCancel: '',
-            pricePsycho: '',
-            reasonNonApplication: '',
-            contactType: '',
-            contact: formData.phone,
-            name: formData.username,
-            is_adult: parseInt(formData.age) >= 18,
-            is_last_page: false,
-            occupation: ''
-          },
-          form: {
-            anxieties: [],
-            questions: formData.requests,
-            customQuestion: [],
-            diagnoses: formData.diseases,
-            diagnoseInfo: '',
-            diagnoseMedicaments: localStorage.getItem('app_diseases_psychologist') ? 
-              JSON.parse(localStorage.getItem('app_diseases_psychologist') || '{}').medications : 'no',
-            traumaticEvents: formData.actions,
-            clientStates: formData.actions,
-            selectedPsychologistsNames: [filtered_by_automatch_psy[currentIndex]?.name],
-            shownPsychologists: '',
-            psychos: [],
-            lastExperience: '',
-            amountExpectations: '',
-            age: formData.age,
-            slots: [],
-            contactType: '',
-            contact: formData.phone,
-            name: formData.username,
-            promocode: formData.promocode,
-            ticket_id: formData.ticketID,
-            emptySlots: false,
-            userTimeZone: 'МСК',
-            bid: 0,
-            rid: 0,
-            categoryType: '',
-            customCategory: '',
-            question_to_psychologist: formData.requests.join('; '),
-            filtered_by_automatch_psy_names: [filtered_by_automatch_psy[currentIndex]?.name],
-            _queries: '',
-            customTraumaticEvent: '',
-            customState: ''
-          },
-          ticket_id: formData.ticketID,
-          userTimeOffsetMsk: timeDifference
-        };
-
-        const response = await axios.post(
-          '/api/schedule',
-          requestData
-        );
-        
-        if (!response.data?.length) {
-          setAvailableSlots([]);
-          return;
-        }
-
-        const slots: { date: string; time: string }[] = [];
-        const days = response.data;
-
-        days.forEach((day: any) => {
-          if (day.slots) {
-            Object.entries(day.slots).forEach(([hour, slotArray]) => {
-              if (Array.isArray(slotArray) && slotArray.length > 0 && slotArray.some((slot: any) => slot?.state === 'available')) {
-                slots.push({ 
-                  date: day.pretty_date, 
-                  time: hour 
-                });
-              }
-            });
+      const slots: Slot[] = [];
+      
+      Object.entries(schedule).forEach(([date, daySlots]) => {
+        Object.entries(daySlots).forEach(([time, slot]) => {
+          if (slot && slot.state === 'Свободен') {
+            slots.push(slot);
           }
         });
-        
-        const sortedSlots = slots.sort((a, b) => {
-          const dateA = new Date(a.date.split('.').reverse().join('-') + ' ' + a.time);
-          const dateB = new Date(b.date.split('.').reverse().join('-') + ' ' + b.time);
-          return dateA.getTime() - dateB.getTime();
-        });
+      });
 
-        setAvailableSlots(sortedSlots.slice(0, 3));
-        setAvailableDays(days);
-      } catch (error) {
-        console.error('Error loading slots:', error);
-        setAvailableSlots([]);
-        setAvailableDays([]);
-      }
+      setAvailableSlots(slots);
     };
 
-    if (filtered_by_automatch_psy[currentIndex]?.name) {
-      loadSlots();
-    }
-  }, [currentIndex, filtered_by_automatch_psy, formData]);
-
-  useEffect(() => {
-    // Обновляем доступные дни при изменении текущего психолога
-    if (filtered_by_automatch_psy[currentIndex]?.schedule?.days) {
-      setAvailableDays(filtered_by_automatch_psy[currentIndex].schedule.days);
+    if (filtered_by_automatch_psy[currentIndex]?.schedule) {
+      loadSlots(filtered_by_automatch_psy[currentIndex].schedule);
     }
   }, [currentIndex, filtered_by_automatch_psy]);
 
   const currentPsychologist = filtered_by_automatch_psy[currentIndex];
+  console.log('Current psychologist data:', currentPsychologist);
 
   const getFilterQueryParams = () => {
     const params = new URLSearchParams();
@@ -269,15 +198,17 @@ export const PsychologistStage = () => {
 
   const handlePrevious = () => {
     if (currentIndex > 0) {
-      dispatch(setIndexPhyc(currentIndex - 1));
       setSelectedSlot(null);
+      setAvailableSlots([]);
+      dispatch(setIndexPhyc(currentIndex - 1));
     }
   };
 
   const handleNext = () => {
     if (currentIndex < filtered_by_automatch_psy.length - 1) {
-      dispatch(setIndexPhyc(currentIndex + 1));
       setSelectedSlot(null);
+      setAvailableSlots([]);
+      dispatch(setIndexPhyc(currentIndex + 1));
     }
   };
 
@@ -295,8 +226,8 @@ export const PsychologistStage = () => {
             JSON.parse(localStorage.getItem('app_diseases_psychologist') || '{}').medications : 'no',
           traumaticEvents: formData.actions,
           clientStates: formData.actions,
-          selectedPsychologistsNames: [],
-          shownPsychologists: "",
+          selectedPsychologistsNames: [currentPsychologist?.name],
+          shownPsychologists: currentPsychologist?.name || "",
           lastExperience: "",
           amountExpectations: "",
           age: formData.age,
@@ -314,7 +245,7 @@ export const PsychologistStage = () => {
           categoryType: "",
           customCategory: "",
           question_to_psychologist: formData.requests.join('; '),
-          filtered_by_automatch_psy_names: [filtered_by_automatch_psy[currentIndex]?.name],
+          filtered_by_automatch_psy_names: [currentPsychologist?.name],
           _queries: "",
           customTraumaticEvent: "",
           customState: "",
@@ -339,22 +270,30 @@ export const PsychologistStage = () => {
             reasonCancel: "",
             pricePsycho: "",
             reasonNonApplication: "",
-            contactType: "",
+            contactType: "Phone",
             contact: formData.phone,
             name: formData.username,
             is_adult: parseInt(formData.age) >= 18,
-            is_last_page: false,
+            is_last_page: true,
             occupation: ""
           }
         };
 
-        await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka-test-contur', requestData);
+        console.log('Отправляем запрос на запись:', requestData);
 
-        dispatch(setSelectedSlots([`${selectedSlot["Дата Локальная"]} ${selectedSlot["Время Локальное"]}`]));
-        dispatch(setSelectedSlotsObjects([JSON.stringify(selectedSlot)]));
-        dispatch(setApplicationStage('gratitude'));
+        const response = await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka-test-contur', requestData);
+        console.log('Ответ сервера:', response.data);
+
+        if (response.status === 200) {
+          dispatch(setSelectedSlots([`${selectedSlot["Дата Локальная"]} ${selectedSlot["Время Локальное"]}`]));
+          dispatch(setSelectedSlotsObjects([selectedSlot.id]));
+          dispatch(setApplicationStage('gratitude'));
+        } else {
+          throw new Error('Ошибка при отправке заявки');
+        }
       } catch (error) {
-        console.error('Error submitting form:', error);
+        console.error('Ошибка при отправке заявки:', error);
+        toast.error('Произошла ошибка при отправке заявки. Пожалуйста, попробуйте еще раз.');
       } finally {
         setIsSubmitting(false);
       }
@@ -404,148 +343,145 @@ export const PsychologistStage = () => {
         </div>
       )}
 
-      <div className="flex justify-between items-center mb-[20px] max-lg:flex-col max-lg:gap-[15px] min-h-[50px] max-lg:min-h-[80px]">
-        {currentIndex > 0 && (
-          <button
-            onClick={handlePrevious}
-            className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]"
-          >
-            <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
-            <span>Предыдущий психолог</span>
-          </button>
-        )}
-        {currentIndex < filtered_by_automatch_psy.length - 1 && remainingPsychologists > 0 && (
-          <button
-            onClick={handleNext}
-            className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ml-auto"
-          >
-            <span>Показать еще {remainingPsychologists} психологов</span>
-            <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
-          </button>
-        )}
-      </div>
+      <div className="flex flex-col h-full">
+        <div className="flex justify-between items-center mb-[20px] max-lg:flex-col max-lg:gap-[15px] min-h-[50px] max-lg:min-h-[80px]">
+          {currentIndex > 0 && (
+            <button
+              onClick={handlePrevious}
+              className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]"
+            >
+              <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
+              <span>Предыдущий психолог</span>
+            </button>
+          )}
+          {currentIndex < filtered_by_automatch_psy.length - 1 && remainingPsychologists > 0 && (
+            <button
+              onClick={handleNext}
+              className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ml-auto"
+            >
+              <span>Показать еще {remainingPsychologists} психологов</span>
+              <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
+            </button>
+          )}
+        </div>
 
-      <div className="flex flex-col grow p-[25px] max-lg:p-[15px] mb-[30px] max-lg:mb-[20px] border-[1px] rounded-[25px]">
-        <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-lg:flex-col max-lg:gap-[15px]">
-          <div className="flex gap-[20px] items-center max-lg:gap-[15px]">
-            <div className="w-[80px] h-[80px] max-lg:w-[60px] max-lg:h-[60px] rounded-full overflow-hidden">
-              <Image
-                src={getGoogleDriveImageUrl(currentPsychologist.link_photo)}
-                alt={currentPsychologist.name}
-                width={80}
-                height={80}
-                className="w-full h-full object-cover"
-              />
+        <div className="flex flex-col grow p-[25px] max-lg:p-[15px] mb-[30px] max-lg:mb-[20px] border-[1px] rounded-[25px] overflow-y-auto max-h-[calc(100vh-400px)] min-lg:max-h-[400px] scrollContainer">
+          <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-lg:flex-col max-lg:gap-[15px]">
+            <div className="flex gap-[20px] items-center max-lg:gap-[15px]">
+              <div className="w-[80px] h-[80px] max-lg:w-[60px] max-lg:h-[60px] rounded-full overflow-hidden">
+                <Image
+                  src={getGoogleDriveImageUrl(currentPsychologist?.avatar || currentPsychologist?.link_photo)}
+                  alt={currentPsychologist?.name || 'Фото психолога'}
+                  width={80}
+                  height={80}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    if (target.src !== '/images/default-avatar.png') {
+                      target.src = '/images/default-avatar.png';
+                    }
+                  }}
+                  priority
+                />
+              </div>
+              <div>
+                <h3 className="text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] font-semibold">
+                  {currentPsychologist?.name}
+                  {currentPsychologist?.age && `, ${currentPsychologist.age} лет`}
+                </h3>
+                <span className="text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#9A9A9A]">
+                  {currentPsychologist?.experience && (
+                    <span>{currentPsychologist.experience}{' '}</span>
+                  )}
+                  {currentPsychologist?.in_community && (
+                    <span>в сообществе</span>
+                  )}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={handleOpenPsychologistCard}
+              className="hover:opacity-80 transition-opacity cursor-pointer text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#116466] max-lg:w-full max-lg:text-center max-lg:py-[8px] max-lg:border max-lg:border-[#116466] max-lg:rounded-[50px]"
+            >
+              Перейти на карточку психолога
+            </button>
+          </div>
+
+          <div className="grid grid-cols-3 gap-[30px] mb-[30px] max-lg:grid-cols-1 max-lg:gap-[20px] max-lg:mb-[20px]">
+            <div>
+              <span className="text-[#9A9A9A] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]">Основной подход:</span>
+              <div className="flex items-center gap-[10px] mt-[5px]">
+                <p className="font-semibold text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px]">{currentPsychologist.main_modal}</p>
+                <Tooltip text="Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов." />
+              </div>
             </div>
             <div>
-              <h3 className="text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] font-semibold">{currentPsychologist.name}, {currentPsychologist.age} лет</h3>
-              <span className="text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#9A9A9A]">
-                {currentPsychologist.experience && (
-                  <span>{currentPsychologist.experience}{' '}</span>
-                )}
-                {currentPsychologist.in_community && (
-                  <span>в сообществе</span>
-                )}
-              </span>
+              <span className="text-[#9A9A9A] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]">Формат встречи:</span>
+              <p className="font-semibold text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] mt-[5px]">Онлайн</p>
+            </div>
+            <div>
+              <span className="text-[#9A9A9A] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]">Стоимость:</span>
+              <div className="flex items-center gap-[10px] mt-[5px]">
+                <p className="font-semibold text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px]">От {currentPsychologist.min_session_price || 0} ₽</p>
+                <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
+              </div>
             </div>
           </div>
+
+          <div className={styles.nextSession}>
+            <div className="mt-[30px]">
+              <h4 className="text-[18px] font-semibold mb-[15px]">Ближайшая запись:</h4>
+              {availableSlots.length > 0 ? (
+                <div className="flex gap-[10px] flex-wrap">
+                  {availableSlots.map((slot, index) => (
+                    <button 
+                      key={index} 
+                      onClick={() => handleSlotSelect(slot)}
+                      className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] cursor-pointer ${
+                        selectedSlot?.id === slot.id
+                          ? 'bg-[#116466] text-white border-[#116466]'
+                          : 'border-[#D4D4D4] text-[#116466] hover:bg-[#116466] hover:text-white hover:border-[#116466]'
+                      }`}
+                    >
+                      {`${slot.date.split('-').reverse().slice(0, 2).join('.')} / ${slot.time}`}
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-[20px] p-[15px] bg-[#F5F5F5] rounded-[10px] text-[16px] text-center">
+                  У психолога пока нет свободного времени для записи
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="shrink-0 mt-auto pb-[10px] flex gap-[10px]">
           <button
-            onClick={handleOpenPsychologistCard}
-            className="hover:opacity-80 transition-opacity cursor-pointer text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#116466] max-lg:w-full max-lg:text-center max-lg:py-[8px] max-lg:border max-lg:border-[#116466] max-lg:rounded-[50px]"
+            type='button'
+            onClick={() => dispatch(setApplicationStage('phone'))}
+            disabled={isSubmitting}
+            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
-            Перейти на карточку психолога
+            Назад
+          </button>
+
+          <button
+            type='submit'
+            disabled={!selectedSlot || isSubmitting}
+            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px] flex justify-center items-center gap-[10px] ${!selectedSlot || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={handleSubmit}
+          >
+            {isSubmitting ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <span>Отправка...</span>
+              </>
+            ) : (
+              'Продолжить'
+            )}
           </button>
         </div>
-
-        <div className="grid grid-cols-3 gap-[30px] mb-[30px] max-lg:grid-cols-1 max-lg:gap-[20px] max-lg:mb-[20px]">
-          <div>
-            <span className="text-[#9A9A9A] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]">Основной подход:</span>
-            <div className="flex items-center gap-[10px] mt-[5px]">
-              <p className="font-semibold text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px]">{currentPsychologist.main_modal}</p>
-              <Tooltip text="Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов." />
-            </div>
-          </div>
-          <div>
-            <span className="text-[#9A9A9A] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]">Формат встречи:</span>
-            <p className="font-semibold text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] mt-[5px]">Онлайн</p>
-          </div>
-          <div>
-            <span className="text-[#9A9A9A] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]">Стоимость:</span>
-            <div className="flex items-center gap-[10px] mt-[5px]">
-              <p className="font-semibold text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px]">От {currentPsychologist.min_session_price || 0} ₽</p>
-              <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-[30px]">
-          <h4 className="text-[18px] font-semibold mb-[15px]">Ближайшая запись:</h4>
-          {availableSlots.length > 0 ? (
-            <div className="flex gap-[10px] flex-wrap">
-              {availableSlots.map((slot, index) => (
-                <button
-                  key={index}
-                  onClick={() => handleSlotSelect({
-                    id: `${slot.date}-${slot.time}`,
-                    psychologist: currentPsychologist.name,
-                    date: slot.date,
-                    time: slot.time,
-                    state: 'available',
-                    ticket: null,
-                    client_id: null,
-                    meeting_link: null,
-                    meeting_id: null,
-                    calendar_meeting_id: null,
-                    confirmed: false,
-                    auto_assigned: false,
-                    auto_canceled: false,
-                    is_helpful_hand: null,
-                    "Дата Локальная": slot.date,
-                    "Время Локальное": slot.time
-                  })}
-                  className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] cursor-pointer ${
-                    selectedSlot?.id === `${slot.date}-${slot.time}`
-                      ? 'bg-[#116466] text-white border-[#116466]'
-                      : 'border-[#D4D4D4] text-[#116466]'
-                  }`}
-                >
-                  {slot.date.split('.').slice(0, 6).join('.')}/{slot.time}
-                </button>
-              ))}
-            </div>
-          ) : (
-            <div className="mt-[20px] p-[15px] bg-[#F5F5F5] rounded-[10px] text-[16px] text-center">
-              У психолога пока нет свободного времени для записи
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="shrink-0 mt-[30px] pb-[10px] flex gap-[10px]">
-        <button
-          type='button'
-          onClick={() => dispatch(setApplicationStage('phone'))}
-          disabled={isSubmitting}
-          className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-        >
-          Назад
-        </button>
-
-        <button
-          type='submit'
-          disabled={!selectedSlot || isSubmitting}
-          className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px] flex justify-center items-center gap-[10px] ${!selectedSlot || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-          onClick={handleSubmit}
-        >
-          {isSubmitting ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-              <span>Отправка...</span>
-            </>
-          ) : (
-            'Продолжить'
-          )}
-        </button>
       </div>
     </div>
   );

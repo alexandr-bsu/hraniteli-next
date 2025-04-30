@@ -155,11 +155,23 @@ export const submitQuestionnaire = async (formData: IApplicationFormData) => {
         });
 
         if (!response.ok) {
+            console.error('Ошибка при отправке анкеты:', response.status, response.statusText);
             throw new Error('Failed to submit questionnaire');
         }
 
         const data = await response.json();
-        console.log('Анкета отправлена успешно:', data);
+
+        // Проверяем наличие слотов
+        let hasSlots = false;
+        if (data[0]?.items) {
+            hasSlots = data[0].items.some((day: any) => {
+                if (!day.slots) return false;
+                return Object.values(day.slots).some((timeSlots: any) => {
+                    return Array.isArray(timeSlots) && timeSlots.length > 0;
+                });
+            });
+        }
+
         return data;
 
     } catch (error) {
@@ -183,7 +195,6 @@ export const getFilteredPsychologists = async () => {
         }
 
         const data = await response.json();
-        console.log('Получены отфильтрованные психологи:', data);
 
         // Парсим и форматируем данные
         const formatPsychologist = (psy: Partial<IPsychologist>): IPsychologist => {
@@ -212,21 +223,12 @@ export const getFilteredPsychologists = async () => {
             };
         };
 
-        // Проверяем разные форматы ответа и фильтруем психологов с пустыми слотами
         let psychologists: IPsychologist[] = [];
 
         if (Array.isArray(data)) {
-            psychologists = data
-                .map((psy: any) => formatPsychologist(psy))
-                .filter((psy: IPsychologist) => psy.schedule?.days.some(day => 
-                    Object.values(day.slots).some((slots: Array<{ id: string }>) => slots && slots.length > 0)
-                ));
+            psychologists = data.map((psy: any) => formatPsychologist(psy));
         } else if (data?.items && Array.isArray(data.items)) {
-            psychologists = data.items
-                .map((psy: any) => formatPsychologist(psy))
-                .filter((psy: IPsychologist) => psy.schedule?.days.some(day => 
-                    Object.values(day.slots).some((slots: Array<{ id: string }>) => slots && slots.length > 0)
-                ));
+            psychologists = data.items.map((psy: any) => formatPsychologist(psy));
         }
 
         if (psychologists.length === 0) {

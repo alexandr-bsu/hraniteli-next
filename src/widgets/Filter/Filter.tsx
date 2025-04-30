@@ -19,7 +19,6 @@ import {
     findByDate, 
     findByGender, 
     findByMental_Illness, 
-    findByMental_Illness2, 
     findByPrice, 
     findByRequests, 
     findByTime, 
@@ -155,7 +154,7 @@ export const Filter = () => {
                                 open={isOpen && modalType === 'FilterGender'}
                             >
                                 <SelectTrigger className="w-full min-h-[65px] font-normal border-none bg-[#FAFAFA] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px]">
-                                    <SelectValue placeholder="Выберите пол хранителя" />
+                                    <SelectValue placeholder="Выберите пол Хранителя" />
                                 </SelectTrigger>
                             </Select>
                             {filterGender && filterGender !== 'other' && (
@@ -196,7 +195,7 @@ export const Filter = () => {
                             {filterPrice.length > 0 && (
                                 <div className="flex flex-wrap gap-2 mt-2">
                                     <div className="flex items-center gap-2 px-4 py-2 bg-[#116466] text-white rounded-[10px] text-[14px]">
-                                        <span>До {filterPrice[0]} ₽</span>
+                                        <span>От {filterPrice[0]} ₽</span>
                                         <button 
                                             onClick={() => {
                                                 setFilterPrice([]);
@@ -281,40 +280,6 @@ export const Filter = () => {
                             </label>
                         </div>
 
-                        <div className="flex items-center gap-[15px] mt-[15px]">
-                            <Checkbox 
-                                className="w-[30px] h-[30px]" 
-                                id="mental_illnesses"
-                                defaultChecked={false}
-                                onCheckedChange={(checked: boolean) => {
-                                    dispatch(findByMental_Illness(checked));
-                                }}
-                            />
-                            <label
-                                htmlFor="mental_illnesses"
-                                className="font-normal text-[16px] lg:text-[16px] md:text-[13px] max-lg:text-[13px] leading-[22px]"
-                            >
-                                Работает с психическими заболеваниями (РПП, СДВГ и др)
-                            </label>
-                        </div>
-
-                        <div className="flex items-center gap-[15px] mt-[15px]">
-                            <Checkbox 
-                                className="w-[30px] h-[30px]" 
-                                id="mental_illnesses2"
-                                defaultChecked={false}
-                                onCheckedChange={(checked: boolean) => {
-                                    dispatch(findByMental_Illness2(checked));
-                                }}
-                            />
-                            <label
-                                htmlFor="mental_illnesses2"
-                                className="font-normal text-[16px] lg:text-[16px] md:text-[13px] max-lg:text-[13px] leading-[22px]"
-                            >
-                                Принимаете ли вы медикаменты по назначению психиатра
-                            </label>
-                        </div>
-                        
                         <div className="flex items-center gap-[15px] mt-[20px]">
                             <Checkbox 
                                 className="w-[30px] h-[30px]" 
@@ -339,6 +304,23 @@ export const Filter = () => {
                                     height={18} 
                                     width={18}
                                 />
+                            </label>
+                        </div>
+
+                        <div className="flex items-center gap-[15px] mt-[15px]">
+                            <Checkbox 
+                                className="w-[30px] h-[30px]" 
+                                id="mental_illnesses"
+                                defaultChecked={false}
+                                onCheckedChange={(checked: boolean) => {
+                                    dispatch(findByMental_Illness(checked));
+                                }}
+                            />
+                            <label
+                                htmlFor="mental_illnesses"
+                                className="font-normal text-[16px] lg:text-[16px] md:text-[13px] max-lg:text-[13px] leading-[22px]"
+                            >
+                                Работает с психиатрическими заболеваниями (ПРЛ, БАР, ПТСР и др)
                             </label>
                         </div>
                     </>

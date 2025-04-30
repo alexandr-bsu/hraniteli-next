@@ -19,7 +19,7 @@ interface ContactStageProps {
 }
 
 interface FormPsyClientInfo {
-    age: number;
+    age: string;
     city: string;
     sex: string;
     psychoEducated: string;
@@ -29,7 +29,7 @@ interface FormPsyClientInfo {
     meetType: string;
     selectionСriteria: string;
     custmCreteria: string;
-    importancePsycho: string;
+    importancePsycho: string[];
     customImportance: string;
     agePsycho: string;
     sexPsycho: string;
@@ -59,7 +59,7 @@ interface FormData {
     shownPsychologists: string;
     lastExperience: string;
     amountExpectations: string;
-    age: number;
+    age: string;
     slots: string[];
     slots_objects: any[];
     contactType: string;
@@ -70,13 +70,13 @@ interface FormData {
     emptySlots: boolean;
     userTimeZone: string;
     userTimeOffsetMsk: string;
-    bid: string;
-    rid: string;
+    bid: number;
+    rid: number;
     categoryType: string;
     customCategory: string;
-    question_to_psychologist: string[];
+    question_to_psychologist: string;
     filtered_by_automatch_psy_names: string[];
-    _queries: string[] | string;
+    _queries: string;
     customTraumaticEvent: string;
     customState: string;
     formPsyClientInfo: FormPsyClientInfo;
@@ -86,7 +86,7 @@ interface FormData {
     utm_content: string | null;
     utm_medium: string | null;
     utm_source: string | null;
-    utm_term: null;
+    utm_term: string | null;
     utm_psy: string | undefined;
 }
 
@@ -195,6 +195,7 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
     const [login, setLogin] = useState('');
     const [telephone, setTelephone] = useState('');
     const [psychologistData, setPsychologistData] = useState<IPsychologist | null>(null);
+    const [isPhoneValid, setIsPhoneValid] = useState(false);
     
     const dispatch = useDispatch();
     
@@ -238,7 +239,8 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
         questions: [],
         customQuestion: [],
         diagnoses: [hasMentalIllness ? 'Есть диагностированное психиатрическое заболевание' : 'Нет'],
-        diagnoseMedicaments: '',
+        diagnoseMedicaments: localStorage.getItem('app_diseases_psychologist') ? 
+            JSON.parse(localStorage.getItem('app_diseases_psychologist') || '{}').medications : 'Нет',
         diagnoseInfo: '',
         traumaticEvents: filterClientQueries(requests, 'traumatic'),
         clientStates: filterClientQueries(requests, 'states'),
@@ -246,30 +248,30 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
         shownPsychologists: '',
         lastExperience: '',
         amountExpectations: '',
-        age: -1,
-        slots,
-        slots_objects,
+        age: localStorage.getItem('app_age') || '',
+        slots: slots,
+        slots_objects: slots_objects,
         contactType: 'Telegram',
         contact: telephone,
         name: login,
         promocode: '',
         ticket_id: ticketId,
         emptySlots: false,
-        userTimeZone: timeDifference.toString(),
+        userTimeZone: 'МСК',
         userTimeOffsetMsk: timeDifference.toString(),
-        bid: '',
-        rid: '',
+        bid: 0,
+        rid: 0,
         categoryType: '',
         customCategory: '',
-        question_to_psychologist: [],
-        filtered_by_automatch_psy_names: [],
-        _queries: requests.map(item => item.name) || '',
+        question_to_psychologist: requests.map(item => item.name).join('; '),
+        filtered_by_automatch_psy_names: [selectedPsychologist],
+        _queries: '',
         customTraumaticEvent: '',
         customState: '',
         formPsyClientInfo: {
-            age: -1,
+            age: localStorage.getItem('app_age') || '',
             city: '',
-            sex: '',
+            sex: localStorage.getItem('app_gender') || '',
             psychoEducated: '',
             anxieties: [],
             customAnexiety: '',
@@ -277,17 +279,17 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
             meetType: '',
             selectionСriteria: '',
             custmCreteria: '',
-            importancePsycho: '',
+            importancePsycho: [],
             customImportance: '',
             agePsycho: '',
-            sexPsycho: '',
+            sexPsycho: 'Не имеет значения',
             priceLastSession: '',
             durationSession: '',
             reasonCancel: '',
             pricePsycho: '',
             reasonNonApplication: '',
-            contactType: '',
-            contact: '',
+            contactType: 'Telegram',
+            contact: telephone,
             name: login,
             is_adult: true,
             is_last_page: false,
@@ -304,20 +306,25 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
     });
 
     const onSubmit = async () => {
+        if (!isPhoneValid) return;
+
         const timeDifference = getTimeDifference();
         const ticketId = makeTicketId(7);
         const formData = getInitialFormData(ticketId, timeDifference);
 
         try {
             await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka-test-contur', formData);
-            setTimeout(() => {
-                redirect(`https://t.me/hraniteli_client_test_bot?start=${ticketId}`);
-            }, 2000);
+            window.location.href = `https://t.me/hraniteli_client_test_bot?start=${ticketId}`;
         } catch (error) {
             console.error('Error submitting form:', error);
         }
     };
-    
+
+    const handlePhoneChange = (value: string) => {
+        setTelephone(value);
+        // Проверяем что телефон содержит минимум 11 цифр (для России)
+        setIsPhoneValid(value.replace(/\D/g, '').length >= 11);
+    };
 
     return (
         <ModalWindow type="ContactForm">
@@ -391,14 +398,24 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
                 
                 <div className='mt-[25px] focus-within:outline-2 focus-within:outline-[#D4D4D4] px-[20px] max-md:placeholder:text-[14px] flex max-md:h-[47px] w-full h-[65px] bg-[#FAFAFA] rounded-[10px] font-normal text-[18px] leading-[25px]'>
                     <Image src='/flag.svg' alt='flag' height={23} width={23} />
-                    <PhoneInput onChange={value => setTelephone(value)} />
+                    <PhoneInput onChange={handlePhoneChange} />
                 </div>
+                {!isPhoneValid && telephone && (
+                    <span className="text-red-500 text-sm mt-1">
+                        Введите корректный номер телефона
+                    </span>
+                )}
             </form>
 
             <DialogFooter className='flex flex-col sm:flex-col'>
                 <Button 
                     onClick={onSubmit} 
-                    className="cursor-pointer max-md:text-[14px] w-full hover:bg-[#116466] bg-[#116466] rounded-[50px] text-[white] py-[25px] font-normal text-[18px] leading-[25px]" 
+                    disabled={!isPhoneValid}
+                    className={`cursor-pointer max-md:text-[14px] w-full rounded-[50px] py-[25px] font-normal text-[18px] leading-[25px] ${
+                        isPhoneValid 
+                            ? 'hover:bg-[#116466] bg-[#116466] text-white' 
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
                     type="button"
                 >
                     Перейти в телеграм бот

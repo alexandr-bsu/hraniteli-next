@@ -61,25 +61,86 @@ export const PhoneStage = () => {
         dispatch(setPhone(data.phone));
 
         try {
-            console.log('Отправляем анкету с данными:', formData);
-            // Отправляем анкету
-            await submitQuestionnaire({
+            // Отправляем анкету и получаем расписание
+            const schedule = await submitQuestionnaire({
                 ...formData,
                 phone: data.phone
             });
 
-            // Получаем отфильтрованных психологов
-            const result = await getFilteredPsychologists();
-            console.log('Получили психологов:', result);
+            // Проверяем наличие слотов
+            let hasSlots = false;
+            if (schedule[0]?.items) {
+                hasSlots = schedule[0].items.some((day: any) => {
+                    if (!day.slots) return false;
+                    return Object.entries(day.slots).some(([time, slots]) => {
+                        if (!Array.isArray(slots)) return false;
+                        return slots.some(slot => slot.state === 'Свободен');
+                    });
+                });
+            }
 
-            if (!result.hasMatches) {
-                console.log('Нет подходящих психологов, увеличиваем счетчик попыток');
+            // Получаем список психологов
+            const result = await getFilteredPsychologists();
+
+            // Если нет слотов вообще - показываем ошибку
+            if (!hasSlots) {
                 dispatch(setHasMatchingError(true));
                 setShowNoMatch(true);
                 return;
             }
 
-            dispatch(fill_filtered_by_automatch_psy(result.items));
+            // Собираем все id психологов из слотов и их расписания
+            const psychologistSchedules = new Map<string, any>();
+            schedule[0].items.forEach((day: any) => {
+                if (!day.slots) return;
+                Object.entries(day.slots).forEach(([time, slots]) => {
+                    if (!Array.isArray(slots)) return;
+                    slots.forEach((slot: any) => {
+                        if (slot.psychologist) {
+                            if (!psychologistSchedules.has(slot.psychologist)) {
+                                const psychologistSchedule: { [date: string]: { [time: string]: any } } = {};
+                                schedule[0].items.forEach((d: any) => {
+                                    if (d.slots) {
+                                        psychologistSchedule[d.pretty_date] = {};
+                                        Object.entries(d.slots).forEach(([t, s]) => {
+                                            if (Array.isArray(s)) {
+                                                const psychologistSlots = s.filter(sl => sl.psychologist === slot.psychologist && sl.state === 'Свободен');
+                                                if (psychologistSlots.length > 0) {
+                                                    psychologistSchedule[d.pretty_date][t] = psychologistSlots[0];
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                                psychologistSchedules.set(slot.psychologist, psychologistSchedule);
+                            }
+                        }
+                    });
+                });
+            });
+
+            // Фильтруем психологов у которых есть слоты
+            const psychologistsWithSlots = result.items.map((psy: any) => {
+                const schedule = psychologistSchedules.get(psy.name);
+                return {
+                    ...psy,
+                    schedule: schedule
+                };
+            }).filter((psy: any) => {
+                const schedule = psychologistSchedules.get(psy.name);
+                if (!schedule) return false;
+                return Object.values(schedule).some((daySlots: any) => 
+                    Object.values(daySlots).some(slot => slot && slot.state === 'Свободен')
+                );
+            });
+
+            if (psychologistsWithSlots.length === 0) {
+                dispatch(setHasMatchingError(true));
+                setShowNoMatch(true);
+                return;
+            }
+
+            dispatch(fill_filtered_by_automatch_psy(psychologistsWithSlots));
             dispatch(setHasMatchingError(false));
             dispatch(setApplicationStage('psychologist'));
         } catch (error) {
@@ -165,4 +226,4 @@ export const PhoneStage = () => {
             </Form>
         </div>
     );
-}; 
+}
