@@ -51,13 +51,13 @@ const PromocodeStage = () => {
     return (
         <div className='px-[50px] max-lg:px-[20px] flex w-full grow'>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-[20px] w-full flex flex-col">
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-[30px] w-full flex flex-col">
                     <FormField
                         control={form.control}
                         name="promocode"
                         render={({ field }) => (
                             <div className='grow'>
-                                <FormItem className='grow'>
+                                <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
                                     <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>
                                         Введите промокод или номер подарочного сертификата
                                     </FormLabel>

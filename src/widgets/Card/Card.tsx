@@ -14,7 +14,8 @@ import { getPsychologistEducation, getPsychologistFullInfo } from '@/shared/api/
 import axios from 'axios';
 import { getTimeDifference } from '@/features/utils';
 import { toast } from "sonner";
-import { Tooltip } from '@/shared/ui/Tooltip';
+import { Tooltip } from '@/shared/ui/Tooltip/Tooltip';
+import { TextTooltip } from '@/shared/ui/Tooltip/TextTooltip';
 
 const getAgeWord = (age: number): string => {
     const lastDigit = age % 10;
@@ -374,8 +375,11 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                             {availableSlots.map((slot, index) => (
                                 <button 
                                     key={index} 
-                                    className={styles.dateButton}
-                                    onClick={handleSlotClick}
+                                    className={`${styles.dateButton} bg-[#FAFAFA] hover:bg-[#116466] hover:text-white transition-colors rounded-[50px] px-[15px] py-[10px]`}
+                                    onClick={() => {
+                                        dispatch(setSelectedPsychologist(psychologist.name));
+                                        dispatch(openModal('Time'));
+                                    }}
                                 >
                                     {slot.date.split('.').slice(0, 2).join('.')}/{slot.time}
                                 </button>
@@ -389,10 +393,12 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
             <div className={styles.queries}>
                 <h3 className={styles.sectionTitle}>Запросы:</h3>
                 <div className={styles.queriesList}>
-                    {psychologist.queries?.split(';').map((query, index) => (
-                        <button key={index} className={styles.queryButton}>
-                            {query.trim()}
-                        </button>
+                    {psychologist.queries?.split(';').slice(0, 6).map((query, index) => (
+                        <TextTooltip key={index} text={query.trim()}>
+                            <button className={styles.queryButton}>
+                                {query.trim()}
+                            </button>
+                        </TextTooltip>
                     ))}
                 </div>
             </div>

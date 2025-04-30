@@ -54,7 +54,7 @@ const AgeStageApplication = () => {
                         name="age"
                         render={({ field }) => (
                             <div className='grow'>
-                                <FormItem className='grow max-[425px]:mb-[30px]'>
+                                <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
                                     <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>
                                         Сколько вам лет?
                                     </FormLabel>

@@ -56,13 +56,13 @@ const RequestStage = () => {
     return (
         <div className='px-[50px] max-lg:px-[20px]  flex w-full grow'>
             <Form {...form} >
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-[20px] w-full flex flex-col">
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-[30px] w-full flex flex-col">
                     <FormField
                         control={form.control}
                         name="request"
                         render={({ field }) => (
                             <div className='grow max-[425px]:mb-[30px]'>
-                                <FormItem className='grow gap-0'>
+                                <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
                                     <FormLabel className='max-lg:text-[16px] font-semibold text-[20px] leading-[27px]'>Опишите свой запрос к психологу: что беспокоит, чего ожидаете, к чему хотите прийти?</FormLabel>
                                     <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
                                         Не знаете ответов — это нормально, напишите, как чувствуете. Можете пропустить если не готовы

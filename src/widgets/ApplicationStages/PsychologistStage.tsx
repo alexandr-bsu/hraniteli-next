@@ -13,6 +13,8 @@ import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
 import { Tooltip } from '@/shared/ui/Tooltip';
 import { NoMatchError } from './NoMatchError';
 import { EmergencyContacts } from './EmergencyContacts';
+import { getTimeDifference } from '@/features/utils';
+import axios from 'axios';
 
 interface Slot {
   id: string;
@@ -60,11 +62,13 @@ export const PsychologistStage = () => {
   const [availableDays, setAvailableDays] = useState<ScheduleDay[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  
+  const [availableSlots, setAvailableSlots] = useState<{date: string, time: string}[]>([]);
+
   const filtered_by_automatch_psy = useSelector((state: RootState) => state.filter.filtered_by_automatch_psy);
   const currentIndex = useSelector((state: RootState) => state.applicationFormData.index_phyc);
   const filters = useSelector((state: RootState) => state.filter);
   const hasError = useSelector((state: RootState) => state.applicationFormData.has_matching_error);
+  const formData = useSelector((state: RootState) => state.applicationFormData);
 
   useEffect(() => {
     const fetchPsychologists = async () => {
@@ -107,9 +111,133 @@ export const PsychologistStage = () => {
   }, [filtered_by_automatch_psy.length, retryCount]);
 
   useEffect(() => {
+    const loadSlots = async () => {
+      try {
+        const timeDifference = getTimeDifference();
+        const startDate = new Date();
+        const endDate = new Date();
+        endDate.setMonth(endDate.getMonth() + 1);
+
+        const requestData = {
+          startDate: startDate.toISOString().split('T')[0],
+          endDate: endDate.toISOString().split('T')[0],
+          ageFilter: formData.age,
+          formPsyClientInfo: {
+            age: formData.age,
+            city: '',
+            sex: formData.gender_user === 'male' ? 'Мужской' : 'Женский',
+            psychoEducated: '',
+            anxieties: [],
+            customAnexiety: '',
+            hasPsychoExperience: '',
+            meetType: '',
+            selectionСriteria: '',
+            custmCreteria: '',
+            importancePsycho: formData.preferences,
+            customImportance: formData.custom_preferences,
+            agePsycho: '',
+            sexPsycho: formData.gender_psychologist === 'male' ? 'Мужчина' : 
+                      formData.gender_psychologist === 'female' ? 'Женщина' : 'Не имеет значения',
+            priceLastSession: '',
+            durationSession: '',
+            reasonCancel: '',
+            pricePsycho: '',
+            reasonNonApplication: '',
+            contactType: '',
+            contact: formData.phone,
+            name: formData.username,
+            is_adult: parseInt(formData.age) >= 18,
+            is_last_page: false,
+            occupation: ''
+          },
+          form: {
+            anxieties: [],
+            questions: formData.requests,
+            customQuestion: [],
+            diagnoses: formData.diseases,
+            diagnoseInfo: '',
+            diagnoseMedicaments: localStorage.getItem('app_diseases_psychologist') ? 
+              JSON.parse(localStorage.getItem('app_diseases_psychologist') || '{}').medications : 'no',
+            traumaticEvents: formData.actions,
+            clientStates: formData.actions,
+            selectedPsychologistsNames: [filtered_by_automatch_psy[currentIndex]?.name],
+            shownPsychologists: '',
+            psychos: [],
+            lastExperience: '',
+            amountExpectations: '',
+            age: formData.age,
+            slots: [],
+            contactType: '',
+            contact: formData.phone,
+            name: formData.username,
+            promocode: formData.promocode,
+            ticket_id: formData.ticketID,
+            emptySlots: false,
+            userTimeZone: 'МСК',
+            bid: 0,
+            rid: 0,
+            categoryType: '',
+            customCategory: '',
+            question_to_psychologist: formData.requests.join('; '),
+            filtered_by_automatch_psy_names: [filtered_by_automatch_psy[currentIndex]?.name],
+            _queries: '',
+            customTraumaticEvent: '',
+            customState: ''
+          },
+          ticket_id: formData.ticketID,
+          userTimeOffsetMsk: timeDifference
+        };
+
+        const response = await axios.post(
+          '/api/schedule',
+          requestData
+        );
+        
+        if (!response.data?.length) {
+          setAvailableSlots([]);
+          return;
+        }
+
+        const slots: { date: string; time: string }[] = [];
+        const days = response.data;
+
+        days.forEach((day: any) => {
+          if (day.slots) {
+            Object.entries(day.slots).forEach(([hour, slotArray]) => {
+              if (Array.isArray(slotArray) && slotArray.length > 0 && slotArray.some((slot: any) => slot?.state === 'available')) {
+                slots.push({ 
+                  date: day.pretty_date, 
+                  time: hour 
+                });
+              }
+            });
+          }
+        });
+        
+        const sortedSlots = slots.sort((a, b) => {
+          const dateA = new Date(a.date.split('.').reverse().join('-') + ' ' + a.time);
+          const dateB = new Date(b.date.split('.').reverse().join('-') + ' ' + b.time);
+          return dateA.getTime() - dateB.getTime();
+        });
+
+        setAvailableSlots(sortedSlots.slice(0, 3));
+        setAvailableDays(days);
+      } catch (error) {
+        console.error('Error loading slots:', error);
+        setAvailableSlots([]);
+        setAvailableDays([]);
+      }
+    };
+
+    if (filtered_by_automatch_psy[currentIndex]?.name) {
+      loadSlots();
+    }
+  }, [currentIndex, filtered_by_automatch_psy, formData]);
+
+  useEffect(() => {
     // Обновляем доступные дни при изменении текущего психолога
     if (filtered_by_automatch_psy[currentIndex]?.schedule?.days) {
-        setAvailableDays(filtered_by_automatch_psy[currentIndex].schedule.days);
+      setAvailableDays(filtered_by_automatch_psy[currentIndex].schedule.days);
     }
   }, [currentIndex, filtered_by_automatch_psy]);
 
@@ -117,7 +245,7 @@ export const PsychologistStage = () => {
 
   const getFilterQueryParams = () => {
     const params = new URLSearchParams();
-    
+
     if (currentPsychologist?.id) {
       params.append('selected_psychologist', currentPsychologist.id);
     }
@@ -157,7 +285,71 @@ export const PsychologistStage = () => {
     if (selectedSlot) {
       setIsSubmitting(true);
       try {
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Имитация задержки
+        const requestData = {
+          anxieties: [],
+          questions: formData.requests,
+          customQuestion: [],
+          diagnoses: formData.diseases,
+          diagnoseInfo: "",
+          diagnoseMedicaments: localStorage.getItem('app_diseases_psychologist') ? 
+            JSON.parse(localStorage.getItem('app_diseases_psychologist') || '{}').medications : 'no',
+          traumaticEvents: formData.actions,
+          clientStates: formData.actions,
+          selectedPsychologistsNames: [],
+          shownPsychologists: "",
+          lastExperience: "",
+          amountExpectations: "",
+          age: formData.age,
+          slots: [`${selectedSlot["Дата Локальная"]} ${selectedSlot["Время Локальное"]}`],
+          slots_objects: [selectedSlot.id],
+          contactType: "Phone",
+          contact: formData.phone,
+          name: formData.username,
+          promocode: formData.promocode,
+          ticket_id: formData.ticketID,
+          emptySlots: false,
+          userTimeZone: "МСК",
+          bid: 0,
+          rid: 0,
+          categoryType: "",
+          customCategory: "",
+          question_to_psychologist: formData.requests.join('; '),
+          filtered_by_automatch_psy_names: [filtered_by_automatch_psy[currentIndex]?.name],
+          _queries: "",
+          customTraumaticEvent: "",
+          customState: "",
+          formPsyClientInfo: {
+            age: formData.age,
+            city: "",
+            sex: formData.gender_user === 'male' ? 'Мужской' : 'Женский',
+            psychoEducated: "",
+            anxieties: [],
+            customAnexiety: "",
+            hasPsychoExperience: "",
+            meetType: "",
+            selectionСriteria: "",
+            custmCreteria: "",
+            importancePsycho: formData.preferences,
+            customImportance: formData.custom_preferences,
+            agePsycho: "",
+            sexPsycho: formData.gender_psychologist === 'male' ? 'Мужчина' : 
+                      formData.gender_psychologist === 'female' ? 'Женщина' : 'Не имеет значения',
+            priceLastSession: "",
+            durationSession: "",
+            reasonCancel: "",
+            pricePsycho: "",
+            reasonNonApplication: "",
+            contactType: "",
+            contact: formData.phone,
+            name: formData.username,
+            is_adult: parseInt(formData.age) >= 18,
+            is_last_page: false,
+            occupation: ""
+          }
+        };
+
+        await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka-test-contur', requestData);
+
         dispatch(setSelectedSlots([`${selectedSlot["Дата Локальная"]} ${selectedSlot["Время Локальное"]}`]));
         dispatch(setSelectedSlotsObjects([JSON.stringify(selectedSlot)]));
         dispatch(setApplicationStage('gratitude'));
@@ -212,10 +404,10 @@ export const PsychologistStage = () => {
         </div>
       )}
 
-      <div className="flex justify-between items-center mb-[20px] max-lg:flex-col max-lg:gap-[15px]">
+      <div className="flex justify-between items-center mb-[20px] max-lg:flex-col max-lg:gap-[15px] min-h-[50px] max-lg:min-h-[80px]">
         {currentIndex > 0 && (
-          <button 
-            onClick={handlePrevious} 
+          <button
+            onClick={handlePrevious}
             className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]"
           >
             <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
@@ -223,7 +415,7 @@ export const PsychologistStage = () => {
           </button>
         )}
         {currentIndex < filtered_by_automatch_psy.length - 1 && remainingPsychologists > 0 && (
-          <button 
+          <button
             onClick={handleNext}
             className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ml-auto"
           >
@@ -237,7 +429,7 @@ export const PsychologistStage = () => {
         <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-lg:flex-col max-lg:gap-[15px]">
           <div className="flex gap-[20px] items-center max-lg:gap-[15px]">
             <div className="w-[80px] h-[80px] max-lg:w-[60px] max-lg:h-[60px] rounded-full overflow-hidden">
-              <Image 
+              <Image
                 src={getGoogleDriveImageUrl(currentPsychologist.link_photo)}
                 alt={currentPsychologist.name}
                 width={80}
@@ -257,7 +449,7 @@ export const PsychologistStage = () => {
               </span>
             </div>
           </div>
-          <button 
+          <button
             onClick={handleOpenPsychologistCard}
             className="hover:opacity-80 transition-opacity cursor-pointer text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#116466] max-lg:w-full max-lg:text-center max-lg:py-[8px] max-lg:border max-lg:border-[#116466] max-lg:rounded-[50px]"
           >
@@ -286,66 +478,74 @@ export const PsychologistStage = () => {
           </div>
         </div>
 
-        <div className="mb-[30px] max-lg:mb-[20px]">
-          <h4 className="font-semibold text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] mb-[10px]">Ближайшая запись:</h4>
-          <div className="flex flex-col gap-[15px] max-h-[300px] overflow-y-auto">
-            {availableDays.map((day) => {
-              const availableSlots = Object.entries(day.slots)
-                .filter(([_, slots]) => slots.length > 0)
-                .map(([time, slots]) => slots[0]);
-
-              if (availableSlots.length === 0) return null;
-
-              return (
-                <div key={day.date} className="border-b pb-[15px]">
-                  <h5 className="font-semibold mb-[10px]">{day.day_name}, {day.pretty_date}</h5>
-                  <div className="flex gap-[10px] flex-wrap">
-                    {availableSlots.map((slot) => (
-                      <button
-                        key={slot.id}
-                        onClick={() => handleSlotSelect(slot)}
-                        className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ${
-                          selectedSlot?.id === slot.id 
-                            ? 'bg-[#116466] text-white border-[#116466]' 
-                            : 'border-[#D4D4D4] text-[#116466]'
-                        }`}
-                      >
-                        {slot["Время Локальное"]}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+        <div className="mt-[30px]">
+          <h4 className="text-[18px] font-semibold mb-[15px]">Ближайшая запись:</h4>
+          {availableSlots.length > 0 ? (
+            <div className="flex gap-[10px] flex-wrap">
+              {availableSlots.map((slot, index) => (
+                <button
+                  key={index}
+                  onClick={() => handleSlotSelect({
+                    id: `${slot.date}-${slot.time}`,
+                    psychologist: currentPsychologist.name,
+                    date: slot.date,
+                    time: slot.time,
+                    state: 'available',
+                    ticket: null,
+                    client_id: null,
+                    meeting_link: null,
+                    meeting_id: null,
+                    calendar_meeting_id: null,
+                    confirmed: false,
+                    auto_assigned: false,
+                    auto_canceled: false,
+                    is_helpful_hand: null,
+                    "Дата Локальная": slot.date,
+                    "Время Локальное": slot.time
+                  })}
+                  className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] cursor-pointer ${
+                    selectedSlot?.id === `${slot.date}-${slot.time}`
+                      ? 'bg-[#116466] text-white border-[#116466]'
+                      : 'border-[#D4D4D4] text-[#116466]'
+                  }`}
+                >
+                  {slot.date.split('.').slice(0, 6).join('.')}/{slot.time}
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-[20px] p-[15px] bg-[#F5F5F5] rounded-[10px] text-[16px] text-center">
+              У психолога пока нет свободного времени для записи
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="shrink-0 pb-[50px] max-lg:pb-[30px] flex gap-[10px]">
-          <button
-              type='button'
-              onClick={() => dispatch(setApplicationStage('phone'))}
-              disabled={isSubmitting}
-              className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-              Назад
-          </button>
+      <div className="shrink-0 mt-[30px] pb-[10px] flex gap-[10px]">
+        <button
+          type='button'
+          onClick={() => dispatch(setApplicationStage('phone'))}
+          disabled={isSubmitting}
+          className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          Назад
+        </button>
 
-          <button
-              type='submit'
-              disabled={!selectedSlot || isSubmitting}
-              className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px] flex justify-center items-center gap-[10px] ${!selectedSlot || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
-              onClick={handleSubmit}
-          >
-              {isSubmitting ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  <span>Отправка...</span>
-                </>
-              ) : (
-                'Продолжить'
-              )}
-          </button>
+        <button
+          type='submit'
+          disabled={!selectedSlot || isSubmitting}
+          className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px] flex justify-center items-center gap-[10px] ${!selectedSlot || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+          onClick={handleSubmit}
+        >
+          {isSubmitting ? (
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              <span>Отправка...</span>
+            </>
+          ) : (
+            'Продолжить'
+          )}
+        </button>
       </div>
     </div>
   );

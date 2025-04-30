@@ -62,7 +62,7 @@ export const EmergencyContacts = ({ onClose }: EmergencyContactsProps) => {
                 Контакты экстренной психологической помощи
             </h2>
 
-            <div className="flex flex-col gap-[30px] overflow-y-auto">
+            <div className="flex flex-col gap-[30px] overflow-y-auto max-h-[calc(100vh-300px)] min-lg:max-h-[450px]">
                 <section>
                     <h3 className="text-[18px] font-semibold mb-[15px]">
                         Универсальные службы:
@@ -120,7 +120,7 @@ export const EmergencyContacts = ({ onClose }: EmergencyContactsProps) => {
                 </section>
             </div>
 
-            <div className="mt-auto pt-[30px]">
+            <div className="shrink-0 mt-[30px]">
                 <button
                     onClick={onClose}
                     className={`w-full border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] rounded-[50px]`}

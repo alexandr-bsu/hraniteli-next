@@ -20,6 +20,7 @@ export interface IApplicationFormData {
   selected_slots_objects: string[];
   index_phyc: number;
   has_matching_error: boolean;
+  matching_attempts: number;
 }
 
 // Состояние формы заявки в Redux

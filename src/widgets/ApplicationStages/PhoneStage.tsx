@@ -13,7 +13,7 @@ import styles from '@/styles/input.module.scss';
 import { IMaskInput } from 'react-imask';
 import { RootState } from '@/redux/store';
 import { NoMatchError } from './NoMatchError';
-import { getPsychologistSchedule } from '@/features/actions/getPsychologistSchedule';
+import { submitQuestionnaire, getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
 import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
 
 const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
@@ -29,7 +29,7 @@ export const PhoneStage = () => {
     const [isLoading, setIsLoading] = React.useState(false);
 
     // 1. Загружаем сохраненные данные из localStorage
-    const savedData = typeof window !== 'undefined' 
+    const savedData = typeof window !== 'undefined'
         ? JSON.parse(localStorage.getItem('app_phone') || '{}')
         : {}
 
@@ -61,23 +61,29 @@ export const PhoneStage = () => {
         dispatch(setPhone(data.phone));
 
         try {
-            // Получаем список психологов с сервера
-            const psychologists = await getPsychologistSchedule({
+            console.log('Отправляем анкету с данными:', formData);
+            // Отправляем анкету
+            await submitQuestionnaire({
                 ...formData,
                 phone: data.phone
             });
 
-            if (!psychologists?.length) {
+            // Получаем отфильтрованных психологов
+            const result = await getFilteredPsychologists();
+            console.log('Получили психологов:', result);
+
+            if (!result.hasMatches) {
+                console.log('Нет подходящих психологов, увеличиваем счетчик попыток');
                 dispatch(setHasMatchingError(true));
                 setShowNoMatch(true);
                 return;
             }
 
-            dispatch(fill_filtered_by_automatch_psy(psychologists));
+            dispatch(fill_filtered_by_automatch_psy(result.items));
             dispatch(setHasMatchingError(false));
             dispatch(setApplicationStage('psychologist'));
         } catch (error) {
-            console.error('Failed to fetch psychologists:', error);
+            console.error('Ошибка при подборе психологов:', error);
             dispatch(setHasMatchingError(true));
             setShowNoMatch(true);
         } finally {
@@ -92,7 +98,7 @@ export const PhoneStage = () => {
     return (
         <div className='px-[50px] max-lg:px-[20px] flex w-full grow'>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-[20px] w-full flex flex-col relative">
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-[30px] w-full flex flex-col relative">
                     {isLoading && (
                         <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50 rounded-[10px]">
                             <div className="flex flex-col items-center gap-[10px]">
@@ -102,21 +108,18 @@ export const PhoneStage = () => {
                         </div>
                     )}
 
-                    <div className="flex flex-col">
-                        <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>
-                            Оставьте ваш контакт для связи
-                        </FormLabel>
-                        <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
-                            Рекламу не присылаем. Психологи не видят ваши контакты. Только вы решаете кому их показать после сессии
-                        </FormDescription>
-                    </div>
-
                     <FormField
                         control={form.control}
                         name="phone"
                         render={({ field: { onChange, value } }) => (
                             <div className='grow'>
-                                <FormItem className='grow'>
+                                <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
+                                    <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>
+                                        Оставьте ваш контакт для связи
+                                    </FormLabel>
+                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
+                                        Рекламу не присылаем. Психологи не видят ваши контакты. Только вы решаете кому их показать после сессии
+                                    </FormDescription>
                                     <div className={styles.input__text_container}>
                                         <IMaskInput
                                             mask="+7 (000) 000-00-00"
@@ -141,16 +144,16 @@ export const PhoneStage = () => {
                     />
 
                     <div className="shrink-0 mt-[30px] pb-[50px] flex gap-[10px]">
-                        <button 
-                            type='button' 
-                            onClick={() => dispatch(setApplicationStage('promocode'))} 
+                        <button
+                            type='button'
+                            onClick={() => dispatch(setApplicationStage('promocode'))}
                             disabled={isLoading}
                             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px] ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             Назад
                         </button>
 
-                        <button 
+                        <button
                             type='submit'
                             disabled={isLoading}
                             className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px] ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}

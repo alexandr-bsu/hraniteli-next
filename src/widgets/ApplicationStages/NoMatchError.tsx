@@ -1,6 +1,10 @@
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { setApplicationStage } from '@/redux/slices/application_form';
+import { resetMatchingAttempts } from '@/redux/slices/application_form_data';
 import { COLORS } from '@/shared/constants/colors';
+import { useEffect, useState } from 'react';
+import { EmergencyContacts } from './EmergencyContacts';
+import { RootState } from '@/redux/store';
 
 interface NoMatchErrorProps {
     onClose: () => void;
@@ -8,21 +12,42 @@ interface NoMatchErrorProps {
 
 export const NoMatchError = ({ onClose }: NoMatchErrorProps) => {
     const dispatch = useDispatch();
+    const [showEmergency, setShowEmergency] = useState(false);
+    const matchingAttempts = useSelector((state: RootState) => state.applicationFormData.matching_attempts);
+
+    useEffect(() => {
+        // Если 3 попытки - показываем экстренные контакты
+        if (matchingAttempts >= 3) {
+            setShowEmergency(true);
+        }
+    }, [matchingAttempts]);
 
     const handleChangeGender = () => {
+        dispatch(resetMatchingAttempts());
         dispatch(setApplicationStage('gender_psychologist'));
         onClose();
     };
 
     const handleChangeConditions = () => {
+        dispatch(resetMatchingAttempts());
         dispatch(setApplicationStage('condition'));
         onClose();
     };
 
     const handleChangeTraumatic = () => {
+        dispatch(resetMatchingAttempts());
         dispatch(setApplicationStage('traumatic'));
         onClose();
     };
+
+    const handleEmergencyClose = () => {
+        dispatch(resetMatchingAttempts());
+        onClose();
+    };
+
+    if (showEmergency) {
+        return <EmergencyContacts onClose={handleEmergencyClose} />;
+    }
 
     return (
         <div className="flex flex-col w-full h-full px-[50px] py-[30px] max-lg:px-[20px]">

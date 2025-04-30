@@ -51,7 +51,7 @@ export default function NameStageApplication() {
             name="username"
             render={({ field }) => (
               <div className='grow max-h-[100%]'>
-                <FormItem className='grow max-[425px]:mb-[30px]'>
+                <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
                   <FormLabel className='text-[20px] lg:text-[20px] md:text-[16px] max-lg:text-[16px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                     Как вас зовут?
                   </FormLabel>

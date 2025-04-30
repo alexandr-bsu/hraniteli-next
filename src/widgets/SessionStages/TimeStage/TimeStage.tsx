@@ -22,39 +22,45 @@ export const TimeStage = () => {
     const modalType = useSelector((state: RootState) => state.modal.type);
     const timeDifference = getTimeDifference();
     const [slots, setSlots] = useState<Slot[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+
+    const loadSlots = async () => {
+        if (!selectedPsychologist || !isOpen || modalType !== 'Time') return;
+
+        setIsLoading(true);
+        try {
+            const response = await axios.post(
+                'https://n8n-v2.hrani.live/webhook/get-agregated-schedule-v2-test-contur',
+                {
+                    psychologist: selectedPsychologist,
+                    userTimeOffsetMsk: timeDifference
+                }
+            );
+
+            if (response.data?.items?.length) {
+                const availableSlots: Slot[] = [];
+                response.data.items.forEach((item: any) => {
+                    if (item.slots) {
+                        Object.entries(item.slots).forEach(([hour, slotArray]: [string, any]) => {
+                            if (Array.isArray(slotArray) && slotArray.length > 0) {
+                                availableSlots.push({
+                                    date: item.pretty_date,
+                                    time: hour
+                                });
+                            }
+                        });
+                    }
+                });
+                setSlots(availableSlots);
+            }
+        } catch (error) {
+            console.error('Ошибка при загрузке слотов:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const loadSlots = async () => {
-            if (!selectedPsychologist || !isOpen || modalType !== 'Time') {
-                return;
-            }
-
-            try {
-                const response = await axios.get(
-                    `https://n8n-v2.hrani.live/webhook/get-aggregated-schedule-by-psychologist-test-contur?utm_psy=${encodeURIComponent(selectedPsychologist)}&userTimeOffsetMsk=${timeDifference}`
-                );
-
-                if (response.data?.items?.length) {
-                    const availableSlots: Slot[] = [];
-                    response.data.items.forEach((item: any) => {
-                        if (item.slots) {
-                            Object.entries(item.slots).forEach(([hour, slotArray]: [string, any]) => {
-                                if (Array.isArray(slotArray) && slotArray.length > 0) {
-                                    availableSlots.push({
-                                        date: item.pretty_date,
-                                        time: hour
-                                    });
-                                }
-                            });
-                        }
-                    });
-                    setSlots(availableSlots);
-                }
-            } catch (error) {
-                console.error('Error loading slots:', error);
-            }
-        };
-
         loadSlots();
     }, [isOpen, selectedPsychologist, timeDifference, modalType]);
 
@@ -65,12 +71,43 @@ export const TimeStage = () => {
     };
 
     const handleNext = () => {
-        // TODO: вернуть после бэка
-        // if (slots.length > 0) {
-            dispatch(closeModal());
-            dispatch(openModal('ContactForm'));
-        // }
+        dispatch(closeModal());
+        dispatch(openModal('ContactForm'));
     };
+
+    const renderTimeZone = () => (
+        <span className="text-[18px] leading-[25px] font-normal text-[#151515] flex gap-[10px] max-lg:flex-col max-lg:text-[14px]">
+            Часовой пояс:
+            <span className="text-[#116466]">
+                МСК {timeDifference !== 0 ? timeDifference > 0 ? ' + '+timeDifference : timeDifference : ''}
+            </span>
+        </span>
+    );
+
+    const renderSlots = () => (
+        <div className="mt-[20px]">
+            <h3 className="font-semibold text-[18px] leading-[25px] mb-[10px] max-lg:text-[14px]">
+                Сегодня:
+            </h3>
+            <div className="flex flex-wrap gap-[10px]">
+                {slots.length > 0 ? (
+                    slots.map((slot, index) => (
+                        <button
+                            key={index}
+                            onClick={() => handleSlotSelect(slot)}
+                            className="px-[15px] py-[10px] bg-[#FAFAFA] rounded-[10px] text-[16px] leading-[22px] hover:bg-[#116466] hover:text-white transition-colors"
+                        >
+                            {slot.date.split('.').slice(0, 2).join('.')}/{slot.time}
+                        </button>
+                    ))
+                ) : (
+                    <span className="text-[18px] leading-[25px] font-normal text-[#151515]">
+                        У психолога пока нет свободного времени для записи
+                    </span>
+                )}
+            </div>
+        </div>
+    );
 
     return (
         <ModalWindow type="Time">
@@ -80,29 +117,15 @@ export const TimeStage = () => {
                 </DialogTitle>
             </DialogHeader>
 
-            <span className="text-[18px] leading-[25px] font-normal text-[#151515] flex gap-[10px] max-lg:flex-col max-lg:text-[14px]">
-                Часовой пояс:
-                <span className="text-[#116466]">
-                    МСК {timeDifference !== 0 ? timeDifference > 0 ? ' + '+timeDifference : timeDifference : ''}
-                </span>
-            </span>
+            {renderTimeZone()}
 
-            <div className="mt-[20px]">
-                <h3 className="font-semibold text-[18px] leading-[25px] mb-[10px] max-lg:text-[14px]">
-                    Сегодня:
-                </h3>
-                <div className="flex flex-wrap gap-[10px]">
-                    {slots.map((slot, index) => (
-                        <button
-                            key={index}
-                            onClick={() => handleSlotSelect(slot)}
-                            className="px-[15px] py-[10px] bg-[#FAFAFA] rounded-[10px] text-[16px] leading-[22px] hover:bg-[#116466] hover:text-white transition-colors"
-                        >
-                            {slot.date.split('.').slice(0, 2).join('.')}/{slot.time}
-                        </button>
-                    ))}
+            {isLoading ? (
+                <div className="flex items-center justify-center py-[30px]">
+                    <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
                 </div>
-            </div>
+            ) : (
+                renderSlots()
+            )}
 
             <DialogFooter className="sm:justify-start">
                 <Button

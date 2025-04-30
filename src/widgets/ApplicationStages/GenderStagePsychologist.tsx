@@ -79,7 +79,7 @@ export const GenderStagePsychologist = () => {
                                     <FormLabel className='text-[20px] lg:text-[20px] md:text-[16px] max-lg:text-[16px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                                         Есть ли у вас предпочтения по полу психолога?
                                     </FormLabel>
-                                    <FormDescription className='text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] leading-[25px] max-lg:leading-[20px] font-normal mt-[10px] max-lg:mt-[8px]'>
+                                    <FormDescription className='text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] leading-[25px] max-lg:leading-[20px] font-normal max-lg:mt-[8px]'>
                                         Выберите один вариант ответа
                                     </FormDescription>
                                     <FormControl className="mt-[20px] max-lg:mt-[16px]">
