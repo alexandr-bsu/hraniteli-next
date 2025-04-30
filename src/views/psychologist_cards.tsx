@@ -10,6 +10,7 @@ import { setDataNamePsychologist, fill_filtered_by_automatch_psy, setAvailableRe
 import Image from "next/image";
 import { getPsychologistAll } from '@/features/actions/getPsychologistAll';
 import { getAvailableRequests } from '@/shared/api/requests';
+import { submitQuestionnaire } from '@/features/actions/getPsychologistSchedule';
 
 type Props = {
     data?: IPsychologist[];
@@ -18,6 +19,7 @@ type Props = {
 
 export const Psychologist_cards = ({data, isLoaded} : Props) => { 
     const filter = useSelector<RootState, any>(state => state.filter);
+    const formData = useSelector((state: RootState) => state.applicationFormData);
     const [isLoading, setLoading] = useState(!isLoaded);
     const [error, setError] = useState<string | null>(null);
     const dispatch = useDispatch();
@@ -129,6 +131,67 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
 
         loadData();
     }, [dispatch, isLoaded]);
+
+    // Загрузка расписания
+    useEffect(() => {
+        const loadSchedules = async () => {
+            if (!filter.filtered_by_automatch_psy.length) return;
+
+            try {
+                const schedule = await submitQuestionnaire(formData);
+
+                if (schedule && schedule[0]?.items) {
+                    // Собираем расписание для каждого психолога
+                    const psychologistSchedules = new Map<string, any>();
+                    schedule[0].items.forEach((day: any) => {
+                        if (!day.slots) return;
+                        Object.entries(day.slots).forEach(([time, slots]) => {
+                            if (!Array.isArray(slots)) return;
+                            slots.forEach((slot: any) => {
+                                if (slot.psychologist) {
+                                    if (!psychologistSchedules.has(slot.psychologist)) {
+                                        const psychologistSchedule: { days: any[] } = { days: [] };
+                                        schedule[0].items.forEach((d: any) => {
+                                            const daySchedule = {
+                                                ...d,
+                                                slots: {}
+                                            };
+                                            if (d.slots) {
+                                                Object.entries(d.slots).forEach(([t, s]) => {
+                                                    if (Array.isArray(s)) {
+                                                        const psychologistSlots = s.filter(sl => sl.psychologist === slot.psychologist);
+                                                        if (psychologistSlots.length > 0) {
+                                                            daySchedule.slots[t] = psychologistSlots;
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                            if (Object.keys(daySchedule.slots).length > 0) {
+                                                psychologistSchedule.days.push(daySchedule);
+                                            }
+                                        });
+                                        psychologistSchedules.set(slot.psychologist, psychologistSchedule);
+                                    }
+                                }
+                            });
+                        });
+                    });
+
+                    // Обновляем психологов с их расписаниями
+                    const updatedPsychologists = filter.filtered_by_automatch_psy.map((psy: any) => ({
+                        ...psy,
+                        schedule: psychologistSchedules.get(psy.name) || { days: [] }
+                    }));
+
+                    dispatch(fill_filtered_by_automatch_psy(updatedPsychologists));
+                }
+            } catch (error) {
+                console.error('Error loading schedules:', error);
+            }
+        };
+
+        loadSchedules();
+    }, [filter.filtered_by_automatch_psy.length, dispatch, formData]);
 
     // Эффект для скролла к выбранному психологу
     useEffect(() => {

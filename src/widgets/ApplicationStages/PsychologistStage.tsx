@@ -216,6 +216,12 @@ export const PsychologistStage = () => {
     if (selectedSlot) {
       setIsSubmitting(true);
       try {
+        // Форматируем дату из YYYY-MM-DD в DD.M
+        const dateObj = new Date(selectedSlot.date);
+        const day = dateObj.getDate();
+        const month = dateObj.getMonth() + 1;
+        const formattedSlot = `${day}.${month} ${selectedSlot.time}`;
+
         const requestData = {
           anxieties: [],
           questions: formData.requests,
@@ -231,7 +237,7 @@ export const PsychologistStage = () => {
           lastExperience: "",
           amountExpectations: "",
           age: formData.age,
-          slots: [`${selectedSlot["Дата Локальная"]} ${selectedSlot["Время Локальное"]}`],
+          slots: [formattedSlot],
           slots_objects: [selectedSlot.id],
           contactType: "Phone",
           contact: formData.phone,
@@ -285,7 +291,7 @@ export const PsychologistStage = () => {
         console.log('Ответ сервера:', response.data);
 
         if (response.status === 200) {
-          dispatch(setSelectedSlots([`${selectedSlot["Дата Локальная"]} ${selectedSlot["Время Локальное"]}`]));
+          dispatch(setSelectedSlots([formattedSlot]));
           dispatch(setSelectedSlotsObjects([selectedSlot.id]));
           dispatch(setApplicationStage('gratitude'));
         } else {

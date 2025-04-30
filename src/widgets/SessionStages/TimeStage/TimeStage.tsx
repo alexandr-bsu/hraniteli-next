@@ -99,7 +99,10 @@ export const TimeStage = () => {
             return dateA.getTime() - dateB.getTime();
         });
 
-        if (dates.length === 0) {
+        // Ограничиваем до 5 дней
+        const limitedDates = dates.slice(0, 5);
+
+        if (limitedDates.length === 0) {
             return (
                 <div className="mt-[20px]">
                     <span className="text-[18px] leading-[25px] font-normal text-[#151515]">
@@ -119,7 +122,7 @@ export const TimeStage = () => {
 
         return (
             <>
-                {dates.map((date) => {
+                {limitedDates.map((date) => {
                     const dateObj = new Date(date.split('.').reverse().join('-'));
                     const isToday = formatDate(today) === formatDate(dateObj);
                     const isTomorrow = formatDate(tomorrow) === formatDate(dateObj);
@@ -160,7 +163,7 @@ export const TimeStage = () => {
         <ModalWindow type="Time">
             <DialogHeader>
                 <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[16px] max-lg:leading-[22px]">
-                    Выберите время сеанса с хранителем
+                    Выберите время сеанса с Хранителем
                 </DialogTitle>
             </DialogHeader>
 

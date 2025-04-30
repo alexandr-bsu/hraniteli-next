@@ -123,29 +123,29 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
 
                 const slots: { date: string; time: string }[] = [];
                 
-                psychologist.schedule.days.forEach((day: any) => {
+                psychologist.schedule.days.forEach((day) => {
                     if (day.slots) {
-                        Object.entries(day.slots).forEach(([hour, slotArray]) => {
-                            if (Array.isArray(slotArray) && slotArray.length > 0 && slotArray.some((slot: any) => slot.state === 'Свободен')) {
-                                console.log('Card - Found available slot at:', hour);
-                                slots.push({ 
-                                    date: day.pretty_date, 
-                                    time: hour 
+                        Object.entries(day.slots).forEach(([time, slotArray]) => {
+                            if (Array.isArray(slotArray)) {
+                                slotArray.forEach((slot) => {
+                                    if (slot && slot.state === 'Свободен') {
+                                        slots.push({
+                                            date: day.pretty_date,
+                                            time: time
+                                        });
+                                    }
                                 });
                             }
                         });
                     }
                 });
-                
-                console.log('Card - Final slots:', slots);
-                
+
                 const sortedSlots = slots.sort((a, b) => {
                     const dateA = new Date(a.date.split('.').reverse().join('-') + ' ' + a.time);
                     const dateB = new Date(b.date.split('.').reverse().join('-') + ' ' + b.time);
                     return dateA.getTime() - dateB.getTime();
                 });
 
-                console.log('Card - Sorted and filtered slots:', sortedSlots.slice(0, 3));
                 setAvailableSlots(sortedSlots.slice(0, 3));
 
             } catch (error) {
@@ -369,7 +369,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                     </div>
 
                     <div className={styles.additionalApproaches}>
-                        <span className={styles.label}>Дополнительные подходы</span>
+                        <span className={styles.label}>Дополнительные подходы:</span>
                         <div className={styles.approaches}>
                             {(Array.isArray(psychologist.additional_modals) 
                                 ? psychologist.additional_modals 
@@ -429,10 +429,10 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
 
             {/* Дополнительная информация (показывается при раскрытии) */}
             <div className={`${styles.expandedContent} ${isExpanded ? styles.expanded : ''}`}>
-                {/* О хранителе */}
+                {/* О Хранителе */}
                 {psychologist.short_description && (
                     <div className={styles.section}>
-                        <h3 className={styles.sectionTitle}>О хранителе</h3>
+                        <h3 className={styles.sectionTitle}>О Хранителе</h3>
                         <p 
                             ref={descriptionRef}
                             className={`${styles.description} ${isDescriptionExpanded ? styles.expanded : ''}`}
@@ -476,9 +476,9 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                     )}
                 </div>
 
-                {/* Подробнее о хранителе */}
+                {/* Подробнее о Хранителе */}
                 <div className={styles.section}>
-                    <h3 className={styles.sectionTitle}>Подробнее о хранителе</h3>
+                    <h3 className={styles.sectionTitle}>Подробнее о Хранителе</h3>
                     <div className={styles.links}>
                         {['vk', 'site', 'telegram'].map((platform) => (
                             psychologist[platform as keyof IPsychologist] && (
@@ -537,7 +537,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                     className={styles.detailsButton} 
                     onClick={() => setIsExpanded(!isExpanded)}
                 >
-                    {isExpanded ? 'Свернуть' : 'Подробнее о хранителе'}
+                    {isExpanded ? 'Свернуть' : 'Подробнее о Хранителе'}
                 </button>
                 <button className={styles.appointmentButton} onClick={handleOpenModal}>
                     Оставить заявку
