@@ -6,12 +6,14 @@ const initialState: IApplicationFormData = {
   username: '',
   age: '',
   gender_user: 'male' as Gender,
-  gender_psychologist: 'male' as Gender,
+  gender_psychologist: 'other' as Gender,
   preferences: [],
   custom_preferences: '',
   actions: [],
   diseases: [],
   requests: [],
+  traumatic: [],
+  conditions: [],
   promocode: '',
   phone: '',
   selected_slots: [],
@@ -55,6 +57,12 @@ export const applicationFormDataSlice = createSlice({
     setRequests: (state, action: PayloadAction<string[]>) => {
       state.requests = action.payload;
     },
+    setTraumatic: (state, action: PayloadAction<string[]>) => {
+      state.traumatic = action.payload;
+    },
+    setConditions: (state, action: PayloadAction<string[]>) => {
+      state.conditions = action.payload;
+    },
     setPromocode: (state, action: PayloadAction<string>) => {
       state.promocode = action.payload;
     },
@@ -93,6 +101,8 @@ export const {
   setActions,
   setDiseases,
   setRequests,
+  setTraumatic,
+  setConditions,
   setPromocode,
   setPhone,
   setSelectedSlots,
