@@ -1,8 +1,9 @@
+ 
 'use client'
 import { Checkbox } from '@/components/ui/checkbox';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { setApplicationStage } from '@/redux/slices/application_form';
-import { setActions, setHasMatchingError } from '@/redux/slices/application_form_data';
+import { setTraumatic, setHasMatchingError } from '@/redux/slices/application_form_data';
 import { useDispatch, useSelector } from 'react-redux';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect } from 'react';
@@ -11,6 +12,8 @@ import * as z from 'zod';
 import { COLORS } from '@/shared/constants/colors';
 import { findByTraumatic } from '@/redux/slices/filter';
 import { RootState } from '@/redux/store';
+import { submitQuestionnaire, getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
+import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
 
 const TRAUMATIC_EVENTS = [
     {
@@ -47,6 +50,7 @@ type FormData = z.infer<typeof FormSchema>;
 
 export const TraumaticStage = () => {
     const dispatch = useDispatch();
+    const formData = useSelector((state: RootState) => state.applicationFormData);
     const filtered_persons = useSelector((state: RootState) => state.filter.filtered_by_automatch_psy);
     const hasError = useSelector((state: RootState) => state.applicationFormData.has_matching_error);
 
@@ -76,7 +80,7 @@ export const TraumaticStage = () => {
         return () => subscription.unsubscribe();
     }, [form.watch]);
 
-    const handleSubmit = (data: FormData) => {
+    const handleSubmit = async (data: FormData) => {
         const selectedEvents = data.traumatic
             .reduce<string[]>((acc, eventId) => {
                 const event = TRAUMATIC_EVENTS.find(item => item.id === eventId);
@@ -89,8 +93,9 @@ export const TraumaticStage = () => {
         // Сохраняем только в localStorage
         localStorage.setItem('app_traumatic', JSON.stringify(selectedEvents));
         
-        // Сначала проверяем подходящих психологов
-        dispatch(findByTraumatic(selectedEvents));
+        // Сохраняем в Redux
+        dispatch(setTraumatic(selectedEvents));
+
         dispatch(setApplicationStage('diseases_psychologist'));
     };
 

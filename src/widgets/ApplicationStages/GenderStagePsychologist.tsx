@@ -21,6 +21,8 @@ import { COLORS } from '@/shared/constants/colors'
 import { findByGender } from '@/redux/slices/filter'
 import { RootState } from '@/redux/store'
 import React, { useEffect } from 'react'
+import { submitQuestionnaire, getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule'
+import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter'
 
 const FormSchema = z.object({
     gender: z.enum(['male', 'female', 'other', 'none'], {
@@ -32,6 +34,7 @@ export const GenderStagePsychologist = () => {
     const dispatch = useDispatch()
     const filtered_persons = useSelector((state: RootState) => state.filter.filtered_by_automatch_psy)
     const hasError = useSelector((state: RootState) => state.applicationFormData.has_matching_error)
+    const formData = useSelector((state: RootState) => state.applicationFormData)
 
     // 1. Загружаем сохраненные данные из localStorage
     const savedData = typeof window !== 'undefined'
@@ -57,12 +60,13 @@ export const GenderStagePsychologist = () => {
     }, [form.watch])
 
     // 4. Отправка формы
-    const handleSubmit = (data: z.infer<typeof FormSchema>) => {
-        // Сначала проверяем подходящих психологов
+    const handleSubmit = async (data: z.infer<typeof FormSchema>) => {
+        // Проверяем подходящих психологов
         dispatch(findByGender(data.gender))
         
         // Сохраняем выбор пользователя
         dispatch(setGenderPsychologist(data.gender))
+
         dispatch(setApplicationStage('request'))
     }
 

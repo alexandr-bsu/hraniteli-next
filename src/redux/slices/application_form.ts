@@ -10,15 +10,13 @@ export type ApplicationStage =
     | 'request'
     | 'condition'
     | 'traumatic'
-    | 'psycho'
-    | 'action'
-    | 'diseases'
     | 'diseases_psychologist'
-    | 'psychologist'
     | 'promocode'
     | 'phone'
     | 'gratitude'
-    | 'error';
+    | 'error'
+    | 'emergency'
+    | 'psychologist';
 
 interface ApplicationFormState {
     application_stage: ApplicationStage;

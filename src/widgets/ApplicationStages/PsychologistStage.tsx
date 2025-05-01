@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setApplicationStage } from '@/redux/slices/application_form';
 import { setIndexPhyc, setHasMatchingError, setSelectedSlots, setSelectedSlotsObjects } from '@/redux/slices/application_form_data';
-import { getPsychologistAll } from '@/features/actions/getPsychologistAll';
+import { getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
+import { IPsychologist } from '@/shared/types/psychologist.types';
 import Image from 'next/image';
 import { COLORS } from '@/shared/constants/colors';
 import Link from 'next/link';
@@ -150,9 +151,24 @@ export const PsychologistStage = () => {
 
       setIsLoading(true);
       try {
-        const data = await getPsychologistAll();
-        if (data?.length) {
-          dispatch(fill_filtered_by_automatch_psy(data));
+        // Получаем полные данные психологов
+        const { items: fullPsychologists } = await getFilteredPsychologists();
+
+        // Мерджим с текущими психологами из стора, приоритет отдаем слотам из стора
+        const mergedPsychologists = fullPsychologists.map((fullPsy: IPsychologist) => {
+          const existingPsy = filtered_by_automatch_psy.find(p => p.name === fullPsy.name);
+          if (existingPsy) {
+            return {
+              ...fullPsy,
+              schedule: existingPsy.schedule || fullPsy.schedule,
+              slots: existingPsy.slots || fullPsy.slots
+            };
+          }
+          return fullPsy;
+        });
+
+        if (mergedPsychologists?.length) {
+          dispatch(fill_filtered_by_automatch_psy(mergedPsychologists));
           dispatch(setHasMatchingError(false));
         } else {
           dispatch(setHasMatchingError(true));
@@ -420,6 +436,8 @@ export const PsychologistStage = () => {
 
   const remainingPsychologists = filtered_by_automatch_psy.length - (currentIndex + 1);
 
+  console.log('currentPsychologist', currentPsychologist);
+
   return (
     <div className="flex flex-col w-full pr-[50px] pl-[50px] pb-[50px] pt-[30px] max-lg:p-[20px] h-full relative">
       {isSubmitting && (
@@ -432,26 +450,28 @@ export const PsychologistStage = () => {
       )}
 
       <div className="flex flex-col h-full">
-        <div className="flex justify-between items-center mb-[20px] max-lg:flex-col max-lg:gap-[15px] min-h-[50px] max-lg:min-h-[80px]">
-          {currentIndex > 0 && (
-            <button
-              onClick={handlePrevious}
-              className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]"
-            >
-              <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
-              <span>Предыдущий психолог</span>
-            </button>
-          )}
-          {currentIndex < filtered_by_automatch_psy.length - 1 && remainingPsychologists > 0 && (
-            <button
-              onClick={handleNext}
-              className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ml-auto"
-            >
-              <span>Показать еще {remainingPsychologists} {getPsychologistDeclension(remainingPsychologists)}</span>
-              <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
-            </button>
-          )}
-        </div>
+        {filtered_by_automatch_psy.length > 1 && (
+          <div className="flex justify-between items-center mb-[20px] max-lg:flex-col max-lg:gap-[15px] min-h-[50px] max-lg:min-h-[80px]">
+            {currentIndex > 0 && (
+              <button
+                onClick={handlePrevious}
+                className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]"
+              >
+                <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
+                <span>Предыдущий психолог</span>
+              </button>
+            )}
+            {currentIndex < filtered_by_automatch_psy.length - 1 && remainingPsychologists > 0 && (
+              <button
+                onClick={handleNext}
+                className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ml-auto"
+              >
+                <span>Показать еще {remainingPsychologists} {getPsychologistDeclension(remainingPsychologists)}</span>
+                <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
+              </button>
+            )}
+          </div>
+        )}
 
         <div className="flex flex-col grow p-[25px] max-lg:p-[15px] mb-[30px] max-lg:mb-[20px] border-[1px] rounded-[25px] overflow-y-auto max-h-[calc(100vh-400px)] min-lg:max-h-[400px] scrollContainer">
           <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-lg:flex-col max-lg:gap-[15px]">
@@ -464,9 +484,10 @@ export const PsychologistStage = () => {
                   height={80}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    if (target.src !== '/images/default-avatar.png') {
-                      target.src = '/images/default-avatar.png';
+                    const img = e.target as HTMLImageElement;
+                    const defaultSrc = '/images/default-avatar.png';
+                    if (img.src !== defaultSrc) {
+                      img.src = defaultSrc;
                     }
                   }}
                   priority
@@ -475,7 +496,7 @@ export const PsychologistStage = () => {
               <div>
                 <h3 className="text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] font-semibold">
                   {currentPsychologist?.name}
-                  {currentPsychologist?.age && `, ${currentPsychologist.age} лет`}
+                  {currentPsychologist?.age && currentPsychologist.age !== 0 && `, ${currentPsychologist.age} лет`}
                 </h3>
                 <span className="text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#9A9A9A]">
                   {currentPsychologist?.experience && (
@@ -525,8 +546,8 @@ export const PsychologistStage = () => {
                     key={index}
                     onClick={() => handleSlotSelect(slot)}
                     className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] cursor-pointer ${selectedSlot?.date === slot.date && selectedSlot?.time === slot.time
-                        ? 'bg-[#116466] text-white border-[#116466]'
-                        : 'border-[#D4D4D4] text-[#116466] hover:bg-[#116466] hover:text-white hover:border-[#116466]'
+                      ? 'bg-[#116466] text-white border-[#116466]'
+                      : 'border-[#D4D4D4] text-[#116466] hover:bg-[#116466] hover:text-white hover:border-[#116466]'
                       }`}
                   >
                     {`${slot.date.split('.').slice(0, 2).join('.')} / ${slot.time}`}

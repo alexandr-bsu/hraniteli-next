@@ -2,7 +2,7 @@
 import { Checkbox } from '@/components/ui/checkbox';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { setApplicationStage } from '@/redux/slices/application_form';
-import { setActions, setHasMatchingError } from '@/redux/slices/application_form_data';
+import { setConditions, setHasMatchingError } from '@/redux/slices/application_form_data';
 import { useDispatch, useSelector } from 'react-redux';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect } from 'react';
@@ -11,6 +11,8 @@ import * as z from 'zod';
 import { COLORS } from '@/shared/constants/colors';
 import { findByConditions } from '@/redux/slices/filter';
 import { RootState } from '@/redux/store';
+import { submitQuestionnaire, getFilteredPsychologists } from "@/features/actions/getPsychologistSchedule"
+import { fill_filtered_by_automatch_psy } from "@/redux/slices/filter"
 
 const CONDITIONS = [
     {
@@ -67,6 +69,7 @@ type FormData = z.infer<typeof FormSchema>;
 
 export const ConditionStage = () => {
     const dispatch = useDispatch();
+    const formData = useSelector((state: RootState) => state.applicationFormData);
     const filtered_persons = useSelector((state: RootState) => state.filter.filtered_by_automatch_psy);
     const hasError = useSelector((state: RootState) => state.applicationFormData.has_matching_error);
 
@@ -98,7 +101,7 @@ export const ConditionStage = () => {
     }, [form.watch]);
     
 
-    const handleSubmit = (data: FormData) => {
+    const handleSubmit = async (data: FormData) => {
         const selectedConditions = data.condition
           .reduce<string[]>((acc, conditionId) => {
             const condition = CONDITIONS.find(item => item.id === conditionId);
@@ -111,8 +114,9 @@ export const ConditionStage = () => {
         // Сохраняем только в localStorage
         localStorage.setItem('app_conditions', JSON.stringify(selectedConditions));
 
-        // Сначала проверяем подходящих психологов
-        dispatch(findByConditions(selectedConditions));
+        // Сохраняем в Redux
+        dispatch(setConditions(selectedConditions));
+
         dispatch(setApplicationStage('traumatic'));
     };
 

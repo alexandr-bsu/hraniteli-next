@@ -21,6 +21,8 @@ export interface IApplicationFormData {
   index_phyc: number;
   has_matching_error: boolean;
   matching_attempts: number;
+  traumatic?: string[];
+  conditions?: string[];
 }
 
 // Состояние формы заявки в Redux

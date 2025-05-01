@@ -1,48 +1,51 @@
 import { useDispatch, useSelector } from 'react-redux';
 import { setApplicationStage } from '@/redux/slices/application_form';
-import { resetMatchingAttempts } from '@/redux/slices/application_form_data';
+import { setHasMatchingError } from '@/redux/slices/application_form_data';
 import { COLORS } from '@/shared/constants/colors';
 import { useEffect, useState } from 'react';
 import { EmergencyContacts } from './EmergencyContacts';
 import { RootState } from '@/redux/store';
 
 interface NoMatchErrorProps {
-    onClose: () => void;
+    onClose?: () => void;
 }
 
 export const NoMatchError = ({ onClose }: NoMatchErrorProps) => {
     const dispatch = useDispatch();
     const [showEmergency, setShowEmergency] = useState(false);
-    const matchingAttempts = useSelector((state: RootState) => state.applicationFormData.matching_attempts);
+    const [matchingAttempts, setMatchingAttempts] = useState(0);
+
+    useEffect(() => {
+        const attempts = Number(localStorage.getItem('matching_attempts') || '0');
+        setMatchingAttempts(attempts);
+    }, []);
 
     useEffect(() => {
         // Если 3 попытки - показываем экстренные контакты
-        if (matchingAttempts >= 3) {
+        if (matchingAttempts >= 5) {
             setShowEmergency(true);
         }
     }, [matchingAttempts]);
 
     const handleChangeGender = () => {
-        dispatch(resetMatchingAttempts());
+        dispatch(setHasMatchingError(false));
         dispatch(setApplicationStage('gender_psychologist'));
-        onClose();
     };
 
     const handleChangeConditions = () => {
-        dispatch(resetMatchingAttempts());
+        dispatch(setHasMatchingError(false));
         dispatch(setApplicationStage('condition'));
-        onClose();
     };
 
     const handleChangeTraumatic = () => {
-        dispatch(resetMatchingAttempts());
+        dispatch(setHasMatchingError(false));
         dispatch(setApplicationStage('traumatic'));
-        onClose();
     };
 
     const handleEmergencyClose = () => {
-        dispatch(resetMatchingAttempts());
-        onClose();
+        localStorage.setItem('matching_attempts', '0');
+        dispatch(setHasMatchingError(false));
+        if (onClose) onClose();
     };
 
     if (showEmergency) {

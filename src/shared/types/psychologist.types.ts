@@ -1,9 +1,20 @@
 export interface ISlot {
   id: string;
   psychologist: string;
-  text: string;
-  time: string;
   date: string;
+  time: string;
+  state: string;
+  ticket: string | null;
+  client_id: string | null;
+  meeting_link: string | null;
+  meeting_id: string | null;
+  calendar_meeting_id: string | null;
+  confirmed: boolean;
+  auto_assigned: boolean;
+  auto_canceled: boolean;
+  is_helpful_hand: boolean | null;
+  "Дата Локальная": string;
+  "Время Локальное": string;
 }
 
 export interface IScheduleDay {
@@ -46,7 +57,7 @@ export interface IPsychologist {
   available_times?: string[];
   price?: number;
   is_video?: boolean;
-  telegram_id?: string;
+  telegram_id?: string | null;
   link_photo?: string;
   queries?: string;
   short_description?: string;
@@ -64,6 +75,23 @@ export interface IPsychologist {
   verified?: boolean;
   is_verified?: boolean;
   in_community?: boolean;
+  internal_number?: string;
+  allow_assignment?: boolean;
+  min_client_age?: number;
+  max_client_age?: number;
+  anketa_name?: string;
+  client_sex?: string;
+  number_of_clients_provided?: number;
+  debt?: number;
+  send_feedback?: boolean;
+  send_payment_link?: boolean;
+  subscription_payment_month?: string | null;
+  psychologist_contact?: string | null;
+  all_with_price?: boolean;
+  first_free?: boolean;
+  help_hand?: boolean;
+  personal_therapy_type?: string | null;
+  is_onboarding_finished?: boolean;
   schedule?: {
     days: {
       date: string;

@@ -19,8 +19,7 @@ const initialState: IApplicationFormData = {
   selected_slots: [],
   selected_slots_objects: [],
   index_phyc: 0,
-  has_matching_error: false,
-  matching_attempts: 0
+  has_matching_error: false
 };
 
 export const applicationFormDataSlice = createSlice({
@@ -77,12 +76,6 @@ export const applicationFormDataSlice = createSlice({
     },
     setHasMatchingError: (state, action: PayloadAction<boolean>) => {
       state.has_matching_error = action.payload;
-      if (action.payload) {
-        state.matching_attempts += 1;
-      }
-    },
-    resetMatchingAttempts: (state) => {
-      state.matching_attempts = 0;
     },
     setIndexPhyc: (state, action: PayloadAction<number>) => {
       state.index_phyc = action.payload;
@@ -108,7 +101,6 @@ export const {
   setSelectedSlots,
   setSelectedSlotsObjects,
   setHasMatchingError,
-  resetMatchingAttempts,
   setIndexPhyc
 } = applicationFormDataSlice.actions;
 

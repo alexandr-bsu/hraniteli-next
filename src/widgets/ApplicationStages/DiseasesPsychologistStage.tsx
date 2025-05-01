@@ -88,14 +88,6 @@ export const DiseasesPsychologistStage = () => {
         }
 
         dispatch(setDiseases(result))
-        
-        // Проверяем есть ли подходящие психологи
-        if (filtered_persons.length === 0) {
-            dispatch(setHasMatchingError(true))
-            setShowNoMatch(true)
-            return
-        }
-
         dispatch(setHasMatchingError(false))
         dispatch(setApplicationStage('promocode'))
     }
