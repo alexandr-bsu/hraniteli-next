@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setApplicationStage } from '@/redux/slices/application_form';
 import { setIndexPhyc, setHasMatchingError, setSelectedSlots, setSelectedSlotsObjects } from '@/redux/slices/application_form_data';
-import { IPsychologist } from '@/shared/types/psychologist.types';
-import { Button } from '@/shared/ui/Button';
 import { getPsychologistAll } from '@/features/actions/getPsychologistAll';
 import Image from 'next/image';
 import { COLORS } from '@/shared/constants/colors';
@@ -37,12 +35,17 @@ interface Slot {
   "Время Локальное": string;
 }
 
-interface DaySlots {
-  [time: string]: Slot;
+interface TimeSlot {
+  state: string;
+  [key: string]: any;
+}
+
+interface DaySchedule {
+  [time: string]: TimeSlot;
 }
 
 interface Schedule {
-  [date: string]: DaySlots;
+  [date: string]: DaySchedule;
 }
 
 interface ScheduleDay {
@@ -54,54 +57,89 @@ interface ScheduleDay {
   pretty_date: string;
 }
 
+interface SimpleSlot {
+  date: string;
+  time: string;
+}
+
 const getGoogleDriveImageUrl = (url: string | undefined) => {
-    if (!url) return '/images/default-avatar.png';
-    
-    // Если это cdnvideo.ru, возвращаем как есть
-    if (url.includes('cdnvideo.ru')) return url;
-    
-    // Убираем @ в начале ссылки если есть
-    const cleanUrl = url.startsWith('@') ? url.slice(1) : url;
-    
-    // Если это не гугл драйв ссылка - возвращаем как есть
-    if (!cleanUrl.includes('drive.google.com')) return cleanUrl;
-    
-    // Если ссылка уже в нужном формате - возвращаем как есть
-    if (cleanUrl.includes('/uc?')) return cleanUrl;
-    
-    // Извлекаем ID файла из разных форматов ссылок
-    let fileId = '';
-    if (cleanUrl.includes('/d/')) {
-        fileId = cleanUrl.match(/\/d\/(.+?)(?:\/|$)/)?.[1] || '';
-    } else if (cleanUrl.includes('id=')) {
-        fileId = cleanUrl.match(/id=(.+?)(?:&|$)/)?.[1] || '';
-    } else if (cleanUrl.includes('/file/d/')) {
-        fileId = cleanUrl.match(/\/file\/d\/([^/]+)/)?.[1] || '';
-    }
-    
-    if (!fileId) return '/images/default-avatar.png';
-    
-    return `https://drive.google.com/uc?export=view&id=${fileId}`;
+  if (!url) return '/images/default-avatar.png';
+
+  // Если это cdnvideo.ru, возвращаем как есть
+  if (url.includes('cdnvideo.ru')) return url;
+
+  // Убираем @ в начале ссылки если есть
+  const cleanUrl = url.startsWith('@') ? url.slice(1) : url;
+
+  // Если это не гугл драйв ссылка - возвращаем как есть
+  if (!cleanUrl.includes('drive.google.com')) return cleanUrl;
+
+  // Если ссылка уже в нужном формате - возвращаем как есть
+  if (cleanUrl.includes('/uc?')) return cleanUrl;
+
+  // Извлекаем ID файла из разных форматов ссылок
+  let fileId = '';
+  if (cleanUrl.includes('/d/')) {
+    fileId = cleanUrl.match(/\/d\/(.+?)(?:\/|$)/)?.[1] || '';
+  } else if (cleanUrl.includes('id=')) {
+    fileId = cleanUrl.match(/id=(.+?)(?:&|$)/)?.[1] || '';
+  } else if (cleanUrl.includes('/file/d/')) {
+    fileId = cleanUrl.match(/\/file\/d\/([^/]+)/)?.[1] || '';
+  }
+
+  if (!fileId) return '/images/default-avatar.png';
+
+  return `https://drive.google.com/uc?export=view&id=${fileId}`;
+};
+
+const getPsychologistDeclension = (count: number): string => {
+  const lastDigit = count % 10;
+  const lastTwoDigits = count % 100;
+
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
+    return 'психологов';
+  }
+
+  if (lastDigit === 1) {
+    return 'психолога';
+  }
+
+  if (lastDigit >= 2 && lastDigit <= 4) {
+    return 'психолога';
+  }
+
+  return 'психологов';
 };
 
 export const PsychologistStage = () => {
   const dispatch = useDispatch();
-  const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<SimpleSlot | null>(null);
   const [showNoMatch, setShowNoMatch] = useState(false);
   const [showEmergency, setShowEmergency] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [availableDays, setAvailableDays] = useState<ScheduleDay[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [availableSlots, setAvailableSlots] = useState<Slot[]>([]);
+  const [availableSlots, setAvailableSlots] = useState<SimpleSlot[]>([]);
 
   const filtered_by_automatch_psy = useSelector<RootState, any[]>(
     state => state.filter.filtered_by_automatch_psy
   );
   const currentIndex = useSelector((state: RootState) => state.applicationFormData.index_phyc);
-  const filters = useSelector((state: RootState) => state.filter);
-  const hasError = useSelector((state: RootState) => state.applicationFormData.has_matching_error);
-  const formData = useSelector((state: RootState) => state.applicationFormData);
+
+  const convertToLocalTime = (mskTime: string) => {
+    const timeDiff = getTimeDifference();
+    const [hours, minutes] = mskTime.split(':').map(Number);
+    const localHours = (hours + timeDiff + 24) % 24;
+    return `${String(localHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  };
+
+  const convertToMskTime = (localTime: string) => {
+    const timeDiff = getTimeDifference();
+    const [hours, minutes] = localTime.split(':').map(Number);
+    const mskHours = (hours - timeDiff + 24) % 24;
+    return `${String(mskHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     const fetchPsychologists = async () => {
@@ -145,28 +183,59 @@ export const PsychologistStage = () => {
   }, [filtered_by_automatch_psy.length, retryCount, isLoading]);
 
   useEffect(() => {
-    const loadSlots = (schedule: { [date: string]: { [time: string]: Slot } } | null) => {
-      if (!schedule) {
-        setAvailableSlots([]);
-        return;
-      }
+    const loadSlots = async () => {
+      try {
+        const currentPsychologist = filtered_by_automatch_psy[currentIndex];
+        if (!currentPsychologist?.schedule) {
+          console.log('Нет расписания');
+          setAvailableSlots([]);
+          return;
+        }
 
-      const slots: Slot[] = [];
-      
-      Object.entries(schedule).forEach(([date, daySlots]) => {
-        Object.entries(daySlots).forEach(([time, slot]) => {
-          if (slot && slot.state === 'Свободен') {
-            slots.push(slot);
+        const slots: SimpleSlot[] = [];
+        const schedule = currentPsychologist.schedule as Schedule;
+
+        console.log('Расписание психолога:', schedule);
+
+        // Обрабатываем расписание как объект с датами
+        Object.entries(schedule).forEach(([date, timeSlots]) => {
+          console.log('Дата:', date, 'Слоты:', timeSlots);
+
+          // Проверяем что есть слоты на эту дату
+          if (Object.keys(timeSlots).length > 0) {
+            Object.entries(timeSlots).forEach(([time, slot]) => {
+              console.log('Время:', time, 'Слот:', slot);
+              if (slot.state === 'Свободен') {
+                // Используем МСК время и конвертируем его в локальное
+                const localTime = convertToLocalTime(time);
+                slots.push({
+                  date: date,
+                  time: localTime
+                });
+              }
+            });
           }
         });
-      });
 
-      setAvailableSlots(slots);
+        console.log('Найденные слоты перед сортировкой:', slots);
+
+        // Сортируем слоты по дате и времени
+        const sortedSlots = slots.sort((a, b) => {
+          const dateA = new Date(a.date.split('.').reverse().join('-') + ' ' + a.time);
+          const dateB = new Date(b.date.split('.').reverse().join('-') + ' ' + b.time);
+          return dateA.getTime() - dateB.getTime();
+        });
+
+        console.log('Отсортированные слоты:', sortedSlots);
+        setAvailableSlots(sortedSlots);
+
+      } catch (error) {
+        console.error('Error loading slots:', error);
+        setAvailableSlots([]);
+      }
     };
 
-    if (filtered_by_automatch_psy[currentIndex]?.schedule) {
-      loadSlots(filtered_by_automatch_psy[currentIndex].schedule);
-    }
+    loadSlots();
   }, [currentIndex, filtered_by_automatch_psy]);
 
   const currentPsychologist = filtered_by_automatch_psy[currentIndex];
@@ -216,49 +285,59 @@ export const PsychologistStage = () => {
     if (selectedSlot) {
       setIsSubmitting(true);
       try {
-        // Форматируем дату из YYYY-MM-DD в DD.M
-        const dateObj = new Date(selectedSlot.date);
-        const day = dateObj.getDate();
-        const month = dateObj.getMonth() + 1;
-        const formattedSlot = `${day}.${month} ${selectedSlot.time}`;
+        // Форматируем дату из DD.MM в DD.M
+        const [day, month] = selectedSlot.date.split('.');
+        const formattedDate = `${parseInt(day)}.${parseInt(month)}`;
+
+        // Конвертируем время обратно в МСК для отправки
+        const mskTime = convertToMskTime(selectedSlot.time);
+        const formattedSlot = `${formattedDate} ${mskTime}`;
+
+        // Получаем запросы из localStorage
+        const storedRequests = localStorage.getItem('app_requests') ?
+          JSON.parse(localStorage.getItem('app_requests') || '[]') : [];
 
         const requestData = {
           anxieties: [],
-          questions: formData.requests,
+          questions: storedRequests,
           customQuestion: [],
-          diagnoses: formData.diseases,
+          diagnoses: localStorage.getItem('app_diseases') ?
+            JSON.parse(localStorage.getItem('app_diseases') || '[]') : [],
           diagnoseInfo: "",
-          diagnoseMedicaments: localStorage.getItem('app_diseases_psychologist') ? 
-            JSON.parse(localStorage.getItem('app_diseases_psychologist') || '{}').medications : 'no',
-          traumaticEvents: formData.actions,
-          clientStates: formData.actions,
+          diagnoseMedicaments: localStorage.getItem('app_diseases_psychologist') ?
+            JSON.parse(localStorage.getItem('app_diseases_psychologist') || '{}').medications : '',
+          traumaticEvents: localStorage.getItem('app_traumatic') ?
+            JSON.parse(localStorage.getItem('app_traumatic') || '[]') : [],
+          clientStates: localStorage.getItem('app_conditions') ?
+            JSON.parse(localStorage.getItem('app_conditions') || '[]') : [],
           selectedPsychologistsNames: [currentPsychologist?.name],
           shownPsychologists: currentPsychologist?.name || "",
           lastExperience: "",
           amountExpectations: "",
-          age: formData.age,
+          age: localStorage.getItem('app_age') || '',
           slots: [formattedSlot],
-          slots_objects: [selectedSlot.id],
+          slots_objects: [],
           contactType: "Phone",
-          contact: formData.phone,
-          name: formData.username,
-          promocode: formData.promocode,
-          ticket_id: formData.ticketID,
+          contact: localStorage.getItem('app_phone') || '',
+          name: localStorage.getItem('app_username') || '',
+          promocode: localStorage.getItem('app_promocode') || '',
+          ticket_id: localStorage.getItem('app_ticket_id') || '',
           emptySlots: false,
           userTimeZone: "МСК",
           bid: 0,
           rid: 0,
           categoryType: "",
           customCategory: "",
-          question_to_psychologist: formData.requests.join('; '),
+          question_to_psychologist: storedRequests.join('; '),
           filtered_by_automatch_psy_names: [currentPsychologist?.name],
           _queries: "",
           customTraumaticEvent: "",
           customState: "",
           formPsyClientInfo: {
-            age: formData.age,
+            age: localStorage.getItem('app_age') || '',
             city: "",
-            sex: formData.gender_user === 'male' ? 'Мужской' : 'Женский',
+            sex: localStorage.getItem('app_gender') === 'male' ? 'Мужской' :
+              localStorage.getItem('app_gender') === 'female' ? 'Женский' : '',
             psychoEducated: "",
             anxieties: [],
             customAnexiety: "",
@@ -266,20 +345,21 @@ export const PsychologistStage = () => {
             meetType: "",
             selectionСriteria: "",
             custmCreteria: "",
-            importancePsycho: formData.preferences,
-            customImportance: formData.custom_preferences,
+            importancePsycho: localStorage.getItem('app_preferences') ?
+              JSON.parse(localStorage.getItem('app_preferences') || '[]') : [],
+            customImportance: localStorage.getItem('app_custom_preferences') || '',
             agePsycho: "",
-            sexPsycho: formData.gender_psychologist === 'male' ? 'Мужчина' : 
-                      formData.gender_psychologist === 'female' ? 'Женщина' : 'Не имеет значения',
+            sexPsycho: localStorage.getItem('app_gender_psychologist') === 'male' ? 'Мужчина' :
+              localStorage.getItem('app_gender_psychologist') === 'female' ? 'Женщина' : 'Не имеет значения',
             priceLastSession: "",
             durationSession: "",
             reasonCancel: "",
             pricePsycho: "",
             reasonNonApplication: "",
             contactType: "Phone",
-            contact: formData.phone,
-            name: formData.username,
-            is_adult: parseInt(formData.age) >= 18,
+            contact: localStorage.getItem('app_phone') || '',
+            name: localStorage.getItem('app_username') || '',
+            is_adult: parseInt(localStorage.getItem('app_age') || '0') >= 18,
             is_last_page: true,
             occupation: ""
           }
@@ -292,7 +372,7 @@ export const PsychologistStage = () => {
 
         if (response.status === 200) {
           dispatch(setSelectedSlots([formattedSlot]));
-          dispatch(setSelectedSlotsObjects([selectedSlot.id]));
+          dispatch(setSelectedSlotsObjects([]));
           dispatch(setApplicationStage('gratitude'));
         } else {
           throw new Error('Ошибка при отправке заявки');
@@ -306,7 +386,9 @@ export const PsychologistStage = () => {
     }
   };
 
-  const handleSlotSelect = (slot: Slot) => {
+  const handleSlotSelect = (slot: SimpleSlot) => {
+    // Время уже в локальном формате, не нужно конвертировать
+    console.log('Выбранный слот:', slot);
     setSelectedSlot(slot);
   };
 
@@ -365,7 +447,7 @@ export const PsychologistStage = () => {
               onClick={handleNext}
               className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ml-auto"
             >
-              <span>Показать еще {remainingPsychologists} психологов</span>
+              <span>Показать еще {remainingPsychologists} {getPsychologistDeclension(remainingPsychologists)}</span>
               <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
             </button>
           )}
@@ -435,30 +517,27 @@ export const PsychologistStage = () => {
           </div>
 
           <div className={styles.nextSession}>
-            <div className="mt-[30px]">
-              <h4 className="text-[18px] font-semibold mb-[15px]">Ближайшая запись:</h4>
-              {availableSlots.length > 0 ? (
-                <div className="flex gap-[10px] flex-wrap">
-                  {availableSlots.map((slot, index) => (
-                    <button 
-                      key={index} 
-                      onClick={() => handleSlotSelect(slot)}
-                      className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] cursor-pointer ${
-                        selectedSlot?.id === slot.id
-                          ? 'bg-[#116466] text-white border-[#116466]'
-                          : 'border-[#D4D4D4] text-[#116466] hover:bg-[#116466] hover:text-white hover:border-[#116466]'
+            <h4 className="text-[18px] font-semibold mb-[15px]">Ближайшая запись:</h4>
+            {availableSlots && availableSlots.length > 0 ? (
+              <div className="flex gap-[10px] flex-wrap">
+                {availableSlots.map((slot, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSlotSelect(slot)}
+                    className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] cursor-pointer ${selectedSlot?.date === slot.date && selectedSlot?.time === slot.time
+                        ? 'bg-[#116466] text-white border-[#116466]'
+                        : 'border-[#D4D4D4] text-[#116466] hover:bg-[#116466] hover:text-white hover:border-[#116466]'
                       }`}
-                    >
-                      {`${slot.date.split('-').reverse().slice(0, 2).join('.')} / ${slot.time}`}
-                    </button>
-                  ))}
-                </div>
-              ) : (
-                <div className="mt-[20px] p-[15px] bg-[#F5F5F5] rounded-[10px] text-[16px] text-center">
-                  У психолога пока нет свободного времени для записи
-                </div>
-              )}
-            </div>
+                  >
+                    {`${slot.date.split('.').slice(0, 2).join('.')} / ${slot.time}`}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-[20px] p-[15px] bg-[#F5F5F5] rounded-[10px] text-[16px] text-center">
+                У психолога пока нет свободного времени для записи
+              </div>
+            )}
           </div>
         </div>
 

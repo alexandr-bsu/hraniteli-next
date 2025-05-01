@@ -13,6 +13,7 @@ import { RootState } from '@/redux/store';
 import { redirect } from 'next/navigation';
 import PhoneInput from '@/components/phoneimput';
 import { getPsychologistAll } from '@/features/actions/getPsychologistAll';
+import Link from 'next/link';
 
 interface ContactStageProps {
     callback: () => void;
@@ -196,6 +197,7 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
     const [telephone, setTelephone] = useState('');
     const [psychologistData, setPsychologistData] = useState<IPsychologist | null>(null);
     const [isPhoneValid, setIsPhoneValid] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     
     const dispatch = useDispatch();
     
@@ -204,6 +206,9 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
     const requests = useSelector((state: RootState) => state.filter.requests) as IPsychologist[];
     const hasMentalIllness = useSelector((state: RootState) => state.filter.mental_illness);
     const selectedPsychologist = useSelector((state: RootState) => state.modal.selectedPsychologist) as string;
+    const applicationFormData = useSelector((state: RootState) => state.applicationFormData);
+    const selectedSlots = useSelector((state: RootState) => state.modal.selectedSlots);
+    const filters = useSelector((state: RootState) => state.filter);
 
     useEffect(() => {
         const loadPsychologistData = async () => {
@@ -271,7 +276,8 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
         formPsyClientInfo: {
             age: localStorage.getItem('app_age') || '',
             city: '',
-            sex: localStorage.getItem('app_gender') || '',
+            sex: applicationFormData.gender_user === 'male' ? 'Мужской' : 
+                 applicationFormData.gender_user === 'female' ? 'Женский' : '',
             psychoEducated: '',
             anxieties: [],
             customAnexiety: '',
@@ -282,7 +288,8 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
             importancePsycho: [],
             customImportance: '',
             agePsycho: '',
-            sexPsycho: 'Не имеет значения',
+            sexPsycho: applicationFormData.gender_psychologist === 'male' ? 'Мужчина' :
+                       applicationFormData.gender_psychologist === 'female' ? 'Женщина' : 'Не имеет значения',
             priceLastSession: '',
             durationSession: '',
             reasonCancel: '',
@@ -305,15 +312,39 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
         utm_psy: undefined
     });
 
+    const separateRequests = (requests: string[]) => {
+        const traumatic: string[] = [];
+        const states: string[] = [];
+
+        requests.forEach(request => {
+            if (TRAUMATIC_EVENTS.includes(request)) {
+                traumatic.push(request);
+            } else {
+                states.push(request);
+            }
+        });
+
+        return { traumatic, states };
+    };
+
     const onSubmit = async () => {
         if (!isPhoneValid) return;
 
-        const timeDifference = getTimeDifference();
-        const ticketId = makeTicketId(7);
-        const formData = getInitialFormData(ticketId, timeDifference);
-
+        setIsSubmitting(true);
         try {
-            await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka-test-contur', formData);
+            const { traumatic, states } = separateRequests(filters.requests?.map(r => r.toString()) || []);
+            const timeDifference = getTimeDifference();
+
+            const requestData = {
+                ...getInitialFormData('', timeDifference),
+                traumaticEvents: [...(applicationFormData.actions || []), ...traumatic],
+                clientStates: [...(applicationFormData.actions || []), ...states],
+            };
+
+            const ticketId = makeTicketId(7);
+            const initialFormData = getInitialFormData(ticketId, timeDifference);
+
+            await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka-test-contur', requestData);
             window.location.href = `https://t.me/hraniteli_client_test_bot?start=${ticketId}`;
         } catch (error) {
             console.error('Error submitting form:', error);
@@ -424,7 +455,7 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
                 <span className='font-normal text-[14px] text-[#151515] max-md:text-[10px]'>
                     Нажимая на «Перейти в телеграм бот», я соглашаюсь с условиями{' '}
                     <span className='text-[#116466]'>
-                        обработки персональных данных, пользовательского соглашения и Оферты
+                        <Link href="https://hrani.live/agreement" target="_blank" className="hover:underline">обработки персональных данных</Link>, пользовательского соглашения и Оферты
                     </span>
                 </span>
             </DialogFooter>

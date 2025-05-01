@@ -55,7 +55,7 @@ export const NoMatchError = ({ onClose }: NoMatchErrorProps) => {
                 К сожалению, мы не смогли подобрать психолога по вашим критериям
             </h2>
             
-            <p className="text-[18px] mb-[30px]">
+            <p className="text-[18px] mb-[30px] text-[#737373]">
                 Рекомендуем изменить ответы в следующих разделах:
             </p>
 
@@ -82,12 +82,12 @@ export const NoMatchError = ({ onClose }: NoMatchErrorProps) => {
                 </button>
             </div>
 
-            <div className="mt-auto pt-[30px]">
+            <div className="shrink-0 max-lg:pb-[30px] flex gap-[10px] mt-auto mb-[20px]">
                 <button
                     onClick={onClose}
-                    className={`w-full border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] rounded-[50px]`}
+                    className="cursor-pointer grow border-[1px] bg-[#116466] p-[12px] text-[white] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px]"
                 >
-                    Закрыть
+                    Продолжить
                 </button>
             </div>
         </div>

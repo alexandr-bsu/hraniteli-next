@@ -57,13 +57,21 @@ export const TraumaticStage = () => {
     const form = useForm<FormData>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            traumatic: savedTraumatic
+            traumatic: savedTraumatic.map((label: string) => 
+                TRAUMATIC_EVENTS.find(item => item.label === label)?.id || ''
+            ).filter((id: string) => id !== '')
         }
     });
 
     useEffect(() => {
         const subscription = form.watch((value) => {
-            localStorage.setItem('app_traumatic', JSON.stringify(value.traumatic || []));
+            // Преобразуем ID в label'ы перед сохранением
+            const labels = value.traumatic?.map(id => {
+                const event = TRAUMATIC_EVENTS.find(item => item.id === id);
+                return event?.label || '';
+            }).filter(label => label !== '') || [];
+            
+            localStorage.setItem('app_traumatic', JSON.stringify(labels));
         });
         return () => subscription.unsubscribe();
     }, [form.watch]);
@@ -78,10 +86,11 @@ export const TraumaticStage = () => {
                 return acc;
             }, []);
 
+        // Сохраняем только в localStorage
+        localStorage.setItem('app_traumatic', JSON.stringify(selectedEvents));
+        
         // Сначала проверяем подходящих психологов
         dispatch(findByTraumatic(selectedEvents));
-
-        dispatch(setActions(selectedEvents));
         dispatch(setApplicationStage('diseases_psychologist'));
     };
 

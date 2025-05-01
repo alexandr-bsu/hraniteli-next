@@ -73,7 +73,7 @@ export const Filter = () => {
 
     return (
         <>
-            <div className="w-[100%] bg-[#FFFFFF] rounded-[20px] p-[20px]">
+            <div className="w-[100%] bg-[#FFFFFF] rounded-[20px] p-[20px] sticky top-[20px]">
                 <div className="max-lg:hidden w-full flex justify-between">
                     <h2 className="font-semibold text-[20px] lg:text-[20px] md:text-[16px] leading-[27px]">
                         Фильтры
@@ -261,6 +261,7 @@ export const Filter = () => {
                                 onSubmit={(times: string[]) => {
                                     dispatch(findByTime(times));
                                 }}
+                                onClose={handleModalClose}
                             />        
                         </div>
 

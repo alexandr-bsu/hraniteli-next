@@ -93,6 +93,7 @@ export const FilterDate: React.FC<FilterDateProps> = ({
         onSubmit={handleTimeSubmit}
         selectedDate={selectedDate}
         availableSlots={selectedDateItem.slots}
+        onClose={handleBackFromTime}
       />
     );
   }

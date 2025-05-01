@@ -44,11 +44,15 @@ export const TimeStage = () => {
                 response.data[0].items.forEach((item: any) => {
                     if (item.slots) {
                         const slots: Slot[] = [];
-                        Object.entries(item.slots).forEach(([hour, slotArray]: [string, any]) => {
+                        Object.entries(item.slots).forEach(([_, slotArray]: [string, any]) => {
                             if (Array.isArray(slotArray) && slotArray.length > 0) {
-                                slots.push({
-                                    date: item.pretty_date,
-                                    time: hour
+                                slotArray.forEach(slot => {
+                                    if (slot.state === 'Свободен') {
+                                        slots.push({
+                                            date: item.pretty_date,
+                                            time: slot.time
+                                        });
+                                    }
                                 });
                             }
                         });
@@ -75,22 +79,41 @@ export const TimeStage = () => {
         dispatch(setSelectedSlot(slot));
     };
 
+    const convertToLocalTime = (mskTime: string) => {
+        const [hours, minutes] = mskTime.split(':').map(Number);
+        const localHours = (hours + timeDifference + 24) % 24;
+        return `${String(localHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    };
+
+    const convertToMskTime = (localTime: string) => {
+        const [hours, minutes] = localTime.split(':').map(Number);
+        const mskHours = (hours - timeDifference + 24) % 24;
+        return `${String(mskHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+    };
+
     const handleNext = () => {
         if (selectedSlot) {
-            dispatch(setSelectedSlots([`${selectedSlot.date} ${selectedSlot.time}`]));
+            // Конвертируем обратно в МСК время перед отправкой
+            const mskSlot = {
+                ...selectedSlot,
+                time: convertToMskTime(selectedSlot.time)
+            };
+            dispatch(setSelectedSlots([`${mskSlot.date} ${mskSlot.time}`]));
             dispatch(closeModal());
             dispatch(openModal('ContactForm'));
         }
-    };
+    };    
 
-    const renderTimeZone = () => (
-        <span className="text-[18px] leading-[25px] font-normal text-[#151515] flex gap-[10px] max-lg:flex-col max-lg:text-[14px]">
-            Часовой пояс:
-            <span className="text-[#116466]">
-                МСК {timeDifference !== 0 ? timeDifference > 0 ? ' + '+timeDifference : timeDifference : ''}
+    const renderTimeZone = () => {
+        const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        const formattedTimeZone = timeZone.replace('_', '/').split('/').slice(-1)[0];
+
+        return (
+            <span className="text-[18px] leading-[25px] font-normal text-[#151515] flex gap-[10px] max-lg:flex-col max-lg:text-[14px]">
+                Часовой пояс: <span className="text-[#116466]">{formattedTimeZone} ( МСК {timeDifference > 0 ? '+' : ''}{timeDifference} )</span>
             </span>
-        </span>
-    );
+        );
+    };
 
     const renderSlots = () => {
         const dates = Object.keys(groupedSlots).sort((a, b) => {
@@ -136,18 +159,20 @@ export const TimeStage = () => {
                             </h3>
                             <div className="flex flex-wrap gap-[10px]">
                                 {groupedSlots[date].map((slot, index) => {
-                                    const isSelected = selectedSlot?.date === slot.date && selectedSlot?.time === slot.time;
+                                    const localTime = convertToLocalTime(slot.time);
+                                    const isSelected = selectedSlot?.date === slot.date && selectedSlot?.time === localTime;
+
                                     return (
                                         <button
                                             key={index}
-                                            onClick={() => handleSlotSelect(slot)}
-                                            className={`px-[15px] py-[10px] rounded-[10px] text-[16px] leading-[22px] transition-colors ${
+                                            onClick={() => handleSlotSelect({...slot, time: localTime})}
+                                            className={`px-[15px] py-[10px] rounded-[50px] cursor-pointer border-[1px] border-[#D4D4D4] text-[16px] leading-[22px] transition-colors ${
                                                 isSelected 
                                                     ? 'bg-[#116466] text-white' 
                                                     : 'bg-[#FAFAFA] hover:bg-[#116466] hover:text-white'
                                             }`}
                                         >
-                                            {slot.time}
+                                            {date} / {localTime}
                                         </button>
                                     );
                                 })}

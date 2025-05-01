@@ -77,13 +77,22 @@ export const ConditionStage = () => {
     const form = useForm<FormData>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-          condition: savedConditions
+            // Преобразуем label'ы в ID при загрузке
+            condition: savedConditions.map((label: string) => 
+                CONDITIONS.find(item => item.label === label)?.id || ''
+            ).filter((id: string) => id !== '')
         }
-      })
+    });
 
     useEffect(() => {
         const subscription = form.watch((value) => {
-            localStorage.setItem('app_conditions', JSON.stringify(value.condition || []));
+            // Преобразуем ID в label'ы перед сохранением
+            const labels = value.condition?.map(id => {
+                const condition = CONDITIONS.find(item => item.id === id);
+                return condition?.label || '';
+            }).filter(label => label !== '') || [];
+            
+            localStorage.setItem('app_conditions', JSON.stringify(labels));
         });
         return () => subscription.unsubscribe();
     }, [form.watch]);
@@ -99,10 +108,11 @@ export const ConditionStage = () => {
             return acc;
           }, []);
 
+        // Сохраняем только в localStorage
+        localStorage.setItem('app_conditions', JSON.stringify(selectedConditions));
+
         // Сначала проверяем подходящих психологов
         dispatch(findByConditions(selectedConditions));
-        
-        dispatch(setActions(selectedConditions));
         dispatch(setApplicationStage('traumatic'));
     };
 
@@ -123,7 +133,7 @@ export const ConditionStage = () => {
                                             Что из описанного ниже вы наблюдаете в своём состоянии в последнее время?
                                         </FormLabel>
                                     <FormDescription
-                                        className='max-lg:text-[14px] font-normal text-[18px] leading-[25px] text-[${COLORS.text.secondary}]'
+                                        className='text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] leading-[25px] max-lg:leading-[20px] font-normal max-lg:mt-[8px]'
                                     >
                                        Выберите все подходящие пункты или пропустите вопрос, если ничего из этого не наблюдается
                                     </FormDescription>

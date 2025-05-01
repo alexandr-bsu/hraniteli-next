@@ -204,9 +204,14 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
     };
 
     const handleSlotClick = (slot: { date: string; time: string }) => {
+        const localSlot = {
+            ...slot,
+            time: convertToLocalTime(slot.time)
+        };
+
         dispatch(setSelectedPsychologist(psychologist.name));
-        dispatch(setSelectedDate(slot.date));
-        dispatch(setSelectedSlot(slot));
+        dispatch(setSelectedDate(localSlot.date));
+        dispatch(setSelectedSlot(localSlot));
         dispatch(openModal('Time'));
     };
 
@@ -215,6 +220,13 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
             ...prev,
             [index]: !prev[index]
         }));
+    };
+
+    const convertToLocalTime = (mskTime: string) => {
+        const timeDiff = getTimeDifference();
+        const [hours, minutes] = mskTime.split(':').map(Number);
+        const localHours = (hours + timeDiff + 24) % 24;
+        return `${String(localHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
     };
 
     return (
@@ -392,7 +404,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                                     className={`${styles.dateButton} bg-[#FAFAFA] cursor-pointer hover:bg-[#116466] hover:text-white transition-colors rounded-[50px] px-[15px] py-[10px]`}
                                     onClick={() => handleSlotClick(slot)}
                                 >
-                                    {slot.date.split('.').slice(0, 2).join('.')}/{slot.time}
+                                    {slot.date.split('.').slice(0, 2).join('.')}/{convertToLocalTime(slot.time)}
                                 </button>
                             ))}
                         </div>

@@ -1,5 +1,6 @@
 import { IApplicationFormData } from '@/shared/types/application.types';
 import { IPsychologist } from '@/shared/types/psychologist.types';
+import { getTimeDifference } from '../utils';
 
 interface PsychologistScheduleRequest {
     startDate: string;
@@ -83,7 +84,7 @@ export const submitQuestionnaire = async (formData: IApplicationFormData) => {
             formPsyClientInfo: {
                 age: formData.age,
                 city: '',
-                sex: formData.gender_user === 'male' ? 'Мужской' : 'Женский',
+                sex: '',
                 psychoEducated: '',
                 anxieties: [],
                 customAnexiety: '',
@@ -94,8 +95,7 @@ export const submitQuestionnaire = async (formData: IApplicationFormData) => {
                 importancePsycho: formData.preferences,
                 customImportance: formData.custom_preferences,
                 agePsycho: '',
-                sexPsycho: formData.gender_psychologist === 'male' ? 'Мужчина' : 
-                          formData.gender_psychologist === 'female' ? 'Женщина' : 'Не имеет значения',
+                sexPsycho: '',
                 priceLastSession: '',
                 durationSession: '',
                 reasonCancel: '',
@@ -114,10 +114,9 @@ export const submitQuestionnaire = async (formData: IApplicationFormData) => {
                 customQuestion: [],
                 diagnoses: formData.diseases,
                 diagnoseInfo: '',
-                diagnoseMedicaments: localStorage.getItem('app_diseases_psychologist') ? 
-                    JSON.parse(localStorage.getItem('app_diseases_psychologist') || '{}').medications : 'no',
-                traumaticEvents: formData.actions,
-                clientStates: formData.actions,
+                diagnoseMedicaments: '',
+                traumaticEvents: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('app_traumatic') || '[]') : [],
+                clientStates: typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('app_conditions') || '[]') : [],
                 selectedPsychologistsNames: [],
                 shownPsychologists: '',
                 psychos: [],
@@ -143,7 +142,7 @@ export const submitQuestionnaire = async (formData: IApplicationFormData) => {
                 customState: ''
             },
             ticket_id: formData.ticketID,
-            userTimeOffsetMsk: 0
+            userTimeOffsetMsk: getTimeDifference()
         };
 
         const response = await fetch('https://n8n-v2.hrani.live/webhook/get-agregated-schedule-v2-test-contur', {

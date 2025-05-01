@@ -29,50 +29,60 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
     
     // Определяем отображаемый список карточек с учётом всех фильтров
     const filtered_persons = useMemo(() => {
-        let result = filter.filtered_by_automatch_psy as IPsychologist[];
+        let result = [...filter.filtered_by_automatch_psy];
         
-        // Применяем фильтр по избранным, если он активен
-        if (filter.favorites && filter.filtered_by_favorites?.length > 0) {
-            result = filter.filtered_by_favorites as IPsychologist[];
-        }
-        
-        // Применяем другие активные фильтры
+        // Применяем фильтр по полу
         if (filter.gender !== 'other' && filter.filtered_by_gender?.length > 0) {
-            result = result.filter((item: IPsychologist) => 
+            result = result.filter(item => 
                 filter.filtered_by_gender.some((f: IPsychologist) => f.id === item.id)
             );
         }
-        
-        if (filter.requests?.length > 0 && filter.filtered_by_requests?.length > 0) {
-            result = filter.filtered_by_requests;
+
+        // Применяем фильтр по избранным
+        if (filter.favorites && filter.filtered_by_favorites?.length > 0) {
+            result = result.filter(item => 
+                filter.filtered_by_favorites.some((f: IPsychologist) => f.id === item.id)
+            );
         }
         
+        // Применяем фильтр по запросам
+        if (filter.requests?.length > 0 && filter.filtered_by_requests?.length > 0) {
+            result = result.filter(item => 
+                filter.filtered_by_requests.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
+        
+        // Применяем фильтр по цене
         if (filter.price > 0 && filter.filtered_by_price?.length > 0) {
-            result = result.filter((item: IPsychologist) => 
+            result = result.filter(item => 
                 filter.filtered_by_price.some((f: IPsychologist) => f.id === item.id)
             );
         }
         
-        if (filter.time?.length > 0 && filter.filtered_by_time?.length > 0) {
-            result = result.filter((item: IPsychologist) => 
+        // Применяем фильтр по времени
+        if (filter.times?.length > 0 && filter.filtered_by_time?.length > 0) {
+            result = result.filter(item => 
                 filter.filtered_by_time.some((f: IPsychologist) => f.id === item.id)
             );
         }
         
-        if (filter.date?.length > 0 && filter.filtered_by_date?.length > 0) {
-            result = result.filter((item: IPsychologist) => 
+        // Применяем фильтр по дате
+        if (filter.dates?.length > 0 && filter.filtered_by_date?.length > 0) {
+            result = result.filter(item => 
                 filter.filtered_by_date.some((f: IPsychologist) => f.id === item.id)
             );
         }
         
+        // Применяем фильтр по видео
         if (filter.video && filter.filtered_by_video?.length > 0) {
-            result = result.filter((item: IPsychologist) => 
+            result = result.filter(item => 
                 filter.filtered_by_video.some((f: IPsychologist) => f.id === item.id)
             );
         }
         
+        // Применяем фильтр по психиатрическим заболеваниям
         if (filter.mental_illness && filter.filtered_by_mental_illness?.length > 0) {
-            result = result.filter((item: IPsychologist) => 
+            result = result.filter(item => 
                 filter.filtered_by_mental_illness.some((f: IPsychologist) => f.id === item.id)
             );
         }
@@ -91,12 +101,20 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
         filter.gender,
         filter.requests,
         filter.price,
-        filter.time,
-        filter.date,
+        filter.times,
+        filter.dates,
         filter.video,
         filter.mental_illness,
         filter.favorites
     ]);
+    
+    // Сортировка психологов по цене
+    const sortedPersons = useMemo(() => {
+        if (filter.price > 0) {
+            return [...filtered_persons].sort((a, b) => (a.min_session_price || 0) - (b.min_session_price || 0));
+        }
+        return filtered_persons;
+    }, [filtered_persons, filter.price]);
     
     // Инициализация данных
     useEffect(() => {
@@ -276,8 +294,8 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
             </aside>
             <main className="min-lg:max-w-[790px] w-full">
                 <div className="flex flex-col gap-[20px] pb-[50px]">
-                    {filtered_persons && filtered_persons.length > 0 ? (
-                        filtered_persons.map((item: IPsychologist, index: number) => (
+                    {sortedPersons && sortedPersons.length > 0 ? (
+                        sortedPersons.map((item: IPsychologist, index: number) => (
                             <Card 
                                 key={item.id} 
                                 psychologist={item} 

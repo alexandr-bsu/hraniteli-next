@@ -11,6 +11,7 @@ interface FilterTimeProps {
   onSubmit: (times: string[]) => void;
   selectedDate: string;
   availableSlots?: { [key: string]: string[] };
+  onClose: () => void;
 }
 
 export const FilterTime: React.FC<FilterTimeProps> = ({ 
@@ -19,7 +20,8 @@ export const FilterTime: React.FC<FilterTimeProps> = ({
   onBack, 
   onSubmit, 
   selectedDate,
-  availableSlots = {} 
+  availableSlots = {},
+  onClose
 }) => {
   const [selectedTimes, setSelectedTimes] = useState<string[]>([]);
 
@@ -41,14 +43,20 @@ export const FilterTime: React.FC<FilterTimeProps> = ({
   };
 
   return (
-    <ModalWindow className='max-[425px]:h-[400px]' open={open} closeButton={false} type={type}>
+    <ModalWindow 
+      className='max-[425px]:h-[400px]' 
+      open={open} 
+      closeButton={false} 
+      type={type}
+      onOpenChange={onClose}
+    >
       <DialogHeader className="flex flex-row items-center">
         <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[16px] max-lg:leading-[22px]">
           Выберите время сессии на {selectedDate}:
         </DialogTitle>
-        <DialogClose className="w-[40px] h-[40px] shrink-0 flex justify-center items-center border-2 border-[#D4D4D4] rounded-full">
+        <button onClick={onClose} className="w-[40px] h-[40px] shrink-0 flex justify-center items-center border-2 border-[#D4D4D4] rounded-full">
           <Image src={'/modal/cross.svg'} alt="cross" height={15} width={15} />
-        </DialogClose>
+        </button>
       </DialogHeader>
 
       <div className="grid grid-cols-5 gap-4 mt-6 max-lg:grid-cols-3">
