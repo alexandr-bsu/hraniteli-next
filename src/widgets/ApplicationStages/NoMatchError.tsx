@@ -84,15 +84,6 @@ export const NoMatchError = ({ onClose }: NoMatchErrorProps) => {
                     Изменить описание травмирующих событий
                 </button>
             </div>
-
-            <div className="shrink-0 max-lg:pb-[30px] flex gap-[10px] mt-auto mb-[20px]">
-                <button
-                    onClick={onClose}
-                    className="cursor-pointer grow border-[1px] bg-[#116466] p-[12px] text-[white] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px]"
-                >
-                    Продолжить
-                </button>
-            </div>
         </div>
     );
 }; 

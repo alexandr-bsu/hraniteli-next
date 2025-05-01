@@ -62,7 +62,7 @@ export const PsychologistCard = ({ psychologist, onSlotSelect, selectedSlots }: 
                   variant={isSelected ? 'primary' : 'secondary'}
                   size="sm"
                 >
-                  {slot.text}
+                  {`${slot.date} ${slot.time}`}
                 </Button>
               );
             })}

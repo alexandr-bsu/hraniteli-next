@@ -19,7 +19,8 @@ const initialState: IApplicationFormData = {
   selected_slots: [],
   selected_slots_objects: [],
   index_phyc: 0,
-  has_matching_error: false
+  has_matching_error: false,
+  matching_attempts: 0
 };
 
 export const applicationFormDataSlice = createSlice({
