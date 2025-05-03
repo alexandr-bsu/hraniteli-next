@@ -342,11 +342,27 @@
 }
 
 .nextSession {
+  overflow: hidden;
+  
   .dates {
     display: flex;
     gap: 8px;
     margin-top: 8px;
     flex-wrap: wrap;
+
+    @include tablet {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding-bottom: 5px;
+      margin-right: -20px;
+      padding-right: 20px;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
 
     @include mobile {
       gap: 6px;
@@ -361,6 +377,7 @@
     @include tablet {
       font-size: 14px;
       padding: 6px 12px;
+      white-space: nowrap;
     }
     
     @include mobile {
@@ -491,6 +508,10 @@
   font-weight: 500;
   cursor: pointer;
 
+  @include tablet {
+    font-size: 14px;
+  }
+
   &:hover {
     background: #F5F5F5;
   }
@@ -514,11 +535,10 @@
 
   @include tablet {
     font-size: 14px;
-    padding: 10px 20px;
   }
 
   @include mobile {
-    padding: 10px 20px;
+    padding: 13px 20px;
   }
 }
 

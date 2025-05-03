@@ -1,4 +1,3 @@
- 
 'use client'
 import { Checkbox } from '@/components/ui/checkbox';
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
@@ -10,10 +9,6 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { COLORS } from '@/shared/constants/colors';
-import { findByTraumatic } from '@/redux/slices/filter';
-import { RootState } from '@/redux/store';
-import { submitQuestionnaire, getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
-import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
 
 const TRAUMATIC_EVENTS = [
     {
@@ -50,9 +45,6 @@ type FormData = z.infer<typeof FormSchema>;
 
 export const TraumaticStage = () => {
     const dispatch = useDispatch();
-    const formData = useSelector((state: RootState) => state.applicationFormData);
-    const filtered_persons = useSelector((state: RootState) => state.filter.filtered_by_automatch_psy);
-    const hasError = useSelector((state: RootState) => state.applicationFormData.has_matching_error);
 
     const savedTraumatic = typeof window !== 'undefined'
         ? JSON.parse(localStorage.getItem('app_traumatic') || '[]')
@@ -100,75 +92,72 @@ export const TraumaticStage = () => {
     };
 
     return (
-        <div className='px-[50px] max-lg:px-[20px] flex w-full grow'>
+        <div className='px-[50px] max-lg:px-[20px] flex w-full grow max-lg:overflow-y-auto'>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-[30px] border-[#D4D4D4] w-full flex flex-col">
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col min-h-min mt-[30px]">
                     <FormField
                         control={form.control}
                         name="traumatic"
                         render={() => (
-                            <div className='grow h-[360px]'>
-                                <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
-                                    <FormLabel className='max-lg:text-[16px] font-semibold text-[20px] leading-[27px]'>
+                            <div className='grow'>
+                                <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px] min-lg:h-[360px] overflow-y-auto'>
+                                    <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                                         Беспокоит ли вас травмирующее событие, с которым сложно справиться самостоятельно?
                                     </FormLabel>
-                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
+                                    <FormDescription className='text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
                                         Выберите все подходящие пункты или пропустите вопрос, если ничего из этого не беспокоит
                                     </FormDescription>
-                                    <div className='flex justify-between mt-[10px] max-lg:flex-col max-h-[150px] max-lg:max-h-none overflow-hidden'>
-                                        <div className='flex flex-col gap-[10px] w-full max-h-[150px] max-lg:max-h-[200px] pb-[50px] overflow-x-auto'>
-                                            {TRAUMATIC_EVENTS.map((item) => (
-                                                <FormField
-                                                    key={item.id}
-                                                    control={form.control}
-                                                    name="traumatic"
-                                                    render={({ field }) => {
-                                                        return (
-                                                            <FormItem
-                                                                key={item.id}
-                                                                className="flex flex-row items-center space-x-3 space-y-0"
-                                                            >
-                                                                <FormControl>
-                                                                    <Checkbox
-                                                                        className='h-[30px] w-[30px]'
-                                                                        checked={field.value?.includes(item.id)}
-                                                                        onCheckedChange={(checked) => {
-                                                                            return checked
-                                                                                ? field.onChange([...field.value, item.id])
-                                                                                : field.onChange(
-                                                                                    field.value?.filter(
-                                                                                        (value: string) => value !== item.id
-                                                                                    )
+                                    <div className='flex flex-col gap-[20px] max-lg:gap-[16px] mt-[20px] max-lg:mt-[16px]'>
+                                        {TRAUMATIC_EVENTS.map((item) => (
+                                            <FormField
+                                                key={item.id}
+                                                control={form.control}
+                                                name="traumatic"
+                                                render={({ field }) => {
+                                                    return (
+                                                        <FormItem
+                                                            key={item.id}
+                                                            className="flex flex-row items-start space-x-3 space-y-0"
+                                                        >
+                                                            <FormControl>
+                                                                <Checkbox
+                                                                    checked={field.value?.includes(item.id)}
+                                                                    onCheckedChange={(checked) => {
+                                                                        return checked
+                                                                            ? field.onChange([...field.value, item.id])
+                                                                            : field.onChange(
+                                                                                field.value?.filter(
+                                                                                    (value) => value !== item.id
                                                                                 )
-                                                                        }}
-                                                                    />
-                                                                </FormControl>
-                                                                <FormLabel className={`text-[18px] leading-[25px] max-lg:text-[16px] font-normal`}>
-                                                                    {item.label}
-                                                                </FormLabel>
-                                                            </FormItem>
-                                                        )
-                                                    }}
-                                                />
-                                            ))}
-                                        </div>
+                                                                            )
+                                                                    }}
+                                                                    className='h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]'
+                                                                />
+                                                            </FormControl>
+                                                            <FormLabel className="text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal">
+                                                                {item.label}
+                                                            </FormLabel>
+                                                        </FormItem>
+                                                    )
+                                                }}
+                                            />
+                                        ))}
                                     </div>
                                 </FormItem>
                             </div>
                         )}
                     />
-                    <div className="shrink-0 mt-[30px] pb-[50px] flex gap-[10px]">
+                    <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px] mt-[30px] max-lg:mt-[30px]">
                         <button
                             type='button'
                             onClick={() => dispatch(setApplicationStage('condition'))}
-                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px]`}
+                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Назад
                         </button>
-
                         <button
                             type='submit'
-                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px]`}
+                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Продолжить
                         </button>

@@ -58,19 +58,19 @@ const PromocodeStage = () => {
                         render={({ field }) => (
                             <div className='grow'>
                                 <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
-                                    <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>
+                                    <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                                         Введите промокод или номер подарочного сертификата
                                     </FormLabel>
-                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
+                                    <FormDescription className='text-[14px] leading-[20px] font-normal'>
                                         Вы можете не указывать код, если у вас его нет
                                     </FormDescription>
                                     <div className={styles.input__text_container}>
                                         <Input 
                                             {...field}
                                             placeholder=" "
-                                            className={`${styles.input__text} placeholder:text-[#9A9A9A] text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[10px] border-none w-full h-full`}
+                                            className={`${styles.input__text} text-[14px] w-full h-full px-[20px] bg-[#FAFAFA] rounded-[10px] border-none`}
                                         />
-                                        <label className={styles.input__text_label}>
+                                        <label className={`${styles.input__text_label} text-[14px]`}>
                                             Введите промокод или номер подарочного сертификата
                                         </label>
                                     </div>
@@ -78,18 +78,17 @@ const PromocodeStage = () => {
                             </div>
                         )}
                     />
-                    <div className="shrink-0 pb-[50px] flex gap-[10px]">
-                        <button 
-                            type='button' 
-                            onClick={() => dispatch(setApplicationStage('diseases_psychologist'))} 
-                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px]`}
+                    <div className="shrink-0 mt-[30px] pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
+                        <button
+                            type='button'
+                            onClick={() => dispatch(setApplicationStage('diseases_psychologist'))}
+                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Назад
                         </button>
-
-                        <button 
-                            type='submit' 
-                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px]`}
+                        <button
+                            type='submit'
+                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Продолжить
                         </button>

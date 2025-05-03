@@ -32,9 +32,10 @@ body {
   
   @media (max-width: 1024px) {
     .textarea__text {
-      height: 30px;
+      height: auto;
+      min-height: 80px;
       border-radius: 15px;
-      margin-top: 25px;
+      margin-top: 15px;
       width: 100%;
       font-size: 14px;
       padding: 12px;

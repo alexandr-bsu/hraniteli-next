@@ -306,7 +306,12 @@ const filterSlice = createSlice({
       state.data_name_psychologist = action.payload;
     },
     setSelectedPsychologist: (state, action: PayloadAction<IPsychologist>) => {
-      state.selected_psychologist = action.payload;
+      // Проверяем наличие ID и генерируем его при необходимости
+      const psychologist = { ...action.payload };
+      if (!psychologist.id && psychologist.name) {
+        psychologist.id = `id_${psychologist.name.replace(/\s+/g, '_')}`;
+      }
+      state.selected_psychologist = psychologist;
     },
     setAvailableRequests: (state, action: PayloadAction<string[]>) => {
       state.available_requests = action.payload;

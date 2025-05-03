@@ -31,10 +31,19 @@ const MainContent = () => {
         const selectedPsychologistId = searchParams.get('selected_psychologist')
         
         if (selectedPsychologistId) {
-          const psychologist = psychologists.find(p => p.id === selectedPsychologistId)
+          // Проверяем формат ID - если это не ID, а имя психолога
+          let psychologist = psychologists.find(p => p.id === selectedPsychologistId)
+          
+          // Если не нашли по ID, пробуем найти по имени (для обратной совместимости)
+          if (!psychologist) {
+            psychologist = psychologists.find(p => p.name === selectedPsychologistId)
+          }
+          
           if (psychologist) {
             // Устанавливаем выбранного психолога для автоскролла
             dispatch(setSelectedPsychologist(psychologist))
+          } else {
+            console.error('Психолог с ID/именем', selectedPsychologistId, 'не найден')
           }
         }
 

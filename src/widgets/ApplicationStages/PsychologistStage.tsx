@@ -8,11 +8,10 @@ import Image from 'next/image';
 import { COLORS } from '@/shared/constants/colors';
 import Link from 'next/link';
 import { RootState } from '@/redux/store';
-import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
+import { fill_filtered_by_automatch_psy, setSelectedPsychologist } from '@/redux/slices/filter';
 import { Tooltip } from '@/shared/ui/Tooltip';
 import { NoMatchError } from './NoMatchError';
 import { EmergencyContacts } from './EmergencyContacts';
-import { getTimeDifference } from '@/features/utils';
 import axios from 'axios';
 import { toast } from 'sonner';
 import styles from './PsychologistStage.module.scss';
@@ -118,7 +117,6 @@ export const PsychologistStage = () => {
   const [showNoMatch, setShowNoMatch] = useState(false);
   const [showEmergency, setShowEmergency] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
-  const [availableDays, setAvailableDays] = useState<ScheduleDay[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [availableSlots, setAvailableSlots] = useState<SimpleSlot[]>([]);
@@ -127,20 +125,6 @@ export const PsychologistStage = () => {
     state => state.filter.filtered_by_automatch_psy
   );
   const currentIndex = useSelector((state: RootState) => state.applicationFormData.index_phyc);
-
-  const convertToLocalTime = (mskTime: string) => {
-    const timeDiff = getTimeDifference();
-    const [hours, minutes] = mskTime.split(':').map(Number);
-    const localHours = (hours + timeDiff + 24) % 24;
-    return `${String(localHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-  };
-
-  const convertToMskTime = (localTime: string) => {
-    const timeDiff = getTimeDifference();
-    const [hours, minutes] = localTime.split(':').map(Number);
-    const mskHours = (hours - timeDiff + 24) % 24;
-    return `${String(mskHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
-  };
 
   useEffect(() => {
     const fetchPsychologists = async () => {
@@ -203,7 +187,6 @@ export const PsychologistStage = () => {
       try {
         const currentPsychologist = filtered_by_automatch_psy[currentIndex];
         if (!currentPsychologist?.schedule) {
-          console.log('Нет расписания');
           setAvailableSlots([]);
           return;
         }
@@ -211,29 +194,22 @@ export const PsychologistStage = () => {
         const slots: SimpleSlot[] = [];
         const schedule = currentPsychologist.schedule as Schedule;
 
-        console.log('Расписание психолога:', schedule);
-
         // Обрабатываем расписание как объект с датами
         Object.entries(schedule).forEach(([date, timeSlots]) => {
-          console.log('Дата:', date, 'Слоты:', timeSlots);
 
           // Проверяем что есть слоты на эту дату
           if (Object.keys(timeSlots).length > 0) {
             Object.entries(timeSlots).forEach(([time, slot]) => {
-              console.log('Время:', time, 'Слот:', slot);
               if (slot.state === 'Свободен') {
-                // Используем МСК время и конвертируем его в локальное
-                const localTime = convertToLocalTime(time);
+                // Время уже в нужном часовом поясе, не конвертируем
                 slots.push({
                   date: date,
-                  time: localTime
+                  time: time
                 });
               }
             });
           }
         });
-
-        console.log('Найденные слоты перед сортировкой:', slots);
 
         // Сортируем слоты по дате и времени
         const sortedSlots = slots.sort((a, b) => {
@@ -242,7 +218,6 @@ export const PsychologistStage = () => {
           return dateA.getTime() - dateB.getTime();
         });
 
-        console.log('Отсортированные слоты:', sortedSlots);
         setAvailableSlots(sortedSlots);
 
       } catch (error) {
@@ -255,13 +230,19 @@ export const PsychologistStage = () => {
   }, [currentIndex, filtered_by_automatch_psy]);
 
   const currentPsychologist = filtered_by_automatch_psy[currentIndex];
-  console.log('Current psychologist data:', currentPsychologist);
 
   const getFilterQueryParams = () => {
     const params = new URLSearchParams();
 
     if (currentPsychologist?.id) {
+      // Убедимся, что используем ID, а не имя
       params.append('selected_psychologist', currentPsychologist.id);
+    } else if (currentPsychologist?.name) {
+      // Если ID отсутствует, используем name (но это временное решение)
+      console.warn('ID психолога отсутствует, используем name:', currentPsychologist.name);
+      // Генерируем id из имени, если его нет
+      const generatedId = `id_${currentPsychologist.name.replace(/\s+/g, '_')}`;
+      params.append('selected_psychologist', generatedId);
     }
 
     return `/?${params.toString()}`;
@@ -269,6 +250,17 @@ export const PsychologistStage = () => {
 
   const handleOpenPsychologistCard = () => {
     const url = getFilterQueryParams();
+    if (currentPsychologist) {
+
+      // Проверяем наличие ID и при необходимости добавляем его
+      if (!currentPsychologist.id && currentPsychologist.name) {
+        const generatedId = `id_${currentPsychologist.name.replace(/\s+/g, '_')}`;
+        currentPsychologist.id = generatedId;
+      }
+
+      // Устанавливаем выбранного психолога для скролла на главной странице
+      dispatch(setSelectedPsychologist(currentPsychologist));
+    }
     window.open(url, '_blank');
   };
 
@@ -305,9 +297,8 @@ export const PsychologistStage = () => {
         const [day, month] = selectedSlot.date.split('.');
         const formattedDate = `${parseInt(day)}.${parseInt(month)}`;
 
-        // Конвертируем время обратно в МСК для отправки
-        const mskTime = convertToMskTime(selectedSlot.time);
-        const formattedSlot = `${formattedDate} ${mskTime}`;
+        // Время уже в нужном формате, не конвертируем
+        const formattedSlot = `${formattedDate} ${selectedSlot.time}`;
 
         // Получаем запросы из localStorage
         const storedRequests = localStorage.getItem('app_requests') ?
@@ -381,10 +372,8 @@ export const PsychologistStage = () => {
           }
         };
 
-        console.log('Отправляем запрос на запись:', requestData);
 
         const response = await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka-test-contur', requestData);
-        console.log('Ответ сервера:', response.data);
 
         if (response.status === 200) {
           dispatch(setSelectedSlots([formattedSlot]));
@@ -403,8 +392,7 @@ export const PsychologistStage = () => {
   };
 
   const handleSlotSelect = (slot: SimpleSlot) => {
-    // Время уже в локальном формате, не нужно конвертировать
-    console.log('Выбранный слот:', slot);
+    // Время уже в нужном формате, не нужно комментировать
     setSelectedSlot(slot);
   };
 
@@ -436,10 +424,8 @@ export const PsychologistStage = () => {
 
   const remainingPsychologists = filtered_by_automatch_psy.length - (currentIndex + 1);
 
-  console.log('currentPsychologist', currentPsychologist);
-
   return (
-    <div className="flex flex-col w-full pr-[50px] pl-[50px] pb-[50px] pt-[30px] max-lg:p-[20px] h-full relative">
+    <div className="px-[50px] max-lg:px-[20px] flex w-full grow relative max-lg:overflow-y-auto">
       {isSubmitting && (
         <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50">
           <div className="flex flex-col items-center gap-[10px]">
@@ -449,9 +435,9 @@ export const PsychologistStage = () => {
         </div>
       )}
 
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full w-full pb-[120px] max-lg:pb-[0px]">
         {filtered_by_automatch_psy.length > 1 && (
-          <div className="flex justify-between items-center mb-[20px] max-lg:flex-col max-lg:gap-[15px] min-h-[50px] max-lg:min-h-[80px]">
+          <div className="flex justify-between items-center mt-[20px] mb-[20px] max-lg:gap-[15px] min-h-[50px]">
             {currentIndex > 0 && (
               <button
                 onClick={handlePrevious}
@@ -473,7 +459,7 @@ export const PsychologistStage = () => {
           </div>
         )}
 
-        <div className="flex flex-col grow p-[25px] max-lg:p-[15px] mb-[30px] max-lg:mb-[20px] border-[1px] rounded-[25px] overflow-y-auto max-h-[calc(100vh-400px)] min-lg:max-h-[400px] scrollContainer">
+        <div className="flex flex-col p-[25px] max-lg:p-[15px] mb-[43px] max-lg:mb-[20px] border-[1px] rounded-[25px] lg:overflow-y-auto lg:h-[400px] scrollContainer max-md:pb-[100px]">
           <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-lg:flex-col max-lg:gap-[15px]">
             <div className="flex gap-[20px] items-center max-lg:gap-[15px]">
               <div className="w-[80px] h-[80px] max-lg:w-[60px] max-lg:h-[60px] rounded-full overflow-hidden">
@@ -494,7 +480,7 @@ export const PsychologistStage = () => {
                 />
               </div>
               <div>
-                <h3 className="text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] font-semibold">
+                <h3 className="text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[14px] font-semibold">
                   {currentPsychologist?.name}
                   {currentPsychologist?.age && currentPsychologist.age !== 0 && `, ${currentPsychologist.age} лет`}
                 </h3>
@@ -510,42 +496,67 @@ export const PsychologistStage = () => {
             </div>
             <button
               onClick={handleOpenPsychologistCard}
-              className="hover:opacity-80 transition-opacity cursor-pointer text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#116466] max-lg:w-full max-lg:text-center max-lg:py-[8px] max-lg:border max-lg:border-[#116466] max-lg:rounded-[50px]"
+              className="hover:opacity-80 transition-opacity cursor-pointer text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#116466] max-lg:hidden"
             >
               Перейти на карточку психолога
             </button>
           </div>
 
-          <div className="grid grid-cols-3 gap-[30px] mb-[30px] max-lg:grid-cols-1 max-lg:gap-[20px] max-lg:mb-[20px]">
+          {/* Desktop */}
+          <div className="hidden lg:grid lg:grid-cols-3 lg:gap-[30px] lg:mb-[30px]">
             <div>
-              <span className="text-[#9A9A9A] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]">Основной подход:</span>
+              <span className="text-[#9A9A9A] text-[16px]">Основной подход:</span>
               <div className="flex items-center gap-[10px] mt-[5px]">
-                <p className="font-semibold text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px]">{currentPsychologist.main_modal}</p>
+                <p className="font-semibold text-[18px] leading-[25px]">{currentPsychologist.main_modal}</p>
                 <Tooltip text="Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов." />
               </div>
             </div>
             <div>
-              <span className="text-[#9A9A9A] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]">Формат встречи:</span>
-              <p className="font-semibold text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] mt-[5px]">Онлайн</p>
+              <span className="text-[#9A9A9A] text-[16px]">Формат встречи:</span>
+              <p className="font-semibold text-[18px] leading-[25px] mt-[5px]">Онлайн</p>
             </div>
             <div>
-              <span className="text-[#9A9A9A] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]">Стоимость:</span>
+              <span className="text-[#9A9A9A] text-[16px]">Стоимость:</span>
               <div className="flex items-center gap-[10px] mt-[5px]">
-                <p className="font-semibold text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px]">От {currentPsychologist.min_session_price || 0} ₽</p>
+                <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p>
                 <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
               </div>
             </div>
           </div>
 
+          {/* Tablet and Mobile */}
+          <div className="lg:hidden mb-[20px]">
+            <div className="mb-[20px]">
+              <span className="text-[#9A9A9A] text-[14px]">Основной подход:</span>
+              <div className="flex items-center gap-[10px]">
+                <p className="font-semibold text-[14px] leading-[20px]">{currentPsychologist.main_modal}</p>
+                <Tooltip text="Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов." />
+              </div>
+            </div>
+            <div className="flex gap-[10px]">
+              <div className="flex-1">
+                <span className="text-[#9A9A9A] text-[14px]">Формат встречи:</span>
+                <p className="font-semibold text-[14px] leading-[20px]">Онлайн</p>
+              </div>
+              <div className="flex-1">
+                <span className="text-[#9A9A9A] text-[14px]">Стоимость:</span>
+                <div className="flex items-center gap-[10px]">
+                  <p className="font-semibold text-[14px]">От {currentPsychologist.min_session_price || 0} ₽</p>
+                  <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className={styles.nextSession}>
-            <h4 className="text-[18px] font-semibold mb-[15px]">Ближайшая запись:</h4>
+            <h4 className="text-[18px] font-semibold mb-[15px] max-lg:text-[14px]">Ближайшая запись:</h4>
             {availableSlots && availableSlots.length > 0 ? (
-              <div className="flex gap-[10px] flex-wrap">
+              <div className="flex gap-[10px] flex-wrap max-lg:flex-nowrap max-lg:overflow-x-auto max-lg:pb-[10px] max-lg:-mx-[15px] max-lg:px-[15px]">
                 {availableSlots.map((slot, index) => (
                   <button
                     key={index}
                     onClick={() => handleSlotSelect(slot)}
-                    className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] cursor-pointer ${selectedSlot?.date === slot.date && selectedSlot?.time === slot.time
+                    className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] cursor-pointer max-lg:shrink-0 ${selectedSlot?.date === slot.date && selectedSlot?.time === slot.time
                       ? 'bg-[#116466] text-white border-[#116466]'
                       : 'border-[#D4D4D4] text-[#116466] hover:bg-[#116466] hover:text-white hover:border-[#116466]'
                       }`}
@@ -560,14 +571,21 @@ export const PsychologistStage = () => {
               </div>
             )}
           </div>
+
+          <button
+            onClick={handleOpenPsychologistCard}
+            className="hidden max-lg:flex mt-[20px] border border-[#116466] border-[1px] max-lg:h-[47px] bg-[#116466] p-[12px] text-[#fff] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] flex justify-center items-center gap-[10px]"
+          >
+            Перейти на карточку психолога
+          </button>
         </div>
 
-        <div className="shrink-0 mt-auto pb-[10px] flex gap-[10px]">
+        <div className="max-lg:fixed max-lg:bottom-[20px] max-lg:left-[20px] max-lg:right-[20px] flex gap-[10px] button-container">
           <button
             type='button'
             onClick={() => dispatch(setApplicationStage('phone'))}
             disabled={isSubmitting}
-            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             Назад
           </button>
@@ -575,17 +593,10 @@ export const PsychologistStage = () => {
           <button
             type='submit'
             disabled={!selectedSlot || isSubmitting}
-            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[16px] rounded-[50px] flex justify-center items-center gap-[10px] ${!selectedSlot || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`cursor-pointer flex-1 border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] flex justify-center items-center gap-[10px] ${!selectedSlot || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={handleSubmit}
           >
-            {isSubmitting ? (
-              <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Отправка...</span>
-              </>
-            ) : (
-              'Продолжить'
-            )}
+            Продолжить
           </button>
         </div>
       </div>

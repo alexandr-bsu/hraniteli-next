@@ -10,7 +10,7 @@ import { FinalStage } from "@/widgets/ApplicationStages/FinalStage";
 import { GenderStageApplication } from "@/widgets/ApplicationStages/GenderStage";
 import { GenderStagePsychologist } from "@/widgets/ApplicationStages/GenderStagePsychologist";
 import NameStageApplication from "@/widgets/ApplicationStages/NameStage";
-import PreferencesStage from "@/widgets/ApplicationStages/PreferencesStage";
+import { PreferencesStage } from "@/widgets/ApplicationStages/PreferencesStage";
 import PromocodeStage from "@/widgets/ApplicationStages/PromocodeStage";
 import { PsychologistStage } from "@/widgets/ApplicationStages/PsychologistStage";
 import RequestStage from "@/widgets/ApplicationStages/RequestStage";
@@ -32,7 +32,8 @@ import { EmergencyContacts } from "@/widgets/ApplicationStages/EmergencyContacts
 const KEY_STAGES = [
     'gender_psychologist',
     'condition',
-    'traumatic'
+    'traumatic',
+    'diseases_psychologist'
 ] as const;
 
 const STAGES_WITH_PROGRESS = [
@@ -265,7 +266,7 @@ export default function ApplicationForm() {
                 <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
                     <div className="flex flex-col items-center gap-4">
                         <div className="w-16 h-16 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
-                        <p className="text-[18px] text-[#116466]">Подбираем психологов...</p>
+                        <p className="text-[18px] text-[#116466] max-lg:text-[14px]">Подбираем психологов...</p>
                     </div>
                 </div>
             )}
@@ -274,10 +275,10 @@ export default function ApplicationForm() {
                 <div className="w-full min-lg:rounded-[30px] pt-[50px] shrink-0">
                     <div className="w-full flex justify-between min-lg:px-[50px] pb-[20px] max-lg:px-[20px]">
                         <div className="flex flex-col gap-[10px]">
-                            <h2 className="font-semibold text-[20px] max-lg:text-[16px] max-lg:leading-[22px] leading-[27px]">
+                            <h2 className="font-semibold text-[20px] max-lg:text-[14px] max-lg:leading-[22px] leading-[27px]">
                                 Подбор психолога
                             </h2>
-                            <span className="font-normal text-[18px] leading-[25px] max-[360px]:w-[192px] max-lg:text-[14px]">
+                            <span className="font-normal text-[18px] max-lg:text-[14px] leading-[25px] max-[360px]:w-[192px]">
                                 Среднее время заполнения заявки - 5 минут
                             </span>
                         </div>

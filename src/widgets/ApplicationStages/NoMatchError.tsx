@@ -54,32 +54,32 @@ export const NoMatchError = ({ onClose }: NoMatchErrorProps) => {
 
     return (
         <div className="flex flex-col w-full h-full px-[50px] py-[30px] max-lg:px-[20px]">
-            <h2 className="text-[20px] font-semibold mb-[20px]">
+            <h2 className="text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold mb-[20px]">
                 К сожалению, мы не смогли подобрать психолога по вашим критериям
             </h2>
             
-            <p className="text-[18px] mb-[30px] text-[#737373]">
+            <p className="text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] text-[#737373] mb-[30px]">
                 Рекомендуем изменить ответы в следующих разделах:
             </p>
 
             <div className="flex flex-col gap-[15px]">
                 <button
                     onClick={handleChangeGender}
-                    className={`w-full text-left p-[20px] border rounded-[15px] text-[18px] hover:border-[${COLORS.primary}] transition-colors`}
+                    className={`w-full text-left p-[20px] border rounded-[15px] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] hover:border-[${COLORS.primary}] transition-colors`}
                 >
                     Изменить предпочтения по полу психолога
                 </button>
                 
                 <button
                     onClick={handleChangeConditions}
-                    className={`w-full text-left p-[20px] border rounded-[15px] text-[18px] hover:border-[${COLORS.primary}] transition-colors`}
+                    className={`w-full text-left p-[20px] border rounded-[15px] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] hover:border-[${COLORS.primary}] transition-colors`}
                 >
                     Изменить описание состояний
                 </button>
                 
                 <button
                     onClick={handleChangeTraumatic}
-                    className={`w-full text-left p-[20px] border rounded-[15px] text-[18px] hover:border-[${COLORS.primary}] transition-colors`}
+                    className={`w-full text-left p-[20px] border rounded-[15px] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] hover:border-[${COLORS.primary}] transition-colors`}
                 >
                     Изменить описание травмирующих событий
                 </button>

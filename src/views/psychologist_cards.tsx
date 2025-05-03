@@ -39,10 +39,10 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
         }
 
         // Применяем фильтр по избранным
-        if (filter.favorites && filter.filtered_by_favorites?.length > 0) {
-            result = result.filter(item => 
-                filter.filtered_by_favorites.some((f: IPsychologist) => f.id === item.id)
-            );
+        if (filter.favorites) {
+            // Если фильтр включен, но нет избранных, всё равно применяем пустой фильтр
+            const favoriteIds = filter.filtered_by_favorites?.map((f: IPsychologist) => f.id) || [];
+            result = result.filter(item => favoriteIds.includes(item.id));
         }
         
         // Применяем фильтр по запросам
@@ -214,14 +214,27 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
     // Эффект для скролла к выбранному психологу
     useEffect(() => {
         const selectedPsychologist = filter.selected_psychologist;
-        if (selectedPsychologist && !isLoading) {
-            // Даем время для отрисовки карточек
+        if (selectedPsychologist && !isLoading) {            
             setTimeout(() => {
-                const selectedCard = document.getElementById(`psychologist-card-${selectedPsychologist.id}`);
+                const selectedCardId = `psychologist-card-${selectedPsychologist.id}`;
+                
+                const selectedCard = document.getElementById(selectedCardId);
                 if (selectedCard) {
                     selectedCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    console.error('Элемент не найден:', selectedCardId);
+                    
+                    // Если карточка не найдена по ID, пробуем найти по имени
+                    if (selectedPsychologist.name) {
+                        const nameBasedId = `psychologist-card-${selectedPsychologist.name.replace(/\s+/g, '_')}`;
+                        const cardByName = document.getElementById(nameBasedId);
+                        
+                        if (cardByName) {
+                            cardByName.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
+                    }
                 }
-            }, 500);
+            }, 1000); // Увеличиваем время ожидания до 1 секунды
         }
     }, [filter.selected_psychologist, isLoading]);
 
@@ -265,6 +278,10 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
             filter.favorites
         );
 
+        // Проверяем, выбран ли фильтр "Только избранные" и пуст ли список избранных
+        const isEmptyFavorites = filter.favorites && 
+            (!filter.filtered_by_favorites || filter.filtered_by_favorites.length === 0);
+
         return (
             <div className="flex flex-col items-center justify-center p-8 bg-white rounded-[20px] min-h-[400px]">
                 <Image 
@@ -275,12 +292,18 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
                     className="mb-6 opacity-80"
                 />
                 <h2 className="text-[24px] font-semibold text-[#116466] mb-2">
-                    {hasActiveFilters ? "Упс! Ничего не найдено" : "Нет доступных специалистов"}
+                    {isEmptyFavorites 
+                        ? "Нет избранных Хранителей" 
+                        : hasActiveFilters 
+                            ? "Упс! Ничего не найдено" 
+                            : "Нет доступных специалистов"}
                 </h2>
                 <p className="text-[16px] text-gray-500 text-center max-w-[400px]">
-                    {hasActiveFilters 
-                        ? "Попробуйте изменить параметры фильтрации или сбросить фильтры" 
-                        : "В данный момент нет доступных специалистов. Пожалуйста, попробуйте позже"
+                    {isEmptyFavorites 
+                        ? "Добавьте Хранителей в избранное, чтобы они отображались здесь" 
+                        : hasActiveFilters 
+                            ? "Попробуйте изменить параметры фильтрации или сбросить фильтры" 
+                            : "В данный момент нет доступных специалистов. Пожалуйста, попробуйте позже"
                     }
                 </p>
             </div>
@@ -295,15 +318,22 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
             <main className="min-lg:max-w-[790px] w-full">
                 <div className="flex flex-col gap-[20px] pb-[50px]">
                     {sortedPersons && sortedPersons.length > 0 ? (
-                        sortedPersons.map((item: IPsychologist, index: number) => (
-                            <Card 
-                                key={item.id} 
-                                psychologist={item} 
-                                id={`psychologist-card-${item.id}`} 
-                                isSelected={filter.selected_psychologist?.id === item.id} 
-                                showBestMatch={hasActiveFilters && index < 3}
-                            />
-                        ))
+                        sortedPersons.map((item: IPsychologist, index: number) => {
+                            // Убедимся, что у каждого психолога есть ID
+                            if (!item.id && item.name) {
+                                item.id = `id_${item.name.replace(/\s+/g, '_')}`;
+                            }
+                            
+                            return (
+                                <Card 
+                                    key={item.id} 
+                                    psychologist={item} 
+                                    id={`psychologist-card-${item.id}`} 
+                                    isSelected={filter.selected_psychologist?.id === item.id} 
+                                    showBestMatch={hasActiveFilters && index < 3}
+                                />
+                            );
+                        })
                     ) : (
                         <EmptyState />
                     )}

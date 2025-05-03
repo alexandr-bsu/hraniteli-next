@@ -84,7 +84,7 @@ export const Filter = () => {
                 <div className="min-lg:hidden w-full flex justify-between">
                     <div className="flex gap-[15px]">
                         <Image src='/filter.svg' height={18} width={18} alt="filter" />
-                        <h2 className="font-semibold text-[20px] lg:text-[20px] md:text-[16px] leading-[27px]">
+                        <h2 className="font-semibold text-[16px] lg:text-[16px] md:text-[16px] leading-[27px]">
                             Фильтры
                         </h2>
                     </div>

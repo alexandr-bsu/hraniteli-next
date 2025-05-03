@@ -109,7 +109,7 @@ export const TimeStage = () => {
         const formattedTimeZone = timeZone.replace('_', '/').split('/').slice(-1)[0];
 
         return (
-            <span className="text-[18px] leading-[25px] font-normal text-[#151515] flex gap-[10px] max-lg:flex-col max-lg:text-[14px]">
+            <span className="text-[18px] leading-[25px] font-normal text-[#151515] flex gap-[10px] max-lg:text-[14px]">
                 Часовой пояс: <span className="text-[#116466]">{formattedTimeZone} ( МСК {timeDifference > 0 ? '+' : ''}{timeDifference} )</span>
             </span>
         );
@@ -187,7 +187,7 @@ export const TimeStage = () => {
     return (
         <ModalWindow type="Time">
             <DialogHeader>
-                <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[16px] max-lg:leading-[22px]">
+                <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[14px] max-lg:leading-[22px]">
                     Выберите время сеанса с Хранителем
                 </DialogTitle>
             </DialogHeader>

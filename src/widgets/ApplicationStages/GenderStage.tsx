@@ -25,11 +25,6 @@ const FormSchema = z.object({
     }),
 })
 
-const sex_data = {
-    ['male']: 'Мужчина',
-    ['female']: 'Женщина',
-} 
-
 export const GenderStageApplication = () => {
     const dispatch = useDispatch();
 
@@ -60,58 +55,58 @@ export const GenderStageApplication = () => {
                         render={({ field }) => (
                             <div className='grow'>
                                 <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
-                                    <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>
+                                    <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                                         Какой у вас пол?
                                     </FormLabel>
-                                    <FormDescription className='max-lg:text-[16px] font-normal text-[18px] leading-[25px]'>
+                                    <FormDescription className='text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
                                         Мы учитываем ваш пол при подборе психолога
                                     </FormDescription>
-                                    <FormControl className="mt-[20px]">
+                                    <FormControl className="mt-[20px] max-lg:mt-[16px]">
                                         <RadioGroup
                                             onValueChange={field.onChange}
                                             defaultValue={field.value}
-                                            className="flex flex-col"
+                                            className="flex flex-col gap-[20px] max-lg:gap-[16px]"
                                         >
-                                            <FormItem className="flex items-center gap-[15px]">
+                                            <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px]" value="male" />
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="male" />
                                                 </FormControl>
-                                                <FormLabel className={`text-[18px] leading-[25px] max-lg:text-[16px] font-normal text-[${COLORS.text.primary}]`}>
+                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
                                                     Мужской
                                                 </FormLabel>
                                             </FormItem>
-                                            <FormItem className="flex items-center gap-[15px]">
+                                            <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl> 
-                                                    <RadioGroupItem className="h-[30px] w-[30px]" value="female" />
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="female" />
                                                 </FormControl>
-                                                <FormLabel className={`text-[18px] leading-[25px] max-lg:text-[16px] font-normal text-[${COLORS.text.primary}]`}>
+                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
                                                     Женский
                                                 </FormLabel>
                                             </FormItem>
                                         </RadioGroup>
                                     </FormControl>
                                     {!form.formState.errors.gender && 
-                                        <span className='mt-[10px] max-lg:text-[16px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
+                                        <span className='mt-[10px] max-lg:text-[14px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
                                             Поле обязательное для заполнения
                                         </span>
                                     }
-                                    <FormMessage className="mt-[10px] max-lg:text-[16px]"/>
+                                    <FormMessage className="mt-[10px] max-lg:text-[14px]"/>
                                 </FormItem>
                             </div>
                         )}
                     />
-                    <div className="shrink-0 pb-[50px] flex gap-[10px]">
+                    <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
                         <button 
                             type='button'
                             onClick={() => dispatch(setApplicationStage('age'))} 
-                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px]`}
+                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Назад
                         </button>
 
                         <button 
                             type='submit' 
-                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px]`}
+                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Продолжить
                         </button>

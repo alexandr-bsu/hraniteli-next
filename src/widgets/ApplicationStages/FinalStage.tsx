@@ -44,7 +44,7 @@ export const FinalStage = () => {
                 <Image className="max-lg:w-[140px] max-lg:h-[140px]"  src={'/card/thanks.svg'} alt="Спасибо" height={210} width={210} />
 
                 <div className="flex flex-col items-center gap-[10px]">
-                    <h2 className="font-semibold text-[26px] max-lg:text-[16px] max-lg:leading-[22px]">Спасибо!</h2>
+                    <h2 className="font-semibold text-[26px] max-lg:text-[14px] max-lg:leading-[22px]">Спасибо!</h2>
 
                     <span className="font-normal text-[18px] leading-[25px] text-center max-lg:text-[14px]">Горячая линия Центра экстренной психологической
                     <br /> 

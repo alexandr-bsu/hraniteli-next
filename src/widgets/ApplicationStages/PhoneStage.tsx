@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 'use client'
 import { Form, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { setApplicationStage } from '@/redux/slices/application_form';
 import { setPhone, setHasMatchingError } from '@/redux/slices/application_form_data';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -166,7 +165,7 @@ export const PhoneStage = () => {
                         <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50 rounded-[10px]">
                             <div className="flex flex-col items-center gap-[10px]">
                                 <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
-                                <span className="text-[18px] text-[#116466]">Подбираем психологов...</span>
+                                <span className="text-[18px] text-[#116466] max-lg:text-[14px]">Подбираем психологов...</span>
                             </div>
                         </div>
                     )}
@@ -177,10 +176,10 @@ export const PhoneStage = () => {
                         render={({ field: { onChange, value } }) => (
                             <div className='grow'>
                                 <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
-                                    <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>
+                                    <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                                         Оставьте ваш контакт для связи
                                     </FormLabel>
-                                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
+                                    <FormDescription className='text-[14px] leading-[20px] font-normal'>
                                         Рекламу не присылаем. Психологи не видят ваши контакты. Только вы решаете кому их показать после сессии
                                     </FormDescription>
                                     <div className={styles.input__text_container}>
@@ -190,9 +189,9 @@ export const PhoneStage = () => {
                                             unmask={false}
                                             onAccept={(value) => onChange(value)}
                                             placeholder=" "
-                                            className={`${styles.input__text} text-[18px] w-full h-full px-[20px] pt-[20px] pb-[10px] bg-[#FAFAFA] rounded-[10px] border-none`}
+                                            className={`${styles.input__text} text-[14px] w-full h-full px-[20px] bg-[#FAFAFA] rounded-[10px] border-none`}
                                         />
-                                        <label className={styles.input__text_label}>
+                                        <label className={`${styles.input__text_label} text-[14px]`}>
                                             Введите номер телефона
                                         </label>
                                     </div>
@@ -206,22 +205,20 @@ export const PhoneStage = () => {
                         )}
                     />
 
-                    <div className="shrink-0 mt-[30px] pb-[50px] flex gap-[10px]">
+                    <div className="shrink-0 mt-[30px] pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
                         <button
                             type='button'
                             onClick={() => dispatch(setApplicationStage('promocode'))}
-                            disabled={isLoading}
-                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px] ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Назад
                         </button>
 
                         <button
                             type='submit'
-                            disabled={isLoading}
-                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[16px] rounded-[50px] ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
-                            {isLoading ? 'Подбираем психологов...' : 'Продолжить'}
+                            Продолжить
                         </button>
                     </div>
                 </form>

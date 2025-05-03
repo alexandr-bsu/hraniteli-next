@@ -369,7 +369,7 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
                 </Button>
             </DialogHeader>
 
-            <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[16px] max-lg:leading-[22px]">
+            <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[14px] max-lg:leading-[22px]">
                 Оставить заявку
             </DialogTitle>
 
