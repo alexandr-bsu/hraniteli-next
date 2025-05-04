@@ -436,29 +436,30 @@ export const PsychologistStage = () => {
       )}
 
       <div className="flex flex-col h-full w-full pb-[120px] max-lg:pb-[0px]">
-        {filtered_by_automatch_psy.length > 1 && (
-          <div className="flex justify-between items-center mt-[20px] mb-[20px] max-lg:gap-[15px] min-h-[50px]">
-            {currentIndex > 0 && (
-              <button
-                onClick={handlePrevious}
-                className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]"
-              >
-                <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
-                <span>Предыдущий психолог</span>
-              </button>
-            )}
-            {currentIndex < filtered_by_automatch_psy.length - 1 && remainingPsychologists > 0 && (
-              <button
-                onClick={handleNext}
-                className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ml-auto"
-              >
-                <span>Показать еще {remainingPsychologists} {getPsychologistDeclension(remainingPsychologists)}</span>
-                <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
-              </button>
-            )}
-          </div>
-        )}
-
+        <div className="flex justify-between items-center mt-[20px] mb-[20px] max-lg:gap-[15px] min-h-[50px]">
+          {filtered_by_automatch_psy.length > 1 && (
+            <>
+              {currentIndex > 0 && (
+                <button
+                  onClick={handlePrevious}
+                  className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]"
+                >
+                  <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
+                  <span>Предыдущий психолог</span>
+                </button>
+              )}
+              {currentIndex < filtered_by_automatch_psy.length - 1 && remainingPsychologists > 0 && (
+                <button
+                  onClick={handleNext}
+                  className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ml-auto"
+                >
+                  <span>Показать еще {remainingPsychologists} {getPsychologistDeclension(remainingPsychologists)}</span>
+                  <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
+                </button>
+              )}
+            </>
+          )}
+        </div>
         <div className="flex flex-col p-[25px] max-lg:p-[15px] mb-[43px] max-lg:mb-[20px] border-[1px] rounded-[25px] lg:overflow-y-auto lg:h-[400px] scrollContainer max-md:pb-[100px]">
           <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-lg:flex-col max-lg:gap-[15px]">
             <div className="flex gap-[20px] items-center max-lg:gap-[15px]">
