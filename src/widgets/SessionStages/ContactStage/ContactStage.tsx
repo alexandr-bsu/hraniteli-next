@@ -177,7 +177,7 @@ const getGoogleDriveImageUrl = (url: string | undefined) => {
         fileId = cleanUrl.match(/id=(.+?)(?:&|$)/)?.[1] || '';
     }
     
-    if (!fileId) return '/images/default-avatar.png';
+    if (!fileId) return '/images/default.jpg';
     
     return `https://drive.google.com/uc?export=view&id=${fileId}`;
 };
@@ -382,7 +382,7 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
                     width={80} 
                     onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = '/images/default-avatar.png';
+                        target.src = '/images/default.jpg';
                     }}
                 />
 

@@ -63,7 +63,7 @@ interface SimpleSlot {
 }
 
 const getGoogleDriveImageUrl = (url: string | undefined) => {
-  if (!url) return '/images/default-avatar.png';
+  if (!url) return '/images/default.jpg';
 
   // Если это cdnvideo.ru, возвращаем как есть
   if (url.includes('cdnvideo.ru')) return url;
@@ -87,7 +87,7 @@ const getGoogleDriveImageUrl = (url: string | undefined) => {
     fileId = cleanUrl.match(/\/file\/d\/([^/]+)/)?.[1] || '';
   }
 
-  if (!fileId) return '/images/default-avatar.png';
+  if (!fileId) return '/images/default.jpg';
 
   return `https://drive.google.com/uc?export=view&id=${fileId}`;
 };
@@ -467,7 +467,7 @@ export const PsychologistStage = () => {
                 <Image
                   src={(currentPsychologist?.avatar || currentPsychologist?.link_photo) ? 
                     getGoogleDriveImageUrl(currentPsychologist?.avatar || currentPsychologist?.link_photo) : 
-                    '/images/default-avatar.png'
+                    '/images/default.jpg'
                   }
                   alt={currentPsychologist?.name || 'Фото психолога'}
                   width={80}
@@ -475,7 +475,7 @@ export const PsychologistStage = () => {
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
-                    img.src = '/images/default-avatar.png';
+                    img.src = '/images/default.jpg';
                     img.onerror = null;
                   }}
                   priority
