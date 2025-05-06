@@ -32,7 +32,7 @@ export const getSchedule = async () => {
   try {
     const { startDate, endDate } = getStartAndEndDates();
     
-    const response = await axios.post('https://n8n-v2.hrani.live/webhook/get-aggregated-psychologist-schedule', {
+    const response = await axios.post('https://n8n-v2.hrani.live/webhook/get-aggregated-all', {
       startDate,
       endDate,
       userTimeOffsetMsk: 0,
