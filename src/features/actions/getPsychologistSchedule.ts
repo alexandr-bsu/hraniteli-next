@@ -71,7 +71,7 @@ interface PsychologistScheduleRequest {
 }
 
 // Отправка анкеты
-export const submitQuestionnaire = async (formData: IApplicationFormData) => {
+export const submitQuestionnaire = async (formData: IApplicationFormData, from_cards: boolean = false) => {
     try {
         const startDate = new Date();
         const endDate = new Date();
@@ -148,7 +148,7 @@ export const submitQuestionnaire = async (formData: IApplicationFormData) => {
             userTimeOffsetMsk: getTimeDifference()
         };
 
-        const response = await fetch('https://n8n-v2.hrani.live/webhook/get-agregated-schedule-v2', {
+        const response = await fetch(from_cards ? 'https://n8n-v2.hrani.live/webhook/get-aggregated-all' : 'https://n8n-v2.hrani.live/webhook/get-agregated-schedule-v2', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

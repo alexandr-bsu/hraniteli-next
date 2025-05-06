@@ -156,7 +156,7 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
             if (!filter.filtered_by_automatch_psy.length) return;
 
             try {
-                const schedule = await submitQuestionnaire(formData);
+                const schedule = await submitQuestionnaire(formData, true);
 
                 if (schedule && schedule[0]?.items) {
                     // Собираем расписание для каждого психолога

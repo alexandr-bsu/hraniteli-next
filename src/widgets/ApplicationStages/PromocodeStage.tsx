@@ -36,14 +36,14 @@ const PromocodeStage = () => {
     // 3. Сохраняем данные при изменении
     useEffect(() => {
         const subscription = form.watch((value) => {
-            localStorage.setItem('app_promocode', JSON.stringify(value));
+            localStorage.setItem('app_promocode', JSON.stringify(value.promocode));
         });
         return () => subscription.unsubscribe();
     }, [form.watch]);
 
     // 4. Отправка формы
     const handleSubmit = (data: z.infer<typeof FormSchema>) => {
-        localStorage.setItem('app_promocode', JSON.stringify(data));
+        localStorage.setItem('app_promocode', JSON.stringify(data.promocode));
         dispatch(setPromocode(data.promocode));
         dispatch(setApplicationStage('phone'));
     }

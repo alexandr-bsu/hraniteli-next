@@ -415,8 +415,8 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                                     </button>
                                 ))}
                             </div> : 
-                            ''
-                            // <p>У психолога пока нет свободного времени для записи</p>
+                            // ''
+                            <p>У психолога пока нет свободного времени для записи</p>
                             }
                     </div>
                     {/* } */}

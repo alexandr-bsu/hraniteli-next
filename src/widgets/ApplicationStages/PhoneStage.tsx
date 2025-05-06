@@ -44,7 +44,7 @@ export const PhoneStage = () => {
     // 3. Сохраняем данные при изменении
     useEffect(() => {
         const subscription = form.watch((value) => {
-            localStorage.setItem('app_phone', JSON.stringify(value));
+            localStorage.setItem('app_phone', JSON.stringify(value.phone));
         });
         return () => subscription.unsubscribe();
     }, [form.watch]);
@@ -57,7 +57,7 @@ export const PhoneStage = () => {
     // 4. Отправка формы
     const handleSubmit = async (data: z.infer<typeof FormSchema>) => {
         setIsLoading(true);
-        localStorage.setItem('app_phone', JSON.stringify(data));
+        localStorage.setItem('app_phone', JSON.stringify(data.phone));
         dispatch(setPhone(data.phone));
 
         try {
