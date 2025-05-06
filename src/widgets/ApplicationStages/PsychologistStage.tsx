@@ -473,18 +473,21 @@ export const PsychologistStage = () => {
           <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-lg:flex-col max-lg:gap-[15px]">
             <div className="flex gap-[20px] items-center max-lg:gap-[15px]">
               <div className="w-[80px] h-[80px] max-lg:w-[60px] max-lg:h-[60px] rounded-full overflow-hidden">
-                <Image
-                  src={getGoogleDriveImageUrl(currentPsychologist?.avatar || currentPsychologist?.link_photo)}
+              <Image
+                  src={(currentPsychologist?.avatar || currentPsychologist?.link_photo) ? 
+                    getGoogleDriveImageUrl(currentPsychologist?.avatar || currentPsychologist?.link_photo) : 
+                    '/images/default-avatar.png'
+                  }
                   alt={currentPsychologist?.name || 'Фото психолога'}
                   width={80}
                   height={80}
                   className="w-full h-full object-cover"
                   onError={(e) => {
                     const img = e.target as HTMLImageElement;
-                    const defaultSrc = '/images/default-avatar.png';
-                    if (img.src !== defaultSrc) {
-                      img.src = defaultSrc;
-                    }
+                    img.src = '/images/default-avatar.png';
+                    img.onerror = null;
+
+
                   }}
                   priority
                 />
