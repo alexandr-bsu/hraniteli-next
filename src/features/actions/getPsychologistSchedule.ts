@@ -84,7 +84,8 @@ export const submitQuestionnaire = async (formData: IApplicationFormData) => {
             formPsyClientInfo: {
                 age: formData.age,
                 city: '',
-                sex: '',
+                sex: formData.gender_user === 'male' ? 'Мужской' : 
+                     formData.gender_user === 'female' ? 'Женский' : '',
                 psychoEducated: '',
                 anxieties: [],
                 customAnexiety: '',
