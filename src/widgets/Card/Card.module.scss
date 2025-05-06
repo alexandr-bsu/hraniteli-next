@@ -1,0 +1,736 @@
+// Mixins for media queries
+@mixin tablet {
+  @media (max-width: 1024px) {
+    @content;
+  }
+}
+
+@mixin mobile {
+  @media (max-width: 768px) {
+    @content;
+  }
+}
+
+.card {
+  position: relative;
+  width: 100%;
+  background: #FFFFFF;
+  border-radius: 20px;
+  padding: 20px;
+  padding-right: calc(20px + var(--scrollbar-compensation, 0px));
+
+  @include tablet {
+    font-size: 14px;
+  }
+
+  @include mobile {
+    padding: 16px;
+    border-radius: 16px;
+  }
+}
+
+.bestMatch {
+  position: absolute;
+  top: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #116466;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 5;
+  width: max-content;
+  text-align: center;
+}
+
+.header {
+  display: flex;
+  gap: 30px;
+  margin-bottom: 24px;
+
+  @include tablet {
+    gap: 20px;
+  }
+
+  @include mobile {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+  }
+}
+
+.avatarSection {
+  flex-shrink: 0;
+  width: 214px;
+
+  @include mobile {
+    width: 100%;
+    max-width: 335px;
+  }
+}
+
+.avatar {
+  position: relative;
+  width: 214px;
+  height: 351px;
+  border-radius: 20px;
+  overflow: hidden;
+  cursor: pointer;
+  
+  @include mobile {
+    width: 100%;
+    height: 0;
+    padding-bottom: 164%; // Сохраняем пропорции
+  }
+  
+  &:hover {
+    .playButton {
+      opacity: 1;
+    }
+  }
+  
+  .image, .video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    
+    @include mobile {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  }
+}
+
+.videoWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+
+  @include mobile {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
+
+  &:hover {
+    .playPauseButton {
+      opacity: 1;
+    }
+  }
+
+  .video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    
+    @include mobile {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+
+.playButton, .playPauseButton {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  z-index: 10;
+  opacity: 0;
+
+  @include mobile {
+    opacity: 1;
+    width: 48px;
+    height: 48px;
+  }
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.7);
+    opacity: 1;
+  }
+}
+
+.info {
+  flex: 1;
+  min-width: 0; // Важно для текстового переполнения
+
+  @include mobile {
+    width: 100%;
+  }
+}
+
+.nameRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+
+  @include mobile {
+    margin-bottom: 8px;
+  }
+}
+
+.name {
+  font-size: 24px;
+  font-weight: 600;
+  color: #151515;
+  margin: 0;
+  
+  @include tablet {
+    font-size: 18px;
+  }
+  
+  @include mobile {
+    font-size: 18px;
+  }
+  
+  &:hover {
+    color: #116466;
+  }
+}
+
+.favoriteButton {
+  background: none;
+  border: none;
+  padding: 8px;
+  cursor: pointer;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+}
+
+.experienceWrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: #666;
+  font-size: 16px;
+  margin-bottom: 16px;
+
+  @include tablet {
+    font-size: 14px;
+  }
+}
+
+.approach {
+  margin-bottom: 16px;
+  display: flex;
+  gap: 12px;
+
+  @include tablet {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  @include mobile {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+.approachBlock {
+  display: flex;
+  flex-direction: column;
+  margin-right: 50px;
+  gap: 10px;
+
+  @include mobile {
+    margin-right: 0;
+    gap: 8px;
+  }
+}
+
+.label {
+  color: #666;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 100%;
+
+  @include tablet {
+    font-size: 14px;
+  }
+}
+
+.value {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Open Sans', sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 100%;
+  position: relative;
+
+  @include tablet {
+    font-size: 14px;
+  }
+}
+
+.infoButton {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #D4D4D4;
+  border-radius: 50%;
+  background: none;
+  color: #666;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+
+  &:hover {
+    background: #F5F5F5;
+  }
+}
+
+.additionalApproaches {
+  margin-bottom: 16px;
+
+  .approaches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .approachItem {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    background: #F5F5F5;
+    border-radius: 16px;
+    font-size: 14px;
+    position: relative;
+
+    @include tablet {
+      font-size: 14px;
+      padding: 4px 10px;
+    }
+
+    @include mobile {
+      [data-radix-popper-content-wrapper] {
+        position: fixed !important;
+        top: 50% !important;
+        left: 50% !important;
+        transform: translate(-50%, -50%) !important;
+        width: calc(100% - 32px) !important;
+        max-width: 100vw;
+      }
+    }
+  }
+}
+
+.nextSession {
+  overflow: hidden;
+  
+  .dates {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+
+    @include tablet {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+      padding-bottom: 5px;
+      margin-right: -20px;
+      padding-right: 20px;
+
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+
+    @include mobile {
+      gap: 6px;
+    }
+  }
+
+  .dateButton {
+    padding: 8px 16px;
+    font-size: 16px;
+    border: 1px solid #D4D4D4;
+    
+    @include tablet {
+      font-size: 14px;
+      padding: 6px 12px;
+      white-space: nowrap;
+    }
+    
+    @include mobile {
+      padding: 6px 12px;
+      font-size: 14px;
+    }
+  }
+}
+
+.sectionTitle {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #9A9A9A;
+
+  @include tablet {
+    font-size: 14px;
+  }
+}
+
+.queries {
+  margin-bottom: 24px;
+}
+
+.queriesList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  
+  @include tablet {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding-bottom: 5px;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  @include mobile {
+    gap: 8px;
+  }
+}
+
+.queryButton {
+  width: 227px;
+  height: 45px;
+  font-size: 16px;
+  padding: 10px;
+  border: 1px solid #D4D4D4;
+  border-radius: 20px;
+  background: white;
+  color: #116466;
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  &:hover {
+    background: #116466;
+    color: white;
+  }
+
+  @include tablet {
+    min-width: 227px;
+    font-size: 14px;
+    white-space: nowrap;
+    padding: 0 14px;
+    transition: all 0.2s ease-in-out;
+    height: 40px;
+  }
+}
+
+.diagnoses {
+  margin-bottom: 24px;
+}
+
+.diagnosesList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.diagnosisItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  color: #151515;
+  position: relative;
+
+  @include tablet {
+    font-size: 14px;
+  }
+
+  @include mobile {
+    [data-radix-popper-content-wrapper] {
+      position: fixed !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      width: calc(100% - 32px) !important;
+      max-width: 100vw;
+    }
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+
+  @include mobile {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+.detailsButton {
+  flex: 1;
+  padding: 12px 24px;
+  border: 1px solid #116466;
+  border-radius: 30px;
+  background: white;
+  color: #116466;
+  font-weight: 500;
+  cursor: pointer;
+
+  @include tablet {
+    font-size: 14px;
+  }
+
+  &:hover {
+    background: #F5F5F5;
+  }
+}
+
+.appointmentButton {
+  flex: 1;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 30px;
+  background: #116466;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    filter: brightness(0.9);
+  }
+
+  @include tablet {
+    font-size: 14px;
+  }
+
+  @include mobile {
+    padding: 13px 20px;
+  }
+}
+
+.expandedContent {
+    border-top: 1px solid var(--color-border);
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+
+    &.expanded {
+        max-height: 2000px;
+        opacity: 1;
+    }
+}
+
+.section {
+    margin-bottom: 24px;
+}
+
+.description {
+    position: relative;
+    max-height: none;
+    overflow: visible;
+    font-size: 18px;
+    line-height: 22px;
+    color: #333;
+    margin: 0;
+
+    &.expanded {
+        max-height: none;
+    }
+
+    &:not(.expanded) {
+        &[style*="height"] {
+            max-height: 44px;
+            overflow: hidden;
+
+            &::after {
+                content: '';
+                position: absolute;
+                bottom: 0;
+                right: 0;
+                width: 100%;
+                height: 22px;
+                background: linear-gradient(180deg, transparent, #fff);
+                pointer-events: none;
+            }
+        }
+    }
+}
+
+.education {
+    .educationItem {
+        margin-bottom: 15px;
+        padding: 15px;
+        background: #FAFAFA;
+        border-radius: 10px;
+
+        h4 {
+            font-weight: 600;
+            font-size: 16px;
+            line-height: 22px;
+            margin-bottom: 10px;
+            color: #151515;
+        }
+    }
+}
+
+.educationText {
+    position: relative;
+    max-height: 44px; // Высота двух строк
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+
+    p {
+        font-size: 14px;
+        line-height: 22px;
+        color: #151515;
+        margin: 0;
+    }
+
+    &.expanded {
+        max-height: 1000px; // Достаточно большое значение
+    }
+
+    &:not(.expanded)::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 22px; // Высота одной строки
+        background: linear-gradient(180deg, transparent, #FAFAFA);
+    }
+}
+
+.readMoreButton {
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 19px;
+    color: #116466;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: opacity 0.2s;
+
+    &:hover {
+        opacity: 0.8;
+    }
+}
+
+.links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+
+    @include mobile {
+        gap: 12px;
+    }
+}
+
+.socialLink {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 1px solid #D4D4D4;
+    border-radius: 20px;
+    color: #333;
+    text-decoration: none;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+
+    @include tablet {
+        padding: 6px 12px;
+    }
+
+    @include mobile {
+        width: 100%;
+        justify-content: center;
+        padding: 12px;
+    }
+
+    &:hover {
+        background: #F5F5F5;
+    }
+}
+
+.personalInfo {
+    display: flex;
+    flex-direction: row;
+    gap: 32px;
+    flex-wrap: wrap;
+
+    @include mobile {
+        gap: 16px;
+    }
+
+    .infoRow {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+
+        @include mobile {
+            width: 100%;
+        }
+    }
+
+    .infoLabel {
+        color: #9A9A9A;
+        font-family: 'Open Sans', sans-serif;
+        font-size: 16px;
+
+        @include tablet {
+            font-size: 14px;
+        }
+    }
+
+    .infoValue {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        font-family: 'Open Sans', sans-serif;
+        font-size: 18px;
+        font-weight: 500;
+        color: #151515;
+        position: relative;
+
+        @include tablet {
+            font-size: 14px;
+        }
+    }
+}

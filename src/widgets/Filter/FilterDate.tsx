@@ -1,190 +1,150 @@
 import { DialogClose, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ModalWindow } from '@/widgets/ModalWindow/ModalWindow';
 import Image from 'next/image';
-import { useCallback, useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { open, openNext } from '@/redux/slices/modal';
-import clsx from 'clsx';
-import axios from 'axios'
-import { ModalState } from '@/redux/store';
-import { fillDatesPsychologists, fillHourAndDate } from '@/redux/slices/filter';
-import { getTimeDifference } from '@/features/utils';
+import { useEffect, useState } from 'react';
+import { ModalType } from '@/redux/slices/modal';
+import { getSchedule, ScheduleItem } from '@/features/actions/getSchedule';
+import { FilterTime } from './FilterTime';
 
-type Props = {
-    callback: () => void;
-    onSubmit: (data: any) => void;
-    type: string;
+interface FilterDateProps {
+  open?: boolean;
+  type: ModalType;
+  callback: () => void;
+  onSubmit: (dates: { date: string; slots?: string[] }[]) => void;
+  selectedDateInfo?: { date: string; slots?: string[] };
 }
 
-type FilterSelectButtonDate = {
-    select: boolean;
-    id: string,
-    text: string,
-}
+export const FilterDate: React.FC<FilterDateProps> = ({ 
+  open, 
+  type, 
+  callback, 
+  onSubmit,
+  selectedDateInfo 
+}) => {
+  const [schedule, setSchedule] = useState<ScheduleItem[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [showTimeSelect, setShowTimeSelect] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<string>('');
+  const [selectedDateItem, setSelectedDateItem] = useState<ScheduleItem | null>(null);
 
-export const FilterDate:React.FC<Props> = ({ type, onSubmit }) => {
-    const dispatch = useDispatch();
+  useEffect(() => {
+    if (open) {
+      loadSchedule();
+      setShowTimeSelect(false);
+      setSelectedDate('');
+      setSelectedDateItem(null);
+    }
+  }, [open]);
 
-    const [ dateFilter, setDateFilter ] = useState<FilterSelectButtonDate[]>();
+  const loadSchedule = async () => {
+    try {
+      setLoading(true);
+      const data = await getSchedule();
+      if (data && data[0]?.items) {
+        setSchedule(data[0].items);
+      }
+    } catch (error) {
+      console.error('Error loading schedule:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const psychologists = useSelector<ModalState>(state => state.filter.data_name_psychologist) as [];
+  const hasAvailableSlots = (slots: { [key: string]: string[] }) => {
+    return Object.values(slots).some(slotArray => slotArray && slotArray.length > 0);
+  };
 
-    const [ datePsychologists, setDatePsychologists ] = useState<any[]>();
+  const getAvailableTimes = (slots: { [key: string]: string[] }) => {
+    return Object.entries(slots)
+      .filter(([_, slotArray]) => slotArray && slotArray.length > 0)
+      .map(([time]) => time);
+  };
 
-    const hours = [
-        '00:00',
-        '01:00',
-        '02:00',
-        '03:00',
-        '04:00',
-        '05:00',
-        '06:00',
-        '07:00',
-        '08:00',
-        '09:00',
-        '10:00',
-        '11:00',
-        '12:00',
-        '13:00',
-        '14:00',
-        '15:00',
-        '16:00',
-        '17:00',
-        '18:00',
-        '19:00',
-        '20:00',
-        '21:00',
-        '22:00',
-        '23:00',
-    ]
+  const handleDateClick = (date: string, item: ScheduleItem) => {
+    setSelectedDate(date);
+    setSelectedDateItem(item);
+    setShowTimeSelect(true);
+  };
 
-    const handleClick = useCallback((findIndex: number = 0) => {
-        setDateFilter((prev: any) => prev?.map((item: any, i: any) => {
-            if (i === findIndex) {
-                return {
-                    select: !item.select,
-                    id: item.id,
-                    text: item.text,
-                }
-            }
-            else {
-                return {
-                    select: item.select,
-                    id: item.id,
-                    text: item.text,
-                }
-            }
-        }))
-    },[])
+  const handleTimeSubmit = (times: string[]) => {
+    if (selectedDate) {
+      const dateItem = {
+        date: selectedDate,
+        slots: times
+      };
+      onSubmit([dateItem]);
+      setShowTimeSelect(false);
+      callback();
+    }
+  };
 
-    useEffect(() => {
-        const timeDifference = getTimeDifference();
+  const handleBackFromTime = () => {
+    setShowTimeSelect(false);
+    setSelectedDate('');
+    setSelectedDateItem(null);
+  };
 
-        for (let index = 0; index < [psychologists]?.length; index++) {
-            const apiUrl = `https://n8n-v2.hrani.live/webhook/get-aggregated-schedule-by-psychologist-test-contur?utm_psy=${psychologists[index]}&userTimeOffsetMsk=${timeDifference}`;
-            
-            axios.get(apiUrl).then((resp) => {
-                const allData = resp.data;
-                setDatePsychologists((prev: any) => 
-                    {
-                        if (prev === undefined || prev === null) {
-                            return [...allData[0].items]
-                        }
-                        return [...prev, ...allData[0].items].filter(item => item != undefined)
-                    }
-                )
-            });
-        }
-    },[psychologists])
-
-    useEffect(() => {
-        console.log(datePsychologists)
-
-        const notDublicate = [] as any
-
-        datePsychologists?.forEach(element => {
-            console.log(element.slots)
-            if(!notDublicate.includes(element.pretty_date)) {
-                notDublicate.push(element.pretty_date);         
-            }
-        }); 
-
-        setDateFilter(notDublicate?.map((item: any) => {
-            return {
-                select: false,
-                id: '',
-                text: item,
-            } 
-        }))
-        const result = [] as any;
-        
-        [psychologists]?.forEach((element1: any) => {
-            datePsychologists?.map((item) => {
-                hours.forEach((hour) => {
-                    [item.slots[hour]].forEach((element: any) => {
-                        if (element[0]?.psychologist === element1)
-                        {
-                            result.push({
-                                element1,
-                                hour,
-                                pretty_date:item.pretty_date})
-                            }
-                        })
-                    }) 
-                })
-        })
-
-
-        dispatch(fillHourAndDate(result))
-        dispatch(fillDatesPsychologists(datePsychologists));
-
-    },[datePsychologists])
-
-    useEffect(() => {
-        if(dateFilter !== undefined && dateFilter !== null) {
-            onSubmit(dateFilter.filter(item => item.select === true).map((item: any) =>
-            {
-                return {
-                    id: item.id,
-                    text: item.text,
-                }
-            }))
-        }
-    },[dateFilter])
-
-
+  if (showTimeSelect && selectedDateItem) {
     return (
-        <ModalWindow className='max-[425px]:h-[519px]' maxWidth='max-w-[960px]' closeButton={false} type={type}>
-            <DialogHeader className="flex flex-row items-center">
-                <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[16px] max-lg:leading-[22px]">Выберите подходящую для Вас дату:</DialogTitle>
-                <DialogClose className="w-[40px] h-[40px] shrink-0 flex justify-center items-center border-2 border-[#D4D4D4] rounded-full">
-                    <Image src={'/modal/cross.svg'} alt="cross" height={15} width={15} />
-                </DialogClose>
-            </DialogHeader>
-
-            <ul className="max-lg:w-full max-lg:grid-cols-[repeat(auto-fit,_minmax(64px,_1fr))] grid gap-[10px] grid-cols-10 mt-[5px] w-fit overflow-auto ">
-                {
-                    dateFilter != undefined && dateFilter?.map((item: FilterSelectButtonDate, i: number) => 
-                        <li key={i} className={
-                            clsx(`max-lg:text-[14px] relative shrink-0 rounded-[50px] w-[74px]  border-[1px] border-[#D4D4D4]  text-[#116466] font-normal text-[18px] leading-[25px] flex justify-center items-center`,
-                            {
-                                ['border-none bg-[#116466] text-[white]']: dateFilter?.[i].select === true
-                            }
-                        )}>
-                            <button onClick={() => handleClick(i)} className="relative h-full w-full cursor-pointer p-[8px] py-[8px]">
-                                {item.text}
-                            </button> 
-                        </li>
-                    )
-                }
-            </ul>
-
-            <button onClick={() => {
-                dispatch(open())
-                dispatch(openNext('FilterTime'));
-            }} className='w-[81px] h-[53px] bg-[#116466] p-[14px] rounded-[50px] text-[#FFFFFF]'>
-                Далее
-            </button>
-        </ModalWindow>
+      <FilterTime
+        type={type}
+        open={true}
+        onBack={handleBackFromTime}
+        onSubmit={handleTimeSubmit}
+        selectedDate={selectedDate}
+        availableSlots={selectedDateItem.slots}
+        onClose={handleBackFromTime}
+      />
     );
+  }
+
+  return (
+    <ModalWindow className='max-[425px]:h-[240px] max-lg:p-[16px]' closeButton={false} type={type}>
+      <DialogHeader className="flex flex-row items-center max-lg:mb-[16px]">
+        <DialogTitle className="grow font-semibold text-[20px] leading-[27px] lg:text-[20px] md:text-[16px] max-lg:text-[14px] max-lg:leading-[22px]">
+          Выберите дату сессии
+        </DialogTitle>
+        <DialogClose onClick={callback} className="w-[40px] h-[40px] shrink-0 flex justify-center items-center border-2 border-[#D4D4D4] rounded-full">
+          <Image src={'/modal/cross.svg'} alt="cross" height={15} width={15} />
+        </DialogClose>
+      </DialogHeader>
+
+      <div className="grid grid-cols-2 gap-4 mt-4 max-h-[400px] overflow-y-auto">
+        {loading ? (
+          <div className="col-span-2 flex justify-center items-center p-8">
+            <div className="w-8 h-8 border-4 border-[#116466] border-t-transparent rounded-full animate-spin" />
+          </div>
+        ) : schedule.length > 0 ? (
+          schedule.map((item, index) => {
+            if (!hasAvailableSlots(item.slots)) return null;
+
+            const isSelected = selectedDateInfo?.date === item.pretty_date;
+            const availableTimes = getAvailableTimes(item.slots);
+            
+            return (
+              <button
+                key={index}
+                onClick={() => handleDateClick(item.pretty_date, item)}
+                className={`p-4 rounded-lg text-left ${
+                  isSelected 
+                    ? 'bg-[#116466] text-white' 
+                    : 'bg-[#FAFAFA] hover:bg-[#E5E5E5]'
+                }`}
+              >
+                <div className="font-medium">{item.pretty_date} ({item.day_name})</div>
+                <div className="text-sm mt-1">
+                  {availableTimes.slice(0, 3).join(', ')}
+                  {availableTimes.length > 3 && '...'}
+                </div>
+              </button>
+            );
+          })
+        ) : (
+          <div className="col-span-2 text-center p-8 text-gray-500">
+            Нет доступных дат для записи
+          </div>
+        )}
+      </div>
+    </ModalWindow>
+  );
 };

@@ -1,4 +1,3 @@
-
 import { DialogClose, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ModalWindow } from '@/widgets/ModalWindow/ModalWindow';
 import {
@@ -16,18 +15,21 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import Image from 'next/image';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useEffect } from 'react';
-type Props = {
-    callback: () => void;
-    onSubmit: (data: any) => void;
-    type: string;
+import { Gender } from '@/shared/types/application.types';
+import { ModalType } from '@/redux/slices/modal';
+
+interface FilterGenderProps {
+  open?: boolean;
+  type: ModalType;
+  onSubmit: (data: Gender) => void;
+  currentGender: Gender;
 }
 
-export const FilterGender:React.FC<Props> = ({onSubmit, type }) => {
+export const FilterGender:React.FC<FilterGenderProps> = ({onSubmit, type, open, currentGender }) => {
 
-    const items =
-    {
-        ['male']: 'Мужчина',
-        ['female']: 'Женщина',
+    const items = {
+        ['male']: 'Мужской',
+        ['female']: 'Женский',
         ['none']: 'Не имеет значения',
     } as const
 
@@ -35,71 +37,73 @@ export const FilterGender:React.FC<Props> = ({onSubmit, type }) => {
         gender: z.enum(["male", "female", "none"]).optional(),
     })
 
-    const { handleSubmit, watch, control, ...form }  = useForm<z.infer<typeof FormSchema>>({
+    const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            gender: 'none'
+            gender: currentGender === 'other' ? 'none' : currentGender === 'none' ? 'none' : currentGender
         }
     })
 
-    const handleCheckboxCheck = watch('gender'); 
-    
+    const { control, setValue } = form;
+
     useEffect(() => {
-        if(handleCheckboxCheck !== undefined) {
-            onSubmit(items[handleCheckboxCheck] as any)
-        }
-    },[handleCheckboxCheck])
+        setValue('gender', currentGender === 'other' ? 'none' : currentGender === 'none' ? 'none' : currentGender);
+    }, [currentGender, setValue]);
+    
+    const handleRadioChange = (value: string) => {
+        const genderValue = value === 'none' ? 'other' : value as Gender;
+        onSubmit(genderValue);
+    }
 
     return (
-        <ModalWindow closeButton={false} type={type}>
-
-            <DialogHeader className="flex flex-row items-center">
-                <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[16px] max-lg:leading-[22px]">С психологом какого пола вы готовы работать?</DialogTitle>
+        <ModalWindow className='max-[425px]:h-[240px] max-lg:p-[16px]' open={open} closeButton={false} type={type}>
+            <DialogHeader className="flex flex-row items-center max-lg:mb-[16px]">
+                <DialogTitle className="grow font-semibold text-[20px] leading-[27px] lg:text-[20px] md:text-[16px] max-lg:text-[14px] max-lg:leading-[22px]">С психологом какого пола вы готовы работать?</DialogTitle>
                 <DialogClose className="w-[40px] h-[40px] shrink-0 flex justify-center items-center border-2 border-[#D4D4D4] rounded-full">
                     <Image src={'/modal/cross.svg'} alt="cross" height={15} width={15} />
                 </DialogClose>
             </DialogHeader>
 
-            <Form {...form} control={control} watch={watch} handleSubmit={handleSubmit}>
-                <form className="w-2/3 space-y-6">
+            <Form {...form}>
+                <form className="w-2/3 space-y-6 max-lg:w-full max-lg:space-y-4">
                     <FormField
                     control={control}
                     name="gender"
                     render={({ field }) => (
                         <FormItem className="space-y-3">
-                        <FormControl >
+                        <FormControl>
                             <RadioGroup
                             defaultValue={field.value}
-                            onValueChange={field.onChange}
+                            onValueChange={handleRadioChange}
                             className="flex flex-col gap-[40px] max-lg:gap-[20px]"
                             >
                             <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                <RadioGroupItem colorRadio={'#116466'} className='w-[30px] h-[30px]' value="male" />
+                                <RadioGroupItem colorRadio={'#116466'} className='w-[30px] h-[30px] max-lg:w-[24px] max-lg:h-[24px]' value="male" />
                                 </FormControl>
-                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
+                                <FormLabel className="font-normal text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px]">
                                 Мужской
                                 </FormLabel>
                             </FormItem>
                             <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                <RadioGroupItem colorRadio='#116466' className='w-[30px] h-[30px]' value="female" />
+                                <RadioGroupItem colorRadio='#116466' className='w-[30px] h-[30px] max-lg:w-[24px] max-lg:h-[24px]' value="female" />
                                 </FormControl>
-                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
+                                <FormLabel className="font-normal text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px]">
                                 Женский
                                 </FormLabel>
                             </FormItem>
                             <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
-                                <RadioGroupItem colorRadio='#116466' className='w-[30px] h-[30px]' value="none" />
+                                <RadioGroupItem colorRadio='#116466' className='w-[30px] h-[30px] max-lg:w-[24px] max-lg:h-[24px]' value="none" />
                                 </FormControl>
-                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
+                                <FormLabel className="font-normal text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px]">
                                     Не имеет значения
                                 </FormLabel>
                             </FormItem>
                             </RadioGroup>
                         </FormControl>
-                        <FormMessage />
+                        <FormMessage className="text-[14px]" />
                         </FormItem>
                     )}
                     />

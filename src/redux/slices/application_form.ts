@@ -1,23 +1,43 @@
-import { createSlice } from "@reduxjs/toolkit";
-import { ModalState } from "../store";
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { RootState } from '../store';
 
-const applicationFormSlice = createSlice({
+export type ApplicationStage = 
+    | 'name'
+    | 'age'
+    | 'gender'
+    | 'preferences'
+    | 'gender_psychologist'
+    | 'request'
+    | 'condition'
+    | 'traumatic'
+    | 'diseases_psychologist'
+    | 'promocode'
+    | 'phone'
+    | 'gratitude'
+    | 'error'
+    | 'emergency'
+    | 'psychologist';
+
+interface ApplicationFormState {
+    application_stage: ApplicationStage;
+}
+
+const initialState: ApplicationFormState = {
+    application_stage: 'name'
+};
+
+export const applicationFormSlice = createSlice({
     name: 'applicationForm',
-
-    initialState:{
-        application_stage: 'name',
-    },
-    
+    initialState,
     reducers: {
-        toNextStage(state, action) {
+        setApplicationStage: (state, action: PayloadAction<ApplicationStage>) => {
             state.application_stage = action.payload;
-        },
-    },
+        }
+    }
 });
 
+export const { setApplicationStage } = applicationFormSlice.actions;
+export const applicationFormReducer = applicationFormSlice.reducer;
 
-export const  { toNextStage } = applicationFormSlice.actions;
-
-export const application_stage = ( state: ModalState ) => state.applicationForm.application_stage;
-
-export default applicationFormSlice.reducer;
+// Селектор для получения текущего этапа
+export const selectCurrentStage = (state: RootState) => state.applicationForm.application_stage;

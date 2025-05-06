@@ -1,6 +1,4 @@
-import { ApplicationForm } from "@/views";
-
-
+import ApplicationForm from "@/views/application_form";
 
 export default function ApplicationFormLayout() {
     return (

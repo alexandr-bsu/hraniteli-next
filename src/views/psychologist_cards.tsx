@@ -1,318 +1,343 @@
 'use client'
-import { ModalState } from "@/redux/store";
+import { RootState } from "@/redux/store";
 import { Card, Filter } from "@/widgets";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from 'axios';
 import Error from "next/error";
-import { IPsychologist } from "@/entities/IPsychologist";
-import { fillDataNamePsycho } from "@/redux/slices/filter";
+import { IPsychologist } from "@/shared/types/psychologist.types";
+import { setDataNamePsychologist, fill_filtered_by_automatch_psy, setAvailableRequests } from "@/redux/slices/filter";
+import Image from "next/image";
+import { getPsychologistAll } from '@/features/actions/getPsychologistAll';
+import { getAvailableRequests } from '@/shared/api/requests';
+import { submitQuestionnaire } from '@/features/actions/getPsychologistSchedule';
 
 type Props = {
-    data: any;
+    data?: IPsychologist[];
+    isLoaded?: boolean;
 }
 
-export const Psychologist_cards = ({data} : Props) => { 
-    const filter = useSelector<ModalState>(state => state.filter) as any;
-    
-    const [ dataCard, setDataCard] = useState<IPsychologist[]>([]);
-
-    const [isLoading, setLoading] = useState(true);
-
+export const Psychologist_cards = ({data, isLoaded} : Props) => { 
+    const filter = useSelector<RootState, any>(state => state.filter);
+    const formData = useSelector((state: RootState) => state.applicationFormData);
+    const [isLoading, setLoading] = useState(!isLoaded);
+    const [error, setError] = useState<string | null>(null);
     const dispatch = useDispatch();
-
-    // useEffect(() => {
-    //     try
-    //     {
-    //         setLoading(true);
-    //         const apiUrl = 'https://n8n-v2.hrani.live/webhook/get-filtered-psychologists-test-contur';
-
-    //         axios.get(apiUrl).then((resp) => {
-    //             const allPsychologist = resp.data;
-
-    //         });
-    //     }
-    //     catch {
-    //         setLoading(false)
-    //         throw new Error('Something went wrong.' as any)
-    //     }
-    //     finally {
-    //         setLoading(false)
-    //     }
-    // },[]);
-
-    useEffect(() => {
-        console.log('data',data)
-
-        dispatch(fillDataNamePsycho(data.map((item: IPsychologist) => {
-            return item.name
-        })))
-        setDataCard(data);
-    },[data])
-
-    useEffect(() => {
-        try
-        {
-            setLoading(true);
-            FilterData(data)
-        }
-        catch {
-            setLoading(false)
-            throw new Error('Something went wrong.' as any)
-        }
-        finally {
-            setLoading(false)
-        }
-    },[filter]);
-
-
-    // useEffect(() => {
-    //     try
-    //     {
-    //         setLoading(true);
-    //         const apiUrl = 'https://n8n-v2.hrani.live/webhook/get-filtered-psychologists-test-contur';
-
-    //         console.log(filter)
-    //         axios.get(apiUrl).then((resp) => {
-    //             const allPsychologist = resp.data;
-    //             FilterData(allPsychologist)
-    //         });
-    //     }
-    //     catch {
-    //         setLoading(false)
-    //         throw new Error('Something went wrong.' as any)
-    //     }
-    //     finally {
-    //         setLoading(false)
-    //     }
-    // },[filter]);
     
+    // Проверка активности фильтров по цене или запросам
+    const hasActiveFilters = filter.price > 0 || (filter.requests?.length > 0);
+    
+    // Определяем отображаемый список карточек с учётом всех фильтров
+    const filtered_persons = useMemo(() => {
+        let result = [...filter.filtered_by_automatch_psy];
+        
+        // Применяем фильтр по полу
+        if (filter.gender !== 'other' && filter.filtered_by_gender?.length > 0) {
+            result = result.filter(item => 
+                filter.filtered_by_gender.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
 
-    //Метод фильтрации данных 
-    const FilterData = async(data: any) => {
-        const gender = filter.gender;
-        const price = filter.price;
-        let requests = filter.requests;
-        const dates = filter.dates;
-        const times = filter.times;
-        const hour_dates = filter.hour_dates;
-        const isVideo = filter.isVideo;
-        const mental_Illness = filter.IsMental_Illness;
-        const mental_Illness2 = filter.IsMental_Illness2;
+        // Применяем фильтр по избранным
+        if (filter.favorites) {
+            // Если фильтр включен, но нет избранных, всё равно применяем пустой фильтр
+            const favoriteIds = filter.filtered_by_favorites?.map((f: IPsychologist) => f.id) || [];
+            result = result.filter(item => favoriteIds.includes(item.id));
+        }
+        
+        // Применяем фильтр по запросам
+        if (filter.requests?.length > 0 && filter.filtered_by_requests?.length > 0) {
+            result = result.filter(item => 
+                filter.filtered_by_requests.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
+        
+        // Применяем фильтр по цене
+        if (filter.price > 0 && filter.filtered_by_price?.length > 0) {
+            result = result.filter(item => 
+                filter.filtered_by_price.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
+        
+        // Применяем фильтр по времени
+        if (filter.times?.length > 0 && filter.filtered_by_time?.length > 0) {
+            result = result.filter(item => 
+                filter.filtered_by_time.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
+        
+        // Применяем фильтр по дате
+        if (filter.dates?.length > 0 && filter.filtered_by_date?.length > 0) {
+            result = result.filter(item => 
+                filter.filtered_by_date.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
+        
+        // Применяем фильтр по видео
+        if (filter.video && filter.filtered_by_video?.length > 0) {
+            result = result.filter(item => 
+                filter.filtered_by_video.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
+        
+        // Применяем фильтр по психиатрическим заболеваниям
+        if (filter.mental_illness && filter.filtered_by_mental_illness?.length > 0) {
+            result = result.filter(item => 
+                filter.filtered_by_mental_illness.some((f: IPsychologist) => f.id === item.id)
+            );
+        }
+        
+        return result;
+    }, [
+        filter.filtered_by_automatch_psy,
+        filter.filtered_by_favorites,
+        filter.filtered_by_gender,
+        filter.filtered_by_requests,
+        filter.filtered_by_price,
+        filter.filtered_by_time,
+        filter.filtered_by_date,
+        filter.filtered_by_video,
+        filter.filtered_by_mental_illness,
+        filter.gender,
+        filter.requests,
+        filter.price,
+        filter.times,
+        filter.dates,
+        filter.video,
+        filter.mental_illness,
+        filter.favorites
+    ]);
+    
+    // Сортировка психологов по цене
+    const sortedPersons = useMemo(() => {
+        if (filter.price > 0) {
+            return [...filtered_persons].sort((a, b) => (a.min_session_price || 0) - (b.min_session_price || 0));
+        }
+        return filtered_persons;
+    }, [filtered_persons, filter.price]);
+    
+    // Инициализация данных
+    useEffect(() => {
+        // Если данные уже загружены из родительского компонента, пропускаем загрузку
+        if (isLoaded) {
+            setLoading(false);
+            return;
+        }
 
-        let filterData = data;
+        const loadData = async () => {
+            try {
+                setLoading(true);
+                const [psychologists, availableRequests] = await Promise.all([
+                    getPsychologistAll(),
+                    getAvailableRequests()
+                ]);
+                
+                if (!psychologists?.length) {
+                    setError('Не удалось загрузить данные психологов');
+                    return;
+                }
 
-        // Фильтрация по стоимости
-        if(filterData !== null && filterData !== undefined && price !== 1500) {  
-            if (filterData.length > 1) {
-                filterData = filterData.filter((item : any) => Number(item.min_session_price) <= price);
+                dispatch(fill_filtered_by_automatch_psy(psychologists));
+                dispatch(setAvailableRequests(availableRequests));
+            } catch (err) {
+                setError('Произошла ошибка при загрузке данных');
+                console.error('Error loading data:', err);
+            } finally {
+                setLoading(false);
             }
-        }
+        };
 
-        // Фильтрация по видео визитки 
-        if(filterData !== null && filterData !== undefined && isVideo) {  
-            const result = filterData.filter((item: any) => item.link_video !== null);
-            filterData = result;
-        }
+        loadData();
+    }, [dispatch, isLoaded]);
 
-// Фильтрация по психическим заболеваниям
-if (filterData) {
-    filterData = filterData.filter((psychologist: IPsychologist) => {
-        if (!psychologist.works_with) return false;
-        
-        const conditions = psychologist.works_with
-            .split(';')
-            .map(item => item.trim());
-        
-        // Проверяем "содержит" вместо точного соответствия
-        const hasMental = conditions.some(condition => 
-            condition.includes('психическое заболевание') || 
-            condition.includes('РПП') ||
-            condition.includes('СДВГ')
-        );
-        
-        const hasPsychiatric = conditions.some(condition =>
-            condition.includes('психиатрическое заболевание') ||
-            condition.includes('ПРЛ') ||
-            condition.includes('БАР') ||
-            condition.includes('ПТСР')
-        );
-        
-        // Определяем, нужно ли применять каждый фильтр
-        const applyMentalFilter = mental_Illness !== false;
-        const applyPsychiatricFilter = mental_Illness2 !== false;
-        
-        // Если ни один фильтр не применяется - показываем всех
-        if (!applyMentalFilter && !applyPsychiatricFilter) {
-            return true;
-        }
-        
-        // Проверяем соответствие включенным фильтрам
-        let matchesMental = true;
-        let matchesPsychiatric = true;
-        
-        if (applyMentalFilter) {
-            matchesMental = (mental_Illness === hasMental);
-        }
-        
-        if (applyPsychiatricFilter) {
-            matchesPsychiatric = (mental_Illness2 === hasPsychiatric);
-        }
-        
-        return matchesMental && matchesPsychiatric;
-    });
-}
-        
+    // Загрузка расписания
+    useEffect(() => {
+        const loadSchedules = async () => {
+            if (!filter.filtered_by_automatch_psy.length) return;
 
-        // Фильтрация по запросу
-        if(filterData !== null && filterData !== undefined && requests.length > 0) {
-            const result = []
-            requests = requests.map(function(item: any){
-                return item?.label;
-            })
-            for (let index = 0; index <= filterData.length - 1; index++) {
-                const queries = filterData[index].queries.split(';').map(function(item: any){
-                    return item.trimStart();
-                });
+            try {
+                const schedule = await submitQuestionnaire(formData);
 
-                let isInclude = true;
-                for (let index = 0; index < requests.length; index++) {
-                    if(!queries.includes(requests[index])) {
-                        isInclude = false;
-                        break;
+                if (schedule && schedule[0]?.items) {
+                    // Собираем расписание для каждого психолога
+                    const psychologistSchedules = new Map<string, any>();
+                    schedule[0].items.forEach((day: any) => {
+                        if (!day.slots) return;
+                        Object.entries(day.slots).forEach(([time, slots]) => {
+                            if (!Array.isArray(slots)) return;
+                            slots.forEach((slot: any) => {
+                                if (slot.psychologist) {
+                                    if (!psychologistSchedules.has(slot.psychologist)) {
+                                        const psychologistSchedule: { days: any[] } = { days: [] };
+                                        schedule[0].items.forEach((d: any) => {
+                                            const daySchedule = {
+                                                ...d,
+                                                slots: {}
+                                            };
+                                            if (d.slots) {
+                                                Object.entries(d.slots).forEach(([t, s]) => {
+                                                    if (Array.isArray(s)) {
+                                                        const psychologistSlots = s.filter(sl => sl.psychologist === slot.psychologist);
+                                                        if (psychologistSlots.length > 0) {
+                                                            daySchedule.slots[t] = psychologistSlots;
+                                                        }
+                                                    }
+                                                });
+                                            }
+                                            if (Object.keys(daySchedule.slots).length > 0) {
+                                                psychologistSchedule.days.push(daySchedule);
+                                            }
+                                        });
+                                        psychologistSchedules.set(slot.psychologist, psychologistSchedule);
+                                    }
+                                }
+                            });
+                        });
+                    });
+
+                    // Обновляем психологов с их расписаниями
+                    const updatedPsychologists = filter.filtered_by_automatch_psy.map((psy: any) => ({
+                        ...psy,
+                        schedule: psychologistSchedules.get(psy.name) || { days: [] }
+                    }));
+
+                    dispatch(fill_filtered_by_automatch_psy(updatedPsychologists));
+                }
+            } catch (error) {
+                console.error('Error loading schedules:', error);
+            }
+        };
+
+        loadSchedules();
+    }, [filter.filtered_by_automatch_psy.length, dispatch, formData]);
+
+    // Эффект для скролла к выбранному психологу
+    useEffect(() => {
+        const selectedPsychologist = filter.selected_psychologist;
+        if (selectedPsychologist && !isLoading) {            
+            setTimeout(() => {
+                const selectedCardId = `psychologist-card-${selectedPsychologist.id}`;
+                
+                const selectedCard = document.getElementById(selectedCardId);
+                if (selectedCard) {
+                    selectedCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                } else {
+                    console.error('Элемент не найден:', selectedCardId);
+                    
+                    // Если карточка не найдена по ID, пробуем найти по имени
+                    if (selectedPsychologist.name) {
+                        const nameBasedId = `psychologist-card-${selectedPsychologist.name.replace(/\s+/g, '_')}`;
+                        const cardByName = document.getElementById(nameBasedId);
+                        
+                        if (cardByName) {
+                            cardByName.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                        }
                     }
                 }
-
-                if(isInclude) {
-                    result.push(filterData[index]);
-                }              
-            }
-            if (result.length === 0) {
-                setDataCard([])
-                return;
-            }
-            filterData = result;  
+            }, 1000); // Увеличиваем время ожидания до 1 секунды
         }
-
-
-        // Фильтрация по полу
-        if(gender !== 'none' && gender !== 'Не имеет значения'  && gender !== '' && gender !== null && gender !== undefined) {
-            filterData = filterData.filter((item: any) => item.sex === gender);       
-        }
-
-        // Фильтрация по дате и  часам 
-        if(filterData !== null && filterData !== undefined && dates.length > 0) {
-            const result = []  as any
-            if (filterData != null && filterData != undefined) {
-                dates.forEach((element: any )=> {
-                    const persons = hour_dates.filter((item: any) => item.pretty_date === element.text)
-                    result.push(persons);
-                }); 
-            }
-    
-            const names = new Set();
-    
-            result.forEach((item: any) => {
-                item.forEach((element: any ) => {
-                    names.add(element.element1)
-                });
-            })
-
-            const newData = [] as any
-
-            names.forEach((res) => {
-                let findItem = data;
-                console.log(res)
-                findItem = data.find((item : any) => item.name === res);
-                if (findItem != undefined && findItem != null) {
-                    newData.push(findItem);
-                }
-            })
-
-            filterData = newData;
-        }
-
-        // Фильтрация по дате и  часам 
-        if(filterData !== null && filterData !== undefined && times.length > 0) {
-            const result = [] as any
-            if (filterData != null && filterData != undefined) {
-                times.forEach((element : any ) => {
-                    console.log(hour_dates)
-                    const persons = hour_dates.filter((item: any) => item.hour === element.text)
-                    result.push(persons);
-                }); 
-            }
-    
-            const names = new Set();
-    
-            result.forEach((item: any ) => {
-                item.forEach((element : any) => {
-                    names.add(element.element1)
-                });
-            })
-
-            const newData = [] as any
-
-            names.forEach((res) => {
-                let findItem = data;
-                findItem = data.find((item : any ) => item.name === res);
-                if (findItem != undefined && findItem != null) {
-                    newData.push(findItem);
-                }
-            })
-
-            filterData = newData;
-        }
-
-        if (filterData !== null && filterData !== undefined) {
-            if(filterData.length === 0) {
-                setDataCard([])
-                return;
-            }
-            if (Object.keys(dataCard)?.length === 1) {{
-                setDataCard(filterData)
-                return;
-            }}
-            setDataCard(filterData)
-        }
-    }
+    }, [filter.selected_psychologist, isLoading]);
 
     if (isLoading) {
         return (
-            <div className="mt-[50px] max-lg:mt-[20px] mb-[50px] max-lg:w-[100%] max-lg:px-[20px] w-full flex max-w-[1204px] max-lg:flex-col justify-center max-lg:gap-[20px] gap-[31px]  ">
-            <aside className="w-full min-lg:max-w-[383px]">
-                <Filter />
-            </aside>
-
-                <main className="min-lg:max-w-[790px] w-full">
-                    <h1>Загрузка...</h1> 
-                </main>
+            <div className="w-full h-[calc(100vh-80px)] flex items-center justify-center">
+                <div className="w-12 h-12 rounded-full border-4 border-[#116466] border-t-transparent animate-spin" />
             </div>
-        )
+        );
     }
-    
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center p-8 bg-white rounded-[20px] min-h-[400px]">
+                <Image 
+                    src="/error.svg" 
+                    alt="Ошибка" 
+                    width={200} 
+                    height={200}
+                    className="mb-6 opacity-80"
+                />
+                <h2 className="text-[24px] font-semibold text-[#116466] mb-2">
+                    Что-то пошло не так
+                </h2>
+                <p className="text-[16px] text-gray-500 text-center max-w-[400px]">
+                    {error}. Пожалуйста, попробуйте обновить страницу
+                </p>
+            </div>
+        );
+    }
+
+    const EmptyState = () => {
+        const hasActiveFilters = Boolean(
+            filter.requests?.length || 
+            filter.gender !== 'other' || 
+            filter.price > 0 || 
+            filter.dates?.length || 
+            filter.times?.length || 
+            filter.video || 
+            filter.mental_illness || 
+            filter.favorites
+        );
+
+        // Проверяем, выбран ли фильтр "Только избранные" и пуст ли список избранных
+        const isEmptyFavorites = filter.favorites && 
+            (!filter.filtered_by_favorites || filter.filtered_by_favorites.length === 0);
+
+        return (
+            <div className="flex flex-col items-center justify-center p-8 bg-white rounded-[20px] min-h-[400px]">
+                <Image 
+                    src={hasActiveFilters ? "/not-found.svg" : "/empty.svg"} 
+                    alt="Ничего не найдено" 
+                    width={200} 
+                    height={200}
+                    className="mb-6 opacity-80"
+                />
+                <h2 className="text-[24px] font-semibold text-[#116466] mb-2">
+                    {isEmptyFavorites 
+                        ? "Нет избранных Хранителей" 
+                        : hasActiveFilters 
+                            ? "Упс! Ничего не найдено" 
+                            : "Нет доступных специалистов"}
+                </h2>
+                <p className="text-[16px] text-gray-500 text-center max-w-[400px]">
+                    {isEmptyFavorites 
+                        ? "Добавьте Хранителей в избранное, чтобы они отображались здесь" 
+                        : hasActiveFilters 
+                            ? "Попробуйте изменить параметры фильтрации или сбросить фильтры" 
+                            : "В данный момент нет доступных специалистов. Пожалуйста, попробуйте позже"
+                    }
+                </p>
+            </div>
+        );
+    };
+
     return (
-        <div className="mt-[50px] max-lg:mt-[20px] mb-[50px] max-lg:w-[100%] max-lg:px-[20px] w-full flex max-w-[1204px] max-lg:flex-col justify-center max-lg:gap-[20px] gap-[31px]  ">
+        <div className="mt-[50px] max-lg:mt-[20px] mb-[50px] max-lg:w-[100%] max-lg:px-[20px] w-full flex max-w-[1204px] max-lg:flex-col justify-center max-lg:gap-[20px] gap-[31px]">
             <aside className="w-full min-lg:max-w-[383px]">
                 <Filter />
             </aside>
-
             <main className="min-lg:max-w-[790px] w-full">
-                <div className="flex flex-col gap-[20px]">
-                    {
-                        dataCard?.length > 1 && dataCard?.map((item: IPsychologist, i) => 
-                        <Card key={i} data={item} />)                    
-                    }
+                <div className="flex flex-col gap-[20px] pb-[50px]">
+                    {sortedPersons && sortedPersons.length > 0 ? (
+                        sortedPersons.map((item: IPsychologist, index: number) => {
+                            // Убедимся, что у каждого психолога есть ID
+                            if (!item.id && item.name) {
+                                item.id = `id_${item.name.replace(/\s+/g, '_')}`;
+                            }
+                            
+                            return (
+                                <Card 
+                                    key={item.id} 
+                                    psychologist={item} 
+                                    id={`psychologist-card-${item.id}`} 
+                                    isSelected={filter.selected_psychologist?.id === item.id} 
+                                    showBestMatch={hasActiveFilters && index < 3}
+                                />
+                            );
+                        })
+                    ) : (
+                        <EmptyState />
+                    )}
                 </div>
-                {
-                    Object.keys(dataCard)?.length === 0 && <h1>
-                        Ничего не найдено
-                    </h1>
-                }
-                {
-                    Object.keys(dataCard)?.length === 1 && dataCard?.map((item: IPsychologist, i) => 
-                        <Card key={i} data={item} />) 
-                }  
             </main>
         </div>
     );

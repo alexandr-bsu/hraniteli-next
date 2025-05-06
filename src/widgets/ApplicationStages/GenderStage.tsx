@@ -14,104 +14,105 @@ import {
 } from "@/components/ui/form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useDispatch } from "react-redux"
-import { toNextStage } from "@/redux/slices/application_form"
-import { fill_gender } from "@/redux/slices/application_form_data"
+import { setApplicationStage } from "@/redux/slices/application_form"
+import { setGenderUser } from "@/redux/slices/application_form_data"
+import { Gender } from "@/shared/types/application.types"
+import { COLORS } from '@/shared/constants/colors';
 
 const FormSchema = z.object({
     gender: z.enum(["male", "female"], {
-    required_error: "Вы не заполнили обязательное поле",
-  }),
+        required_error: "Вы не заполнили обязательное поле",
+    }),
 })
 
-const sex_data = {
-    ['male']: 'Мужчина',
-    ['female']: 'Женщина',
-} 
-
 export const GenderStageApplication = () => {
-
-
     const dispatch = useDispatch();
 
-      // 1. Загружаем сохраненное имя при инициализации
-      const savedGender = typeof window !== 'undefined' 
-      ? localStorage.getItem('app_gender') || 'male'
-      : 'female'
-    
-      //Настраиваем форму
-        const form = useForm<z.infer<typeof FormSchema>>({
-            resolver: zodResolver(FormSchema),
-            defaultValues: {
-                gender: savedGender as 'male' | 'female' || undefined,
-            }
-        })
-    
-         const handleSubmit = (data: { gender: string }) => {
-            localStorage.setItem('app_gender', data.gender) // Сохраняем в localStorage
-            dispatch(fill_gender(data.gender)) // Сохраняем в Redux (если нужно)
-            dispatch(toNextStage('preferences')) // Переход на следующую страницу
+    const savedGender = typeof window !== 'undefined' 
+        ? localStorage.getItem('app_gender') || 'male'
+        : 'female'
 
-         }
+    const form = useForm<z.infer<typeof FormSchema>>({
+        resolver: zodResolver(FormSchema),
+        defaultValues: {
+            gender: savedGender as 'male' | 'female' || undefined,
+        }
+    })
 
-  return (
-    <div className='px-[50px] max-lg:px-[20px]  flex w-full grow'>
-        <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col mt-[30px]">
-            <FormField
-            control={form.control}
-            name="gender"
-            render={({ field }) => (
-                <div className='grow'>
-                <FormItem className='grow'>
-                    <FormLabel className=' max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>Какой у вас пол?</FormLabel>
-                    <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px] mt-[10px]'>
-                        Мы учитываем ваш пол при подборе психолога
-                    </FormDescription>
-                    <FormControl className="mt-[20px]">
-                        <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col"
+    const handleSubmit = (data: { gender: Gender }) => {
+        localStorage.setItem('app_gender', data.gender)
+        dispatch(setGenderUser(data.gender))
+        dispatch(setApplicationStage('preferences'))
+    }
+
+    return (
+        <div className='px-[50px] max-lg:px-[20px] flex w-full grow'>
+            <Form {...form}>
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col mt-[30px]">
+                    <FormField
+                        control={form.control}
+                        name="gender"
+                        render={({ field }) => (
+                            <div className='grow'>
+                                <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
+                                    <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
+                                        Какой у вас пол?
+                                    </FormLabel>
+                                    <FormDescription className='text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
+                                        Мы учитываем ваш пол при подборе психолога
+                                    </FormDescription>
+                                    <FormControl className="mt-[20px] max-lg:mt-[16px]">
+                                        <RadioGroup
+                                            onValueChange={field.onChange}
+                                            defaultValue={field.value}
+                                            className="flex flex-col gap-[20px] max-lg:gap-[16px]"
+                                        >
+                                            <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
+                                                <FormControl>
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="male" />
+                                                </FormControl>
+                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
+                                                    Мужской
+                                                </FormLabel>
+                                            </FormItem>
+                                            <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
+                                                <FormControl> 
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="female" />
+                                                </FormControl>
+                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
+                                                    Женский
+                                                </FormLabel>
+                                            </FormItem>
+                                        </RadioGroup>
+                                    </FormControl>
+                                    {!form.formState.errors.gender && 
+                                        <span className='mt-[10px] max-lg:text-[14px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
+                                            Поле обязательное для заполнения
+                                        </span>
+                                    }
+                                    <FormMessage className="mt-[10px] max-lg:text-[14px]"/>
+                                </FormItem>
+                            </div>
+                        )}
+                    />
+                    <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
+                        <button 
+                            type='button'
+                            onClick={() => dispatch(setApplicationStage('age'))} 
+                            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
-                            <FormItem className="flex items-center gap-[15px]">
-                                <FormControl>
-                                <RadioGroupItem className="h-[30px] w-[30px]" value="male" />
-                                </FormControl>
-                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
-                                    Мужской
-                                </FormLabel>
-                            </FormItem>
-                            <FormItem className="flex items-center gap-[15px]">
-                                <FormControl> 
-                                <RadioGroupItem className="h-[30px] w-[30px]" value="female" />
-                                </FormControl>
-                                <FormLabel className="font-normal text-[18px] max-lg:text-[14px]">
-                                    Женский
-                                </FormLabel>
-                            </FormItem>
-                        </RadioGroup>
-                    </FormControl>
-                    { !form.formState.errors.gender && 
-                        <span className='mt-[10px] max-lg:text-[12px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
-                         Это обязательное поле
-                        </span>
-                    }
-                    <FormMessage className="mt-[10px]"/>
-                </FormItem>
-                </div>
-            )}
-            />
-            <div className="shrink-0  pb-[50px] flex gap-[10px]">
-                <button type='submit' onClick={() => dispatch(toNextStage('age'))} className="cursor-pointer shrink-0 w-[81px] border-[1px] border-[#116466] p-[12px] text-[#116466] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]">
-                    Назад
-                </button>
+                            Назад
+                        </button>
 
-                <button type='submit' className="cursor-pointer grow border-[1px] bg-[#116466] p-[12px] text-[white] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]">
-                    Продолжить
-                </button>
-            </div>
-        </form>
-        </Form>
-    </div>
-  )
+                        <button 
+                            type='submit' 
+                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
+                        >
+                            Продолжить
+                        </button>
+                    </div>
+                </form>
+            </Form>
+        </div>
+    )
 }

@@ -1,359 +1,617 @@
-import { getTimeDifference } from "@/features/utils";
-import { toNextStage } from "@/redux/slices/application_form";
-import { fill_maxIndex, fill_slots } from "@/redux/slices/application_form_data";
-import { fill_filtered_by_automatch_psy } from "@/redux/slices/filter";
-import { ModalState } from "@/redux/store";
-import axios from "axios";
-import { useCallback, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import PsychologistStageItem from "./PsychologistStageItem";
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setApplicationStage } from '@/redux/slices/application_form';
+import { setIndexPhyc, setHasMatchingError, setSelectedSlots, setSelectedSlotsObjects } from '@/redux/slices/application_form_data';
+
+import { getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
+import { IPsychologist } from '@/shared/types/psychologist.types';
+import Image from 'next/image';
+import { COLORS } from '@/shared/constants/colors';
+import Link from 'next/link';
+import { RootState } from '@/redux/store';
+import { fill_filtered_by_automatch_psy, setSelectedPsychologist } from '@/redux/slices/filter';
+import { Tooltip } from '@/shared/ui/Tooltip';
+import { NoMatchError } from './NoMatchError';
+import { EmergencyContacts } from './EmergencyContacts';
+import axios from 'axios';
+import { toast } from 'sonner';
+import styles from './PsychologistStage.module.scss';
+
+interface Slot {
+  id: string;
+  psychologist: string;
+  date: string;
+  time: string;
+  state: string;
+  ticket: string | null;
+  client_id: string | null;
+  meeting_link: string | null;
+  meeting_id: string | null;
+  calendar_meeting_id: string | null;
+  confirmed: boolean;
+  auto_assigned: boolean;
+  auto_canceled: boolean;
+  is_helpful_hand: boolean | null;
+  "Дата Локальная": string;
+  "Время Локальное": string;
+}
+
+interface TimeSlot {
+  state: string;
+  [key: string]: any;
+}
+
+interface DaySchedule {
+  [time: string]: TimeSlot;
+}
+
+interface Schedule {
+  [date: string]: DaySchedule;
+}
+
+interface ScheduleDay {
+  date: string;
+  slots: {
+    [key: string]: Slot[];
+  };
+  day_name: string;
+  pretty_date: string;
+}
+
+interface SimpleSlot {
+  date: string;
+  time: string;
+}
+
+const getGoogleDriveImageUrl = (url: string | undefined) => {
+  if (!url) return '/images/default-avatar.png';
+
+  // Если это cdnvideo.ru, возвращаем как есть
+  if (url.includes('cdnvideo.ru')) return url;
+
+  // Убираем @ в начале ссылки если есть
+  const cleanUrl = url.startsWith('@') ? url.slice(1) : url;
+
+  // Если это не гугл драйв ссылка - возвращаем как есть
+  if (!cleanUrl.includes('drive.google.com')) return cleanUrl;
+
+  // Если ссылка уже в нужном формате - возвращаем как есть
+  if (cleanUrl.includes('/uc?')) return cleanUrl;
+
+  // Извлекаем ID файла из разных форматов ссылок
+  let fileId = '';
+  if (cleanUrl.includes('/d/')) {
+    fileId = cleanUrl.match(/\/d\/(.+?)(?:\/|$)/)?.[1] || '';
+  } else if (cleanUrl.includes('id=')) {
+    fileId = cleanUrl.match(/id=(.+?)(?:&|$)/)?.[1] || '';
+  } else if (cleanUrl.includes('/file/d/')) {
+    fileId = cleanUrl.match(/\/file\/d\/([^/]+)/)?.[1] || '';
+  }
+
+  if (!fileId) return '/images/default-avatar.png';
+
+  return `https://drive.google.com/uc?export=view&id=${fileId}`;
+};
+
+const getPsychologistDeclension = (count: number): string => {
+  const lastDigit = count % 10;
+  const lastTwoDigits = count % 100;
+
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
+    return 'психологов';
+  }
+
+  if (lastDigit === 1) {
+    return 'психолога';
+  }
+
+  if (lastDigit >= 2 && lastDigit <= 4) {
+    return 'психолога';
+  }
+
+  return 'психологов';
+};
 
 export const PsychologistStage = () => {
-    const dispatch = useDispatch();
-
-    const filtered_persons = useSelector<ModalState>(state => state.filter.filtered_by_automatch_psy) as any;
-
-    const application_form_data = useSelector<ModalState>(state => state) as ModalState;
-
-    const [resultData, setResultData] = useState() as any [];
-    
-    const hours = [
-        '00:00',
-        '01:00',
-        '02:00',
-        '03:00',
-        '04:00',
-        '05:00',
-        '06:00',
-        '07:00',
-        '08:00',
-        '09:00',
-        '10:00',
-        '11:00',
-        '12:00',
-        '13:00',
-        '14:00',
-        '15:00',
-        '16:00',
-        '17:00',
-        '18:00',
-        '19:00',
-        '20:00',
-        '21:00',
-        '22:00',
-        '23:00',
-    ]
-
-
-    useEffect(() => {
-        const time_difference = getTimeDifference();
-
-        const data = {
-            anxieties: [],
-            questions: [],
-            customQuestion: [],
-
-            diagnoses:  [application_form_data.applicationFormData.diseases[0]],
-
-            diagnoseMedicaments: 'Нет',
-
-            diagnoseInfo:false,
-
-            traumaticEvents: [...application_form_data.applicationFormData.actions, application_form_data.applicationFormData.custom_preferences],
-
-            clientStates: application_form_data.applicationFormData.preferences,
-
-            selectedPsychologistsNames: [],
-
-            shownPsychologists: '',
-            lastExperience: 'Да, было.  До года',
-            amountExpectations: '',
-            age: Number(application_form_data.applicationFormData.age),
-
-            slots: [],
-            slots_objects: [],
-
-            contactType: 'Telegram',
-            contact: '+71234567890',
-
-            name: application_form_data.applicationFormData.username,
-
-            promocode: application_form_data.applicationFormData.promocode,
-
-            ticket_id: application_form_data.applicationFormData.ticketID,
-
-            emptySlots: false,
-
-            userTimeZone: time_difference,
-            userTimeOffsetMsk: time_difference,
-            bid: 3764,
-
-            rid: 4091,
-
-            categoryType: '',
-
-            customCategory: '',
-
-            question_to_psychologist: application_form_data.applicationFormData.requests,
-
-            filtered_by_automatch_psy_names: [],
-
-            _queries: '',
-
-            customTraumaticEvent: 'Ещё одно состояние',
-
-            customState: '',
-
-            formPsyClientInfo: {
-                age: 18,
-                city: '',
-                sex: application_form_data.applicationFormData.gender_user,
-                psychoEducated: 'Да, я практикующий специалист',
-                anxieties: [],
-                customAnexiety: '',
-                hasPsychoExperience: 'Да, я работал(а) с психологом/психотерапевтом',
-                meetType: 'Оффлайн',
-                selectionСriteria: '',
-                custmCreteria: '',
-                importancePsycho: application_form_data.applicationFormData.preferences,
-
-                customImportance: application_form_data.applicationFormData.custom_preferences,
-
-                agePsycho: '',
-                sexPsycho: 'Не имеет значения',
-                priceLastSession: '',
-                durationSession: 'До года',
-                reasonCancel: 'Не помогло, вообще прекратил(а)',
-                pricePsycho: '',
-                reasonNonApplication: '',
-                contactType: '',
-                contact: '+71234567890',
-                name: application_form_data.applicationFormData.username,
-                is_adult: true,
-                is_last_page: false,
-                occupation: 'Предприниматель'     
-            },
-            utm_client: null,
-            utm_tarif: undefined,
-            utm_campaign: null,
-            utm_content: null,
-            utm_medium: null,
-            utm_source: null,
-            utm_term: null,
-            utm_psy: undefined
-        }
-
-        const apiUrl = 'https://n8n-v2.hrani.live/webhook/get-aggregated-psychologist-schedule-test-contur';
-
-        axios.post(apiUrl, data).then((resp) => {
-            const data = resp.data;
-            const result = [] as any
-
-            data[0].items.map((item:any) => {
-                // Массив [ Person ]
-                [item.slots].forEach((element: any) => {                  
-                    for (let index = 0; index < Object.keys(element).length; index++) {
-                        const slot = element[hours[index]]
-                        if (slot !== undefined && slot !== null && slot.length > 0)
-                        {
-                            slot.forEach((elementSlot:any) => {
-                                result.push(elementSlot)
-                            });
-                        }
-                    }
-                })
-            })
-
-            const names = new Set();
-
-            result.forEach((element: any) => {
-                names.add(element.psychologist);
-            });
-            
-            const apiUrl = 'https://n8n-v2.hrani.live/webhook/get-filtered-psychologists-test-contur';
-            axios.get(apiUrl).then((resp: any) => {
-                const persons = [] as any;
-                const newData = resp.data;
-                console.log(newData)
-
-                names.forEach((e) => {
-                    const data = result.filter((item:any) => item.psychologist === e)
-                    const dataPerson = newData.find((item:any) => item.name === e)
-                    console.log(dataPerson)
-                    console.log(newData[0].name)
-                    persons.push({
-                        name: e,
-                        slots: [
-                            ...data,
-                        ],
-                        experience: dataPerson?.experience,
-                        age: dataPerson?.age,
-                        max_session_price: dataPerson?.max_session_price,
-                        main_modal: dataPerson?.main_modal,
-                    })
-                })
-                dispatch(fill_maxIndex(persons.length))
-    
-                dispatch(fill_filtered_by_automatch_psy(persons))
-            });
-        });
-    },[])
-
-    const handleSubmit = useCallback(() => {
-        const time_difference = getTimeDifference();
-
-        const data = {
-            anxieties: [],
-            questions: [],
-            customQuestion: [],
-
-            diagnoses:  [application_form_data.applicationFormData.diseases[0]],
-
-            diagnoseMedicaments: 'Нет',
-
-            diagnoseInfo:false,
-
-            traumaticEvents: [...application_form_data.applicationFormData.actions, application_form_data.applicationFormData.custom_preferences],
-
-            clientStates: application_form_data.applicationFormData.preferences,
-
-            selectedPsychologistsNames: [],
-
-            shownPsychologists: '',
-            lastExperience: 'Да, было.  До года',
-            amountExpectations: '',
-            age: Number(application_form_data.applicationFormData.age),
-
-            slots: [
-                resultData.map((item: any) => {
-                    return item.text;
-                })
-            ],
-            slots_objects: [
-                resultData.map((item: any) => {
-                    return item.id;
-                })
-            ],
-
-            contactType: 'Telegram',
-            contact: '+71234567890',
-
-            name: application_form_data.applicationFormData.username,
-
-            promocode: application_form_data.applicationFormData.promocode,
-
-            ticket_id: application_form_data.applicationFormData.ticketID,
-
-            emptySlots: false,
-
-            userTimeZone: time_difference,
-            userTimeOffsetMsk: time_difference,
-            bid: 3764,
-
-            rid: 4091,
-
-            categoryType: '',
-
-            customCategory: '',
-
-            question_to_psychologist: application_form_data.applicationFormData.requests,
-
-            filtered_by_automatch_psy_names: filtered_persons?.map((item:any) => {
-                return item.name
-            }),
-
-            _queries: '',
-
-            customTraumaticEvent: 'Ещё одно состояние',
-
-            customState: '',
-
-            formPsyClientInfo: {
-                age: 18,
-                city: '',
-                sex: application_form_data.applicationFormData.gender_user,
-                psychoEducated: 'Да, я практикующий специалист',
-                anxieties: [],
-                customAnexiety: '',
-                hasPsychoExperience: 'Да, я работал(а) с психологом/психотерапевтом',
-                meetType: 'Оффлайн',
-                selectionСriteria: '',
-                custmCreteria: '',
-                importancePsycho: application_form_data.applicationFormData.preferences,
-
-                customImportance: application_form_data.applicationFormData.custom_preferences,
-
-                agePsycho: '',
-                sexPsycho: 'Не имеет значения',
-                priceLastSession: '',
-                durationSession: 'До года',
-                reasonCancel: 'Не помогло, вообще прекратил(а)',
-                pricePsycho: '',
-                reasonNonApplication: '',
-                contactType: '',
-                contact: '+71234567890',
-                name: application_form_data.applicationFormData.username,
-                is_adult: true,
-                is_last_page: false,
-                occupation: 'Предприниматель'     
-            },
-            utm_client: null,
-            utm_tarif: undefined,
-            utm_campaign: null,
-            utm_content: null,
-            utm_medium: null,
-            utm_source: null,
-            utm_term: null,
-            utm_psy: undefined
-        }
-
-        const apiUrl = 'https://n8n-v2.hrani.live/webhook/get-aggregated-psychologist-schedule-test-contur';
-
-        const delayBeforeSuccess = setTimeout(() => {
-            dispatch(toNextStage('gratitude'))
-        },1000)
-
-        console.log(data)
-
-        axios.post(apiUrl, data).then(() => {
-            console.log('success');
-
-            return () => delayBeforeSuccess;
-        }).catch(() => {
-
+  const dispatch = useDispatch();
+  const [selectedSlot, setSelectedSlot] = useState<SimpleSlot | null>(null);
+  const [showNoMatch, setShowNoMatch] = useState(false);
+  const [showEmergency, setShowEmergency] = useState(false);
+  const [retryCount, setRetryCount] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [availableSlots, setAvailableSlots] = useState<SimpleSlot[]>([]);
+
+  // UPDATED извлекаем ticketId из Redux
+  const ticketID = useSelector<RootState, string>(
+    state => state.applicationFormData.ticketID
+  );
+
+  const filtered_by_automatch_psy = useSelector<RootState, any[]>(
+    state => state.filter.filtered_by_automatch_psy
+  );
+  const currentIndex = useSelector((state: RootState) => state.applicationFormData.index_phyc);
+
+  useEffect(() => {
+    const fetchPsychologists = async () => {
+      if (filtered_by_automatch_psy.length > 0) {
+        setIsLoading(false);
+        return;
+      }
+
+      setIsLoading(true);
+      try {
+        // Получаем полные данные психологов
+        const { items: fullPsychologists } = await getFilteredPsychologists();
+
+        // Мерджим с текущими психологами из стора, приоритет отдаем слотам из стора
+        const mergedPsychologists = fullPsychologists.map((fullPsy: IPsychologist) => {
+          const existingPsy = filtered_by_automatch_psy.find(p => p.name === fullPsy.name);
+          if (existingPsy) {
+            return {
+              ...fullPsy,
+              schedule: existingPsy.schedule || fullPsy.schedule,
+              slots: existingPsy.slots || fullPsy.slots
+            };
+          }
+          return fullPsy;
         });
 
-        dispatch(fill_slots(resultData));
+        if (mergedPsychologists?.length) {
+          dispatch(fill_filtered_by_automatch_psy(mergedPsychologists));
+          dispatch(setHasMatchingError(false));
+        } else {
+          dispatch(setHasMatchingError(true));
+          setShowNoMatch(true);
+        }
+      } catch (error) {
+        console.error('Failed to fetch psychologists:', error);
+        dispatch(setHasMatchingError(true));
+        setShowNoMatch(true);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-        return () => delayBeforeSuccess;
-    },[resultData])
+    fetchPsychologists();
+  }, []);
 
+  useEffect(() => {
+    if (!isLoading && filtered_by_automatch_psy.length === 0) {
+      setShowNoMatch(true);
+    }
+  }, [filtered_by_automatch_psy.length, isLoading]);
+
+  useEffect(() => {
+    if (!isLoading && filtered_by_automatch_psy.length === 0 && retryCount > 0) {
+      setShowEmergency(true);
+    }
+  }, [filtered_by_automatch_psy.length, retryCount, isLoading]);
+
+  useEffect(() => {
+    const loadSlots = async () => {
+      try {
+        const currentPsychologist = filtered_by_automatch_psy[currentIndex];
+        if (!currentPsychologist?.schedule) {
+          setAvailableSlots([]);
+          return;
+        }
+
+        const slots: SimpleSlot[] = [];
+        const schedule = currentPsychologist.schedule as Schedule;
+
+        // Обрабатываем расписание как объект с датами
+        Object.entries(schedule).forEach(([date, timeSlots]) => {
+
+          // Проверяем что есть слоты на эту дату
+          if (Object.keys(timeSlots).length > 0) {
+            Object.entries(timeSlots).forEach(([time, slot]) => {
+              if (slot.state === 'Свободен') {
+                // Время уже в нужном часовом поясе, не конвертируем
+                slots.push({
+                  date: date,
+                  time: time
+                });
+              }
+            });
+          }
+        });
+
+        // Сортируем слоты по дате и времени
+        const sortedSlots = slots.sort((a, b) => {
+          const dateA = new Date(a.date.split('.').reverse().join('-') + ' ' + a.time);
+          const dateB = new Date(b.date.split('.').reverse().join('-') + ' ' + b.time);
+          return dateA.getTime() - dateB.getTime();
+        });
+
+        setAvailableSlots(sortedSlots);
+
+      } catch (error) {
+        console.error('Error loading slots:', error);
+        setAvailableSlots([]);
+      }
+    };
+
+    loadSlots();
+  }, [currentIndex, filtered_by_automatch_psy]);
+
+  const currentPsychologist = filtered_by_automatch_psy[currentIndex];
+
+  const getFilterQueryParams = () => {
+    const params = new URLSearchParams();
+
+    if (currentPsychologist?.id) {
+      // Убедимся, что используем ID, а не имя
+      params.append('selected_psychologist', currentPsychologist.id);
+    } else if (currentPsychologist?.name) {
+      // Если ID отсутствует, используем name (но это временное решение)
+      console.warn('ID психолога отсутствует, используем name:', currentPsychologist.name);
+      // Генерируем id из имени, если его нет
+      const generatedId = `id_${currentPsychologist.name.replace(/\s+/g, '_')}`;
+      params.append('selected_psychologist', generatedId);
+    }
+
+    return `/?${params.toString()}`;
+  };
+
+  const handleOpenPsychologistCard = () => {
+    const url = getFilterQueryParams();
+    if (currentPsychologist) {
+
+      // Проверяем наличие ID и при необходимости добавляем его
+      if (!currentPsychologist.id && currentPsychologist.name) {
+        const generatedId = `id_${currentPsychologist.name.replace(/\s+/g, '_')}`;
+        currentPsychologist.id = generatedId;
+      }
+
+      // Устанавливаем выбранного психолога для скролла на главной странице
+      dispatch(setSelectedPsychologist(currentPsychologist));
+    }
+    window.open(url, '_blank');
+  };
+
+  const handleCloseNoMatch = () => {
+    setShowNoMatch(false);
+    setRetryCount(prev => prev + 1);
+  };
+
+  const handleCloseEmergency = () => {
+    setShowEmergency(false);
+  };
+
+  const handlePrevious = () => {
+    if (currentIndex > 0) {
+      setSelectedSlot(null);
+      setAvailableSlots([]);
+      dispatch(setIndexPhyc(currentIndex - 1));
+    }
+  };
+
+  const handleNext = () => {
+    if (currentIndex < filtered_by_automatch_psy.length - 1) {
+      setSelectedSlot(null);
+      setAvailableSlots([]);
+      dispatch(setIndexPhyc(currentIndex + 1));
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (selectedSlot) {
+      setIsSubmitting(true);
+      try {
+        // Форматируем дату из DD.MM в DD.M
+        const [day, month] = selectedSlot.date.split('.');
+        const formattedDate = `${parseInt(day)}.${parseInt(month)}`;
+
+        // Время уже в нужном формате, не конвертируем
+        const formattedSlot = `${formattedDate} ${selectedSlot.time}`;
+
+        // Получаем запросы из localStorage
+        const storedRequests = localStorage.getItem('app_requests') ?
+          JSON.parse(localStorage.getItem('app_requests') || '[]') : [];
+
+        const requestData = {
+          anxieties: [],
+          questions: storedRequests,
+          customQuestion: [],
+          diagnoses: localStorage.getItem('app_diseases') ?
+            JSON.parse(localStorage.getItem('app_diseases') || '[]') : [],
+          diagnoseInfo: "",
+          diagnoseMedicaments: localStorage.getItem('app_diseases_psychologist') ?
+            JSON.parse(localStorage.getItem('app_diseases_psychologist') || '{}').medications : '',
+          traumaticEvents: localStorage.getItem('app_traumatic') ?
+            JSON.parse(localStorage.getItem('app_traumatic') || '[]') : [],
+          clientStates: localStorage.getItem('app_conditions') ?
+            JSON.parse(localStorage.getItem('app_conditions') || '[]') : [],
+          selectedPsychologistsNames: [currentPsychologist?.name],
+          shownPsychologists: currentPsychologist?.name || "",
+          lastExperience: "",
+          amountExpectations: "",
+          age: localStorage.getItem('app_age') || '',
+          slots: [formattedSlot],
+          slots_objects: [],
+          contactType: "Phone",
+          contact: localStorage.getItem('app_phone') || '',
+          name: localStorage.getItem('app_username') || '',
+          promocode: localStorage.getItem('app_promocode') || '',
+          // UPDATE: устанавливаем ticket_id из redux 
+          ticket_id: ticketID || '',
+
+          // ticket_id: localStorage.getItem('app_ticket_id') || '',
+          emptySlots: false,
+          userTimeZone: "МСК",
+          bid: 0,
+          rid: 0,
+          categoryType: "",
+          customCategory: "",
+          question_to_psychologist: storedRequests.join('; '),
+          filtered_by_automatch_psy_names: [currentPsychologist?.name],
+          _queries: "",
+          customTraumaticEvent: "",
+          customState: "",
+          formPsyClientInfo: {
+            age: localStorage.getItem('app_age') || '',
+            city: "",
+            sex: localStorage.getItem('app_gender') === 'male' ? 'Мужской' :
+              localStorage.getItem('app_gender') === 'female' ? 'Женский' : '',
+            psychoEducated: "",
+            anxieties: [],
+            customAnexiety: "",
+            hasPsychoExperience: "",
+            meetType: "",
+            selectionСriteria: "",
+            custmCreteria: "",
+            importancePsycho: localStorage.getItem('app_preferences') ?
+              JSON.parse(localStorage.getItem('app_preferences') || '[]') : [],
+            customImportance: localStorage.getItem('app_custom_preferences') || '',
+            agePsycho: "",
+            sexPsycho: localStorage.getItem('app_gender_psychologist') === 'male' ? 'Мужчина' :
+              localStorage.getItem('app_gender_psychologist') === 'female' ? 'Женщина' : 'Не имеет значения',
+            priceLastSession: "",
+            durationSession: "",
+            reasonCancel: "",
+            pricePsycho: "",
+            reasonNonApplication: "",
+            contactType: "Phone",
+            contact: localStorage.getItem('app_phone') || '',
+            name: localStorage.getItem('app_username') || '',
+            is_adult: parseInt(localStorage.getItem('app_age') || '0') >= 18,
+            is_last_page: true,
+            occupation: ""
+          }
+        };
+
+
+        const response = await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka', requestData);
+
+        if (response.status === 200) {
+          dispatch(setSelectedSlots([formattedSlot]));
+          dispatch(setSelectedSlotsObjects([]));
+          dispatch(setApplicationStage('gratitude'));
+        } else {
+          throw new Error('Ошибка при отправке заявки');
+        }
+      } catch (error) {
+        console.error('Ошибка при отправке заявки:', error);
+        toast.error('Произошла ошибка при отправке заявки. Пожалуйста, попробуйте еще раз.');
+      } finally {
+        setIsSubmitting(false);
+      }
+    }
+  };
+
+  const handleSlotSelect = (slot: SimpleSlot) => {
+    // Время уже в нужном формате, не нужно комментировать
+    setSelectedSlot(slot);
+  };
+
+  if (isLoading) {
     return (
-        <>
-            <div className="flex flex-col min-h-full min-lg:mx-[40px] max-lg:px-[20px] mt-[20px] grow h-[100%]">
-                <div className="grow w-full justify-center min-h-full h-[100%]">
-                    {
-                        filtered_persons?.map((item: any, i: any) => <>
-                            <PsychologistStageItem index={i} onSubmit={(d) => {
-                                setResultData(d)
-                            }} data={item} />
-                        </>)
-                    }
-                </div>
-
-
-                <div className="shrink-0 mt-[25px]  pb-[50px] flex gap-[10px]">
-                    <button onClick={() => dispatch(toNextStage('promocode'))} className="cursor-pointer shrink-0 w-[81px] border-[1px] border-[#116466] p-[12px] text-[#116466] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]">
-                        Назад
-                    </button>
-
-                    <button type='button'  onClick={() => {
-                        handleSubmit();
-                        }} className="cursor-pointer grow border-[1px] bg-[#116466] p-[12px] text-[white] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]">
-                        Продолжить
-                    </button>
-                </div>
-            </div>
-        </>
+      <div className="flex flex-col items-center justify-center h-full">
+        <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
+        <span className="mt-4 text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[14px] text-[#116466]">Загрузка психологов...</span>
+      </div>
     );
+  }
+
+  if (showEmergency) {
+    return <EmergencyContacts onClose={handleCloseEmergency} />;
+  }
+
+  if (showNoMatch) {
+    return <NoMatchError onClose={handleCloseNoMatch} />;
+  }
+
+  if (!filtered_by_automatch_psy.length) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full">
+        <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
+        <span className="mt-4 text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[14px] text-[#116466]">Загрузка психологов...</span>
+      </div>
+    );
+  }
+
+  const remainingPsychologists = filtered_by_automatch_psy.length - (currentIndex + 1);
+
+  return (
+    <div className="px-[50px] max-lg:px-[20px] flex w-full grow relative max-lg:overflow-y-auto">
+      {isSubmitting && (
+        <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50">
+          <div className="flex flex-col items-center gap-[10px]">
+            <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-[18px] text-[#116466]">Отправка заявки...</span>
+          </div>
+        </div>
+      )}
+
+      <div className="flex flex-col h-full w-full pb-[120px] max-lg:pb-[0px]">
+        <div className="flex justify-between items-center mt-[20px] mb-[20px] max-lg:gap-[15px] min-h-[50px]">
+          {filtered_by_automatch_psy.length > 1 && (
+            <>
+              {currentIndex > 0 && (
+                <button
+                  onClick={handlePrevious}
+                  className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]"
+                >
+                  <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
+                  <span>Предыдущий психолог</span>
+                </button>
+              )}
+              {currentIndex < filtered_by_automatch_psy.length - 1 && remainingPsychologists > 0 && (
+                <button
+                  onClick={handleNext}
+                  className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ml-auto"
+                >
+                  <span>Показать еще {remainingPsychologists} {getPsychologistDeclension(remainingPsychologists)}</span>
+                  <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
+                </button>
+              )}
+            </>
+          )}
+        </div>
+        <div className="flex flex-col p-[25px] max-lg:p-[15px] mb-[43px] max-lg:mb-[20px] border-[1px] rounded-[25px] lg:overflow-y-auto lg:h-[400px] scrollContainer max-md:pb-[100px]">
+          <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-lg:flex-col max-lg:gap-[15px]">
+            <div className="flex gap-[20px] items-center max-lg:gap-[15px]">
+              <div className="w-[80px] h-[80px] max-lg:w-[60px] max-lg:h-[60px] rounded-full overflow-hidden">
+                <Image
+                  src={getGoogleDriveImageUrl(currentPsychologist?.avatar || currentPsychologist?.link_photo)}
+                  alt={currentPsychologist?.name || 'Фото психолога'}
+                  width={80}
+                  height={80}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    const defaultSrc = '/images/default-avatar.png';
+                    if (img.src !== defaultSrc) {
+                      img.src = defaultSrc;
+                    }
+                  }}
+                  priority
+                />
+              </div>
+              <div>
+                <h3 className="text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[14px] font-semibold">
+                  {currentPsychologist?.name}
+                  {currentPsychologist?.age && currentPsychologist.age !== 0 && `, ${currentPsychologist.age} лет`}
+                </h3>
+                <span className="text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#9A9A9A]">
+                  {currentPsychologist?.experience && (
+                    <span>{currentPsychologist.experience}{' '}</span>
+                  )}
+                  {currentPsychologist?.in_community && (
+                    <span>в сообществе</span>
+                  )}
+                </span>
+              </div>
+            </div>
+            <button
+              onClick={handleOpenPsychologistCard}
+              className="hover:opacity-80 transition-opacity cursor-pointer text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#116466] max-lg:hidden"
+            >
+              Перейти на карточку психолога
+            </button>
+          </div>
+
+          {/* Desktop */}
+          <div className="hidden lg:grid lg:grid-cols-3 lg:gap-[30px] lg:mb-[30px]">
+            <div>
+              <span className="text-[#9A9A9A] text-[16px]">Основной подход:</span>
+              <div className="flex items-center gap-[10px] mt-[5px]">
+                {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
+                <p className="font-semibold text-[18px] leading-[25px] whitespace-nowrap">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
+                <Tooltip text="Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов." />
+              </div>
+            </div>
+            <div>
+              <span className="text-[#9A9A9A] text-[16px]">Формат встречи:</span>
+              <p className="font-semibold text-[18px] leading-[25px] mt-[5px]">Онлайн</p>
+            </div>
+            <div>
+              <span className="text-[#9A9A9A] text-[16px]">Стоимость:</span>
+              <div className="flex items-center gap-[10px] mt-[5px]">
+                <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p>
+                <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
+              </div>
+            </div>
+          </div>
+
+          {/* Tablet and Mobile */}
+          <div className="lg:hidden mb-[20px]">
+            <div className="mb-[20px]">
+              <span className="text-[#9A9A9A] text-[14px]">Основной подход:</span>
+              <div className="flex items-center gap-[10px]">
+                {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
+                <p className="font-semibold text-[14px] leading-[20px] whitespace-nowrap">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
+                <Tooltip text="Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов." />
+              </div>
+            </div>
+            <div className="flex gap-[10px]">
+              <div className="flex-1">
+                <span className="text-[#9A9A9A] text-[14px]">Формат встречи:</span>
+                <p className="font-semibold text-[14px] leading-[20px]">Онлайн</p>
+              </div>
+              <div className="flex-1">
+                <span className="text-[#9A9A9A] text-[14px]">Стоимость:</span>
+                <div className="flex items-center gap-[10px]">
+                  <p className="font-semibold text-[14px]">От {currentPsychologist.min_session_price || 0} ₽</p>
+                  <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className={styles.nextSession}>
+            <h4 className="text-[18px] font-semibold mb-[15px] max-lg:text-[14px]">Ближайшая запись:</h4>
+            {availableSlots && availableSlots.length > 0 ? (
+              <div className="flex gap-[10px] flex-wrap max-lg:flex-nowrap max-lg:overflow-x-auto max-lg:pb-[10px] max-lg:-mx-[15px] max-lg:px-[15px]">
+                {availableSlots.map((slot, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSlotSelect(slot)}
+                    className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] cursor-pointer max-lg:shrink-0 ${selectedSlot?.date === slot.date && selectedSlot?.time === slot.time
+                      ? 'bg-[#116466] text-white border-[#116466]'
+                      : 'border-[#D4D4D4] text-[#116466] hover:bg-[#116466] hover:text-white hover:border-[#116466]'
+                      }`}
+                  >
+                    {`${slot.date.split('.').slice(0, 2).join('.')} / ${slot.time}`}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="mt-[20px] p-[15px] bg-[#F5F5F5] rounded-[10px] text-[16px] text-center">
+                У психолога пока нет свободного времени для записи
+              </div>
+            )}
+          </div>
+
+          <button
+            onClick={handleOpenPsychologistCard}
+            className="hidden max-lg:flex mt-[20px] border border-[#116466] border-[1px] max-lg:h-[47px] bg-[#116466] p-[12px] text-[#fff] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] flex justify-center items-center gap-[10px]"
+          >
+            Перейти на карточку психолога
+          </button>
+        </div>
+
+        <div className="max-lg:fixed max-lg:bottom-[20px] max-lg:left-[20px] max-lg:right-[20px] flex gap-[10px] button-container">
+          <button
+            type='button'
+            onClick={() => dispatch(setApplicationStage('phone'))}
+            disabled={isSubmitting}
+            className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            Назад
+          </button>
+
+          <button
+            type='submit'
+            disabled={!selectedSlot || isSubmitting}
+            className={`cursor-pointer flex-1 border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] flex justify-center items-center gap-[10px] ${!selectedSlot || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+            onClick={handleSubmit}
+          >
+            Продолжить
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };

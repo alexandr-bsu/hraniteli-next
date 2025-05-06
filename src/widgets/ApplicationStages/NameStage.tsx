@@ -1,22 +1,23 @@
 'use client'
 import { Form, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { toNextStage } from '@/redux/slices/application_form'
+import { setApplicationStage } from '@/redux/slices/application_form'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useDispatch } from 'react-redux'
-import { fill_username } from '@/redux/slices/application_form_data'
+import { setUsername } from '@/redux/slices/application_form_data'
+import styles from '@/styles/input.module.scss'
 
 const FormSchema = z.object({
-  username: z.string().nonempty("Вы не заполнили обязательное поле")
+  username: z.string().optional()
 })
 
 export default function NameStageApplication() {
   const dispatch = useDispatch()
-  
+
   // 1. Загружаем сохраненное имя при инициализации
-  const savedName = typeof window !== 'undefined' 
+  const savedName = typeof window !== 'undefined'
     ? localStorage.getItem('app_username') || ''
     : ''
 
@@ -29,10 +30,12 @@ export default function NameStageApplication() {
   })
 
   // 3. Сохраняем данные
-  const handleSubmit = (data: { username: string }) => {
-    localStorage.setItem('app_username', data.username) // Сохраняем в localStorage
-    dispatch(fill_username(data.username)) // Сохраняем в Redux (если нужно)
-    dispatch(toNextStage('age')) // Переход на следующую страницу
+  const handleSubmit = (data: { username?: string }) => {
+    if (data.username) {
+      localStorage.setItem('app_username', data.username)
+      dispatch(setUsername(data.username))
+    }
+    dispatch(setApplicationStage('age'))
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i);
       console.log('Данные локалстореж')
@@ -48,44 +51,36 @@ export default function NameStageApplication() {
             name="username"
             render={({ field }) => (
               <div className='grow max-h-[100%]'>
-                <FormItem className='grow max-[425px]:mb-[30px]'>
-                  <FormLabel className='max-lg:text-[16px] max-lg:leading-[22px] font-semibold text-[20px] leading-[27px]'>
+                <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
+                  <FormLabel className='text-[20px] lg:text-[20px] md:text-[16px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                     Как вас зовут?
                   </FormLabel>
-                  <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px] mt-[10px]'>
+                  <FormDescription className='text-[14px] leading-[20px] font-normal max-lg:mt-[8px]'>
                     Вы можете не указывать имя, если пока не готовы
                   </FormDescription>
-                  <div className='input__text_container max-lg:mt-[10px] mt-[30px] relative bg-[#FAFAFA] w-full h-[65px]'>
+                  <div className={styles.input__text_container}>
                     <Input
                       {...field}
-                      className='input__text placeholder:text-[#9A9A9A] rounded-[10px] border-none w-full h-full'
+                      placeholder=" "
+                      className={`${styles.input__text} text-[14px] w-full h-full px-[20px] bg-[#FAFAFA] rounded-[10px] border-none`}
                       onChange={(e) => {
-                        field.onChange(e) // Обновляем значение в форме
-                        localStorage.setItem('app_username', e.target.value) // Сразу сохраняем
+                        field.onChange(e)
+                        localStorage.setItem('app_username', e.target.value)
                       }}
                     />
-                    <label className='input__text_label'>Введите ваше имя или псевдоним</label>
+                    <label className={`${styles.input__text_label} text-[14px]`}>
+                      Введите ваше имя или псевдоним
+                    </label>
                   </div>
-                  {!form.formState.errors.username && (
-                    <span className='mt-[10px] max-lg:text-[12px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
-                      Это обязательное поле
-                    </span>
-                  )}
-                  <FormMessage className='mt-[10px]'/>
+                  <FormMessage className='mt-[10px] max-lg:mt-[8px]' />
                 </FormItem>
               </div>
             )}
           />
-          <div className="shrink-0 pb-[50px] flex gap-[10px]">
-            <button 
-              type="button" 
-              className="cursor-pointer shrink-0 w-[81px] border-[1px] border-[#116466] p-[12px] text-[#116466] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]"
-            >
-              Назад
-            </button>
-            <button 
-              type="submit" 
-              className="cursor-pointer grow border-[1px] bg-[#116466] p-[12px] text-[white] font-normal text-[18px] max-lg:text-[14px] rounded-[50px]"
+          <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
+            <button
+              type="submit"
+              className="cursor-pointer grow border-[1px] bg-[#116466] min-lg:p-[12px] text-[white] font-normal text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]"
             >
               Продолжить
             </button>
