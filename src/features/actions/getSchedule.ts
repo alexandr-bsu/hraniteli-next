@@ -32,10 +32,24 @@ export const getSchedule = async () => {
   try {
     const { startDate, endDate } = getStartAndEndDates();
     
+    const getMoscowTime = (): Date => {
+      const now = new Date();
+      // Московское время — это текущее UTC время +3 часа
+      return new Date(now.getTime() + 3 * 60 * 60 * 1000);
+    };
+    
+    const getTimeDifference = (): number => {
+      // Смещение пользователя в часах (например, для UTC+3 вернет 3)
+      const userOffset = -(new Date().getTimezoneOffset() / 60);
+      const moscowOffset = 3; // Москва UTC+3
+      // Разница = Московское смещение - пользовательское смещение
+      return moscowOffset - userOffset;
+    };  
+
     const response = await axios.post('https://n8n-v2.hrani.live/webhook/get-aggregated-all', {
       startDate,
       endDate,
-      userTimeOffsetMsk: 0,
+      userTimeOffsetMsk: getTimeDifference(),
       ageFilter: "",
       formPsyClientInfo: {
         age: "",
@@ -46,7 +60,7 @@ export const getSchedule = async () => {
       },
       form: {
         emptySlots: false,
-        userTimeZone: "МСК"
+        userTimeZone: "МСК" + (getTimeDifference() > 0 ? '+'+getTimeDifference() : getTimeDifference() < 0 ? getTimeDifference() : '')
       }
     });
 
