@@ -124,10 +124,7 @@ export const TimeStage = () => {
             return dateA.getTime() - dateB.getTime();
         });
 
-        // Ограничиваем до 5 дней
-        const limitedDates = dates.slice(0, 5);
-
-        if (limitedDates.length === 0) {
+        if (dates.length === 0) {
             return (
                 <div className="mt-[20px]">
                     <span className="text-[18px] leading-[25px] font-normal text-[#151515]">
@@ -147,7 +144,7 @@ export const TimeStage = () => {
 
         return (
             <>
-                {limitedDates.map((date) => {
+                {dates.map((date) => {
                     const dateObj = new Date(date.split('.').reverse().join('-'));
                     const isToday = formatDate(today) === formatDate(dateObj);
                     const isTomorrow = formatDate(tomorrow) === formatDate(dateObj);
@@ -194,15 +191,17 @@ export const TimeStage = () => {
                 </DialogTitle>
             </DialogHeader>
 
-            {renderTimeZone()}
+            <div className="overflow-y-auto max-h-[60vh] pr-2">
+                {renderTimeZone()}
 
-            {isLoading ? (
-                <div className="flex items-center justify-center py-[30px]">
-                    <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
-                </div>
-            ) : (
-                renderSlots()
-            )}
+                {isLoading ? (
+                    <div className="flex items-center justify-center py-[30px]">
+                        <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                ) : (
+                    renderSlots()
+                )}
+            </div>
 
             <DialogFooter className="sm:justify-start">
                 <Button
