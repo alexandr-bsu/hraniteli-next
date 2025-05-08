@@ -262,7 +262,7 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
         promocode: '',
         ticket_id: ticketId,
         emptySlots: false,
-        userTimeZone: 'МСК',
+        userTimeZone: 'МСК'+(+timeDifference>0 ? '+'+timeDifference : timeDifference == 0 ? '' : timeDifference),
         userTimeOffsetMsk: timeDifference.toString(),
         bid: 0,
         rid: 0,

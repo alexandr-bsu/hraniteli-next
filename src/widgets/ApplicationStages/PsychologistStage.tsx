@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setApplicationStage } from '@/redux/slices/application_form';
 import { setIndexPhyc, setHasMatchingError, setSelectedSlots, setSelectedSlotsObjects } from '@/redux/slices/application_form_data';
-
+import { getTimeDifference } from '@/features/utils';
 import { getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
 import { IPsychologist } from '@/shared/types/psychologist.types';
 import Image from 'next/image';
@@ -295,6 +295,8 @@ export const PsychologistStage = () => {
     }
   };
 
+  const timeDifference = getTimeDifference();
+
   const handleSubmit = async () => {
     if (selectedSlot) {
       setIsSubmitting(true);
@@ -339,7 +341,8 @@ export const PsychologistStage = () => {
 
           // ticket_id: localStorage.getItem('app_ticket_id') || '',
           emptySlots: false,
-          userTimeZone: "МСК",
+          userTimeZone: "МСК"+(+timeDifference>0 ? '+'+timeDifference : timeDifference == 0 ? '' : timeDifference),
+          userTimeOffsetMsk: timeDifference.toString(),
           bid: 0,
           rid: 0,
           categoryType: "",

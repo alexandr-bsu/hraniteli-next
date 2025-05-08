@@ -36,5 +36,5 @@ export const getTimeDifference = (): number => {
   const userOffset = -(new Date().getTimezoneOffset() / 60);
   const moscowOffset = 3; // Москва UTC+3
   // Разница = Московское смещение - пользовательское смещение
-  return moscowOffset - userOffset;
+  return userOffset-moscowOffset;
 };  

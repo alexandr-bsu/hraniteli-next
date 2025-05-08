@@ -43,7 +43,7 @@ export const getSchedule = async () => {
       const userOffset = -(new Date().getTimezoneOffset() / 60);
       const moscowOffset = 3; // Москва UTC+3
       // Разница = Московское смещение - пользовательское смещение
-      return moscowOffset - userOffset;
+      return userOffset-moscowOffset;
     };  
 
     const response = await axios.post('https://n8n-v2.hrani.live/webhook/get-aggregated-all', {
