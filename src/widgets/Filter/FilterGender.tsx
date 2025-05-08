@@ -30,7 +30,7 @@ export const FilterGender:React.FC<FilterGenderProps> = ({onSubmit, type, open, 
     const items = {
         ['male']: 'Мужской',
         ['female']: 'Женский',
-        ['none']: 'Не имеет значения',
+        // ['none']: 'Не имеет значения',
     } as const
 
     const FormSchema = z.object({
@@ -93,14 +93,14 @@ export const FilterGender:React.FC<FilterGenderProps> = ({onSubmit, type, open, 
                                 Женский
                                 </FormLabel>
                             </FormItem>
-                            <FormItem className="flex items-center space-x-3 space-y-0">
+                            {/* <FormItem className="flex items-center space-x-3 space-y-0">
                                 <FormControl>
                                 <RadioGroupItem colorRadio='#116466' className='w-[30px] h-[30px] max-lg:w-[24px] max-lg:h-[24px]' value="none" />
                                 </FormControl>
                                 <FormLabel className="font-normal text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px]">
                                     Не имеет значения
                                 </FormLabel>
-                            </FormItem>
+                            </FormItem> */}
                             </RadioGroup>
                         </FormControl>
                         <FormMessage className="text-[14px]" />
