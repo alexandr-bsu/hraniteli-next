@@ -252,7 +252,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                                     src={getGoogleDriveVideoUrl(videoUrl) || undefined}
                                     playsInline
                                     loop
-                                    muted
+                                    // muted
                                     preload="metadata"
                                     className={styles.video}
                                     autoPlay
