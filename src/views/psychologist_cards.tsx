@@ -86,6 +86,9 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
                 filter.filtered_by_mental_illness.some((f: IPsychologist) => f.id === item.id)
             );
         }
+
+        //Сортируем психологов по наличию слотов (сначала показываем психологов со слотами потом без)
+        result = result.sort((a, b): number => {return b.schedule?.days.length - a.schedule?.days.length})
         
         return result;
     }, [
