@@ -149,21 +149,23 @@ const filterSlice = createSlice({
       state.requests = action.payload;
       
       if (action.payload.length > 0) {
-        // Разбиваем поисковый запрос на отдельные слова
-        const searchWords = action.payload[0].toLowerCase().split(', ');
-        
+
         state.filtered_by_requests = state.filtered_by_automatch_psy.filter(psy => {
-          const psychologistRequests = psy.requests || psy.queries?.split(', ') || [];
-          
+          const psychologistRequests = psy.queries?.split('; ') || psy.requests || [];
+
           // Разбиваем запросы психолога на отдельные группы по точке с запятой
           const flattenedRequests = psychologistRequests.flatMap(req => 
-            req.split(';').map(r => r.trim().toLowerCase())
+            req.split('; ').map(r => r.trim().toLowerCase())
           );
           
-          // Проверяем, что все слова из поискового запроса есть в запросах психолога
-          const hasMatch = searchWords.every(word =>
-            flattenedRequests.some(psychRequest => psychRequest.includes(word))
+          // Проверяем, что все запросы из выбранных в фильтре есть в запросах психолога
+          // TODO: настроить логику фильтрации по блокирующим и не блокирующим запросам
+          const hasMatch = state.requests.every(request =>
+            flattenedRequests.some(psychRequest => {
+              return psychRequest.trim().toLowerCase() == request.trim().toLowerCase()
+            })
           );
+          
           
           return hasMatch;
         });
