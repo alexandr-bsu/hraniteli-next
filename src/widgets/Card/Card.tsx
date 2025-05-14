@@ -361,8 +361,11 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                             />
                         </button>
                     </div>
-
-                    <div className={styles.experienceWrapper}>
+                    <Tooltip 
+                    text={`${psychologist.name.split(" ")[1]} как Хранитель придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`}
+                    customMargin="35%"
+                    >
+                    <div className={`${styles.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
                         {psychologist.experience && (
                             <span className={styles.experience}>
                                 {psychologist.experience}
@@ -371,6 +374,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                         {psychologist.in_community && (
                             <span className={styles.experience}>
                                 в сообществе
+                                
                             </span>
                         )}
                         {psychologist.verified && (
@@ -384,6 +388,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                             />
                         )}
                     </div>
+                    </Tooltip>
 
                     <div className={styles.approach}>
                         <div className={styles.approachBlock}>
@@ -465,7 +470,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                     <h3 className={styles.sectionTitle}>Диагностированные заболевания:</h3>
                     <div className={styles.diagnosesList}>
                         <div className={styles.diagnosisItem}>
-                            Работает с психиатрическими заболеваниями (ПРЛ, БАР, ПТСР и др)
+                            Работает с психическими заболеваниями (ПРЛ, БАР, ПТСР и др)
                             <Tooltip text="Психолог работает с пациентами, у которых диагностированно психическое заболевание" />
                         </div>
                     </div>
@@ -587,7 +592,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                     {isExpanded ? 'Свернуть' : 'Подробнее о Хранителе'}
                 </button>
                 <button className={styles.appointmentButton} onClick={handleOpenModal}>
-                    Оставить заявку
+                    Записаться на диагностику
                 </button>
             </div>
         </div>

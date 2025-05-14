@@ -112,7 +112,9 @@ export const TimeStage = () => {
 
         return (
             <span className="text-[18px] leading-[25px] font-normal text-[#151515] flex gap-[10px] max-lg:text-[14px]">
-                Часовой пояс: <span className="text-[#116466]">{formattedTimeZone} ( МСК {timeDifference > 0 ? '+' : ''}{timeDifference} )</span>
+                {/* Часовой пояс: <span className="text-[#116466]">{formattedTimeZone} ( МСК {timeDifference > 0 ? '+' : ''}{timeDifference} )</span> */}
+                Часовой пояс: <span className="text-[#116466]">{formattedTimeZone}</span>
+
             </span>
         );
     };
@@ -187,8 +189,14 @@ export const TimeStage = () => {
         <ModalWindow type="Time">
             <DialogHeader>
                 <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[14px] max-lg:leading-[22px]">
-                    Выберите время сеанса с Хранителем
+                    Выберите время диагностической сессии
                 </DialogTitle>
+                <ul className='text-[#999999] flex space-x-[10px] flex-wrap'>
+                    <li>Длительность - до 30 минут.</li>
+                    <li>Формат - онлайн видеозвонок.</li>
+                    <li>Стоимость - бесплатно</li>
+                    
+                    </ul>
             </DialogHeader>
 
             <div className="overflow-y-auto max-h-[60vh] pr-2">

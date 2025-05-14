@@ -4,10 +4,11 @@ import styles from './Tooltip.module.scss';
 
 interface TooltipProps {
     text: string;
+    customMargin ?: string;
     children?: ReactNode;
 }
 
-export const Tooltip: FC<TooltipProps> = ({ text }) => {
+export const Tooltip: FC<TooltipProps> = ({ text, children, customMargin }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -40,7 +41,7 @@ export const Tooltip: FC<TooltipProps> = ({ text }) => {
             position: 'fixed',
             left: `${left}px`,
             top: `${top}px`,
-            transform: 'translateY(40px)',
+            transform: `translateY(${customMargin ? customMargin : '40px'})`,
             zIndex: 1000
         };
     };
@@ -63,7 +64,7 @@ export const Tooltip: FC<TooltipProps> = ({ text }) => {
             })}
         >
             <div className={styles.iconWrapper}>
-                <Image src="/card/hint.svg" alt="hint" width={24} height={24} />
+                {children ? children : <Image src="/card/hint.svg" alt="hint" width={24} height={24} />}
             </div>
             {isVisible && (
                 <>
