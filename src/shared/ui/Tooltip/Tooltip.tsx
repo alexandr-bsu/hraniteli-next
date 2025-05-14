@@ -40,7 +40,7 @@ export const Tooltip: FC<TooltipProps> = ({ text }) => {
             position: 'fixed',
             left: `${left}px`,
             top: `${top}px`,
-            transform: 'translateY(-100%)',
+            transform: 'translateY(40px)',
             zIndex: 1000
         };
     };

@@ -32,6 +32,7 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
     const filter = useSelector<RootState, any>(state => state.filter);
     const formData = useSelector((state: RootState) => state.applicationFormData);
     const [isLoading, setLoading] = useState(!isLoaded);
+    const [isScheduleLoaded, setScheduleLoaded] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const dispatch = useDispatch();
     
@@ -214,6 +215,7 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
                         schedule: psychologistSchedules.get(psy.name) || { days: [] }
                     }));
 
+                    setScheduleLoaded(true)
                     dispatch(fill_filtered_by_automatch_psy(updatedPsychologists));
                 }
             } catch (error) {
@@ -249,7 +251,7 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
                 }
             }, 1000); // Увеличиваем время ожидания до 1 секунды
         }
-    }, [filter.selected_psychologist, isLoading]);
+    }, [filter.selected_psychologist, isScheduleLoaded]);
 
     if (isLoading) {
         return (
@@ -296,6 +298,8 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
             (!filter.filtered_by_favorites || filter.filtered_by_favorites.length === 0);
 
         return (
+            <>
+            <h1 className="text-2xl font-bold text-white pb-[20px]">Подбор психолога и запись на консультацию онлайн</h1>
             <div className="flex flex-col items-center justify-center p-8 bg-white rounded-[20px] min-h-[400px]">
                 <Image 
                     src={hasActiveFilters ? "/not-found.svg" : "/empty.svg"} 
@@ -320,6 +324,7 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
                     }
                 </p>
             </div>
+            </>
         );
     };
 
@@ -329,6 +334,7 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
                 <Filter />
             </aside>
             <main className="min-lg:max-w-[790px] w-full">
+                <h1 className="text-2xl font-bold text-white pb-[20px]">Подбор психолога и запись на консультацию онлайн</h1>
                 <div className="flex flex-col gap-[20px] pb-[50px]">
                     {sortedPersons && sortedPersons.length > 0 ? (
                         sort_persons_by_slot_having(sortedPersons).map((item: IPsychologist, index: number) => {

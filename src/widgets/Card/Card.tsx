@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { Tooltip } from '@/shared/ui/Tooltip/Tooltip';
 import { TextTooltip } from '@/shared/ui/Tooltip/TextTooltip';
 import { setSelectedPsychologist } from "@/redux/slices/filter";
+import { useSearchParams, usePathname } from 'next/navigation'
 
 const getAgeWord = (age: number): string => {
     const lastDigit = age % 10;
@@ -68,6 +69,13 @@ const getGoogleDriveVideoUrl = (url: string | null | undefined) => {
     return `https://drive.google.com/uc?export=view&id=${fileId}`;
 };
 
+const method_description = {
+    "Аналитическая психология": "Подход помогает глубоко исследовать причины вашего текущего состояния — включая травмы, подавленные чувства и сценарии, повторяющиеся в жизни. Работа строится не только через разговор, но и через образы: сны, символы, метафоры, МАК-карты, сказки. Здесь важна не только логика, но и воображение — как инструмент самопонимания. Вместе с психологом вы будете размышлять, исследовать свои чувства и искать смысл в личной истории",
+    "Гештальт":"Подход поможет вам соединить «в моменте» мысли, чувства и эмоции - он в целом держит в фокусе ваши эмоции. Ключевая идея - вернуть вас в состояние «здесь и сейчас», дать возможность в настоящем осмыслить и понять себя и свои потребности. Помимо этого, вместе с психологом вы сможете осмыслить отношения с окружающими  - завершить те контакты, которые приносят переживания. Это очень живой и разговорный подход",
+    "Психоанализ":"В этом подходе акцент делается на том, чтобы заново переосмыслить (в основном) ваш детский опыт, который влияет на убеждения и предпочтения в настоящем. Вместе с психологом вы будете искать и «выводить в свет» подавленные мысли и желания, которые сдерживают вашу энергию жизни, страсти (или по-другому - «Либидо»). Это творческий, глубинный, психодинамический подход, близкий по техникам к аналитической психологии",
+    "КПТ":"Этот подход поможет вам скорректировать свое поведение и реакции, избавиться от симптомов, не затрагивая причин, что важно особенно если вы не готовы «идти туда» сейчас. В подходе огромное количество техник, которые помогают найти нерациональные негативные убеждения, а затем изменить их. Это очень логический и структурный подход, с большим объемом саморефлексии, а иногда и домашними заданиями в виде дневника мыслей и эмоций",
+}
+
 interface CardProps {
     psychologist: IPsychologist;
     id?: string;
@@ -77,6 +85,8 @@ interface CardProps {
 
 export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatch = false }) => {
     const dispatch = useDispatch();
+    const searchParams = useSearchParams()
+
     const modal = useSelector((state: RootState) => state.modal);
     const favorites = useSelector((state: RootState) => state.favorites.items);
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -90,6 +100,8 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const descriptionRef = useRef<HTMLParagraphElement>(null);
     const [shouldShowGradient, setShouldShowGradient] = useState(false);
+
+    
 
     // Если ID не задан, создаем его из имени
     useEffect(() => {
@@ -232,6 +244,15 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
         }));
     };
 
+    const scrolledPsychologist = searchParams.get('selected_psychologist')
+    const isScrolledPsychologist = scrolledPsychologist == psychologist.name 
+
+    useEffect(() => {
+        if(isScrolledPsychologist){
+            setIsExpanded(true)
+        }
+    }, [isScrolledPsychologist])
+
     return (
         <div id={id} className={`${styles.card} ${isSelected ? 'animate-pulse-highlight bg-[#F5F5F5]' : ''}`}>
             {/* Верхняя часть с фото и основной инфой */}
@@ -370,14 +391,14 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                             <div className={styles.value}>
                                 {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
                                 {psychologist.main_modal ? psychologist.main_modal : ''}
-                                <Tooltip text="Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов." />
+                                <Tooltip text={method_description[psychologist.main_modal] ? method_description[psychologist.main_modal] : 'Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов.'} />
                             </div>
                         </div>
                         <div className={styles.approachBlock}>
                             <span className={styles.label}>Стоимость:</span>
                             <div className={styles.value}>
                                 От {psychologist.min_session_price || 0} ₽
-                                <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
+                                <Tooltip text="Стоимость сессии длительностью 50-55 минут в формате онлайн видеозвонка. Частоту и формат последующих встреч определяете вместе с психологом" />
                             </div>
                         </div>
                     </div>
@@ -392,7 +413,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                             ).map((approach: string, index: number) => (
                                 <div key={index} className={styles.approachItem}>
                                     {approach.trim()}
-                                    <Tooltip text="Дополнительные подходы, которые психолог использует в своей работе для более эффективной помощи клиентам." />
+                                    <Tooltip text={method_description[approach.trim()] ? method_description[approach.trim()] : "Дополнительные подходы, которые психолог использует в своей работе для более эффективной помощи клиентам."}  />
                                 </div>
                             ))}
                         </div>
@@ -445,14 +466,14 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                     <div className={styles.diagnosesList}>
                         <div className={styles.diagnosisItem}>
                             Работает с психиатрическими заболеваниями (ПРЛ, БАР, ПТСР и др)
-                            <Tooltip text="Психолог имеет опыт работы с данным диагнозом и может помочь в его коррекции или адаптации." />
+                            <Tooltip text="Психолог работает с пациентами, у которых диагностированно психическое заболевание" />
                         </div>
                     </div>
                 </div>
             )}
 
             {/* Дополнительная информация (показывается при раскрытии) */}
-            <div className={`${styles.expandedContent} ${isExpanded ? styles.expanded : ''}`}>
+            <div className={`${styles.expandedContent} ${isExpanded  ? styles.expanded : ''}`}>
                 {/* О Хранителе */}
                 {psychologist.short_description && (
                     <div className={styles.section}>
@@ -534,7 +555,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                             <span className={styles.infoLabel}>Личная терапия:</span>
                             <span className={styles.infoValue}>
                                 {psychologist.personal_therapy_duration ? 'Да' : 'Нет'}
-                                <Tooltip text="Личная терапия - важный опыт для психолога, позволяющий лучше понимать клиентов и работать над собой." />
+                                <Tooltip text="Психолог находится в личной терапии более 6 месяцев" />
                             </span>
                         </div>
                         <div className={styles.infoRow}>
@@ -542,16 +563,16 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                             <span className={styles.infoValue}>
                                 {/* {psychologist.supervision ? 'Да' : 'Нет'} */}
                                 Да
-                                <Tooltip text="Супервизия - профессиональная поддержка психолога более опытным коллегой, что обеспечивает качество работы." />
+                                <Tooltip text="Психолог посещает групповые супервизии в сообществе" />
                             </span>
                         </div>
                         <div className={styles.infoRow}>
                             <span className={styles.infoLabel}>Семейное положение:</span>
-                            <span className={styles.infoValue}>{psychologist.is_married ? 'В браке' : 'Не в браке'}</span>
+                            <span className={styles.infoValue}>{psychologist.is_married == null ? '-' : psychologist.is_married ? 'В браке' : 'Не в браке'}</span>
                         </div>
                         <div className={styles.infoRow}>
                             <span className={styles.infoLabel}>Есть дети:</span>
-                            <span className={styles.infoValue}>{psychologist.has_children ? 'Да' : 'Нет'}</span>
+                            <span className={styles.infoValue}>{psychologist.has_children == null ? '-' : psychologist.has_children ? 'Да' : 'Нет'}</span>
                         </div>
                     </div>
                 </div>
