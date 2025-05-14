@@ -508,7 +508,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
 
                 {/* Запросы */}
                 <div className={styles.queries}>
-                    <h3 className={styles.sectionTitle}>Запросы:</h3>
+                    <h3 className={styles.sectionTitle}>Запросы</h3>
                     <div className={styles.queriesList}>
                         {psychologist.queries?.split(';').slice(0, 6).map((query, index) => (
                             <TextTooltip key={index} text={query.trim()}>
@@ -523,7 +523,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                 {/* Диагностированные заболевания */}
                 {psychologist.works_with?.includes('Есть диагностированное психиатрическое заболевание (ПРЛ, БАР, ПТСР и др)') && (
                     <div className={styles.diagnoses}>
-                        <h3 className={styles.sectionTitle}>Диагностированные заболевания:</h3>
+                        <h3 className={styles.sectionTitle}>Диагностированные заболевания</h3>
                         <div className={styles.diagnosesList}>
                             <div className={styles.diagnosisItem}>
                                 Работает с психическими заболеваниями (ПРЛ, БАР, ПТСР и др)
