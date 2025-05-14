@@ -272,24 +272,24 @@ export default function ApplicationForm() {
             )}
 
             {currentStage !== 'gratitude' && currentStage !== 'error' && (
-                <div className="w-full min-lg:rounded-[30px] pt-[50px] shrink-0">
-                    <div className="w-full flex justify-between min-lg:px-[50px] pb-[20px] max-lg:px-[20px]">
-                        <div className="flex flex-col gap-[10px]">
+                <div className="w-full min-lg:rounded-[30px] pt-[30px] shrink-0">
+                    <div className="w-full flex justify-between min-lg:px-[50px] max-lg:px-[20px]">
+                        <div className="flex flex-col md:gap-[10px] justify-center">
                             <h2 className="font-semibold text-[20px] max-lg:text-[14px] max-lg:leading-[22px] leading-[27px]">
                                 Подбор психолога
                             </h2>
-                            <span className="font-normal text-[18px] max-lg:text-[14px] leading-[25px] max-[360px]:w-[192px]">
+                            <span className="font-normal text-[18px] hidden md:block max-lg:text-[14px] leading-[25px] max-[360px]:w-[192px]">
                                 Среднее время заполнения заявки - 5 минут
                             </span>
                         </div>
 
-                        <button 
+                        {/* <button 
                             type="button" 
                             onClick={handleClose}
-                            className="cursor-pointer w-[50px] h-[50px] rounded-full flex justify-center items-center border-[1px] border-[#D4D4D4]"
+                            className="cursor-pointer w-[30px] h-[30px] rounded-full flex justify-center items-center border-[1px] border-[#D4D4D4]"
                         >
                             <Image src='/modal/cross.svg' alt="cross" height={15} width={15} />
-                        </button>
+                        </button> */}
                     </div>
 
                     {showProgress && (
@@ -315,7 +315,7 @@ export default function ApplicationForm() {
                         </>
                     )}
 
-                    <hr className="w-full border-t-[2px] border-dotted mt-[30px]" />
+                    <hr className="w-full border-t-[2px] border-dotted mt-[15px]" />
                 </div>
             )}
 

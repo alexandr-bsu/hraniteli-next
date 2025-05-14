@@ -90,7 +90,7 @@ export const PreferencesStage = () => {
   return (
     <div className='px-[50px] max-lg:px-[20px] flex w-full grow max-lg:overflow-y-auto'>
       <Form {...form} >
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col min-h-min mt-[30px]">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col min-h-min mt-[15px]">
           <FormField
             control={form.control}
             name="preferences"
@@ -157,7 +157,7 @@ export const PreferencesStage = () => {
               </div>
             )}
           />
-          <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px] mt-[30px] max-lg:mt-[30px]">
+          <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px] mt-[30px] max-lg:mt-[10px]">
             <button
               type='button'
               onClick={() => dispatch(setApplicationStage('gender'))}

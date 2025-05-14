@@ -103,7 +103,7 @@ export const DiseasesPsychologistStage = () => {
     return (
         <div className='px-[50px] max-lg:px-[20px] flex w-full grow max-lg:overflow-y-auto'>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col min-h-min mt-[30px]">
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col min-h-min mt-[15px]">
                     <FormField
                         control={form.control}
                         name="diseases"
@@ -111,7 +111,7 @@ export const DiseasesPsychologistStage = () => {
                             <div className='grow'>
                                 <FormItem className={`grow p-[30px] max-lg:max-h-[400px] max-lg:p-[15px] border-[1px] rounded-[25px] max-h-[370px] ${showMedications ? 'overflow-hidden overflow-y-auto' : ''}`}>
                                     <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
-                                        Есть ли у вас диагностированные психиатрические заболевания?
+                                        Есть ли у вас диагностированные психические заболевания?
                                     </FormLabel>
                                     <FormDescription className='text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
                                         Выберите один вариант ответа
@@ -186,7 +186,7 @@ export const DiseasesPsychologistStage = () => {
                         )}
                     />
 
-                    <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px] mt-[30px] max-lg:mt-[30px]">
+                    <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px] mt-[30px] max-lg:mt-[10px]">
                         <button
                             type='button'
                             onClick={() => dispatch(setApplicationStage('traumatic'))}

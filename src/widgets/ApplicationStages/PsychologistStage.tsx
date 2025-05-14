@@ -518,7 +518,7 @@ export const PsychologistStage = () => {
             </div>
             <button
               onClick={handleOpenPsychologistCard}
-              className="hover:opacity-80 transition-opacity cursor-pointer text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#116466] max-lg:hidden lg:flex"
+              className="hover:opacity-80 transition-opacity cursor-pointer text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#116466] flex"
             >
               Перейти на карточку психолога
             </button>
@@ -596,12 +596,12 @@ export const PsychologistStage = () => {
             )}
           </div>
 
-          <button
+          {/* <button
             onClick={handleOpenPsychologistCard}
-            className="hidden max-lg:flex mt-[20px] border border-[#116466] max-lg:h-[47px] bg-[#116466] p-[12px] text-[#fff] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] justify-center items-center gap-[10px]"
+            className="hover:opacity-80 transition-opacity cursor-pointer text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#116466] lg:hidden max-lg:flex px-10 py-4 underline justify-center items-center"
           >
             Перейти на карточку психолога
-          </button>
+          </button> */}
         </div>
 
         <div className="max-lg:fixed max-lg:bottom-[20px] max-lg:left-[20px] max-lg:right-[20px] flex gap-[10px] button-container">
