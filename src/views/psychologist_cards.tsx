@@ -299,7 +299,7 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
 
         return (
             <>
-            <h1 className="text-2xl font-bold text-white pb-[20px]">Подбор психолога и запись на консультацию онлайн</h1>
+            <h1 className="text-2xl font-bold text-white pb-[20px] hidden">Подбор психолога и запись на консультацию онлайн</h1>
             <div className="flex flex-col items-center justify-center p-8 bg-white rounded-[20px] min-h-[400px]">
                 <Image 
                     src={hasActiveFilters ? "/not-found.svg" : "/empty.svg"} 
@@ -334,7 +334,7 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
                 <Filter />
             </aside>
             <main className="min-lg:max-w-[790px] w-full">
-                <h1 className="text-2xl font-bold text-white pb-[20px]">Подбор психолога и запись на консультацию онлайн</h1>
+                <h1 className="text-2xl font-bold text-white pb-[20px] hidden">Подбор психолога и запись на консультацию онлайн</h1>
                 <div className="flex flex-col gap-[20px] pb-[50px]">
                     {sortedPersons && sortedPersons.length > 0 ? (
                         sort_persons_by_slot_having(sortedPersons).map((item: IPsychologist, index: number) => {

@@ -261,7 +261,7 @@ export default function ApplicationForm() {
     const showProgress = (STAGES_WITH_PROGRESS as readonly string[]).includes(currentStage) && !hasError;
 
     return (
-        <div className="w-full overflow-hidden h-screen min-lg:max-w-[960px] min-lg:max-h-[800px] min-lg:rounded-[30px] bg-[white] flex flex-col relative">
+        <div className="w-full overflow-hidden h-screen m-[20px] rounded-[30px] bg-[white] flex flex-col relative">
             {isLoading && (
                 <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
                     <div className="flex flex-col items-center gap-4">

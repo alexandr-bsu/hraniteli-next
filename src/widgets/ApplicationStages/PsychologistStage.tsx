@@ -435,6 +435,12 @@ export const PsychologistStage = () => {
   }
 
   const remainingPsychologists = filtered_by_automatch_psy.length - (currentIndex + 1);
+  const method_description = {
+    "Аналитическая психология": "Подход помогает глубоко исследовать причины вашего текущего состояния — включая травмы, подавленные чувства и сценарии, повторяющиеся в жизни. Работа строится не только через разговор, но и через образы: сны, символы, метафоры, МАК-карты, сказки. Здесь важна не только логика, но и воображение — как инструмент самопонимания. Вместе с психологом вы будете размышлять, исследовать свои чувства и искать смысл в личной истории",
+    "Гештальт":"Подход поможет вам соединить «в моменте» мысли, чувства и эмоции - он в целом держит в фокусе ваши эмоции. Ключевая идея - вернуть вас в состояние «здесь и сейчас», дать возможность в настоящем осмыслить и понять себя и свои потребности. Помимо этого, вместе с психологом вы сможете осмыслить отношения с окружающими  - завершить те контакты, которые приносят переживания. Это очень живой и разговорный подход",
+    "Психоанализ":"В этом подходе акцент делается на том, чтобы заново переосмыслить (в основном) ваш детский опыт, который влияет на убеждения и предпочтения в настоящем. Вместе с психологом вы будете искать и «выводить в свет» подавленные мысли и желания, которые сдерживают вашу энергию жизни, страсти (или по-другому - «Либидо»). Это творческий, глубинный, психодинамический подход, близкий по техникам к аналитической психологии",
+    "КПТ":"Этот подход поможет вам скорректировать свое поведение и реакции, избавиться от симптомов, не затрагивая причин, что важно особенно если вы не готовы «идти туда» сейчас. В подходе огромное количество техник, которые помогают найти нерациональные негативные убеждения, а затем изменить их. Это очень логический и структурный подход, с большим объемом саморефлексии, а иногда и домашними заданиями в виде дневника мыслей и эмоций",
+}
 
   return (
     <div className="px-[50px] max-lg:px-[20px] flex w-full grow relative max-lg:overflow-y-auto">
@@ -512,7 +518,7 @@ export const PsychologistStage = () => {
             </div>
             <button
               onClick={handleOpenPsychologistCard}
-              className="hover:opacity-80 transition-opacity cursor-pointer text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#116466] max-lg:hidden"
+              className="hover:opacity-80 transition-opacity cursor-pointer text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#116466] max-lg:hidden lg:flex"
             >
               Перейти на карточку психолога
             </button>
@@ -525,7 +531,7 @@ export const PsychologistStage = () => {
               <div className="flex items-center gap-[10px] mt-[5px]">
                 {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
                 <p className="font-semibold text-[18px] leading-[25px] whitespace-nowrap">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
-                <Tooltip text="Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов." />
+                <Tooltip text={method_description[currentPsychologist.main_modal] ? method_description[currentPsychologist.main_modal] : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
               </div>
             </div>
             <div>
@@ -536,7 +542,7 @@ export const PsychologistStage = () => {
               <span className="text-[#9A9A9A] text-[16px]">Стоимость:</span>
               <div className="flex items-center gap-[10px] mt-[5px]">
                 <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p>
-                <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
+                <Tooltip text="Стоимость сессии длительностью 50-55 минут в формате онлайн видеозвонка. Частоту и формат последующих встреч определяете вместе с психологом" />
               </div>
             </div>
           </div>
@@ -548,7 +554,7 @@ export const PsychologistStage = () => {
               <div className="flex items-center gap-[10px]">
                 {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
                 <p className="font-semibold text-[14px] leading-[20px] whitespace-nowrap">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
-                <Tooltip text="Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов." />
+                <Tooltip text={method_description[currentPsychologist.main_modal] ? method_description[currentPsychologist.main_modal] : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
               </div>
             </div>
             <div className="flex gap-[10px]">
@@ -592,7 +598,7 @@ export const PsychologistStage = () => {
 
           <button
             onClick={handleOpenPsychologistCard}
-            className="hidden max-lg:flex mt-[20px] border border-[#116466] border-[1px] max-lg:h-[47px] bg-[#116466] p-[12px] text-[#fff] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] flex justify-center items-center gap-[10px]"
+            className="hidden max-lg:flex mt-[20px] border border-[#116466] max-lg:h-[47px] bg-[#116466] p-[12px] text-[#fff] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] justify-center items-center gap-[10px]"
           >
             Перейти на карточку психолога
           </button>

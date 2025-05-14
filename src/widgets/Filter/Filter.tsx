@@ -321,7 +321,7 @@ export const Filter = () => {
                                 htmlFor="mental_illnesses"
                                 className="font-normal text-[16px] lg:text-[16px] md:text-[13px] max-lg:text-[13px] leading-[22px]"
                             >
-                                Работает с психиатрическими заболеваниями (ПРЛ, БАР, ПТСР и др)
+                                Работает с психическими заболеваниями (ПРЛ, БАР, ПТСР и др)
                             </label>
                         </div>
                     </>

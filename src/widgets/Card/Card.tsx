@@ -71,9 +71,9 @@ const getGoogleDriveVideoUrl = (url: string | null | undefined) => {
 
 const method_description = {
     "Аналитическая психология": "Подход помогает глубоко исследовать причины вашего текущего состояния — включая травмы, подавленные чувства и сценарии, повторяющиеся в жизни. Работа строится не только через разговор, но и через образы: сны, символы, метафоры, МАК-карты, сказки. Здесь важна не только логика, но и воображение — как инструмент самопонимания. Вместе с психологом вы будете размышлять, исследовать свои чувства и искать смысл в личной истории",
-    "Гештальт":"Подход поможет вам соединить «в моменте» мысли, чувства и эмоции - он в целом держит в фокусе ваши эмоции. Ключевая идея - вернуть вас в состояние «здесь и сейчас», дать возможность в настоящем осмыслить и понять себя и свои потребности. Помимо этого, вместе с психологом вы сможете осмыслить отношения с окружающими  - завершить те контакты, которые приносят переживания. Это очень живой и разговорный подход",
-    "Психоанализ":"В этом подходе акцент делается на том, чтобы заново переосмыслить (в основном) ваш детский опыт, который влияет на убеждения и предпочтения в настоящем. Вместе с психологом вы будете искать и «выводить в свет» подавленные мысли и желания, которые сдерживают вашу энергию жизни, страсти (или по-другому - «Либидо»). Это творческий, глубинный, психодинамический подход, близкий по техникам к аналитической психологии",
-    "КПТ":"Этот подход поможет вам скорректировать свое поведение и реакции, избавиться от симптомов, не затрагивая причин, что важно особенно если вы не готовы «идти туда» сейчас. В подходе огромное количество техник, которые помогают найти нерациональные негативные убеждения, а затем изменить их. Это очень логический и структурный подход, с большим объемом саморефлексии, а иногда и домашними заданиями в виде дневника мыслей и эмоций",
+    "Гештальт": "Подход поможет вам соединить «в моменте» мысли, чувства и эмоции - он в целом держит в фокусе ваши эмоции. Ключевая идея - вернуть вас в состояние «здесь и сейчас», дать возможность в настоящем осмыслить и понять себя и свои потребности. Помимо этого, вместе с психологом вы сможете осмыслить отношения с окружающими  - завершить те контакты, которые приносят переживания. Это очень живой и разговорный подход",
+    "Психоанализ": "В этом подходе акцент делается на том, чтобы заново переосмыслить (в основном) ваш детский опыт, который влияет на убеждения и предпочтения в настоящем. Вместе с психологом вы будете искать и «выводить в свет» подавленные мысли и желания, которые сдерживают вашу энергию жизни, страсти (или по-другому - «Либидо»). Это творческий, глубинный, психодинамический подход, близкий по техникам к аналитической психологии",
+    "КПТ": "Этот подход поможет вам скорректировать свое поведение и реакции, избавиться от симптомов, не затрагивая причин, что важно особенно если вы не готовы «идти туда» сейчас. В подходе огромное количество техник, которые помогают найти нерациональные негативные убеждения, а затем изменить их. Это очень логический и структурный подход, с большим объемом саморефлексии, а иногда и домашними заданиями в виде дневника мыслей и эмоций",
 }
 
 interface CardProps {
@@ -101,7 +101,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
     const descriptionRef = useRef<HTMLParagraphElement>(null);
     const [shouldShowGradient, setShouldShowGradient] = useState(false);
 
-    
+
 
     // Если ID не задан, создаем его из имени
     useEffect(() => {
@@ -245,10 +245,10 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
     };
 
     const scrolledPsychologist = searchParams.get('selected_psychologist')
-    const isScrolledPsychologist = scrolledPsychologist == psychologist.name 
+    const isScrolledPsychologist = scrolledPsychologist == psychologist.name
 
     useEffect(() => {
-        if(isScrolledPsychologist){
+        if (isScrolledPsychologist) {
             setIsExpanded(true)
         }
     }, [isScrolledPsychologist])
@@ -361,33 +361,33 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                             />
                         </button>
                     </div>
-                    <Tooltip 
-                    text={`${psychologist.name.split(" ")[1]} как Хранитель придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`}
-                    customMargin="35%"
+                    <Tooltip
+                        text={`${psychologist.name.split(" ")[1]} как Хранитель придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`}
+                        customMargin="35%"
                     >
-                    <div className={`${styles.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
-                        {psychologist.experience && (
-                            <span className={styles.experience}>
-                                {psychologist.experience}
-                            </span>
-                        )}
-                        {psychologist.in_community && (
-                            <span className={styles.experience}>
-                                в сообществе
-                                
-                            </span>
-                        )}
-                        {psychologist.verified && (
-                            <Image
-                                src="/card/verified.svg"
-                                alt="Verified"
-                                width={23}
-                                height={23}
-                                style={{ marginLeft: '6px' }}
-                                unoptimized
-                            />
-                        )}
-                    </div>
+                        <div className={`${styles.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
+                            {psychologist.experience && (
+                                <span className={styles.experience}>
+                                    {psychologist.experience}
+                                </span>
+                            )}
+                            {psychologist.in_community && (
+                                <span className={styles.experience}>
+                                    в сообществе
+
+                                </span>
+                            )}
+                            {psychologist.verified && (
+                                <Image
+                                    src="/card/verified.svg"
+                                    alt="Verified"
+                                    width={23}
+                                    height={23}
+                                    style={{ marginLeft: '6px' }}
+                                    unoptimized
+                                />
+                            )}
+                        </div>
                     </Tooltip>
 
                     <div className={styles.approach}>
@@ -395,7 +395,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                             <span className={styles.label}>Основной подход:</span>
                             <div className={styles.value}>
                                 {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
-                                {psychologist.main_modal ? psychologist.main_modal : ''}
+                                {psychologist.main_modal ? psychologist.main_modal : 'Аналитическая психология'}
                                 <Tooltip text={method_description[psychologist.main_modal] ? method_description[psychologist.main_modal] : 'Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов.'} />
                             </div>
                         </div>
@@ -418,7 +418,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                             ).map((approach: string, index: number) => (
                                 <div key={index} className={styles.approachItem}>
                                     {approach.trim()}
-                                    <Tooltip text={method_description[approach.trim()] ? method_description[approach.trim()] : "Дополнительные подходы, которые психолог использует в своей работе для более эффективной помощи клиентам."}  />
+                                    <Tooltip text={method_description[approach.trim()] ? method_description[approach.trim()] : "Дополнительные подходы, которые психолог использует в своей работе для более эффективной помощи клиентам."} />
                                 </div>
                             ))}
                         </div>
@@ -440,66 +440,45 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                                         {slot.date.split('.').slice(0, 2).join('.')}/{slot.time}
                                     </button>
                                 ))}
-                            </div> : 
+                            </div> :
                             // ''
                             <p>У психолога пока нет свободного времени для записи</p>
-                            }
+                        }
                     </div>
                     {/* } */}
                 </div>
             </div>
 
 
-            {/* Запросы */}
-            <div className={styles.queries}>
-                <h3 className={styles.sectionTitle}>Запросы:</h3>
-                <div className={styles.queriesList}>
-                    {psychologist.queries?.split(';').slice(0, 6).map((query, index) => (
-                        <TextTooltip key={index} text={query.trim()}>
-                            <button className={styles.queryButton}>
-                                {query.trim()}
-                            </button>
-                        </TextTooltip>
-                    ))}
-                </div>
-            </div>
 
-            {/* Диагностированные заболевания */}
-            {psychologist.works_with?.includes('Есть диагностированное психиатрическое заболевание (ПРЛ, БАР, ПТСР и др)') && (
-                <div className={styles.diagnoses}>
-                    <h3 className={styles.sectionTitle}>Диагностированные заболевания:</h3>
-                    <div className={styles.diagnosesList}>
-                        <div className={styles.diagnosisItem}>
-                            Работает с психическими заболеваниями (ПРЛ, БАР, ПТСР и др)
-                            <Tooltip text="Психолог работает с пациентами, у которых диагностированно психическое заболевание" />
-                        </div>
-                    </div>
+
+            {/* О Хранителе */}
+            {psychologist.short_description && (
+                <div className={styles.section}>
+                    <h3 className={styles.sectionTitle}>О Хранителе</h3>
+                    <p
+                        ref={descriptionRef}
+                        className={`${styles.description} ${isDescriptionExpanded ? styles.expanded : ''}`}
+                        style={shouldShowGradient ? { height: isDescriptionExpanded ? 'auto' : '44px' } : undefined}
+                    >
+                        {psychologist.short_description}
+                    </p>
+                    {shouldShowGradient && (
+                        <button
+                            className={styles.readMoreButton}
+                            onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                        >
+                            {isDescriptionExpanded ? 'Свернуть' : 'Читать еще'}
+                        </button>
+                    )}
                 </div>
             )}
 
+
+
             {/* Дополнительная информация (показывается при раскрытии) */}
-            <div className={`${styles.expandedContent} ${isExpanded  ? styles.expanded : ''}`}>
-                {/* О Хранителе */}
-                {psychologist.short_description && (
-                    <div className={styles.section}>
-                        <h3 className={styles.sectionTitle}>О Хранителе</h3>
-                        <p
-                            ref={descriptionRef}
-                            className={`${styles.description} ${isDescriptionExpanded ? styles.expanded : ''}`}
-                            style={shouldShowGradient ? { height: isDescriptionExpanded ? 'auto' : '44px' } : undefined}
-                        >
-                            {psychologist.short_description}
-                        </p>
-                        {shouldShowGradient && (
-                            <button
-                                className={styles.readMoreButton}
-                                onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                            >
-                                {isDescriptionExpanded ? 'Свернуть' : 'Читать еще'}
-                            </button>
-                        )}
-                    </div>
-                )}
+            <div className={`${styles.expandedContent} ${isExpanded ? styles.expanded : ''}`}>
+
 
                 {/* Образование */}
                 {/* UPDATE Правильно разобрал информацию об образовании психолога */}
@@ -526,6 +505,33 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                         </div>
                     )}
                 </div>
+
+                {/* Запросы */}
+                <div className={styles.queries}>
+                    <h3 className={styles.sectionTitle}>Запросы:</h3>
+                    <div className={styles.queriesList}>
+                        {psychologist.queries?.split(';').slice(0, 6).map((query, index) => (
+                            <TextTooltip key={index} text={query.trim()}>
+                                <button className={styles.queryButton}>
+                                    {query.trim()}
+                                </button>
+                            </TextTooltip>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Диагностированные заболевания */}
+                {psychologist.works_with?.includes('Есть диагностированное психиатрическое заболевание (ПРЛ, БАР, ПТСР и др)') && (
+                    <div className={styles.diagnoses}>
+                        <h3 className={styles.sectionTitle}>Диагностированные заболевания:</h3>
+                        <div className={styles.diagnosesList}>
+                            <div className={styles.diagnosisItem}>
+                                Работает с психическими заболеваниями (ПРЛ, БАР, ПТСР и др)
+                                <Tooltip text="Психолог работает с пациентами, у которых диагностированно психическое заболевание" />
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Подробнее о Хранителе */}
                 <div className={styles.section}>
