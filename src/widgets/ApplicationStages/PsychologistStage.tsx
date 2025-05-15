@@ -580,7 +580,7 @@ const getMethodDescription = (method:string | undefined): string => {
               <div className="flex items-center gap-[10px]">
                 {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
                 <p className="font-semibold text-[14px] leading-[20px] whitespace-nowrap">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
-                <Tooltip text={getMethodDescription(currentPsychologist.main_modal) != '' ? getMethodDescription(currentPsychologist.main_modal) != '' : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
+                <Tooltip text={getMethodDescription(currentPsychologist.main_modal) != '' ? getMethodDescription(currentPsychologist.main_modal)  : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
               </div>
             </div>
             <div className="flex gap-[10px]">
