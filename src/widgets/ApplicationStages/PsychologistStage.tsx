@@ -16,6 +16,7 @@ import { EmergencyContacts } from './EmergencyContacts';
 import axios from 'axios';
 import { toast } from 'sonner';
 import styles from './PsychologistStage.module.scss';
+import { format } from 'date-fns';
 
 interface Slot {
   id: string;
@@ -61,6 +62,7 @@ interface ScheduleDay {
 interface SimpleSlot {
   date: string;
   time: string;
+  moscow_datetime_formatted: string;
 }
 
 const getGoogleDriveImageUrl = (url: string | undefined) => {
@@ -207,11 +209,15 @@ export const PsychologistStage = () => {
           if (Object.keys(timeSlots).length > 0) {
             Object.entries(timeSlots).forEach(([time, slot]) => {
               if (slot.state === 'Свободен') {
+                
+                let moscow_datetime = new Date(`${slot.date}T${slot.time}`)
                 // Время уже в нужном часовом поясе, не конвертируем
                 slots.push({
                   date: date,
-                  time: time
+                  time: time,
+                  moscow_datetime_formatted: format(moscow_datetime, 'dd.M HH:00'),
                 });
+               
               }
             });
           }
@@ -301,12 +307,8 @@ export const PsychologistStage = () => {
     if (selectedSlot) {
       setIsSubmitting(true);
       try {
-        // Форматируем дату из DD.MM в DD.M
-        const [day, month] = selectedSlot.date.split('.');
-        const formattedDate = `${parseInt(day)}.${parseInt(month)}`;
-
         // Время уже в нужном формате, не конвертируем
-        const formattedSlot = `${formattedDate} ${selectedSlot.time}`;
+        const formattedSlot = `${selectedSlot.moscow_datetime_formatted}`;
 
         // Получаем запросы из localStorage
         const storedRequests = localStorage.getItem('app_requests') ?
@@ -384,10 +386,10 @@ export const PsychologistStage = () => {
           }
         };
 
-
         const response = await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka', requestData);
 
         if (response.status === 200) {
+
           dispatch(setSelectedSlots([formattedSlot]));
           dispatch(setSelectedSlotsObjects([]));
           dispatch(setApplicationStage('gratitude'));
@@ -621,13 +623,6 @@ const getMethodDescription = (method:string | undefined): string => {
               </div>
             )}
           </div>
-
-          {/* <button
-            onClick={handleOpenPsychologistCard}
-            className="hover:opacity-80 transition-opacity cursor-pointer text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#116466] lg:hidden max-lg:flex px-10 py-4 underline justify-center items-center"
-          >
-            Перейти на карточку психолога
-          </button> */}
         </div>
 
         <div className="max-lg:fixed max-lg:bottom-[20px] max-lg:left-[20px] max-lg:right-[20px] flex gap-[10px] button-container">
