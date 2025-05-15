@@ -76,6 +76,31 @@ const method_description = {
     "КПТ": "Этот подход поможет вам скорректировать свое поведение и реакции, избавиться от симптомов, не затрагивая причин, что важно особенно если вы не готовы «идти туда» сейчас. В подходе огромное количество техник, которые помогают найти нерациональные негативные убеждения, а затем изменить их. Это очень логический и структурный подход, с большим объемом саморефлексии, а иногда и домашними заданиями в виде дневника мыслей и эмоций",
 }
 
+const getMethodDescription = (method:string | undefined): string => {
+    if (method == undefined) return ''
+
+    let description:string = ''
+    switch(method){
+        case 'Аналитическая психология': 
+            description = method_description['Аналитическая психология']
+            break
+        case 'Гештальт': 
+            description = method_description['Гештальт']
+            break
+        case 'Психоанализ': 
+            description = method_description['Психоанализ']
+            break
+        case 'КПТ': 
+            description = method_description['КПТ']
+            break
+        default: 
+            description =''
+            break
+    }
+
+    return description
+}
+
 interface CardProps {
     psychologist: IPsychologist;
     id?: string;
@@ -395,8 +420,8 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                             <span className={styles.label}>Основной подход:</span>
                             <div className={styles.value}>
                                 {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
-                                {psychologist.main_modal ? psychologist.main_modal : 'Аналитическая психология'}
-                                <Tooltip text={method_description[psychologist.main_modal] ? method_description[psychologist.main_modal] : 'Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов.'} />
+                                {psychologist.main_modal ? psychologist.main_modal : ''}
+                                <Tooltip text={getMethodDescription(psychologist.main_modal) != '' ? getMethodDescription(psychologist.main_modal) : 'Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов.'} />
                             </div>
                         </div>
                         <div className={styles.approachBlock}>
@@ -418,7 +443,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                             ).map((approach: string, index: number) => (
                                 <div key={index} className={styles.approachItem}>
                                     {approach.trim()}
-                                    <Tooltip text={method_description[approach.trim()] ? method_description[approach.trim()] : "Дополнительные подходы, которые психолог использует в своей работе для более эффективной помощи клиентам."} />
+                                    <Tooltip text={getMethodDescription(approach.trim()) ? getMethodDescription(approach.trim()) : "Дополнительные подходы, которые психолог использует в своей работе для более эффективной помощи клиентам."} />
                                 </div>
                             ))}
                         </div>
