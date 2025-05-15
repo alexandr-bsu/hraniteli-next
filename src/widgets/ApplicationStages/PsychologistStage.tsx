@@ -210,7 +210,7 @@ export const PsychologistStage = () => {
             Object.entries(timeSlots).forEach(([time, slot]) => {
               if (slot.state === 'Свободен') {
                 
-                let moscow_datetime = new Date(`${slot.date}T${slot.time}`)
+                const moscow_datetime = new Date(`${slot.date}T${slot.time}`)
                 // Время уже в нужном часовом поясе, не конвертируем
                 slots.push({
                   date: date,
