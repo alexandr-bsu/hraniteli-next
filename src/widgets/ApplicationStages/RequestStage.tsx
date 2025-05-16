@@ -92,7 +92,7 @@ const RequestStage = () => {
                                             }}
                                         />
                                         <label className={styles.input__text_label}>
-                                            Опишите вашу просьбу
+                                            Опишите вашу запрос
                                         </label>
                                     </div>
                                 </FormItem>
