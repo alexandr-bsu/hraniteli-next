@@ -506,7 +506,7 @@ const getMethodDescription = (method:string | undefined): string => {
             </>
           )}
         </div>
-        <div className="flex flex-col p-[25px] max-lg:p-[15px] mb-[43px] max-lg:mb-[20px] border-[1px] rounded-[25px] lg:overflow-y-auto  scrollContainer">
+        <div className="flex flex-col p-[25px] max-lg:p-[15px] mb-[43px] max-lg:mb-[20px] border-[1px] rounded-[25px] scrollContainer max-h-[500px]">
           <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-[650px]:flex-col max-[650px]:gap-[15px]">
             <div className="flex gap-[20px] items-center max-lg:gap-[15px]">
               <div className="w-[80px] h-[80px] max-lg:w-[60px] max-lg:h-[60px] rounded-full overflow-hidden">
@@ -603,7 +603,7 @@ const getMethodDescription = (method:string | undefined): string => {
           <div className={styles.nextSession}>
             <h4 className="text-[18px] font-semibold mb-[15px] max-lg:text-[14px]">Ближайшая запись:</h4>
             {availableSlots && availableSlots.length > 0 ? (
-              <div className="flex gap-[10px] flex-wrap max-lg:flex-nowrap max-lg:overflow-x-auto max-lg:pb-[10px] max-lg:-mx-[15px] max-lg:px-[15px]">
+              <div className="flex gap-[10px] flex-wrap overflow-y-auto">
                 {availableSlots.map((slot, index) => (
                   <button
                     key={index}
