@@ -506,8 +506,8 @@ const getMethodDescription = (method:string | undefined): string => {
             </>
           )}
         </div>
-        <div className="flex flex-col p-[25px] max-lg:p-[15px] mb-[43px] max-lg:mb-[20px] border-[1px] rounded-[25px] lg:overflow-y-auto lg:h-[400px] scrollContainer max-md:pb-[100px]">
-          <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-lg:flex-col max-lg:gap-[15px]">
+        <div className="flex flex-col p-[25px] max-lg:p-[15px] mb-[43px] max-lg:mb-[20px] border-[1px] rounded-[25px] lg:overflow-y-auto  scrollContainer">
+          <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-[650px]:flex-col max-[650px]:gap-[15px]">
             <div className="flex gap-[20px] items-center max-lg:gap-[15px]">
               <div className="w-[80px] h-[80px] max-lg:w-[60px] max-lg:h-[60px] rounded-full overflow-hidden">
                 <Image
@@ -625,7 +625,7 @@ const getMethodDescription = (method:string | undefined): string => {
           </div>
         </div>
 
-        <div className="max-lg:fixed max-lg:bottom-[20px] max-lg:left-[20px] max-lg:right-[20px] flex gap-[10px] button-container">
+        <div className="pb-[20px] flex gap-[10px]">
           <button
             type='button'
             onClick={() => dispatch(setApplicationStage('phone'))}
