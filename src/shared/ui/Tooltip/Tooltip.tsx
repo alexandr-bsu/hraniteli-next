@@ -6,9 +6,10 @@ interface TooltipProps {
     text: string;
     customMargin ?: string;
     children?: ReactNode;
+    className?: string
 }
 
-export const Tooltip: FC<TooltipProps> = ({ text, children, customMargin }) => {
+export const Tooltip: FC<TooltipProps> = ({ text, children, customMargin, className }) => {
     const [isVisible, setIsVisible] = useState(false);
     const [isMobile, setIsMobile] = useState(false);
     const wrapperRef = useRef<HTMLDivElement>(null);
@@ -56,7 +57,7 @@ export const Tooltip: FC<TooltipProps> = ({ text, children, customMargin }) => {
     return (
         <div 
             ref={wrapperRef}
-            className={styles.tooltipWrapper}
+            className={`${styles.tooltipWrapper} ${className}`}
             onClick={handleClick}
             {...(!isMobile && {
                 onMouseEnter: () => setIsVisible(true),

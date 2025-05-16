@@ -534,14 +534,25 @@ const getMethodDescription = (method:string | undefined): string => {
                   {currentPsychologist?.name}
                   {currentPsychologist?.age && currentPsychologist.age !== 0 && `, ${currentPsychologist.age} лет`}
                 </h3>
-                <span className="text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#9A9A9A]">
+
+                
+                <span className="text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] flex items-center text-[#9A9A9A]">
                   {currentPsychologist?.experience && (
                     <span>{currentPsychologist.experience}{' '}</span>
                   )}
                   {currentPsychologist?.in_community && (
                     <span>в сообществе</span>
+                    
                   )}
+
+                  <Tooltip
+                        className='ml-4'
+                        text={`${currentPsychologist?.name?.split(" ")[1]} как Хранитель придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`}
+                    />
                 </span>
+
+                
+                {/* </Tooltip> */}
               </div>
             </div>
             <button

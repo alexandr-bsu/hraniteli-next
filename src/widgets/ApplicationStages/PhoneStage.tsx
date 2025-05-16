@@ -19,7 +19,7 @@ import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
 const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
 
 const FormSchema = z.object({
-    phone: z.string().regex(phoneRegex, 'Введите корректный номер телефона').or(z.literal(''))
+    phone: z.string().nonempty("Вы не заполнили обязательное поле").regex(phoneRegex, 'Введите корректный номер телефона')
 });
 
 export const PhoneStage = () => {
