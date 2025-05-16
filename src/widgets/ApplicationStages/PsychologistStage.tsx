@@ -506,7 +506,7 @@ const getMethodDescription = (method:string | undefined): string => {
             </>
           )}
         </div>
-        <div className="flex flex-col p-[25px] max-lg:p-[15px] mb-[43px] max-lg:mb-[20px] border-[1px] rounded-[25px] scrollContainer max-h-[500px]">
+        <div className="flex flex-col p-[25px] max-lg:p-[15px] mb-[43px] max-lg:mb-[20px] border-[1px] rounded-[25px] scrollContainer max-h-[550px] overflow-y-auto">
           <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-[650px]:flex-col max-[650px]:gap-[15px]">
             <div className="flex gap-[20px] items-center max-lg:gap-[15px]">
               <div className="w-[80px] h-[80px] max-lg:w-[60px] max-lg:h-[60px] rounded-full overflow-hidden">
@@ -608,7 +608,7 @@ const getMethodDescription = (method:string | undefined): string => {
                   <button
                     key={index}
                     onClick={() => handleSlotSelect(slot)}
-                    className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] cursor-pointer max-lg:shrink-0 ${selectedSlot?.date === slot.date && selectedSlot?.time === slot.time
+                    className={`px-[15px] py-[8px] rounded-[50px] border whitespace-nowrap text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] cursor-pointer max-lg:shrink-0 flex grow items-center justify-center ${selectedSlot?.date === slot.date && selectedSlot?.time === slot.time
                       ? 'bg-[#116466] text-white border-[#116466]'
                       : 'border-[#D4D4D4] text-[#116466] hover:bg-[#116466] hover:text-white hover:border-[#116466]'
                       }`}
