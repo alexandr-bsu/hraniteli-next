@@ -337,7 +337,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                             </div>
                         ) : (
                             <Image
-                                src={imageUrl}
+                                src={imageUrl.trimEnd()}
                                 alt={psychologist.name}
                                 width={214}
                                 height={351}
