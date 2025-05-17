@@ -16,6 +16,7 @@ import { EmergencyContacts } from './EmergencyContacts';
 import axios from 'axios';
 import { toast } from 'sonner';
 import styles from './PsychologistStage.module.scss';
+import styles_cards from '../Card/Card.module.scss';
 import { format } from 'date-fns';
 
 interface Slot {
@@ -145,7 +146,7 @@ export const PsychologistStage = () => {
       try {
         // Получаем полные данные психологов
         const { items: fullPsychologists } = await getFilteredPsychologists();
-
+        // console.log('fullPsychologists', fullPsychologists)
         // Мерджим с текущими психологами из стора, приоритет отдаем слотам из стора
         const mergedPsychologists = fullPsychologists.map((fullPsy: IPsychologist) => {
           const existingPsy = filtered_by_automatch_psy.find(p => p.name === fullPsy.name);
@@ -530,26 +531,39 @@ const getMethodDescription = (method:string | undefined): string => {
                 />
               </div>
               <div>
-                <h3 className="text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[14px] font-semibold">
+                <h3 className="text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[14px] font-semibold mb-1">
                   {currentPsychologist?.name}
                   {currentPsychologist?.age && currentPsychologist.age !== 0 && `, ${currentPsychologist.age} лет`}
                 </h3>
 
-                
-                <span className="text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] flex items-center text-[#9A9A9A]">
-                  {currentPsychologist?.experience && (
-                    <span>{currentPsychologist.experience}{' '}</span>
-                  )}
-                  {currentPsychologist?.in_community && (
-                    <span>в сообществе</span>
-                    
-                  )}
+                <Tooltip
+                        text={`${currentPsychologist.name.split(" ")[1]} как Хранитель придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`}
+                        customMargin="35%"
+                    >
+                        <div className={`${styles_cards.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
+                            {currentPsychologist.experience && (
+                                <span className={styles_cards.experience}>
+                                    {currentPsychologist.experience}
+                                </span>
+                            )}
+                            {currentPsychologist.in_community && (
+                                <span className={styles_cards.experience}>
+                                    в сообществе
 
-                  <Tooltip
-                        className='ml-4'
-                        text={`${currentPsychologist?.name?.split(" ")[1]} как Хранитель придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`}
-                    />
-                </span>
+                                </span>
+                            )}
+                            {currentPsychologist.verified && (
+                                <Image
+                                    src="/card/verified.svg"
+                                    alt="Verified"
+                                    width={23}
+                                    height={23}
+                                    style={{ marginLeft: '6px' }}
+                                    unoptimized
+                                />
+                            )}
+                        </div>
+                    </Tooltip>
 
                 
                 {/* </Tooltip> */}
@@ -587,8 +601,10 @@ const getMethodDescription = (method:string | undefined): string => {
           </div>
 
           {/* Tablet and Mobile */}
-          <div className="lg:hidden mb-[20px]">
-            <div className="mb-[20px]">
+          <div className="lg:hidden block mb-[20px]">
+            
+            <div className="flex flex-wrap gap-[10px] justify-between items-center max-w-[700px]">
+              <div className="flex flex-col w-fit">
               <span className="text-[#9A9A9A] text-[14px]">Основной подход:</span>
               <div className="flex items-center gap-[10px]">
                 {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
@@ -596,6 +612,30 @@ const getMethodDescription = (method:string | undefined): string => {
                 <Tooltip text={getMethodDescription(currentPsychologist.main_modal) != '' ? getMethodDescription(currentPsychologist.main_modal)  : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
               </div>
             </div>
+
+              <div className="flex flex-col w-fit">
+                <span className="text-[#9A9A9A] text-[14px]">Формат встречи:</span>
+                <p className="font-semibold text-[14px] leading-[20px]">Онлайн</p>
+              </div> 
+              <div className="flex flex-col w-fit">
+                <span className="text-[#9A9A9A] text-[14px]">Стоимость:</span>
+                <div className="flex items-center gap-[10px]">
+                  <p className="font-semibold text-[14px]">От {currentPsychologist.min_session_price || 0} ₽</p>
+                  <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* <div className="max-[600px]:block hidden lg:hidden mb-[20px]">
+            <div className="mb-[20px]">
+              <span className="text-[#9A9A9A] text-[14px]">Основной подход:</span>
+              <div className="flex items-center gap-[10px]">
+                <p className="font-semibold text-[14px] leading-[20px] whitespace-nowrap">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
+                <Tooltip text={getMethodDescription(currentPsychologist.main_modal) != '' ? getMethodDescription(currentPsychologist.main_modal)  : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
+              </div>
+            </div>
+            
             <div className="flex gap-[10px]">
               <div className="flex-1">
                 <span className="text-[#9A9A9A] text-[14px]">Формат встречи:</span>
@@ -609,7 +649,7 @@ const getMethodDescription = (method:string | undefined): string => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
           <div className={styles.nextSession}>
             <h4 className="text-[18px] font-semibold mb-[15px] max-lg:text-[14px]">Ближайшая запись:</h4>

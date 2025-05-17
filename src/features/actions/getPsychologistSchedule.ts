@@ -221,7 +221,9 @@ export const getFilteredPsychologists = async () => {
                 short_description: psy.short_description || '',
                 link_video: psy.link_video || null,
                 verified: psy.verified || psy.is_verified || false,
-                schedule: psy.schedule || undefined
+                schedule: psy.schedule || undefined,
+                main_modal: psy.main_modal || undefined,
+                in_community: psy.in_community || undefined
             };
         };
 
