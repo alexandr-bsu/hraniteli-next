@@ -210,7 +210,7 @@ export const PsychologistStage = () => {
           if (Object.keys(timeSlots).length > 0) {
             Object.entries(timeSlots).forEach(([time, slot]) => {
               if (slot.state === 'Свободен') {
-                
+
                 const moscow_datetime = new Date(`${slot.date}T${slot.time}`)
                 // Время уже в нужном часовом поясе, не конвертируем
                 slots.push({
@@ -218,7 +218,7 @@ export const PsychologistStage = () => {
                   time: time,
                   moscow_datetime_formatted: format(moscow_datetime, 'dd.M HH:00'),
                 });
-               
+
               }
             });
           }
@@ -344,7 +344,7 @@ export const PsychologistStage = () => {
 
           // ticket_id: localStorage.getItem('app_ticket_id') || '',
           emptySlots: false,
-          userTimeZone: "МСК"+(+timeDifference>0 ? '+'+timeDifference : timeDifference == 0 ? '' : timeDifference),
+          userTimeZone: "МСК" + (+timeDifference > 0 ? '+' + timeDifference : timeDifference == 0 ? '' : timeDifference),
           userTimeOffsetMsk: timeDifference.toString(),
           bid: 0,
           rid: 0,
@@ -444,32 +444,32 @@ export const PsychologistStage = () => {
     "Гештальт": "Подход поможет вам соединить «в моменте» мысли, чувства и эмоции - он в целом держит в фокусе ваши эмоции. Ключевая идея - вернуть вас в состояние «здесь и сейчас», дать возможность в настоящем осмыслить и понять себя и свои потребности. Помимо этого, вместе с психологом вы сможете осмыслить отношения с окружающими  - завершить те контакты, которые приносят переживания. Это очень живой и разговорный подход",
     "Психоанализ": "В этом подходе акцент делается на том, чтобы заново переосмыслить (в основном) ваш детский опыт, который влияет на убеждения и предпочтения в настоящем. Вместе с психологом вы будете искать и «выводить в свет» подавленные мысли и желания, которые сдерживают вашу энергию жизни, страсти (или по-другому - «Либидо»). Это творческий, глубинный, психодинамический подход, близкий по техникам к аналитической психологии",
     "КПТ": "Этот подход поможет вам скорректировать свое поведение и реакции, избавиться от симптомов, не затрагивая причин, что важно особенно если вы не готовы «идти туда» сейчас. В подходе огромное количество техник, которые помогают найти нерациональные негативные убеждения, а затем изменить их. Это очень логический и структурный подход, с большим объемом саморефлексии, а иногда и домашними заданиями в виде дневника мыслей и эмоций",
-}
+  }
 
-const getMethodDescription = (method:string | undefined): string => {
+  const getMethodDescription = (method: string | undefined): string => {
     if (method == undefined) return ''
 
-    let description:string = ''
-    switch(method){
-        case 'Аналитическая психология': 
-            description = method_description['Аналитическая психология']
-            break
-        case 'Гештальт': 
-            description = method_description['Гештальт']
-            break
-        case 'Психоанализ': 
-            description = method_description['Психоанализ']
-            break
-        case 'КПТ': 
-            description = method_description['КПТ']
-            break
-        default: 
-            description =''
-            break
+    let description: string = ''
+    switch (method) {
+      case 'Аналитическая психология':
+        description = method_description['Аналитическая психология']
+        break
+      case 'Гештальт':
+        description = method_description['Гештальт']
+        break
+      case 'Психоанализ':
+        description = method_description['Психоанализ']
+        break
+      case 'КПТ':
+        description = method_description['КПТ']
+        break
+      default:
+        description = ''
+        break
     }
 
     return description
-}
+  }
 
   return (
     <div className="px-[50px] max-lg:px-[20px] flex w-full grow relative max-lg:overflow-y-auto">
@@ -483,31 +483,31 @@ const getMethodDescription = (method:string | undefined): string => {
       )}
 
       <div className="flex flex-col h-full w-full pb-[120px] max-lg:pb-[0px]">
-        <div className="flex justify-between items-center mt-[20px] mb-[20px] max-lg:gap-[15px] min-h-[50px]">
-          {filtered_by_automatch_psy.length > 1 && (
-            <>
-              {currentIndex > 0 && (
-                <button
-                  onClick={handlePrevious}
-                  className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]"
-                >
-                  <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
-                  <span>Предыдущий психолог</span>
-                </button>
-              )}
-              {currentIndex < filtered_by_automatch_psy.length - 1 && remainingPsychologists > 0 && (
-                <button
-                  onClick={handleNext}
-                  className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ml-auto"
-                >
-                  <span>Показать еще {remainingPsychologists} {getPsychologistDeclension(remainingPsychologists)}</span>
-                  <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
-                </button>
-              )}
-            </>
-          )}
-        </div>
-        <div className="flex flex-col p-[25px] max-lg:p-[15px] mb-[43px] max-lg:mb-[20px] border-[1px] rounded-[25px] scrollContainer max-h-[550px] overflow-y-auto">
+        {filtered_by_automatch_psy.length > 1 && <div className="flex justify-between items-center mt-[20px] max-lg:gap-[15px] min-h-[50px]">
+
+          <>
+            {currentIndex > 0 && (
+              <button
+                onClick={handlePrevious}
+                className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]"
+              >
+                <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
+                <span>Предыдущий психолог</span>
+              </button>
+            )}
+            {currentIndex < filtered_by_automatch_psy.length - 1 && remainingPsychologists > 0 && (
+              <button
+                onClick={handleNext}
+                className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ml-auto"
+              >
+                <span>Показать еще {remainingPsychologists} {getPsychologistDeclension(remainingPsychologists)}</span>
+                <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
+              </button>
+            )}
+          </>
+
+        </div>}
+        <div className="flex flex-col p-[25px] max-lg:p-[15px] mb-[43px] max-lg:mb-[20px] border-[1px] rounded-[25px] scrollContainer max-h-[550px] overflow-y-auto mt-[20px]">
           <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-[650px]:flex-col max-[650px]:gap-[15px]">
             <div className="flex gap-[20px] items-center max-lg:gap-[15px]">
               <div className="w-[80px] h-[80px] max-lg:w-[60px] max-lg:h-[60px] rounded-full overflow-hidden">
@@ -537,35 +537,35 @@ const getMethodDescription = (method:string | undefined): string => {
                 </h3>
 
                 <Tooltip
-                        text={`${currentPsychologist.name.split(" ")[1]} как Хранитель придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`}
-                        customMargin="35%"
-                    >
-                        <div className={`${styles_cards.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
-                            {currentPsychologist.experience && (
-                                <span className={styles_cards.experience}>
-                                    {currentPsychologist.experience}
-                                </span>
-                            )}
-                            {currentPsychologist.in_community && (
-                                <span className={styles_cards.experience}>
+                  text={`${currentPsychologist.name.split(" ")[1]} как Хранитель придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`}
+                  customMargin="35%"
+                >
+                  <div className={`${styles_cards.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
+                    {currentPsychologist.experience && (
+                      <span className={`${styles_cards.experience} text-[12px]`}>
+                        {currentPsychologist.experience}
+                      </span>
+                    )}
+                    {/* {currentPsychologist.in_community && (
+                                <span className={`${styles_cards.experience} text-[12px]`}>
                                     в сообществе
 
                                 </span>
-                            )}
-                            {currentPsychologist.verified && (
-                                <Image
-                                    src="/card/verified.svg"
-                                    alt="Verified"
-                                    width={23}
-                                    height={23}
-                                    style={{ marginLeft: '6px' }}
-                                    unoptimized
-                                />
-                            )}
-                        </div>
-                    </Tooltip>
+                            )} */}
+                    {currentPsychologist.verified && (
+                      <Image
+                        src="/card/verified.svg"
+                        alt="Verified"
+                        width={23}
+                        height={23}
+                        style={{ marginLeft: '6px' }}
+                        unoptimized
+                      />
+                    )}
+                  </div>
+                </Tooltip>
 
-                
+
                 {/* </Tooltip> */}
               </div>
             </div>
@@ -602,21 +602,21 @@ const getMethodDescription = (method:string | undefined): string => {
 
           {/* Tablet and Mobile */}
           <div className="lg:hidden block mb-[20px]">
-            
+
             <div className="flex flex-wrap gap-[10px] justify-between items-center max-w-[700px]">
               <div className="flex flex-col w-fit">
-              <span className="text-[#9A9A9A] text-[14px]">Основной подход:</span>
-              <div className="flex items-center gap-[10px]">
-                {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
-                <p className="font-semibold text-[14px] leading-[20px] whitespace-nowrap">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
-                <Tooltip text={getMethodDescription(currentPsychologist.main_modal) != '' ? getMethodDescription(currentPsychologist.main_modal)  : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
+                <span className="text-[#9A9A9A] text-[14px]">Основной подход:</span>
+                <div className="flex items-center gap-[10px]">
+                  {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
+                  <p className="font-semibold text-[14px] leading-[20px] whitespace-nowrap">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
+                  <Tooltip text={getMethodDescription(currentPsychologist.main_modal) != '' ? getMethodDescription(currentPsychologist.main_modal) : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
+                </div>
               </div>
-            </div>
 
               <div className="flex flex-col w-fit">
                 <span className="text-[#9A9A9A] text-[14px]">Формат встречи:</span>
                 <p className="font-semibold text-[14px] leading-[20px]">Онлайн</p>
-              </div> 
+              </div>
               <div className="flex flex-col w-fit">
                 <span className="text-[#9A9A9A] text-[14px]">Стоимость:</span>
                 <div className="flex items-center gap-[10px]">
