@@ -30,11 +30,11 @@ import { EmergencyContacts } from "@/widgets/DiagnosesStages/EmergencyContacts";
 
 // Только три ключевых экрана, которые влияют на подбор психологов
 const KEY_STAGES = [
-    // 'gender_psychologist',
-    // 'condition',
-    // 'traumatic',
-    // 'diseases_psychologist'
-    'default'
+    'gender_psychologist',
+    'condition',
+    'traumatic',
+    'diseases_psychologist'
+    // 'default'
 ] as const;
 
 const STAGES_WITH_PROGRESS = [
@@ -77,6 +77,140 @@ export default function DiagnosesForm() {
             localStorage.setItem('matching_attempts', '0');
         }
     }, [dispatch, ticketID]);
+
+    // Получаем первоначальный список психологов и обновляем при смене ключевых экранов
+    // TODO: придумать как эффективно и просто получать список психологов при загрузке формы (первый шаг)
+    useEffect(() => {
+        const updatePsychologists = async () => {
+            // Если мы переходим на экран редактирования с NoMatchError, не делаем проверку
+            if (hasError && (
+                currentStage === 'gender_psychologist' ||
+                currentStage === 'condition' ||
+                currentStage === 'traumatic'
+            )) {
+                return;
+            }
+
+            // Проверяем, уходим ли мы с одного из трех ключевых экранов
+            const isKeyStageTransition = prevStage.current && KEY_STAGES.includes(prevStage.current as any);
+
+            if (isKeyStageTransition) {
+                setIsLoading(true);
+            }
+
+            try {
+                // Получаем актуальные данные формы на момент вызова
+                const currentFormData = store.getState().applicationFormData;
+                
+                // Отправляем текущие данные формы и получаем расписание
+                const schedule = await submitQuestionnaire(currentFormData, false, true);
+                
+                // Собираем все id психологов из слотов и их расписания
+                const psychologistSchedules = new Map<string, any>();
+                schedule[0].items.forEach((day: any) => {
+                    if (!day.slots) return;
+                    Object.entries(day.slots).forEach(([time, slots]) => {
+                        if (!Array.isArray(slots)) return;
+                        slots.forEach((slot: any) => {
+                            if (slot.psychologist) {
+                                if (!psychologistSchedules.has(slot.psychologist)) {
+                                    const psychologistSchedule: { [date: string]: { [time: string]: any } } = {};
+                                    schedule[0].items.forEach((d: any) => {
+                                        if (d.slots) {
+                                            psychologistSchedule[d.pretty_date] = {};
+                                            Object.entries(d.slots).forEach(([t, s]) => {
+                                                if (Array.isArray(s)) {
+                                                    const psychologistSlots = s.filter(sl => sl.psychologist === slot.psychologist && sl.state === 'Свободен');
+                                                    if (psychologistSlots.length > 0) {
+                                                        psychologistSchedule[d.pretty_date][t] = psychologistSlots[0];
+                                                    }
+                                                }
+                                            });
+                                        }
+                                    });
+                                    psychologistSchedules.set(slot.psychologist, psychologistSchedule);
+                                }
+                            }
+                        });
+                    });
+                });
+
+                // Берем текущий список психологов из стора
+                const currentPsychologists = store.getState().filter.filtered_by_automatch_psy;
+
+                // Фильтруем психологов у которых есть слоты
+                const psychologistsWithSlots = Array.from(psychologistSchedules.entries()).map(([name, schedule]) => ({
+                    name,
+                    schedule,
+                    id: name,
+                    link_video: null,
+                    age: undefined,
+                    sex: undefined,
+                    experience: undefined,
+                    max_session_price: undefined,
+                    min_session_price: undefined,
+                    avatar: undefined,
+                    specialization: [],
+                    rating: undefined,
+                    reviews_count: undefined,
+                    works_with: undefined,
+                    mental_illness: [],
+                    mental_illness2: [],
+                    video: false,
+                    requests: [],
+                    queries: '',
+                    short_description: '',
+                    verified: false
+                })).filter((psy: any) => {
+                    const schedule = psychologistSchedules.get(psy.name);
+                    if (!schedule) return false;
+                    return Object.values(schedule).some((daySlots: any) =>
+                        // @ts-expect-error Сложная структура данных
+                        Object.values(daySlots).some(slot => slot && slot.state === 'Свободен')
+                    );
+                });
+
+                // Проверяем наличие психологов со слотами только при переходе с ключевого экрана
+                if (isKeyStageTransition && psychologistsWithSlots.length === 0) {
+                    const currentAttempts = Number(localStorage.getItem('matching_attempts') || '0');
+                    console.log('Нет подходящих психологов, попытка:', currentAttempts + 1);
+                    
+                    localStorage.setItem('matching_attempts', (currentAttempts + 1).toString());
+                    
+                    if (currentAttempts + 1 >= 5) {
+                        dispatch(setHasMatchingError(true));
+                        dispatch(setApplicationStage('emergency'));
+                        return;
+                    }
+                    
+                    dispatch(setHasMatchingError(true));
+                    dispatch(setApplicationStage('error'));
+                    return;
+                }
+
+                dispatch(fill_filtered_by_automatch_psy(psychologistsWithSlots));
+                if (isKeyStageTransition) {
+                    dispatch(setHasMatchingError(false));
+                }
+            } catch (error) {
+                console.error('Failed to update filtered psychologists:', error);
+            } finally {
+                // Минимальное время показа лоадера - 1 секунда
+                if (isKeyStageTransition) {
+                    setTimeout(() => {
+                        setIsLoading(false);
+                    }, 1000);
+                } else {
+                    setIsLoading(false);
+                }
+            }
+        };
+
+        updatePsychologists();
+        
+        // Сохраняем текущий экран для следующей проверки
+        prevStage.current = currentStage;
+    }, []);
 
     // Получаем первоначальный список психологов и обновляем при смене ключевых экранов
     useEffect(() => {
@@ -209,8 +343,8 @@ export default function DiagnosesForm() {
         
         // Сохраняем текущий экран для следующей проверки
         prevStage.current = currentStage;
-    // }, [currentStage, dispatch]);
-    }, []);
+    }, [currentStage, dispatch]);
+    // }, []);
 
 
     const handleClose = () => {
