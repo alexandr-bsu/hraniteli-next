@@ -55,7 +55,7 @@ export default function NameStageApplication() {
                   <FormLabel className='text-[20px] lg:text-[20px] md:text-[16px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                     Как вас зовут?
                   </FormLabel>
-                  <FormDescription className='text-[18px] leading-[20px] font-normal max-lg:mt-[8px]'>
+                  <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
                     Вы можете не указывать имя, если пока не готовы
                   </FormDescription>
                   <div className={styles.input__text_container}>

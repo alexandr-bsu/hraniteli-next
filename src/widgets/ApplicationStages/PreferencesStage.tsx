@@ -100,7 +100,7 @@ export const PreferencesStage = () => {
                   <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                     Что вам важно в психологе?
                   </FormLabel>
-                  <FormDescription className='text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
+                  <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
                     Опыт, образование и личная терапия - по умолчанию. Если предпочтений нет - можете пропустить
                   </FormDescription>
                   <div className='flex flex-col gap-[20px] max-lg:gap-[16px] mt-[20px] max-lg:mt-[16px]'>

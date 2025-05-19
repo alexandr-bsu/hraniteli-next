@@ -113,7 +113,7 @@ export const DiseasesPsychologistStage = () => {
                                     <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                                         Есть ли у вас диагностированные психические заболевания?
                                     </FormLabel>
-                                    <FormDescription className='text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
+                                    <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
                                         Выберите один вариант ответа
                                     </FormDescription>
                                     <FormControl className="mt-[20px] max-lg:mt-[16px]">
@@ -149,7 +149,7 @@ export const DiseasesPsychologistStage = () => {
                                                     <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold block mt-[20px] max-lg:mt-[16px] mb-[10px]'>
                                                         Принимаете ли вы медикаменты по назначению психиатра?
                                                     </FormLabel>
-                                                    <FormDescription className='text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
+                                                    <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
                                                         Выберите один вариант ответа
                                                     </FormDescription>
                                                     <FormControl className="mt-[20px] max-lg:mt-[16px]">

@@ -179,7 +179,7 @@ export const PhoneStage = () => {
                                     <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                                         Оставьте ваш контакт для связи
                                     </FormLabel>
-                                    <FormDescription className='text-[18px] leading-[20px] font-normal'>
+                                    <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
                                         Рекламу не присылаем. Психологи не видят ваши контакты. Только вы решаете кому их показать после сессии
                                     </FormDescription>
                                     <div className={styles.input__text_container}>

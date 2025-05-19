@@ -104,7 +104,7 @@ export const TraumaticStage = () => {
                                     <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                                         Беспокоит ли вас травмирующее событие, с которым сложно справиться самостоятельно?
                                     </FormLabel>
-                                    <FormDescription className='text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
+                                    <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
                                         Выберите все подходящие пункты или пропустите вопрос, если ничего из этого не беспокоит
                                     </FormDescription>
                                     <div className='flex flex-col gap-[20px] max-lg:gap-[16px] mt-[20px] max-lg:mt-[16px]'>

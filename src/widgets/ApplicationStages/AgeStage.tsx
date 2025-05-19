@@ -58,7 +58,7 @@ const AgeStageApplication = () => {
                                     <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                                         Сколько вам лет?
                                     </FormLabel>
-                                    <FormDescription className='text-[18px] leading-[20px] font-normal max-lg:mt-[8px]'>
+                                    <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
                                         Мы учитываем ваш возраст при подборе психолога
                                     </FormDescription>
                                     <div className={styles.input__text_container}>
