@@ -489,7 +489,7 @@ export const PsychologistStage = () => {
             {currentIndex > 0 && (
               <button
                 onClick={handlePrevious}
-                className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px]"
+                className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[14px] lg:text-[14px] md:text-[12px] max-lg:text-[12px] text-right"
               >
                 <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
                 <span>Предыдущий психолог</span>
@@ -498,7 +498,7 @@ export const PsychologistStage = () => {
             {currentIndex < filtered_by_automatch_psy.length - 1 && remainingPsychologists > 0 && (
               <button
                 onClick={handleNext}
-                className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] ml-auto"
+                className="flex items-center gap-[10px] cursor-pointer text-left text-[#116466] text-[14px] lg:text-[14px] md:text-[12px] max-lg:text-[12px] ml-auto"
               >
                 <span>Показать еще {remainingPsychologists} {getPsychologistDeclension(remainingPsychologists)}</span>
                 <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
@@ -566,7 +566,7 @@ export const PsychologistStage = () => {
             </div>
             <button
               onClick={handleOpenPsychologistCard}
-              className="hover:opacity-80 transition-opacity cursor-pointer text-[16px] lg:text-[16px] md:text-[14px] max-lg:text-[14px] text-[#116466] flex"
+              className="hover:opacity-80 transition-opacity text-left cursor-pointer text-[14px] lg:text-[14px] md:text-[12px] max-lg:text-[12px] text-[#116466] flex"
             >
               Перейти на карточку психолога
             </button>
@@ -578,7 +578,7 @@ export const PsychologistStage = () => {
               <span className="text-[#9A9A9A] text-[16px]">Основной подход:</span>
               <div className="flex items-center gap-[10px] mt-[5px]">
                 {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
-                <p className="font-semibold text-[18px] leading-[25px] whitespace-nowrap">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
+                <p className="font-semibold text-[18px] leading-[25px]">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
                 <Tooltip text={getMethodDescription(currentPsychologist.main_modal) != '' ? getMethodDescription(currentPsychologist.main_modal) : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
               </div>
             </div>
@@ -603,7 +603,7 @@ export const PsychologistStage = () => {
                 <span className="text-[#9A9A9A] text-[14px]">Основной подход:</span>
                 <div className="flex items-center gap-[10px]">
                   {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
-                  <p className="font-semibold text-[14px] leading-[20px] whitespace-nowrap">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
+                  <p className="font-semibold text-[14px] leading-[20px]">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
                   <Tooltip text={getMethodDescription(currentPsychologist.main_modal) != '' ? getMethodDescription(currentPsychologist.main_modal) : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
                 </div>
               </div>
