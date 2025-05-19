@@ -531,7 +531,7 @@ export const PsychologistStage = () => {
                 />
               </div>
               <div>
-                <h3 className="text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[14px] font-semibold mb-1">
+                <h3 className="text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[14px] font-semibold mb-1 whitespace-nowrap">
                   {currentPsychologist?.name}
                   {currentPsychologist?.age && currentPsychologist.age !== 0 && `, ${currentPsychologist.age} лет`}
                 </h3>
