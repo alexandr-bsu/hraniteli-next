@@ -542,7 +542,7 @@ export const PsychologistStage = () => {
                 >
                   <div className={`${styles_cards.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
                     {currentPsychologist.experience && (
-                      <span className={`${styles_cards.experience} text-[12px]`}>
+                      <span className={`${styles_cards.experience} text-[12px] whitespace-nowrap`}>
                         {currentPsychologist.experience} в сообществе
                       </span>
                     )}
