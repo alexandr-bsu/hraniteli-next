@@ -602,14 +602,14 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                                 <Tooltip text="Психолог посещает групповые супервизии в сообществе" />
                             </span>
                         </div>
-                        <div className={styles.infoRow}>
+                        {psychologist.is_married && <div className={styles.infoRow}>
                             <span className={styles.infoLabel}>Семейное положение:</span>
-                            <span className={styles.infoValue}>{psychologist.is_married == null ? '-' : psychologist.is_married ? 'В браке' : 'Не в браке'}</span>
-                        </div>
-                        <div className={styles.infoRow}>
+                            <span className={styles.infoValue}>{psychologist.is_married == null ? '-' : psychologist.is_married ? 'В браке' : 'Не в браке'} </span>
+                        </div>}
+                        {psychologist.has_children && <div className={styles.infoRow}>
                             <span className={styles.infoLabel}>Есть дети:</span>
                             <span className={styles.infoValue}>{psychologist.has_children == null ? '-' : psychologist.has_children ? 'Да' : 'Нет'}</span>
-                        </div>
+                        </div>}
                     </div>
                 </div>
             </div>
