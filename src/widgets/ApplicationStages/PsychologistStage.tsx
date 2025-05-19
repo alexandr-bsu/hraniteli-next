@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import styles from './PsychologistStage.module.scss';
 import styles_cards from '../Card/Card.module.scss';
 import { format } from 'date-fns';
+import { getAgeWord } from '@/features/utils';
 
 interface Slot {
   id: string;
@@ -533,7 +534,7 @@ export const PsychologistStage = () => {
               <div>
                 <h3 className="text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[14px] font-semibold mb-1 whitespace-nowrap">
                   {currentPsychologist?.name}
-                  {currentPsychologist?.age && currentPsychologist.age !== 0 && `, ${currentPsychologist.age} лет`}
+                  {currentPsychologist?.age && currentPsychologist.age !== 0 && `, ${currentPsychologist.age} ${getAgeWord(currentPsychologist.age)}`}
                 </h3>
 
                 <Tooltip

@@ -2,6 +2,7 @@ import { IPsychologist, ISlot } from '@/shared/types/psychologist.types';
 import { Button } from '@/shared/ui/Button';
 import { COLORS } from '@/shared/constants/colors';
 import Image from 'next/image';
+import { getAgeWord } from '@/features/utils';
 
 interface PsychologistCardProps {
   psychologist: IPsychologist;
@@ -34,7 +35,7 @@ export const PsychologistCard = ({ psychologist, onSlotSelect, selectedSlots }: 
               )}
               {psychologist.age && (
                 <span className={`text-[14px] leading-[19px] text-[${COLORS.text.secondary}]`}>
-                  Возраст: {psychologist.age} лет
+                  Возраст: {psychologist.age} {getAgeWord(psychologist.age)}
                 </span>
               )}
               {psychologist.max_session_price && (
