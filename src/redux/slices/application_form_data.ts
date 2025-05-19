@@ -27,8 +27,8 @@ export const applicationFormDataSlice = createSlice({
   name: 'applicationFormData',
   initialState,
   reducers: {
-    generateTicketId: (state) => {
-      state.ticketID = Math.random().toString(36).substring(7);
+    generateTicketId: (state, prefix) => {
+      state.ticketID = (prefix.payload ? prefix.payload : '')+Math.random().toString(36).substring(7);
     },
     setUsername: (state, action: PayloadAction<string>) => {
       state.username = action.payload;

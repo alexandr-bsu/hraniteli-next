@@ -387,7 +387,7 @@ export const PsychologistStage = () => {
           }
         };
 
-        const response = await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka', requestData);
+        const response = await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka-diagnostic-v2', requestData);
 
         if (response.status === 200) {
 
@@ -546,7 +546,7 @@ export const PsychologistStage = () => {
                         {currentPsychologist.experience} в сообществе
                       </span>
                     )}
-                    
+                 
                     {currentPsychologist.verified && (
                       <Image
                         src="/card/verified.svg"

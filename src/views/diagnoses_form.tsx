@@ -2,38 +2,39 @@
 
 import { generateTicketId } from "@/redux/slices/application_form_data";
 import { RootState, store } from "@/redux/store";
-import AgeStageApplication from "@/widgets/ApplicationStages/AgeStage";
-import ConditionStage from "@/widgets/ApplicationStages/ConditionStage";
-import TraumaticStage from "@/widgets/ApplicationStages/TraumaticStage";
-import { DiseasesPsychologistStage } from "@/widgets/ApplicationStages/DiseasesPsychologistStage";
-import { FinalStage } from "@/widgets/ApplicationStages/FinalStage";
-import { GenderStageApplication } from "@/widgets/ApplicationStages/GenderStage";
-import { GenderStagePsychologist } from "@/widgets/ApplicationStages/GenderStagePsychologist";
-import NameStageApplication from "@/widgets/ApplicationStages/NameStage";
-import { PreferencesStage } from "@/widgets/ApplicationStages/PreferencesStage";
-import PromocodeStage from "@/widgets/ApplicationStages/PromocodeStage";
-import { PsychologistStage } from "@/widgets/ApplicationStages/PsychologistStage";
-import RequestStage from "@/widgets/ApplicationStages/RequestStage";
+import AgeStageApplication from "@/widgets/DiagnosesStages/AgeStage";
+import ConditionStage from "@/widgets/DiagnosesStages/ConditionStage";
+import TraumaticStage from "@/widgets/DiagnosesStages/TraumaticStage";
+import { DiseasesPsychologistStage } from "@/widgets/DiagnosesStages/DiseasesPsychologistStage";
+import { FinalStage } from "@/widgets/DiagnosesStages/FinalStage";
+import { GenderStageApplication } from "@/widgets/DiagnosesStages/GenderStage";
+import { GenderStagePsychologist } from "@/widgets/DiagnosesStages/GenderStagePsychologist";
+import NameStageApplication from "@/widgets/DiagnosesStages/NameStage";
+import { PreferencesStage } from "@/widgets/DiagnosesStages/PreferencesStage";
+import PromocodeStage from "@/widgets/DiagnosesStages/PromocodeStage";
+import { PsychologistStage } from "@/widgets/DiagnosesStages/PsychologistStage";
+import RequestStage from "@/widgets/DiagnosesStages/RequestStage";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { ApplicationStage } from '@/redux/slices/application_form';
-import { PhoneStage } from "@/widgets/ApplicationStages/PhoneStage";
+import { PhoneStage } from "@/widgets/DiagnosesStages/PhoneStage";
 import { getPsychologistAll } from "@/features/actions/getPsychologistAll";
 import { fill_filtered_by_automatch_psy } from "@/redux/slices/filter";
 import { submitQuestionnaire, getFilteredPsychologists } from "@/features/actions/getPsychologistSchedule";
 import { setHasMatchingError } from "@/redux/slices/application_form_data";
 import { setApplicationStage } from "@/redux/slices/application_form";
-import { NoMatchError } from "@/widgets/ApplicationStages/NoMatchError";
-import { EmergencyContacts } from "@/widgets/ApplicationStages/EmergencyContacts";
+import { NoMatchError } from "@/widgets/DiagnosesStages/NoMatchError";
+import { EmergencyContacts } from "@/widgets/DiagnosesStages/EmergencyContacts";
 
 // Только три ключевых экрана, которые влияют на подбор психологов
 const KEY_STAGES = [
-    'gender_psychologist',
-    'condition',
-    'traumatic',
-    'diseases_psychologist'
+    // 'gender_psychologist',
+    // 'condition',
+    // 'traumatic',
+    // 'diseases_psychologist'
+    'default'
 ] as const;
 
 const STAGES_WITH_PROGRESS = [
@@ -42,7 +43,7 @@ const STAGES_WITH_PROGRESS = [
     'gender',
     'preferences',
     'gender_psychologist',
-    'request',
+    // 'request',
     'condition',
     'traumatic',
     'diseases_psychologist',
@@ -50,7 +51,7 @@ const STAGES_WITH_PROGRESS = [
     'phone'
 ] as const satisfies readonly ApplicationStage[];
 
-export default function ApplicationForm() {
+export default function DiagnosesForm() {
     const router = useRouter();
     const dispatch = useDispatch();
     const prevStage = useRef<ApplicationStage | null>(null);
@@ -72,7 +73,7 @@ export default function ApplicationForm() {
 
     useEffect(() => {
         if (!ticketID) {
-            dispatch(generateTicketId(''));
+            dispatch(generateTicketId('ds_'));
             localStorage.setItem('matching_attempts', '0');
         }
     }, [dispatch, ticketID]);
@@ -101,7 +102,7 @@ export default function ApplicationForm() {
                 const currentFormData = store.getState().applicationFormData;
                 
                 // Отправляем текущие данные формы и получаем расписание
-                const schedule = await submitQuestionnaire(currentFormData);
+                const schedule = await submitQuestionnaire(currentFormData, false, true);
                 
                 // Собираем все id психологов из слотов и их расписания
                 const psychologistSchedules = new Map<string, any>();
@@ -208,7 +209,9 @@ export default function ApplicationForm() {
         
         // Сохраняем текущий экран для следующей проверки
         prevStage.current = currentStage;
-    }, [currentStage, dispatch]);
+    // }, [currentStage, dispatch]);
+    }, []);
+
 
     const handleClose = () => {
         router.push('/');
@@ -276,7 +279,7 @@ export default function ApplicationForm() {
                     <div className="w-full flex justify-between min-lg:px-[50px] max-lg:px-[20px]">
                         <div className="flex flex-col md:gap-[10px] justify-center">
                             <h2 className="font-semibold text-[20px] max-lg:text-[14px] max-lg:leading-[22px] leading-[27px]">
-                                Подбор психолога
+                                Независимая диагностика запроса от Хранителей
                             </h2>
                             <span className="font-normal text-[18px] hidden md:block max-lg:text-[14px] leading-[25px] max-[360px]:w-[192px]">
                                 Среднее время заполнения заявки - 5 минут
