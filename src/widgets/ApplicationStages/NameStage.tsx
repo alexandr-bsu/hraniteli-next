@@ -45,7 +45,7 @@ export default function NameStageApplication() {
   return (
     <div className='px-[50px] max-lg:px-[20px] flex w-full grow'>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full mt-[30px] flex flex-col">
+        <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full mt-[15px] flex flex-col">
           <FormField
             control={form.control}
             name="username"

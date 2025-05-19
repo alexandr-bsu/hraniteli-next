@@ -160,7 +160,7 @@ export const PhoneStage = () => {
     return (
         <div className='px-[50px] max-lg:px-[20px] flex w-full grow'>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-[30px] w-full flex flex-col relative">
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-[15px] w-full flex flex-col relative">
                     {isLoading && (
                         <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50 rounded-[10px]">
                             <div className="flex flex-col items-center gap-[10px]">

@@ -51,7 +51,7 @@ const PromocodeStage = () => {
     return (
         <div className='px-[50px] max-lg:px-[20px] flex w-full grow'>
             <Form {...form}>
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-[30px] w-full flex flex-col">
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-[15px] w-full flex flex-col">
                     <FormField
                         control={form.control}
                         name="promocode"

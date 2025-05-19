@@ -120,7 +120,7 @@ export const ConditionStage = () => {
     return (
         <div className='px-[50px] max-lg:px-[20px] flex w-full grow max-lg:overflow-y-auto'>
             <Form {...form} >
-                <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-[30px] border-[#D4D4D4] w-full flex flex-col">
+                <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-[15px] border-[#D4D4D4] w-full flex flex-col">
                     <FormField
                         control={form.control}
                         name="condition"
