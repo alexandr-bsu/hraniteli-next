@@ -5,11 +5,14 @@ import { Textarea } from '@/components/ui/textarea'
 import { setApplicationStage } from '@/redux/slices/application_form'
 import { setPreferences, setCustomPreferences } from '@/redux/slices/application_form_data'
 import { zodResolver } from '@hookform/resolvers/zod'
-import React, { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
-import { useDispatch } from 'react-redux'
 import { z } from 'zod'
 import { COLORS } from '@/shared/constants/colors'
+
+import axios from 'axios';
+import { useEffect } from 'react';
+import { RootState } from "@/redux/store";
+import { useDispatch, useSelector } from 'react-redux';
 
 // UPDATE Изменение id у чекбоксов что важно в психологе
 // Данные чекбоксов
@@ -46,7 +49,18 @@ const FormSchema = z.object({
 })
 
 export const PreferencesStage = () => {
-  const dispatch = useDispatch()
+   const dispatch = useDispatch();
+    const ticketID = useSelector<RootState, string>(
+        state => state.applicationFormData.ticketID
+    );
+
+    useEffect(() => {
+        axios({
+            method: "PUT",
+            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+            data: { step: "Что важно в психологе", ticket_id:ticketID },
+        });
+    }, [])
 
   // 1. Загружаем сохраненные данные из localStorage
   const loadSavedData = () => {

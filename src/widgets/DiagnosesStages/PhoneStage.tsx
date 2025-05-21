@@ -15,6 +15,7 @@ import { RootState } from '@/redux/store';
 import { NoMatchError } from './NoMatchError';
 import { submitQuestionnaire, getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
 import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
+import axios from 'axios';
 
 const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
 
@@ -24,6 +25,18 @@ const FormSchema = z.object({
 
 export const PhoneStage = () => {
     const dispatch = useDispatch();
+    const ticketID = useSelector<RootState, string>(
+        state => state.applicationFormData.ticketID
+    );
+
+    useEffect(() => {
+        axios({
+            method: "PUT",
+            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+            data: { step: "Контакты клиента", ticket_id:ticketID },
+        });
+    }, [])
+
     const formData = useSelector((state: RootState) => state.applicationFormData);
     const [showNoMatch, setShowNoMatch] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);

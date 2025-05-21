@@ -13,6 +13,7 @@ import { findByConditions } from '@/redux/slices/filter';
 import { RootState } from '@/redux/store';
 import { submitQuestionnaire, getFilteredPsychologists } from "@/features/actions/getPsychologistSchedule"
 import { fill_filtered_by_automatch_psy } from "@/redux/slices/filter"
+import axios from 'axios';
 
 const CONDITIONS = [
     {
@@ -69,6 +70,17 @@ type FormData = z.infer<typeof FormSchema>;
 
 export const ConditionStage = () => {
     const dispatch = useDispatch();
+    const ticketID = useSelector<RootState, string>(
+        state => state.applicationFormData.ticketID
+    );
+
+    useEffect(() => {
+        axios({
+            method: "PUT",
+            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+            data: { step: "Состояние клиента", ticket_id:ticketID },
+        });
+    }, [])
 
     const savedConditions = typeof window !== 'undefined' 
     ? JSON.parse(localStorage.getItem('app_conditions') || '[]')

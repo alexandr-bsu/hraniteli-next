@@ -1,4 +1,8 @@
 import { COLORS } from '@/shared/constants/colors';
+import axios from 'axios';
+import { useEffect } from 'react';
+import { RootState } from "@/redux/store";
+import { useDispatch, useSelector } from 'react-redux';
 
 interface EmergencyContactsProps {
     onClose: () => void;
@@ -56,6 +60,20 @@ const EMERGENCY_CONTACTS = {
 };
 
 export const EmergencyContacts = ({ onClose }: EmergencyContactsProps) => {
+
+    const dispatch = useDispatch();
+    const ticketID = useSelector<RootState, string>(
+            state => state.applicationFormData.ticketID
+        );
+    
+    useEffect(()=>{
+    axios({
+      method: "PUT",
+      url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+      data: { step: "Контакты экстренных служб", ticket_id:ticketID },
+    });
+    }, [])
+
     return (
         <div className="flex flex-col w-full h-full px-[50px] py-[30px] max-lg:px-[20px]">
             <h2 className="text-[20px] font-semibold mb-[20px]">

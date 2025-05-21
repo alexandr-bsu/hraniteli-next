@@ -133,7 +133,7 @@ export const submitQuestionnaire = async (formData: IApplicationFormData, from_c
                 promocode: formData.promocode,
                 ticket_id: formData.ticketID,
                 emptySlots: false,
-                userTimeZone: 'МСК',
+                userTimeZone: "МСК" + (getTimeDifference() > 0 ? '+'+getTimeDifference() : getTimeDifference() < 0 ? getTimeDifference() : ''),
                 bid: 0,
                 rid: 0,
                 categoryType: '',
