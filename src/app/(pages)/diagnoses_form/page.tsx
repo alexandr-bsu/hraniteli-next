@@ -13,15 +13,15 @@ export default function ApplicationFormLayout() {
         state => state.applicationFormData.ticketID
     );
 
-    if (!ticketID) {
-        dispatch(generateTicketId('ds_'));
-    }
-
     useEffect(() => {
-        // Инициализируем трекер формы
         if (!ticketID) {
             dispatch(generateTicketId('ds_'));
         }
+    }, [])
+
+
+    useEffect(() => {
+        // Инициализируем трекер формы
 
         axios({
             method: "POST",
@@ -29,7 +29,7 @@ export default function ApplicationFormLayout() {
             data: { ticket_id: ticketID, form_type: 'Заявка на диагностику', step: "Начало" },
         });
 
-    }, []);
+    }, [ticketID]);
 
     return (
         // <div className="w-full min-h-[100svh] max-lg:flex-col  max-lg:justify-start  min-lg:flex justify-center items-center">
