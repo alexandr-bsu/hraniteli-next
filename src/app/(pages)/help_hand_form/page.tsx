@@ -16,17 +16,20 @@ export default function ApplicationFormLayout() {
     );
 
     if (!ticketID) {
-            dispatch(generateTicketId('hh_'));
+        dispatch(generateTicketId('hh_'));
     }
 
     useEffect(() => {
+        if (!ticketID) {
+            dispatch(generateTicketId('hh_'));
+        }
         // Инициализируем трекер формы
         axios({
             method: "POST",
             url: "https://n8n-v2.hrani.live/webhook/init-form-tracking",
             data: { ticket_id: ticketID, form_type: 'Заявка на Руку помощи', step: "Начало" },
         });
-        
+
     }, []);
 
     return (

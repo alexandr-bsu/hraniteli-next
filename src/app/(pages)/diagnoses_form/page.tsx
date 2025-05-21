@@ -14,17 +14,21 @@ export default function ApplicationFormLayout() {
     );
 
     if (!ticketID) {
-            dispatch(generateTicketId('ds_'));
+        dispatch(generateTicketId('ds_'));
     }
 
     useEffect(() => {
         // Инициализируем трекер формы
+        if (!ticketID) {
+            dispatch(generateTicketId('ds_'));
+        }
+
         axios({
             method: "POST",
             url: "https://n8n-v2.hrani.live/webhook/init-form-tracking",
             data: { ticket_id: ticketID, form_type: 'Заявка на диагностику', step: "Начало" },
         });
-        
+
     }, []);
 
     return (
