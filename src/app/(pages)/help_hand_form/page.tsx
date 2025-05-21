@@ -16,7 +16,7 @@ export default function ApplicationFormLayout() {
     );
 
     if (!ticketID) {
-            dispatch(generateTicketId('ds_'));
+            dispatch(generateTicketId('hh_'));
     }
 
     useEffect(() => {
@@ -24,7 +24,7 @@ export default function ApplicationFormLayout() {
         axios({
             method: "POST",
             url: "https://n8n-v2.hrani.live/webhook/init-form-tracking",
-            data: { ticket_id: !ticketID ? dispatch(generateTicketId('ds_')) : ticketID, form_type: 'Заявка на Руку помощи', step: "Начало" },
+            data: { ticket_id: ticketID, form_type: 'Заявка на Руку помощи', step: "Начало" },
         });
         
     }, []);

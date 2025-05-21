@@ -22,7 +22,7 @@ export default function ApplicationFormLayout() {
         axios({
             method: "POST",
             url: "https://n8n-v2.hrani.live/webhook/init-form-tracking",
-            data: { ticket_id: !ticketID ? dispatch(generateTicketId('ds_')) : ticketID, form_type: 'Заявка на диагностику', step: "Начало" },
+            data: { ticket_id: ticketID, form_type: 'Заявка на диагностику', step: "Начало" },
         });
         
     }, []);
