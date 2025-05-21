@@ -1,0 +1,26 @@
+.input__text_container {
+  position: relative;
+  
+  .input__text {
+    background: #FAFAFA;
+    padding: 20px 16px;
+    font-size: 18px;
+    
+    &:focus + .input__text_label,
+    &:not(:placeholder-shown) + .input__text_label {
+      transform: translateY(-28px) scale(0.8);
+      color: #116466;
+    }
+  }
+  
+  .input__text_label {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: all 0.2s;
+    pointer-events: none;
+    color: #9A9A9A;
+    transform-origin: left top;
+  }
+} 

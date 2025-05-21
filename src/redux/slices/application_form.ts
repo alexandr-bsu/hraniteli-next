@@ -1,10 +1,12 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 
+// UPDATE 20.05: Добавил experience и psychologist_price
 export type ApplicationStage = 
     | 'name'
     | 'age'
     | 'gender'
+    | 'experience'
     | 'preferences'
     | 'gender_psychologist'
     | 'request'
@@ -12,6 +14,7 @@ export type ApplicationStage =
     | 'traumatic'
     | 'diseases_psychologist'
     | 'promocode'
+    | 'psychologist_price'
     | 'phone'
     | 'gratitude'
     | 'error'
