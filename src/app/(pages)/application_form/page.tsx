@@ -1,3 +1,5 @@
+"use client"
+
 import ApplicationForm from "@/views/application_form";
 import { generateTicketId } from "@/redux/slices/application_form_data";
 import { useEffect } from "react";

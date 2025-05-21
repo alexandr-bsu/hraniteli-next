@@ -1,3 +1,5 @@
+"use client"
+
 import HelpHandForm from "@/views/help_hand_form";
 
 import { generateTicketId } from "@/redux/slices/application_form_data";
