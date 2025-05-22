@@ -24,7 +24,7 @@ export async function getPsychologistAll() {
         if (data.length > 0) {
             data[0] = {
                 ...data[0],
-                link_video: 'https://cache-eggstv.cdnvideo.ru/fs/pub/hrani.live/video/svetalana_avk.mp4'
+                link_video: null
             };
         }
 
