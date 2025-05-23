@@ -395,6 +395,11 @@ export const PsychologistStage = () => {
           dispatch(setSelectedSlots([formattedSlot]));
           dispatch(setSelectedSlotsObjects([]));
           dispatch(setApplicationStage('gratitude'));
+
+          if (typeof window !== 'undefined' && window.ym) {
+            window.ym(100081518, 'reachGoal', "submit_form_podbor_bes_issledovanie");
+          }
+
         } else {
           throw new Error('Ошибка при отправке заявки');
         }
@@ -547,7 +552,7 @@ export const PsychologistStage = () => {
                         {currentPsychologist.experience} в сообществе
                       </span>
                     )}
-                    
+
                     {currentPsychologist.verified && (
                       <Image
                         src="/card/verified.svg"
