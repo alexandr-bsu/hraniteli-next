@@ -29,6 +29,8 @@ const PromocodeStage = () => {
             url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
             data: { step: "Промокод", ticket_id:ticketID },
         });
+
+        ym("100081518", "reachGoal", "promo");
     }, [])
 
     const filtered_persons = useSelector((state: RootState) => state.filter.filtered_by_automatch_psy);
