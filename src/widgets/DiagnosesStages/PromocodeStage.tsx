@@ -13,6 +13,7 @@ import { COLORS } from '@/shared/constants/colors';
 import styles from '@/styles/input.module.scss';
 import axios from 'axios';
 
+
 const FormSchema = z.object({
     promocode: z.string()
 });
@@ -27,16 +28,19 @@ const PromocodeStage = () => {
         axios({
             method: "PUT",
             url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
-            data: { step: "Промокод", ticket_id:ticketID },
+            data: { step: "Промокод", ticket_id: ticketID },
         });
 
-        ym("100081518", "reachGoal", "promo");
+        if (typeof window !== 'undefined' && window.ym) {
+            window.ym(100081518, 'reachGoal', "promo");
+        }
+
     }, [])
 
     const filtered_persons = useSelector((state: RootState) => state.filter.filtered_by_automatch_psy);
 
     // 1. Загружаем сохраненные данные из localStorage
-    const savedData = typeof window !== 'undefined' 
+    const savedData = typeof window !== 'undefined'
         ? JSON.parse(localStorage.getItem('app_promocode') || '{}')
         : {}
 
@@ -80,7 +84,7 @@ const PromocodeStage = () => {
                                         Вы можете не указывать код, если у вас его нет
                                     </FormDescription>
                                     <div className={styles.input__text_container}>
-                                        <Input 
+                                        <Input
                                             {...field}
                                             placeholder=" "
                                             className={`${styles.input__text} text-[14px] w-full h-full px-[20px] bg-[#FAFAFA] rounded-[10px] border-none`}

@@ -39,6 +39,11 @@ const AgeStageApplication = () => {
       url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
       data: { step: "Возраст клиента", ticket_id:ticketID },
     });
+
+    if (typeof window !== 'undefined' && window.ym) {
+            window.ym(100081518, 'reachGoal', "age");
+    }
+
     }, [])
 
     // 1. Загружаем сохраненное имя при инициализации

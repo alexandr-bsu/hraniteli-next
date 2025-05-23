@@ -35,6 +35,10 @@ export const PhoneStage = () => {
             url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
             data: { step: "Контакты клиента", ticket_id:ticketID },
         });
+
+        if (typeof window !== 'undefined' && window.ym) {
+            window.ym(100081518, 'reachGoal', "svyaz");
+        }
     }, [])
 
     const formData = useSelector((state: RootState) => state.applicationFormData);
