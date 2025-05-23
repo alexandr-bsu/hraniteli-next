@@ -31,17 +31,17 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: `
               function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-              m[i].l=1*new Date();
-              for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-              k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-              (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-          
-              ym(100081518, "init", {
-                   clickmap:true,
-                   trackLinks:true,
-                   accurateTrackBounce:true,
-                   webvisor:true
-              };
+   m[i].l=1*new Date();
+   for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+   k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+   (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+   ym(102105189, "init", {
+        clickmap:true,
+        trackLinks:true,
+        accurateTrackBounce:true,
+        webvisor:true
+   }
             `,
           }}
         />
@@ -55,14 +55,7 @@ export default function RootLayout({
         <noscript
           dangerouslySetInnerHTML={{
             __html: `
-      <div>
-        <img
-          src="https://mc.yandex.ru/watch/100081518"
-          style="position:absolute;left:-9999px;"
-          alt="Yandex Metrika Counter"
-          crossOrigin="anonymous"
-        />
-      </div>
+      <div><img src="https://mc.yandex.ru/watch/102105189" style="position:absolute; left:-9999px;" alt="" /></div>
     `,
           }}
         />

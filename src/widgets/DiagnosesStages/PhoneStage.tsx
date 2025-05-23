@@ -37,7 +37,7 @@ export const PhoneStage = () => {
         });
 
         if (typeof window !== 'undefined' && window.ym) {
-            window.ym(100081518, 'reachGoal', "svyaz");
+            window.ym(102105189, 'reachGoal', "svyaz");
         }
     }, [])
 

@@ -41,7 +41,7 @@ const AgeStageApplication = () => {
     });
 
     if (typeof window !== 'undefined' && window.ym) {
-            window.ym(100081518, 'reachGoal', "age");
+            window.ym(102105189, 'reachGoal', "age");
     }
 
     }, [])
