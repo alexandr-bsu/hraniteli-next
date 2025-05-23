@@ -421,7 +421,7 @@ export const PsychologistStage = () => {
 
         // Получаем запросы из localStorage
         const storedRequests = localStorage.getItem('app_request') ?
-          JSON.parse(localStorage.getItem('app_request') || '')?.request : '';
+          [JSON.parse(localStorage.getItem('app_request') || '')?.request] : [];
 
         const requestData = {
           anxieties: [],
