@@ -98,7 +98,7 @@ export const PreferencesStage = () => {
 
     dispatch(setPreferences(selectedLabels))
     dispatch(setCustomPreferences(data.customPreferences))
-    dispatch(setApplicationStage('gender_psychologist'))
+    dispatch(setApplicationStage('request'))
   }
 
   return (

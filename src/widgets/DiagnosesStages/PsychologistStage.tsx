@@ -420,8 +420,8 @@ export const PsychologistStage = () => {
         const formattedSlot = `${selectedSlot.moscow_datetime_formatted}`;
 
         // Получаем запросы из localStorage
-        const storedRequests = localStorage.getItem('app_requests') ?
-          JSON.parse(localStorage.getItem('app_requests') || '[]') : [];
+        const storedRequests = localStorage.getItem('app_request') ?
+          JSON.parse(localStorage.getItem('app_request') || '')?.request : '';
 
         const requestData = {
           anxieties: [],
@@ -458,7 +458,7 @@ export const PsychologistStage = () => {
           rid: 0,
           categoryType: "",
           customCategory: "",
-          question_to_psychologist: storedRequests.join('; '),
+          question_to_psychologist: storedRequests,
           filtered_by_automatch_psy_names: [currentPsychologist?.name],
           _queries: "",
           customTraumaticEvent: "",
