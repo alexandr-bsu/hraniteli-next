@@ -69,7 +69,7 @@ export const PriceSessionStage = () => {
                         name="price_session"
                         render={({ field }) => (
                             <div className='grow'>
-                                <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
+                                <FormItem className='grid gap-2 grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px] min-lg:h-[360px] overflow-y-auto'>
                                     <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                                         Какую сумму вы готовы выделить на каждую сессию?
                                     </FormLabel>
