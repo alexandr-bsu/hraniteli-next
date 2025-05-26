@@ -6,10 +6,14 @@ import { setAge } from '@/redux/slices/application_form_data';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch } from 'react-redux';
 import { z } from 'zod'
 import { COLORS } from '@/shared/constants/colors';
 import styles from '@/styles/input.module.scss'
+
+import axios from 'axios';
+import { useEffect } from 'react';
+import { RootState } from "@/redux/store";
+import { useDispatch, useSelector } from 'react-redux';
 
 const FormSchema = z.object({
     age: z.string()
@@ -25,6 +29,22 @@ type FormData = z.infer<typeof FormSchema>;
 
 const AgeStageApplication = () => {
     const dispatch = useDispatch();
+    const ticketID = useSelector<RootState, string>(
+            state => state.applicationFormData.ticketID
+        );
+    
+    useEffect(()=>{
+    axios({
+      method: "PUT",
+      url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+      data: { step: "Возраст клиента", ticket_id:ticketID },
+    });
+
+    if (typeof window !== 'undefined' && window.ym) {
+            window.ym(102105189, 'reachGoal', "age");
+    }
+
+    }, [])
 
     // 1. Загружаем сохраненное имя при инициализации
     const savedAge = typeof window !== 'undefined' 
@@ -59,7 +79,7 @@ const AgeStageApplication = () => {
                                         Сколько вам лет?
                                     </FormLabel>
                                     <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
-                                        Это важно для психолога, который знакомится с вашей заявкой
+                                        Мы учитываем ваш возраст при подборе психолога
                                     </FormDescription>
                                     <div className={styles.input__text_container}>
                                         <Input

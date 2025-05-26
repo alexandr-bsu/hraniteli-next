@@ -9,6 +9,8 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { COLORS } from '@/shared/constants/colors';
+import axios from 'axios';
+import { RootState } from '@/redux/store';
 
 const TRAUMATIC_EVENTS = [
     {
@@ -45,6 +47,17 @@ type FormData = z.infer<typeof FormSchema>;
 
 export const TraumaticStage = () => {
     const dispatch = useDispatch();
+    const ticketID = useSelector<RootState, string>(
+        state => state.applicationFormData.ticketID
+    );
+
+    useEffect(() => {
+        axios({
+            method: "PUT",
+            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+            data: { step: "Травматическое событие", ticket_id:ticketID },
+        });
+    }, [])
 
     const savedTraumatic = typeof window !== 'undefined'
         ? JSON.parse(localStorage.getItem('app_traumatic') || '[]')
@@ -53,7 +66,7 @@ export const TraumaticStage = () => {
     const form = useForm<FormData>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            traumatic: savedTraumatic.map((label: string) => 
+            traumatic: savedTraumatic.map((label: string) =>
                 TRAUMATIC_EVENTS.find(item => item.label === label)?.id || ''
             ).filter((id: string) => id !== '')
         }
@@ -66,7 +79,7 @@ export const TraumaticStage = () => {
                 const event = TRAUMATIC_EVENTS.find(item => item.id === id);
                 return event?.label || '';
             }).filter(label => label !== '') || [];
-            
+
             localStorage.setItem('app_traumatic', JSON.stringify(labels));
         });
         return () => subscription.unsubscribe();
@@ -84,7 +97,7 @@ export const TraumaticStage = () => {
 
         // Сохраняем только в localStorage
         localStorage.setItem('app_traumatic', JSON.stringify(selectedEvents));
-        
+
         // Сохраняем в Redux
         dispatch(setTraumatic(selectedEvents));
 

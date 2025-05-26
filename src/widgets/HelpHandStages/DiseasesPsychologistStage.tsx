@@ -21,6 +21,7 @@ import { COLORS } from '@/shared/constants/colors'
 import { RootState } from '@/redux/store'
 import { useState, useEffect } from "react"
 import { NoMatchError } from './NoMatchError'
+import axios from "axios"
 
 const FormSchema = z.object({
     diseases: z.enum(["diseases1", "diseases2", 'nothing'], {
@@ -36,7 +37,19 @@ const diseases = {
 }
 
 export const DiseasesPsychologistStage = () => {
-    const dispatch = useDispatch()
+    const dispatch = useDispatch();
+    const ticketID = useSelector<RootState, string>(
+            state => state.applicationFormData.ticketID
+        );
+    
+    useEffect(()=>{
+    axios({
+      method: "PUT",
+      url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+      data: { step: "Психические заболевания", ticket_id:ticketID },
+    });
+    }, [])
+
     const hasError = useSelector((state: RootState) => state.applicationFormData.has_matching_error)
     const [showNoMatch, setShowNoMatch] = useState(hasError)
     
@@ -189,7 +202,7 @@ export const DiseasesPsychologistStage = () => {
                     <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px] mt-[30px] max-lg:mt-[10px]">
                         <button
                             type='button'
-                            onClick={() => dispatch(setApplicationStage('traumatic'))}
+                            onClick={() => dispatch(setApplicationStage('preferences'))}
                             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Назад

@@ -14,7 +14,9 @@ import { IMaskInput } from 'react-imask';
 import { RootState } from '@/redux/store';
 import { NoMatchError } from './NoMatchError';
 import { submitQuestionnaire, getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
+import {submitHelpHandQuestionnaire} from '@/features/actions/HelpHand'
 import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
+import axios from 'axios';
 
 const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
 
@@ -24,6 +26,22 @@ const FormSchema = z.object({
 
 export const PhoneStage = () => {
     const dispatch = useDispatch();
+    const ticketID = useSelector<RootState, string>(
+        state => state.applicationFormData.ticketID
+    );
+
+    useEffect(() => {
+        axios({
+            method: "PUT",
+            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+            data: { step: "Контакты клиента", ticket_id:ticketID },
+        });
+
+        if (typeof window !== 'undefined' && window.ym) {
+            window.ym(102105189, 'reachGoal', "svyaz");
+        }
+    }, [])
+
     const formData = useSelector((state: RootState) => state.applicationFormData);
     const [showNoMatch, setShowNoMatch] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
@@ -62,90 +80,17 @@ export const PhoneStage = () => {
 
         try {
             // Отправляем анкету и получаем расписание
-            const schedule = await submitQuestionnaire({
-                ...formData,
-                phone: data.phone
-            }, false, true);
-
-            // Проверяем наличие слотов
-            let hasSlots = false;
-            if (schedule[0]?.items) {
-                hasSlots = schedule[0].items.some((day: any) => {
-                    if (!day.slots) return false;
-                    return Object.entries(day.slots).some(([time, slots]) => {
-                        if (!Array.isArray(slots)) return false;
-                        return slots.some(slot => slot.state === 'Свободен');
-                    });
-                });
-            }
-
-            // Получаем список психологов
-            const result = await getFilteredPsychologists();
-
-            // Если нет слотов вообще - показываем ошибку
-            if (!hasSlots) {
-                dispatch(setHasMatchingError(true));
-                setShowNoMatch(true);
-                return;
-            }
-
-            // Собираем все id психологов из слотов и их расписания
-            const psychologistSchedules = new Map<string, any>();
-            schedule[0].items.forEach((day: any) => {
-                if (!day.slots) return;
-                Object.entries(day.slots).forEach(([time, slots]) => {
-                    if (!Array.isArray(slots)) return;
-                    slots.forEach((slot: any) => {
-                        if (slot.psychologist) {
-                            if (!psychologistSchedules.has(slot.psychologist)) {
-                                const psychologistSchedule: { [date: string]: { [time: string]: any } } = {};
-                                schedule[0].items.forEach((d: any) => {
-                                    if (d.slots) {
-                                        psychologistSchedule[d.pretty_date] = {};
-                                        Object.entries(d.slots).forEach(([t, s]) => {
-                                            if (Array.isArray(s)) {
-                                                const psychologistSlots = s.filter(sl => sl.psychologist === slot.psychologist && sl.state === 'Свободен');
-                                                if (psychologistSlots.length > 0) {
-                                                    psychologistSchedule[d.pretty_date][t] = psychologistSlots[0];
-                                                }
-                                            }
-                                        });
-                                    }
-                                });
-                                psychologistSchedules.set(slot.psychologist, psychologistSchedule);
-                            }
-                        }
-                    });
-                });
+             const formRequestResult = await submitHelpHandQuestionnaire({
+                 ...formData,
+                 phone: data.phone
             });
-
-            // Фильтруем психологов у которых есть слоты
-            const psychologistsWithSlots = result.items.map((psy: any) => {
-                const schedule = psychologistSchedules.get(psy.name);
-                return {
-                    ...psy,
-                    schedule: schedule
-                };
-            }).filter((psy: any) => {
-                const schedule = psychologistSchedules.get(psy.name);
-                if (!schedule) return false;
-                return Object.values(schedule).some((daySlots: any) =>
-                    // @ts-expect-error
-                    Object.values(daySlots).some(slot => slot && slot.state === 'Свободен')
-                );
-            });
-
-            if (psychologistsWithSlots.length === 0) {
-                dispatch(setHasMatchingError(true));
-                setShowNoMatch(true);
-                return;
-            }
-
-            dispatch(fill_filtered_by_automatch_psy(psychologistsWithSlots));
+  
             dispatch(setHasMatchingError(false));
-            dispatch(setApplicationStage('psychologist'));
+            dispatch(setApplicationStage('gratitude'));
+
+
         } catch (error) {
-            console.error('Ошибка при подборе психологов:', error);
+            console.error('Ошибка при отправке формы:', error);
             dispatch(setHasMatchingError(true));
             setShowNoMatch(true);
         } finally {
@@ -208,7 +153,7 @@ export const PhoneStage = () => {
                     <div className="shrink-0 mt-[30px] pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
                         <button
                             type='button'
-                            onClick={() => dispatch(setApplicationStage('promocode'))}
+                            onClick={() => dispatch(setApplicationStage('psychologist_price'))}
                             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Назад

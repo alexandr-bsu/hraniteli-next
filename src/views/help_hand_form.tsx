@@ -8,11 +8,10 @@ import TraumaticStage from "@/widgets/HelpHandStages/TraumaticStage";
 import { DiseasesPsychologistStage } from "@/widgets/HelpHandStages/DiseasesPsychologistStage";
 import { FinalStage } from "@/widgets/HelpHandStages/FinalStage";
 import { GenderStageApplication } from "@/widgets/HelpHandStages/GenderStage";
-import { GenderStagePsychologist } from "@/widgets/HelpHandStages/GenderStagePsychologist";
+import { PriceSessionStage } from "@/widgets/HelpHandStages/PriceSessionStage";
 import NameStageApplication from "@/widgets/HelpHandStages/NameStage";
 import { PreferencesStage } from "@/widgets/HelpHandStages/PreferencesStage";
-import PromocodeStage from "@/widgets/HelpHandStages/PromocodeStage";
-import { PsychologistStage } from "@/widgets/HelpHandStages/PsychologistStage";
+import {ExperienceStage} from "@/widgets/HelpHandStages/ExperienceStage";
 import RequestStage from "@/widgets/HelpHandStages/RequestStage";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -20,7 +19,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { ApplicationStage } from '@/redux/slices/application_form';
 import { PhoneStage } from "@/widgets/HelpHandStages/PhoneStage";
 import { NoMatchError } from "@/widgets/HelpHandStages/NoMatchError";
-import { EmergencyContacts } from "@/widgets/HelpHandStages/EmergencyContacts";
 
 
 
@@ -28,13 +26,13 @@ const STAGES_WITH_PROGRESS = [
     'name',
     'age',
     'gender',
+    'experience',
     'preferences',
-    'gender_psychologist',
-    'request',
+    'diseases_psychologist',
     'condition',
     'traumatic',
-    'diseases_psychologist',
-    'promocode',
+    'request',
+    'psychologist_price',
     'phone'
 ] as const satisfies readonly ApplicationStage[];
 
@@ -86,7 +84,7 @@ export default function HelpHandForm() {
             case 'gender':
                 return <GenderStageApplication />;
             case 'experience':
-                return <GenderStageApplication />;
+                return <ExperienceStage />;
             case 'preferences':
                 return <PreferencesStage />;
             case 'diseases_psychologist':
@@ -98,17 +96,13 @@ export default function HelpHandForm() {
             case 'request':
                 return <RequestStage />;
            case 'psychologist_price':
-                return <GenderStageApplication />;
+                return <PriceSessionStage />;
             case 'phone':
                 return <PhoneStage />;
             case 'gratitude':
                 return <FinalStage />;
             case 'error':
                 return <NoMatchError onClose={handleClose} />;
-            case 'emergency':
-                return <EmergencyContacts onClose={handleClose} />;
-            case 'psychologist':
-                return <PsychologistStage />;
            
             default:
                 return null;

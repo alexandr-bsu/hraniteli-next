@@ -1,14 +1,18 @@
 import { ApplicationStage } from '@/redux/slices/application_form';
 
 export type Gender = 'male' | 'female' | 'other' | 'none';
+export type ClientExperience = 'earlier' | 'in_therapy' | 'supposed' | 'no' | 'none';
+export type Price = 'free' | '300' | '500' | '1000' | '1500' | '2000' | '3000';
 export type ContactType = 'Telegram' | 'WhatsApp' | 'Phone';
 
 export interface IApplicationFormData {
   ticketID: string;
   username: string;
   age: string;
+  price_session: Price;
   gender_user: Gender;
   gender_psychologist: Gender;
+  experience: ClientExperience;
   preferences: string[];
   custom_preferences: string;
   actions: string[];

@@ -1,10 +1,26 @@
 "use client"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { useSelector } from "react-redux"
-import { RootState } from "@/redux/store"
+
+import axios from 'axios';
+import { useEffect } from 'react';
+import { RootState } from "@/redux/store";
+import { useDispatch, useSelector } from 'react-redux';
 
 export const FinalStage = () => {
+  const dispatch = useDispatch();
+    const ticketID = useSelector<RootState, string>(
+        state => state.applicationFormData.ticketID
+    );
+
+    useEffect(() => {
+        axios({
+            method: "PUT",
+            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+            data: { step: "Заявка отправлена", ticket_id:ticketID },
+        });
+    }, [])
+
   const router = useRouter()
   const ticketId = useSelector((state: RootState) => state.applicationFormData.ticketID)
 

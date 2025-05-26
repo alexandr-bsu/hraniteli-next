@@ -1,10 +1,13 @@
-import { useDispatch, useSelector } from 'react-redux';
 import { setApplicationStage } from '@/redux/slices/application_form';
 import { setHasMatchingError } from '@/redux/slices/application_form_data';
 import { COLORS } from '@/shared/constants/colors';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { EmergencyContacts } from './EmergencyContacts';
-import { RootState } from '@/redux/store';
+
+import axios from 'axios';
+import { useEffect } from 'react';
+import { RootState } from "@/redux/store";
+import { useDispatch, useSelector } from 'react-redux';
 
 interface NoMatchErrorProps {
     onClose?: () => void;
@@ -12,6 +15,18 @@ interface NoMatchErrorProps {
 
 export const NoMatchError = ({ onClose }: NoMatchErrorProps) => {
     const dispatch = useDispatch();
+    const ticketID = useSelector<RootState, string>(
+            state => state.applicationFormData.ticketID
+        );
+    
+    useEffect(()=>{
+    axios({
+      method: "PUT",
+      url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+      data: { step: "Изменение критериев подбора", ticket_id:ticketID },
+    });
+    }, [])
+
     const [showEmergency, setShowEmergency] = useState(false);
     const [matchingAttempts, setMatchingAttempts] = useState(0);
 

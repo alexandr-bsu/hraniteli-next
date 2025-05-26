@@ -1,14 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IApplicationFormData, Gender } from '@/shared/types/application.types';
+import { IApplicationFormData, Gender, ClientExperience, Price } from '@/shared/types/application.types';
 
 const initialState: IApplicationFormData = {
   ticketID: '',
   username: '',
   age: '',
+  price_session: 'free' as Price,
   gender_user: 'male' as Gender,
   gender_psychologist: 'other' as Gender,
   preferences: [],
   custom_preferences: '',
+  experience: 'no' as ClientExperience,
   actions: [],
   diseases: [],
   requests: [],
@@ -38,6 +40,12 @@ export const applicationFormDataSlice = createSlice({
     },
     setGenderUser: (state, action: PayloadAction<Gender>) => {
       state.gender_user = action.payload;
+    },
+    setExperienceUser: (state, action: PayloadAction<ClientExperience>) => {
+      state.experience = action.payload;
+    },
+    setPriceSession: (state, action: PayloadAction<Price>) => {
+      state.price_session = action.payload;
     },
     setGenderPsychologist: (state, action: PayloadAction<Gender>) => {
       state.gender_psychologist = action.payload;
@@ -87,6 +95,7 @@ export const applicationFormDataSlice = createSlice({
 export const {
   generateTicketId,
   setUsername,
+  setPriceSession,
   setAge,
   setGenderUser,
   setGenderPsychologist,
@@ -97,6 +106,7 @@ export const {
   setRequests,
   setTraumatic,
   setConditions,
+  setExperienceUser,
   setPromocode,
   setPhone,
   setSelectedSlots,
