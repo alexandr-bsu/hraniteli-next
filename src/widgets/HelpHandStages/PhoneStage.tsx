@@ -106,14 +106,6 @@ export const PhoneStage = () => {
         <div className='px-[50px] max-lg:px-[20px] flex w-full grow'>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-[15px] w-full flex flex-col relative">
-                    {isLoading && (
-                        <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50 rounded-[10px]">
-                            <div className="flex flex-col items-center gap-[10px]">
-                                <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
-                                <span className="text-[18px] text-[#116466] max-lg:text-[14px]">Подбираем психологов...</span>
-                            </div>
-                        </div>
-                    )}
 
                     <FormField
                         control={form.control}
@@ -125,7 +117,7 @@ export const PhoneStage = () => {
                                         Оставьте ваш контакт для связи
                                     </FormLabel>
                                     <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
-                                        Рекламу не присылаем. Психологи не видят ваши контакты. Только вы решаете кому их показать после сессии
+                                        Рекламу не присылаем. Ваш контакт видит только психолог, который выбрал вашу заявку
                                     </FormDescription>
                                     <div className={styles.input__text_container}>
                                         <IMaskInput

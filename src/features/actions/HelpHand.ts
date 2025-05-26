@@ -144,7 +144,7 @@ export const submitHelpHandQuestionnaire = async (formData: IApplicationFormData
         };
 
         const response = await fetch(
-            'https://n8n-v2.hrani.live/webhook/helpful-hand-zayavka', {
+            'https://n8n-v2.hrani.live/webhook/register-ticket-for-help-hand', {
 
             method: 'POST',
             headers: {

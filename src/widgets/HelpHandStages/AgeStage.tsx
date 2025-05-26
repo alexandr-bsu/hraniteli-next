@@ -79,7 +79,7 @@ const AgeStageApplication = () => {
                                         Сколько вам лет?
                                     </FormLabel>
                                     <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
-                                        Мы учитываем ваш возраст при подборе психолога
+                                        Это важно для психолога, который знакомится с вашей заявкой
                                     </FormDescription>
                                     <div className={styles.input__text_container}>
                                         <Input

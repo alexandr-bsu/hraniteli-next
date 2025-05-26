@@ -33,7 +33,7 @@ const FormSchema = z.object({
 const diseases = {
     ['diseases1']: ['Есть диагностированное психическое заболевание'],
     ['diseases2']: ['Есть диагностированное психиатрическое заболевание'],
-    ['nothing']: ['Не имеет значения']
+    ['nothing']: ['Нет']
 }
 
 export const DiseasesPsychologistStage = () => {

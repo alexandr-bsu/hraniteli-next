@@ -1,5 +1,5 @@
 'use client'
-import { Form, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Form, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { setApplicationStage } from '@/redux/slices/application_form';
@@ -16,7 +16,7 @@ import { RootState } from "@/redux/store";
 import { useDispatch, useSelector } from 'react-redux';
 
 const FormSchema = z.object({
-    request: z.string(),
+    request: z.string().nonempty('Поле обязательное для заполнения'),
 })
 
 const RequestStage = () => {
@@ -81,10 +81,10 @@ const RequestStage = () => {
                         name="request"
                         render={({ field }) => (
                             <div className='grow'>
-                                <FormItem className='grow p-[30px] max-lg:p-[15px] border-[1px] rounded-[25px] min-lg:h-[360px] overflow-y-auto'>
-                                    <FormLabel className='max-lg:text-[14px] font-semibold text-[20px] leading-[27px]'>Опишите свой запрос к психологу</FormLabel>
+                                <FormItem className='grow p-[30px] max-lg:p-[15px] border-[1px] rounded-[25px] overflow-y-auto'>
+                                    <FormLabel className='flex items-center gap-2 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>Опишите свой запрос к психологу: что беспокоит, чего ожидаете, к чему хотите прийти?</FormLabel>
                                     <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
-                                        Не знаете ответов — это нормально, напишите, как чувствуете. Можете пропустить если не готовы
+                                        Не знаете ответов — это нормально, напишите, как чувствуете. Этот блок нельзя пропустить поскольку он позволяет психологу лучше понять ваш запрос
                                     </FormDescription>
                                     <div className={styles.input__text_container}>
                                         <Textarea
@@ -109,6 +109,12 @@ const RequestStage = () => {
                                             Опишите ваш запрос
                                         </label>
                                     </div>
+                                    {!form.formState.errors.request &&
+                                        <span className='mt-[10px] max-lg:text-[14px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
+                                            Поле обязательное для заполнения
+                                        </span>
+                                    }
+                                    <FormMessage className="mt-[10px] max-lg:text-[14px]" />
                                 </FormItem>
                             </div>
                         )}

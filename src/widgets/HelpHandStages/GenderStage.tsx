@@ -74,7 +74,7 @@ export const GenderStageApplication = () => {
                                         Какой у вас пол?
                                     </FormLabel>
                                     <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
-                                        Мы учитываем ваш пол при подборе психолога
+                                        Это также важно для психолога
                                     </FormDescription>
                                     <FormControl className="mt-[20px] max-lg:mt-[16px]">
                                         <RadioGroup
