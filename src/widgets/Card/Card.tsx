@@ -623,7 +623,7 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
                     {isExpanded ? 'Свернуть' : 'Подробнее о Хранителе'}
                 </button>
                 <button className={styles.appointmentButton} onClick={handleOpenModal}>
-                    Записаться на диагностику
+                    Записаться на сессию
                 </button>
             </div>
         </div>

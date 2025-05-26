@@ -189,14 +189,15 @@ export const TimeStage = () => {
         <ModalWindow type="Time">
             <DialogHeader>
                 <DialogTitle className="grow font-semibold text-[20px] leading-[27px] max-lg:text-[14px] max-lg:leading-[22px]">
-                    Выберите время диагностической сессии
+                    {/* Выберите время диагностической сессии */}
+                    Выберите время сессии
                 </DialogTitle>
-                <ul className='text-[#999999] flex space-x-[10px] flex-wrap'>
+                {/* <ul className='text-[#999999] flex space-x-[10px] flex-wrap'>
                     <li>Длительность - до 30 минут.</li>
                     <li>Формат - онлайн видеозвонок.</li>
                     <li>Стоимость - бесплатно</li>
                     
-                    </ul>
+                    </ul> */}
             </DialogHeader>
 
             <div className="overflow-y-auto max-h-[60vh] pr-2">
