@@ -57,7 +57,7 @@ export const ExperienceStage = () => {
     const handleSubmit = (data: { experience: ClientExperience }) => {
         localStorage.setItem('app_experience', data.experience)
         dispatch(setExperienceUser(data.experience))
-        dispatch(setApplicationStage('preferences'))
+        dispatch(setApplicationStage('meet_type'))
     }
 
     return (
@@ -71,7 +71,7 @@ export const ExperienceStage = () => {
                             <div className='grow'>
                                 <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
                                     <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
-                                        Обращались ли вы к психологу или к психотерапевту ранее?
+                                        У вас есть опыт работы с психологом/психотерапевтом?
                                     </FormLabel>
                                     <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
                                         Выберите один вариант ответа
@@ -87,16 +87,7 @@ export const ExperienceStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="earlier" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
-                                                    Да, обращался(ась) ранее
-                                                </FormLabel>
-                                            </FormItem>
-
-                                             <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
-                                                <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="in_therapy" />
-                                                </FormControl>
-                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
-                                                    Да, сейчас нахожусь в терапии
+                                                    Да, я работал(а) с психологом/психотерапевтом
                                                 </FormLabel>
                                             </FormItem>
 
@@ -109,15 +100,6 @@ export const ExperienceStage = () => {
                                                 </FormLabel>
                                             </FormItem>
 
-                                             <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
-                                                <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="no" />
-                                                </FormControl>
-                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
-                                                    Нет
-                                                </FormLabel>
-                                            </FormItem>
-                                            
                                         </RadioGroup>
                                     </FormControl>
                                     {!form.formState.errors.experience &&
@@ -133,7 +115,7 @@ export const ExperienceStage = () => {
                     <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
                         <button
                             type='button'
-                            onClick={() => dispatch(setApplicationStage('gender'))}
+                            onClick={() => dispatch(setApplicationStage('psychologist_education'))}
                             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Назад

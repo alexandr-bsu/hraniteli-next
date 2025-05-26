@@ -2,38 +2,31 @@
 
 import { generateTicketId } from "@/redux/slices/application_form_data";
 import { RootState, store } from "@/redux/store";
-import AgeStageApplication from "@/widgets/ResearchStages/AgeStage";
-import ConditionStage from "@/widgets/ResearchStages/ConditionStage";
-import TraumaticStage from "@/widgets/ResearchStages/TraumaticStage";
-import { DiseasesPsychologistStage } from "@/widgets/ResearchStages/DiseasesPsychologistStage";
-import { FinalStage } from "@/widgets/ResearchStages/FinalStage";
-import { GenderStageApplication } from "@/widgets/ResearchStages/GenderStage";
-import { PriceSessionStage } from "@/widgets/ResearchStages/PriceSessionStage";
-import NameStageApplication from "@/widgets/ResearchStages/NameStage";
-import { PreferencesStage } from "@/widgets/ResearchStages/PreferencesStage";
-import {ExperienceStage} from "@/widgets/ResearchStages/ExperienceStage";
-import RequestStage from "@/widgets/ResearchStages/RequestStage";
+import CityStage from "@/widgets/ResearchStages/CityStage";
+import PsychologistEducationStage from "@/widgets/ResearchStages/PsychologistEducationStage";
+import { ExperienceStage } from "@/widgets/ResearchStages/ExperienceStage";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { ApplicationStage } from '@/redux/slices/application_form';
-import { PhoneStage } from "@/widgets/ResearchStages/PhoneStage";
-import { NoMatchError } from "@/widgets/ResearchStages/NoMatchError";
+import { ApplicationStage, setApplicationStage } from '@/redux/slices/application_form';
+import MeetingTypeStage from "@/widgets/ResearchStages/MeetingTypeStage";
+import ChoosePreferencesStage from "@/widgets/ResearchStages/ChoosePreferencesStage";
+import { LastSessionPriceStage } from "@/widgets/ResearchStages/PriceSessionStage";
+import SessionDurationStage from "@/widgets/ResearchStages/SessionDurationStage";
+import CancelationStage from "@/widgets/ResearchStages/CancelationStage";
 
 
 
 const STAGES_WITH_PROGRESS = [
-    'name',
-    'age',
-    'gender',
+    'city',
+    'psychologist_education',
     'experience',
-    'preferences',
-    'diseases_psychologist',
-    'condition',
-    'traumatic',
-    'request',
-    'psychologist_price',
-    'phone'
+    'meet_type',
+    'choose_preferences',
+    'last_session_price',
+    'session_duration',
+    'cancelation',
+    'occupation',
 ] as const satisfies readonly ApplicationStage[];
 
 export default function ResearchForm() {
@@ -41,16 +34,19 @@ export default function ResearchForm() {
     const dispatch = useDispatch();
     const prevStage = useRef<ApplicationStage | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    
+
     const currentStage = useSelector<RootState, ApplicationStage>(
         state => state.applicationForm.application_stage
     );
+
+    useEffect(() => {
+        dispatch(setApplicationStage('city'))
+    }, [])
+
     const ticketID = useSelector<RootState, string>(
         state => state.applicationFormData.ticketID
     );
-    const filtered_by_automatch_psy = useSelector<RootState, any[]>(
-        state => state.filter.filtered_by_automatch_psy
-    );
+   
     const hasError = useSelector<RootState, boolean>(
         state => state.applicationFormData.has_matching_error
     );
@@ -58,15 +54,11 @@ export default function ResearchForm() {
 
     useEffect(() => {
         if (!ticketID) {
-            dispatch(generateTicketId('hh_'));
+            dispatch(generateTicketId(''));
             localStorage.setItem('matching_attempts', '0');
         }
-    }, [dispatch, ticketID]);  
+    }, [dispatch, ticketID]);
 
-
-    const handleClose = () => {
-        router.push('/');
-    };
 
     const getProgressPercentage = () => {
         const stagesArray = STAGES_WITH_PROGRESS as readonly string[];
@@ -77,33 +69,24 @@ export default function ResearchForm() {
 
     const renderStage = (stage: ApplicationStage) => {
         switch (stage) {
-            case 'name':
-                return <NameStageApplication />;
-            case 'age':
-                return <AgeStageApplication />;
-            case 'gender':
-                return <GenderStageApplication />;
+            case 'city':
+                return <CityStage />
+            case 'psychologist_education':
+                return <PsychologistEducationStage />
             case 'experience':
-                return <ExperienceStage />;
-            case 'preferences':
-                return <PreferencesStage />;
-            case 'diseases_psychologist':
-                return <DiseasesPsychologistStage />;
-            case 'condition':
-                return <ConditionStage />;
-            case 'traumatic':
-                return <TraumaticStage />;
-            case 'request':
-                return <RequestStage />;
-           case 'psychologist_price':
-                return <PriceSessionStage />;
-            case 'phone':
-                return <PhoneStage />;
-            case 'gratitude':
-                return <FinalStage />;
-            case 'error':
-                return <NoMatchError onClose={handleClose} />;
-           
+                return <ExperienceStage/>
+            case 'meet_type':
+                return <MeetingTypeStage/>
+            case 'choose_preferences':
+                return <ChoosePreferencesStage/>
+            case 'last_session_price':
+                return <LastSessionPriceStage/>
+            case 'session_duration':
+                return <SessionDurationStage/>
+            case 'cancelation':
+                return <CancelationStage/>
+            case 'occupation':
+                return <></>
             default:
                 return null;
         }
@@ -118,7 +101,7 @@ export default function ResearchForm() {
                     <div className="w-full flex justify-between min-lg:px-[50px] max-lg:px-[20px]">
                         <div className="flex flex-col md:gap-[10px] justify-center">
                             <h2 className="font-semibold text-[20px] max-lg:text-[14px] max-lg:leading-[22px] leading-[27px]">
-                                Заявка на подбор психолога в проекте «Рука помощи от Хранителей»
+                                Анкета для исследования опыта работы с психологами
                             </h2>
                             <span className="font-normal text-[18px] hidden md:block max-lg:text-[14px] leading-[25px] max-[360px]:w-[192px]">
                                 Среднее время заполнения заявки - 5 минут
@@ -137,7 +120,7 @@ export default function ResearchForm() {
                                         {getProgressPercentage()}%
                                     </div>
                                 </li>
-                                
+
                             </ul>
                         </>
                     )}

@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { setApplicationStage } from "@/redux/slices/application_form"
-import { setGenderUser } from "@/redux/slices/application_form_data"
-import { Gender } from "@/shared/types/application.types"
+import { setSessionDuration } from "@/redux/slices/application_form_data"
+import { SessionDuration } from "@/shared/types/application.types"
 import { COLORS } from '@/shared/constants/colors';
 
 import axios from 'axios';
@@ -24,12 +24,12 @@ import { RootState } from "@/redux/store";
 import { useDispatch, useSelector } from 'react-redux';
 
 const FormSchema = z.object({
-    gender: z.enum(["male", "female"], {
+    session_duration: z.enum(['<1 month', '2-3 months', '<1 year', '>1 year'], {
         required_error: "Вы не заполнили обязательное поле",
     }),
 })
 
-export const GenderStageApplication = () => {
+const SessionDurationStage = () => {
     const dispatch = useDispatch();
     const ticketID = useSelector<RootState, string>(
         state => state.applicationFormData.ticketID
@@ -39,42 +39,42 @@ export const GenderStageApplication = () => {
         axios({
             method: "PUT",
             url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
-            data: { step: "Пол клиента", ticket_id:ticketID },
+            data: { step: "Продолжительность терапии", ticket_id:ticketID },
         });
     }, [])
 
-    const savedGender = typeof window !== 'undefined'
-        ? localStorage.getItem('app_gender') || 'male'
-        : 'female'
+    const savedSessionDuration = typeof window !== 'undefined'
+        ? localStorage.getItem('app_session_duration') || '<1 month'
+        : '<1 month'
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            gender: savedGender as 'male' | 'female' || undefined,
+            session_duration: savedSessionDuration as  '<1 month' | '2-3 months' | '<1 year' | '>1 year' || undefined,
         }
     })
 
-    const handleSubmit = (data: { gender: Gender }) => {
-        localStorage.setItem('app_gender', data.gender)
-        dispatch(setGenderUser(data.gender))
-        dispatch(setApplicationStage('experience'))
+    const handleSubmit = (data: { session_duration: SessionDuration }) => {
+        localStorage.setItem('app_session_duration', data.session_duration)
+        dispatch(setSessionDuration(data.session_duration))
+        dispatch(setApplicationStage('cancelation'))
     }
 
     return (
-        <div className='px-[50px] max-lg:px-[20px] flex w-full grow'>
+        <div className='px-[50px] max-lg:px-[20px] flex w-full grow max-lg:overflow-y-auto'>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col mt-[15px]">
                     <FormField
                         control={form.control}
-                        name="gender"
+                        name="session_duration"
                         render={({ field }) => (
                             <div className='grow'>
-                                <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
+                                <FormItem className='grid gap-2 grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px] min-lg:h-[360px] overflow-y-auto'>
                                     <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
-                                        Какой у вас пол?
+                                        {localStorage.getItem('app_experience') == 'earlier' ? 'Сколько длилась терапия?' : ''}
                                     </FormLabel>
                                     <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
-                                        Это также важно для психолога
+                                        Выберите один вариант ответа
                                     </FormDescription>
                                     <FormControl className="mt-[20px] max-lg:mt-[16px]">
                                         <RadioGroup
@@ -84,23 +84,44 @@ export const GenderStageApplication = () => {
                                         >
                                             <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="male" />
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="<1 month" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
-                                                    Мужской
+                                                    До месяца
                                                 </FormLabel>
                                             </FormItem>
+
                                             <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="female" />
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="2-3 months" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
-                                                    Женский
+                                                    2-3 месяца
                                                 </FormLabel>
                                             </FormItem>
+
+                                            <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
+                                                <FormControl>
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="<1 year" />
+                                                </FormControl>
+                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
+                                                    До года
+                                                </FormLabel>
+                                            </FormItem>
+
+                                            <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
+                                                <FormControl>
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value=">1 year" />
+                                                </FormControl>
+                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
+                                                    Более года
+                                                </FormLabel>
+                                            </FormItem>
+
+                                                              
                                         </RadioGroup>
                                     </FormControl>
-                                    {!form.formState.errors.gender &&
+                                    {!form.formState.errors.session_duration &&
                                         <span className='mt-[10px] max-lg:text-[14px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
                                             Поле обязательное для заполнения
                                         </span>
@@ -113,7 +134,7 @@ export const GenderStageApplication = () => {
                     <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
                         <button
                             type='button'
-                            onClick={() => dispatch(setApplicationStage('age'))}
+                            onClick={() => dispatch(setApplicationStage('last_session_price'))}
                             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Назад
@@ -131,3 +152,5 @@ export const GenderStageApplication = () => {
         </div>
     )
 }
+
+export default SessionDurationStage

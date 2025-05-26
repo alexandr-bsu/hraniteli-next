@@ -1,11 +1,19 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IApplicationFormData, Gender, ClientExperience, Price } from '@/shared/types/application.types';
+import { IApplicationFormData, Gender, ClientExperience, Price, PsychologistEducation, MeetingType, ChoosePreferences, LastSessionPriceResearch, SessionDuration, CancelReason } from '@/shared/types/application.types';
+import { setPsychologists } from './psychologists';
 
 const initialState: IApplicationFormData = {
   ticketID: '',
   username: '',
   age: '',
+  city:'',
+  cancel_reason: 'solved' as CancelReason,
+  session_duration: '<1 month' as SessionDuration,
+  choose_preferences: 'friends' as ChoosePreferences,
+  meeting_type:'online' as MeetingType,
+  psychologist_education: 'no' as PsychologistEducation,
   price_session: 'free' as Price,
+  last_session_price: 'free' as LastSessionPriceResearch,
   gender_user: 'male' as Gender,
   gender_psychologist: 'other' as Gender,
   preferences: [],
@@ -38,6 +46,9 @@ export const applicationFormDataSlice = createSlice({
     setAge: (state, action: PayloadAction<string>) => {
       state.age = action.payload;
     },
+    setCity: (state, action: PayloadAction<string>) => {
+      state.city = action.payload;
+    },
     setGenderUser: (state, action: PayloadAction<Gender>) => {
       state.gender_user = action.payload;
     },
@@ -46,6 +57,26 @@ export const applicationFormDataSlice = createSlice({
     },
     setPriceSession: (state, action: PayloadAction<Price>) => {
       state.price_session = action.payload;
+    },
+
+    setLastSessionPrice: (state, action: PayloadAction<LastSessionPriceResearch>) =>{
+      state.last_session_price = action.payload
+    },
+
+    setPsychologistsEducation: (state, action: PayloadAction<PsychologistEducation>) => {
+      state.psychologist_education = action.payload;
+    },
+    setMeetingType: (state, action: PayloadAction<MeetingType>) => {
+      state.meeting_type = action.payload;
+    },
+    setCancelReason: (state, action: PayloadAction<CancelReason>) => {
+      state.cancel_reason = action.payload;
+    },
+    setSessionDuration: (state, action: PayloadAction<SessionDuration>) => {
+      state.session_duration = action.payload;
+    },
+    setChoosePreferences: (state, action: PayloadAction<ChoosePreferences>) => {
+      state.choose_preferences = action.payload;
     },
     setGenderPsychologist: (state, action: PayloadAction<Gender>) => {
       state.gender_psychologist = action.payload;
@@ -96,7 +127,11 @@ export const {
   generateTicketId,
   setUsername,
   setPriceSession,
+  setLastSessionPrice,
+  setCancelReason,
+  setPsychologistsEducation,
   setAge,
+  setChoosePreferences,
   setGenderUser,
   setGenderPsychologist,
   setPreferences,
@@ -106,12 +141,15 @@ export const {
   setRequests,
   setTraumatic,
   setConditions,
+  setMeetingType,
   setExperienceUser,
   setPromocode,
   setPhone,
   setSelectedSlots,
   setSelectedSlotsObjects,
   setHasMatchingError,
+  setSessionDuration,
+  setCity,
   setIndexPhyc
 } = applicationFormDataSlice.actions;
 
