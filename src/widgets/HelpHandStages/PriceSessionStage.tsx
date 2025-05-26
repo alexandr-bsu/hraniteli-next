@@ -61,7 +61,7 @@ export const PriceSessionStage = () => {
     }
 
     return (
-        <div className='px-[50px] max-lg:px-[20px] flex w-full grow'>
+        <div className='px-[50px] max-lg:px-[20px] flex w-full grow max-lg:overflow-y-auto'>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col mt-[15px]">
                     <FormField
