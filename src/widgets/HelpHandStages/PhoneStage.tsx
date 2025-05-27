@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/ban-ts-comment */
+
 'use client'
 import { Form, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
 import { setApplicationStage } from '@/redux/slices/application_form';
