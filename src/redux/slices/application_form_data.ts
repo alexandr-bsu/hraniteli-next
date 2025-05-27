@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IApplicationFormData, Gender, ClientExperience, Price, PsychologistEducation, MeetingType, ChoosePreferences, LastSessionPriceResearch, SessionDuration, CancelReason } from '@/shared/types/application.types';
+import { IApplicationFormData, Gender, ClientExperience, Price, PsychologistEducation, MeetingType, ChoosePreferences, LastSessionPriceResearch, SessionDuration, CancelReason, Occupation } from '@/shared/types/application.types';
 import { setPsychologists } from './psychologists';
 
 const initialState: IApplicationFormData = {
@@ -16,6 +16,7 @@ const initialState: IApplicationFormData = {
   last_session_price: 'free' as LastSessionPriceResearch,
   gender_user: 'male' as Gender,
   gender_psychologist: 'other' as Gender,
+  occupation: 'fulltime' as Occupation,
   preferences: [],
   custom_preferences: '',
   experience: 'no' as ClientExperience,
@@ -66,6 +67,11 @@ export const applicationFormDataSlice = createSlice({
     setPsychologistsEducation: (state, action: PayloadAction<PsychologistEducation>) => {
       state.psychologist_education = action.payload;
     },
+
+    setOccupation: (state, action: PayloadAction<Occupation>) => {
+      state.occupation = action.payload;
+    },
+
     setMeetingType: (state, action: PayloadAction<MeetingType>) => {
       state.meeting_type = action.payload;
     },
@@ -133,6 +139,7 @@ export const {
   setAge,
   setChoosePreferences,
   setGenderUser,
+  setOccupation,
   setGenderPsychologist,
   setPreferences,
   setCustomPreferences,

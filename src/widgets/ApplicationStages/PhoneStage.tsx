@@ -15,6 +15,8 @@ import { RootState } from '@/redux/store';
 import { NoMatchError } from './NoMatchError';
 import { submitQuestionnaire, getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
 import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
+import { useSearchParams } from 'next/navigation'
+
 
 const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
 
@@ -24,6 +26,11 @@ const FormSchema = z.object({
 
 export const PhoneStage = () => {
     const dispatch = useDispatch();
+
+    const searchParams = useSearchParams()
+    // Проверяем, перешли ли мы из иммледовательской формы
+    const isResearchRedirect = searchParams.get('research') == 'true'
+
     const formData = useSelector((state: RootState) => state.applicationFormData);
     const [showNoMatch, setShowNoMatch] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
@@ -208,7 +215,7 @@ export const PhoneStage = () => {
                     <div className="shrink-0 mt-[30px] pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
                         <button
                             type='button'
-                            onClick={() => dispatch(setApplicationStage('promocode'))}
+                            onClick={() => isResearchRedirect ? dispatch(setApplicationStage('diseases_psychologist')) : dispatch(setApplicationStage('promocode'))}
                             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Назад

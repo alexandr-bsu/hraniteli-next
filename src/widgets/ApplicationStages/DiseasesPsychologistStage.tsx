@@ -21,6 +21,7 @@ import { COLORS } from '@/shared/constants/colors'
 import { RootState } from '@/redux/store'
 import { useState, useEffect } from "react"
 import { NoMatchError } from './NoMatchError'
+import { useSearchParams } from 'next/navigation'
 
 const FormSchema = z.object({
     diseases: z.enum(["diseases1", "diseases2", 'nothing'], {
@@ -37,9 +38,14 @@ const diseases = {
 
 export const DiseasesPsychologistStage = () => {
     const dispatch = useDispatch()
+
+    const searchParams = useSearchParams()
+    // Проверяем, перешли ли мы из иммледовательской формы
+    const isResearchRedirect = searchParams.get('research') == 'true'
+
     const hasError = useSelector((state: RootState) => state.applicationFormData.has_matching_error)
     const [showNoMatch, setShowNoMatch] = useState(hasError)
-    
+
     // 1. Загружаем сохраненные данные из localStorage
     const savedData = typeof window !== 'undefined'
         ? (() => {
@@ -88,7 +94,12 @@ export const DiseasesPsychologistStage = () => {
 
         dispatch(setDiseases(result))
         dispatch(setHasMatchingError(false))
-        dispatch(setApplicationStage('promocode'))
+        if (isResearchRedirect) {
+            dispatch(setApplicationStage('phone'))
+        } else {
+            dispatch(setApplicationStage('promocode'))
+        }
+
     }
 
     const handleCloseNoMatch = () => {

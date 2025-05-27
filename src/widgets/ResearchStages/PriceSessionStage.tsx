@@ -75,7 +75,7 @@ export const LastSessionPriceStage = () => {
                             <div className='grow'>
                                 <FormItem className='grid gap-2 grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px] min-lg:h-[360px] overflow-y-auto'>
                                     <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
-                                        {localStorage.getItem('app_experience') == 'earlier' ? 'Сколько стоила одна сессия?' : 'Дополнить фразу позже (Стоимость сессии)'}
+                                        {localStorage.getItem('app_experience') == 'earlier' ? 'Сколько стоила одна сессия?' : 'В какой ценовой категории специалиста вы искали?'}
                                     </FormLabel>
                                     <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
                                         Вознаграждение влияет на скорость подбора психолога - оно должно быть комфортным для всех сторон.
@@ -106,7 +106,7 @@ export const LastSessionPriceStage = () => {
 
                                             <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="<3000>" />
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="<3000" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
                                                     Меньше 3000 руб.

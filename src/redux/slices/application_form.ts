@@ -31,10 +31,14 @@ export type ApplicationStage =
 
 interface ApplicationFormState {
     application_stage: ApplicationStage;
+    rid: number;
+    bid: number;
 }
 
 const initialState: ApplicationFormState = {
-    application_stage: 'name'
+    application_stage: 'name',
+    rid: 0,
+    bid:0
 };
 
 export const applicationFormSlice = createSlice({
@@ -43,11 +47,19 @@ export const applicationFormSlice = createSlice({
     reducers: {
         setApplicationStage: (state, action: PayloadAction<ApplicationStage>) => {
             state.application_stage = action.payload;
-        }
+        },
+
+        setRid: (state, action: PayloadAction<number>) => {
+            state.rid = action.payload;
+        },
+
+        setBid: (state, action: PayloadAction<number>) => {
+            state.bid = action.payload;
+        },
     }
 });
 
-export const { setApplicationStage } = applicationFormSlice.actions;
+export const { setApplicationStage, setRid, setBid} = applicationFormSlice.actions;
 export const applicationFormReducer = applicationFormSlice.reducer;
 
 // Селектор для получения текущего этапа

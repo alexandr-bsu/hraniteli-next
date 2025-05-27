@@ -28,6 +28,7 @@ import { setApplicationStage } from "@/redux/slices/application_form";
 import { NoMatchError } from "@/widgets/ApplicationStages/NoMatchError";
 import { EmergencyContacts } from "@/widgets/ApplicationStages/EmergencyContacts";
 
+
 // Только три ключевых экрана, которые влияют на подбор психологов
 const KEY_STAGES = [
     'gender_psychologist',
@@ -53,6 +54,12 @@ const STAGES_WITH_PROGRESS = [
 export default function ApplicationForm() {
     const router = useRouter();
     const dispatch = useDispatch();
+    
+    // const searchParams = useSearchParams()
+    // Проверяем, перешли ли мы из иммледовательской формы
+    // const isResearchRedirect = searchParams.get('research') == 'true'
+
+
     const prevStage = useRef<ApplicationStage | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     

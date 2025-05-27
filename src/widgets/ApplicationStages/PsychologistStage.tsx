@@ -19,6 +19,7 @@ import styles from './PsychologistStage.module.scss';
 import styles_cards from '../Card/Card.module.scss';
 import { format } from 'date-fns';
 import { getAgeWord } from '@/features/utils';
+import { useSearchParams } from 'next/navigation';
 
 interface Slot {
   id: string;
@@ -118,6 +119,9 @@ const getPsychologistDeclension = (count: number): string => {
 
 export const PsychologistStage = () => {
   const dispatch = useDispatch();
+  const searchParams = useSearchParams()
+  const isResearchRedirect = searchParams.get('research') == 'true'
+
   const [selectedSlot, setSelectedSlot] = useState<SimpleSlot | null>(null);
   const [showNoMatch, setShowNoMatch] = useState(false);
   const [showEmergency, setShowEmergency] = useState(false);
@@ -125,6 +129,9 @@ export const PsychologistStage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [availableSlots, setAvailableSlots] = useState<SimpleSlot[]>([]);
+
+  const ridId = useSelector((state: RootState) => state.applicationForm.rid)
+  const bidId = useSelector((state: RootState) => state.applicationForm.bid)
 
   // UPDATED извлекаем ticketId из Redux
   const ticketID = useSelector<RootState, string>(
@@ -313,8 +320,8 @@ export const PsychologistStage = () => {
         const formattedSlot = `${selectedSlot.moscow_datetime_formatted}`;
 
         // Получаем запросы из localStorage
-        const storedRequests = localStorage.getItem('app_requests') ?
-          JSON.parse(localStorage.getItem('app_requests') || '[]') : [];
+        const storedRequests = localStorage.getItem('app_request') ?
+          [JSON.parse(localStorage.getItem('app_request') || '[]')?.request] : [];
 
         const requestData = {
           anxieties: [],
@@ -331,7 +338,13 @@ export const PsychologistStage = () => {
             JSON.parse(localStorage.getItem('app_conditions') || '[]') : [],
           selectedPsychologistsNames: [currentPsychologist?.name],
           shownPsychologists: currentPsychologist?.name || "",
-          lastExperience: "",
+          lastExperience: localStorage.getItem('app_experience') === 'earlier' ? 'Да, я работал(а) с психологом/психотерапевтом.' + (localStorage.getItem('app_experience') == 'earlier' ?
+              localStorage.getItem('app_session_duration') === '<1 month' ? 'До месяца' :
+                localStorage.getItem('app_session_duration') === '2-3 months' ? '2-3 месяца' :
+                  localStorage.getItem('app_session_duration') === '<1 year' ? 'До года' :
+                    localStorage.getItem('app_session_duration') === '>1 year' ? 'Более года' : ''
+              : ''):
+              localStorage.getItem('app_experience') === 'supposed' ? 'Нет, я не работал(а) с психологом/психотерапевтом' : '',
           amountExpectations: "",
           age: localStorage.getItem('app_age') || '',
           slots: [formattedSlot],
@@ -339,7 +352,7 @@ export const PsychologistStage = () => {
           contactType: "Telegram",
           contact: localStorage.getItem('app_phone') || '',
           name: localStorage.getItem('app_username') || '',
-          promocode: localStorage.getItem('app_promocode') || '',
+          promocode: localStorage.getItem('app_promocode') || isResearchRedirect ? 'Клиент перешёл из исследовательской анкеты' : '',
           // UPDATE: устанавливаем ticket_id из redux 
           ticket_id: ticketID || '',
 
@@ -347,8 +360,8 @@ export const PsychologistStage = () => {
           emptySlots: false,
           userTimeZone: "МСК" + (+timeDifference > 0 ? '+' + timeDifference : timeDifference == 0 ? '' : timeDifference),
           userTimeOffsetMsk: timeDifference.toString(),
-          bid: 0,
-          rid: 0,
+          bid: bidId,
+          rid: ridId,
           categoryType: "",
           customCategory: "",
           question_to_psychologist: storedRequests.join('; '),
@@ -361,34 +374,184 @@ export const PsychologistStage = () => {
             city: "",
             sex: localStorage.getItem('app_gender') === 'male' ? 'Мужской' :
               localStorage.getItem('app_gender') === 'female' ? 'Женский' : '',
-            psychoEducated: "",
+
+            psychoEducated: localStorage.getItem('app_psychologist_education') === 'practic' ? 'Да, я практикующий специалист' :
+              localStorage.getItem('app_psychologist_education') === 'other_speciality' ? 'Да, но работаю в другой сфере' :
+                localStorage.getItem('app_psychologist_education') === 'student' ? 'В процессе получения' :
+                  localStorage.getItem('app_psychologist_education') === 'no' ? 'Нет' : '',
+
             anxieties: [],
             customAnexiety: "",
-            hasPsychoExperience: "",
-            meetType: "",
-            selectionСriteria: "",
+            hasPsychoExperience: localStorage.getItem('app_experience') === 'earlier' ? 'Да, я работал(а) с психологом/психотерапевтом' :
+              localStorage.getItem('app_experience') === 'supposed' ? 'Нет, но рассматривал(а) такую возможность' : '',
+
+            meetType: localStorage.getItem('app_meeting_type') === 'online' ? 'Онлайн' :
+              localStorage.getItem('app_meeting_type') === 'offline' ? 'Оффлайн' :
+                localStorage.getItem('app_meeting_type') === 'both' ? 'И так и так' : '',
+
+            selectionСriteria: localStorage.getItem('app_choose_preferences') === 'friends' ? 'По рекомендациям знакомых' :
+              localStorage.getItem('app_choose_preferences') === 'self' ? 'Самостоятельно просматривал(а) анкеты в интернете или читал(а) отзывы' :
+                localStorage.getItem('app_choose_preferences') === 'service' ? 'Через сервис, который сам подбирает подходящего специалиста' : '',
+
             custmCreteria: "",
             importancePsycho: localStorage.getItem('app_preferences') ?
               JSON.parse(localStorage.getItem('app_preferences') || '[]') : [],
+
             customImportance: localStorage.getItem('app_custom_preferences') || '',
             agePsycho: "",
             sexPsycho: localStorage.getItem('app_gender_psychologist') === 'male' ? 'Мужчина' :
               localStorage.getItem('app_gender_psychologist') === 'female' ? 'Женщина' : 'Не имеет значения',
-            priceLastSession: "",
-            durationSession: "",
-            reasonCancel: "",
-            pricePsycho: "",
-            reasonNonApplication: "",
+
+            priceLastSession: localStorage.getItem('app_experience') == 'earlier' ?
+              localStorage.getItem('app_last_session_price') === 'free' ? 'Бесплатно' :
+                localStorage.getItem('app_last_session_price') === '<1000' ? 'Меньше 1000 руб.' :
+                  localStorage.getItem('app_last_session_price') === '<3000' ? 'Меньше 3000 руб.' :
+                    localStorage.getItem('app_last_session_price') === '<5000' ? 'Меньше 5000 руб.' :
+                      localStorage.getItem('app_last_session_price') === '5000+' ? '5000 руб. и более' : ''
+              : '',
+
+            durationSession: localStorage.getItem('app_experience') == 'earlier' ?
+              localStorage.getItem('app_session_duration') === '<1 month' ? 'До месяца' :
+                localStorage.getItem('app_session_duration') === '2-3 months' ? '2-3 месяца' :
+                  localStorage.getItem('app_session_duration') === '<1 year' ? 'До года' :
+                    localStorage.getItem('app_session_duration') === '>1 year' ? 'Более года' : ''
+              : '',
+
+            reasonCancel: localStorage.getItem('app_experience') == 'earlier' ?
+              localStorage.getItem('app_cancel_reason') === 'solved' ? 'Помогло, проблема была решена' :
+                localStorage.getItem('app_cancel_reason') === 'new_psychologist' ? 'Не помогло, выбрал(а) нового' :
+                  localStorage.getItem('app_cancel_reason') === 'full_cancel' ? 'Не помогло, вообще прекратил(а)' :
+                    localStorage.getItem('app_cancel_reason') === 'expensive' ? 'Дорого' :
+                      localStorage.getItem('app_cancel_reason') === 'uncomfortable' ? 'Неудобно по времени/формату/месту' :
+                        localStorage.getItem('app_cancel_reason') === 'in_therapy' ? 'Я всё еще в терапии' : ''
+              : '',
+
+            pricePsycho: localStorage.getItem('app_experience') == 'supposed' ?
+              localStorage.getItem('app_last_session_price') === 'free' ? 'Бесплатно' :
+                localStorage.getItem('app_last_session_price') === '<1000' ? 'Меньше 1000 руб.' :
+                  localStorage.getItem('app_last_session_price') === '<3000' ? 'Меньше 3000 руб.' :
+                    localStorage.getItem('app_last_session_price') === '<5000' ? 'Меньше 5000 руб.' :
+                      localStorage.getItem('app_last_session_price') === '5000+' ? '5000 руб. и более' : ''
+              : '',
+
+            reasonNonApplication: localStorage.getItem('app_experience') == 'supposed' ?
+              localStorage.getItem('app_cancel_reason') === 'solved' ? 'Проблемы сами разрешились' :
+                localStorage.getItem('app_cancel_reason') === 'no trust' ? 'Не было доверия' :
+                  localStorage.getItem('app_cancel_reason') === 'expensive' ? 'Дорого' :
+                    localStorage.getItem('app_cancel_reason') === 'other' ? 'Другая причина' : ''
+              : '',
+
             contactType: "Telegram",
             contact: localStorage.getItem('app_phone') || '',
             name: localStorage.getItem('app_username') || '',
             is_adult: parseInt(localStorage.getItem('app_age') || '0') >= 18,
             is_last_page: true,
-            occupation: ""
+            occupation: localStorage.getItem('app_occupation') === 'fulltime' ? 'Постоянная работа в найме' :
+              localStorage.getItem('app_occupation') === 'freelance' ? 'Фрилансер/самозанятый/работаю на себя' :
+                localStorage.getItem('app_occupation') === 'business' ? 'Предприниматель' :
+                  localStorage.getItem('app_occupation') === 'additional income' ? 'Не работаю, есть доп. источник дохода' :
+                    localStorage.getItem('app_occupation') === 'no income' ? 'Не работаю, нет доп. источников доходов' : ''
           }
         };
 
         const response = await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka', requestData);
+
+        if (ridId && bidId) {
+          await axios.put('https://n8n-v2.hrani.live/webhook/update-contacts-stb',
+            {
+              rid: ridId,
+              bid: bidId,
+              contact: localStorage.getItem('app_phone') || '',
+              contactType: "Telegram",
+              name: localStorage.getItem('app_username') || '',
+              age: localStorage.getItem('app_age') || '',
+              formPsyClientInfo: {
+                age: localStorage.getItem('app_age') || '',
+                city: "",
+                sex: localStorage.getItem('app_gender') === 'male' ? 'Мужской' :
+                  localStorage.getItem('app_gender') === 'female' ? 'Женский' : '',
+
+                psychoEducated: localStorage.getItem('app_psychologist_education') === 'practic' ? 'Да, я практикующий специалист' :
+                  localStorage.getItem('app_psychologist_education') === 'other_speciality' ? 'Да, но работаю в другой сфере' :
+                    localStorage.getItem('app_psychologist_education') === 'student' ? 'В процессе получения' :
+                      localStorage.getItem('app_psychologist_education') === 'no' ? 'Нет' : '',
+
+                anxieties: [],
+                customAnexiety: "",
+                hasPsychoExperience: localStorage.getItem('app_experience') === 'earlier' ? 'Да, я работал(а) с психологом/психотерапевтом' :
+                  localStorage.getItem('app_experience') === 'supposed' ? 'Нет, но рассматривал(а) такую возможность' : '',
+
+                meetType: localStorage.getItem('app_meeting_type') === 'online' ? 'Онлайн' :
+                  localStorage.getItem('app_meeting_type') === 'offline' ? 'Оффлайн' :
+                    localStorage.getItem('app_meeting_type') === 'both' ? 'И так и так' : '',
+
+                selectionСriteria: localStorage.getItem('app_choose_preferences') === 'friends' ? 'По рекомендациям знакомых' :
+                  localStorage.getItem('app_choose_preferences') === 'self' ? 'Самостоятельно просматривал(а) анкеты в интернете или читал(а) отзывы' :
+                    localStorage.getItem('app_choose_preferences') === 'service' ? 'Через сервис, который сам подбирает подходящего специалиста' : '',
+
+                custmCreteria: "",
+                importancePsycho: localStorage.getItem('app_preferences') ?
+                  JSON.parse(localStorage.getItem('app_preferences') || '[]') : [],
+
+                customImportance: localStorage.getItem('app_custom_preferences') || '',
+                agePsycho: "",
+                sexPsycho: localStorage.getItem('app_gender_psychologist') === 'male' ? 'Мужчина' :
+                  localStorage.getItem('app_gender_psychologist') === 'female' ? 'Женщина' : 'Не имеет значения',
+
+                priceLastSession: localStorage.getItem('app_experience') == 'earlier' ?
+                  localStorage.getItem('app_last_session_price') === 'free' ? 'Бесплатно' :
+                    localStorage.getItem('app_last_session_price') === '<1000' ? 'Меньше 1000 руб.' :
+                      localStorage.getItem('app_last_session_price') === '<3000' ? 'Меньше 3000 руб.' :
+                        localStorage.getItem('app_last_session_price') === '<5000' ? 'Меньше 5000 руб.' :
+                          localStorage.getItem('app_last_session_price') === '5000+' ? '5000 руб. и более' : ''
+                  : '',
+
+                durationSession: localStorage.getItem('app_experience') == 'earlier' ?
+                  localStorage.getItem('app_session_duration') === '<1 month' ? 'До месяца' :
+                    localStorage.getItem('app_session_duration') === '2-3 months' ? '2-3 месяца' :
+                      localStorage.getItem('app_session_duration') === '<1 year' ? 'До года' :
+                        localStorage.getItem('app_session_duration') === '>1 year' ? 'Более года' : ''
+                  : '',
+
+                reasonCancel: localStorage.getItem('app_experience') == 'earlier' ?
+                  localStorage.getItem('app_cancel_reason') === 'solved' ? 'Помогло, проблема была решена' :
+                    localStorage.getItem('app_cancel_reason') === 'new_psychologist' ? 'Не помогло, выбрал(а) нового' :
+                      localStorage.getItem('app_cancel_reason') === 'full_cancel' ? 'Не помогло, вообще прекратил(а)' :
+                        localStorage.getItem('app_cancel_reason') === 'expensive' ? 'Дорого' :
+                          localStorage.getItem('app_cancel_reason') === 'uncomfortable' ? 'Неудобно по времени/формату/месту' :
+                            localStorage.getItem('app_cancel_reason') === 'in_therapy' ? 'Я всё еще в терапии' : ''
+                  : '',
+
+                pricePsycho: localStorage.getItem('app_experience') == 'supposed' ?
+                  localStorage.getItem('app_last_session_price') === 'free' ? 'Бесплатно' :
+                    localStorage.getItem('app_last_session_price') === '<1000' ? 'Меньше 1000 руб.' :
+                      localStorage.getItem('app_last_session_price') === '<3000' ? 'Меньше 3000 руб.' :
+                        localStorage.getItem('app_last_session_price') === '<5000' ? 'Меньше 5000 руб.' :
+                          localStorage.getItem('app_last_session_price') === '5000+' ? '5000 руб. и более' : ''
+                  : '',
+
+                reasonNonApplication: localStorage.getItem('app_experience') == 'supposed' ?
+                  localStorage.getItem('app_cancel_reason') === 'solved' ? 'Проблемы сами разрешились' :
+                    localStorage.getItem('app_cancel_reason') === 'no trust' ? 'Не было доверия' :
+                      localStorage.getItem('app_cancel_reason') === 'expensive' ? 'Дорого' :
+                        localStorage.getItem('app_cancel_reason') === 'other' ? 'Другая причина' : ''
+                  : '',
+
+                contactType: "Telegram",
+                contact: localStorage.getItem('app_phone') || '',
+                name: localStorage.getItem('app_username') || '',
+                is_adult: parseInt(localStorage.getItem('app_age') || '0') >= 18,
+                is_last_page: true,
+                occupation: localStorage.getItem('app_occupation') === 'fulltime' ? 'Постоянная работа в найме' :
+                  localStorage.getItem('app_occupation') === 'freelance' ? 'Фрилансер/самозанятый/работаю на себя' :
+                    localStorage.getItem('app_occupation') === 'business' ? 'Предприниматель' :
+                      localStorage.getItem('app_occupation') === 'additional income' ? 'Не работаю, есть доп. источник дохода' :
+                        localStorage.getItem('app_occupation') === 'no income' ? 'Не работаю, нет доп. источников доходов' : ''
+              }
+            }
+          )
+        }
+
 
         if (response.status === 200) {
 

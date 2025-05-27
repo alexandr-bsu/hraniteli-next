@@ -14,8 +14,8 @@ import {
 } from "@/components/ui/form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { setApplicationStage } from "@/redux/slices/application_form"
-import { setChoosePreferences } from "@/redux/slices/application_form_data"
-import { ChoosePreferences } from "@/shared/types/application.types"
+import { setOccupation } from "@/redux/slices/application_form_data"
+import { Occupation } from "@/shared/types/application.types"
 import { COLORS } from '@/shared/constants/colors';
 
 import axios from 'axios';
@@ -24,12 +24,12 @@ import { RootState } from "@/redux/store";
 import { useDispatch, useSelector } from 'react-redux';
 
 const FormSchema = z.object({
-    choose_preferences: z.enum(['friends', 'self', 'service'], {
+    occupation: z.enum(['fulltime', 'freelance', 'business', 'additional income', 'no income'], {
         required_error: "Вы не заполнили обязательное поле",
     }),
 })
 
-const ChoosePreferencesStage = () => {
+const OccupationStage = () => {
     const dispatch = useDispatch();
     const ticketID = useSelector<RootState, string>(
         state => state.applicationFormData.ticketID
@@ -39,25 +39,25 @@ const ChoosePreferencesStage = () => {
         axios({
             method: "PUT",
             url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
-            data: { step: "Критерии отбора клиентов", ticket_id:ticketID },
+            data: { step: "Трудовое положение", ticket_id:ticketID },
         });
     }, [])
 
-    const savedChoosePreferences = typeof window !== 'undefined'
-        ? localStorage.getItem('app_choose_preferences') || 'friends'
-        : 'friends'
+    const savedOccupation = typeof window !== 'undefined'
+        ? localStorage.getItem('app_occupation') || 'fulltime'
+        : 'fulltime'
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            choose_preferences: savedChoosePreferences as  'friends'| 'self' | 'service' || undefined,
+            occupation: savedOccupation as  "fulltime" | "freelance" | "business" | "additional income" | "no income" || undefined,
         }
     })
 
-    const handleSubmit = (data: { choose_preferences: ChoosePreferences }) => {
-        localStorage.setItem('app_choose_preferences', data.choose_preferences)
-        dispatch(setChoosePreferences(data.choose_preferences))
-        dispatch(setApplicationStage('last_session_price'))
+    const handleSubmit = (data: { occupation: Occupation }) => {
+        localStorage.setItem('app_occupation', data.occupation)
+        dispatch(setOccupation(data.occupation))
+        dispatch(setApplicationStage('gratitude'))
     }
 
     return (
@@ -66,12 +66,12 @@ const ChoosePreferencesStage = () => {
                 <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col mt-[15px]">
                     <FormField
                         control={form.control}
-                        name="choose_preferences"
+                        name="occupation"
                         render={({ field }) => (
                             <div className='grow'>
                                 <FormItem className='grid gap-2 grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px] min-lg:h-[360px] overflow-y-auto'>
                                     <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
-                                        {localStorage.getItem('app_experience') == 'earlier' ? 'Как вы выбрали себе психолога, психотерапевта? Выберите именно тот путь, который в итоге оказался эффективным' : 'Как вы подбирали специалиста?'}
+                                        Какое в данный момент у вас трудовое положение?
                                     </FormLabel>
                                     <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
                                         Выберите один вариант ответа
@@ -84,35 +84,52 @@ const ChoosePreferencesStage = () => {
                                         >
                                             <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="friends" />
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="fulltime" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
-                                                    По рекомендациям знакомых
+                                                    Постоянная работа в найме
                                                 </FormLabel>
                                             </FormItem>
 
                                             <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="self" />
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="freelance" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
-                                                    Самостоятельно просматривал(а) анкеты в интернете или читал(а) отзывы
+                                                    Фрилансер/самозанятый/работаю на себя
                                                 </FormLabel>
                                             </FormItem>
 
                                             <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="service" />
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="business" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
-                                                    Через сервис, который сам подбирает подходящего специалиста
+                                                    Предприниматель
                                                 </FormLabel>
                                             </FormItem>
 
-                                                              
+                                            <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
+                                                <FormControl>
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="additional income" />
+                                                </FormControl>
+                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
+                                                    Не работаю, есть доп. источник дохода
+                                                </FormLabel>
+                                            </FormItem>
+
+                                            <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
+                                                <FormControl>
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="no_income" />
+                                                </FormControl>
+                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
+                                                    Не работаю, нет доп. источников доходов
+                                                </FormLabel>
+                                            </FormItem>                                          
+          
                                         </RadioGroup>
                                     </FormControl>
-                                    {!form.formState.errors.choose_preferences &&
+                                    {!form.formState.errors.occupation &&
                                         <span className='mt-[10px] max-lg:text-[14px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
                                             Поле обязательное для заполнения
                                         </span>
@@ -125,7 +142,7 @@ const ChoosePreferencesStage = () => {
                     <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
                         <button
                             type='button'
-                            onClick={() => dispatch(setApplicationStage('meet_type'))}
+                            onClick={() => dispatch(setApplicationStage('cancelation'))}
                             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Назад
@@ -144,4 +161,4 @@ const ChoosePreferencesStage = () => {
     )
 }
 
-export default ChoosePreferencesStage
+export default OccupationStage

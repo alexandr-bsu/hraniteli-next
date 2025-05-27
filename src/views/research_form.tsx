@@ -14,6 +14,8 @@ import ChoosePreferencesStage from "@/widgets/ResearchStages/ChoosePreferencesSt
 import { LastSessionPriceStage } from "@/widgets/ResearchStages/PriceSessionStage";
 import SessionDurationStage from "@/widgets/ResearchStages/SessionDurationStage";
 import CancelationStage from "@/widgets/ResearchStages/CancelationStage";
+import OccupationStage from "@/widgets/ResearchStages/OccupationStage";
+import { FinalStage } from "@/widgets/ResearchStages/FinalStage";
 
 
 
@@ -26,7 +28,7 @@ const STAGES_WITH_PROGRESS = [
     'last_session_price',
     'session_duration',
     'cancelation',
-    'occupation',
+    'occupation'
 ] as const satisfies readonly ApplicationStage[];
 
 export default function ResearchForm() {
@@ -86,7 +88,9 @@ export default function ResearchForm() {
             case 'cancelation':
                 return <CancelationStage/>
             case 'occupation':
-                return <></>
+                return <OccupationStage/>
+            case 'gratitude':
+                return <FinalStage/>
             default:
                 return null;
         }

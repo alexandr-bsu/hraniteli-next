@@ -71,7 +71,7 @@ const MeetingTypeStage = () => {
                             <div className='grow'>
                                 <FormItem className='grid gap-2 grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px] min-lg:h-[360px] overflow-y-auto'>
                                     <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
-                                        {localStorage.getItem('app_experience') == 'earlier' ? 'Это были оффлайн или онлайн встречи?' : 'Дополнить фразу позже (формат сессии)'}
+                                        {localStorage.getItem('app_experience') == 'earlier' ? 'Это были оффлайн или онлайн встречи?' : 'Вы рассматривали возможность работы с психологом онлайн или оффлайн?'}
                                     </FormLabel>
                                     <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
                                         Выберите один вариант ответа

@@ -10,12 +10,14 @@ export type ChoosePreferences = 'friends' | 'self' | 'service'
 export type LastSessionPriceResearch = 'free' | '<1000' | '<3000' | '<5000' | '5000+'
 export type SessionDuration = '<1 month' | '2-3 months' | '<1 year' | '>1 year'
 export type CancelReason = 'solved' | 'new_psychologist' | 'full_cancel' | 'expensive' | 'uncomfortable' | 'in_therapy' | 'other' | 'no trust'
+export type Occupation = "fulltime" | "freelance" | "business" | "additional income" | "no income"
 
 export interface IApplicationFormData {
   city: string;
   ticketID: string;
   username: string;
   psychologist_education: PsychologistEducation;
+  occupation: Occupation;
   age: string;
   price_session: Price;
   cancel_reason: CancelReason;

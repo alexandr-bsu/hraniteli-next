@@ -12,6 +12,8 @@ import { IPsychologist } from '@/shared/types/psychologist.types';
 export interface RootState {
   applicationForm: {
     application_stage: ApplicationStage;
+    rid: number;
+    bid: number;
   };
   applicationFormData: IApplicationFormData;
   filter: {
