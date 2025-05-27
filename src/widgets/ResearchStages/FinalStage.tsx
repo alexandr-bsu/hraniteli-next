@@ -24,11 +24,7 @@ export const FinalStage = () => {
     }, [])
 
   const router = useRouter()
-  const ticketId = useSelector((state: RootState) => state.applicationFormData.ticketID)
-  const ridId = useSelector((state: RootState) => state.applicationForm.rid)
-  const bidId = useSelector((state: RootState) => state.applicationForm.bid)
-
-  let hasSheetsIds = ridId && bidId ? true : false
+  
 
   const handleClose = () => {
     // Очищаем localStorage
