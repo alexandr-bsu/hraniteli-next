@@ -127,7 +127,6 @@ export const PsychologistStage = () => {
 
   const searchParams = useSearchParams()
   const isResearchRedirect = searchParams.get('research') == 'true'
-  
   useEffect(() => {
 
     // Отправляем данные в трекер до выбора слотов
@@ -454,7 +453,7 @@ export const PsychologistStage = () => {
           contactType: "Telegram",
           contact: localStorage.getItem('app_phone') || '',
           name: localStorage.getItem('app_username') || '',
-          promocode: localStorage.getItem('app_promocode') || isResearchRedirect ? 'Клиент перешёл из исследовательской анкеты' : '',
+          promocode: isResearchRedirect ? 'Клиент перешёл из исследовательской анкеты' : localStorage.getItem('app_promocode') || '',
           // UPDATE: устанавливаем ticket_id из redux 
           ticket_id: ticketID || '',
 
