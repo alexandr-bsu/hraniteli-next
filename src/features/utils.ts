@@ -1,29 +1,10 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-
-// // Конвертируем текущее время в МСК
-// export const getMoscowTime = (): Date => {
-//   const userTime = new Date();
-//   const userTimeZoneOffset = userTime.getTimezoneOffset() * 60 * 1000; // get user's time zone offset in milliseconds
-//   const moscowOffset = 3 * 60 * 60 * 1000; // Moscow is UTC+3
-//   const moscowTime = new Date(
-//     userTime.getTime() + userTimeZoneOffset + moscowOffset
-//   );
-
-//   return moscowTime;
-// };
-
-// // Получить разницу в часовых поясах между московским временем и временем пользователя
-//  getTimeDifference = (): number => {
-//   const userTime = new Date().getTime();
-//   const moscowTime = getMoscowTime().getTime();
-//   const timeDifference = Math.round((userTime - moscowTime) / 1000 / 60 / 60);
-//   return timeDifference;
-// };
 
 export const getMoscowTime = (): Date => {
   const now = new Date();
@@ -48,3 +29,15 @@ export const getAgeWord = (age: number): string => {
     if (lastDigit >= 2 && lastDigit <= 4) return 'года';
     return 'лет';
 };
+
+export const clearStorage = (is_research_redirect: boolean = false) => {
+  localStorage.removeItem('app_age')
+  localStorage.removeItem('app_traumatic')
+  localStorage.removeItem('app_conditions')
+  localStorage.removeItem('app_gender_psychologist')
+  localStorage.removeItem('matching_attempts')
+  
+  if(!is_research_redirect){
+    localStorage.removeItem('app_occupation')
+  }
+}
