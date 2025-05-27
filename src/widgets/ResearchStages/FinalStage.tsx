@@ -11,6 +11,18 @@ import { useEffect } from "react"
 export const FinalStage = () => {
   const dispatch = useDispatch()
 
+  const ticketID = useSelector<RootState, string>(
+        state => state.applicationFormData.ticketID
+    );
+
+    useEffect(() => {
+        axios({
+            method: "PUT",
+            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+            data: { step: "Исследовательская часть отправлена", ticket_id: ticketID },
+        });
+    }, [])
+
   const router = useRouter()
   const ticketId = useSelector((state: RootState) => state.applicationFormData.ticketID)
   const ridId = useSelector((state: RootState) => state.applicationForm.rid)

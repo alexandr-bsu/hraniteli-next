@@ -13,11 +13,12 @@ import { findByConditions } from '@/redux/slices/filter';
 import { RootState } from '@/redux/store';
 import { submitQuestionnaire, getFilteredPsychologists } from "@/features/actions/getPsychologistSchedule"
 import { fill_filtered_by_automatch_psy } from "@/redux/slices/filter"
+import axios from 'axios';
 
 const CONDITIONS = [
     {
-      id: "condition",
-      label: "Физические недомогания: постоянная усталость, бессонница, проблемы с питанием, проблемы с памятью, психосоматические реакции",
+        id: "condition",
+        label: "Физические недомогания: постоянная усталость, бессонница, проблемы с питанием, проблемы с памятью, психосоматические реакции",
     },
     {
         id: "condition1",
@@ -69,16 +70,27 @@ type FormData = z.infer<typeof FormSchema>;
 
 export const ConditionStage = () => {
     const dispatch = useDispatch();
+    const ticketID = useSelector<RootState, string>(
+        state => state.applicationFormData.ticketID
+    );
 
-    const savedConditions = typeof window !== 'undefined' 
-    ? JSON.parse(localStorage.getItem('app_conditions') || '[]')
-    : []
+    useEffect(() => {
+        axios({
+            method: "PUT",
+            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+            data: { step: "Состояние клиента", ticket_id: ticketID },
+        });
+    }, [])
+
+    const savedConditions = typeof window !== 'undefined'
+        ? JSON.parse(localStorage.getItem('app_conditions') || '[]')
+        : []
 
     const form = useForm<FormData>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
             // Преобразуем label'ы в ID при загрузке
-            condition: savedConditions.map((label: string) => 
+            condition: savedConditions.map((label: string) =>
                 CONDITIONS.find(item => item.label === label)?.id || ''
             ).filter((id: string) => id !== '')
         }
@@ -91,22 +103,22 @@ export const ConditionStage = () => {
                 const condition = CONDITIONS.find(item => item.id === id);
                 return condition?.label || '';
             }).filter(label => label !== '') || [];
-            
+
             localStorage.setItem('app_conditions', JSON.stringify(labels));
         });
         return () => subscription.unsubscribe();
     }, [form.watch]);
-    
+
 
     const handleSubmit = async (data: FormData) => {
         const selectedConditions = data.condition
-          .reduce<string[]>((acc, conditionId) => {
-            const condition = CONDITIONS.find(item => item.id === conditionId);
-            if (condition?.label) {
-              acc.push(condition.label);
-            }
-            return acc;
-          }, []);
+            .reduce<string[]>((acc, conditionId) => {
+                const condition = CONDITIONS.find(item => item.id === conditionId);
+                if (condition?.label) {
+                    acc.push(condition.label);
+                }
+                return acc;
+            }, []);
 
         // Сохраняем только в localStorage
         localStorage.setItem('app_conditions', JSON.stringify(selectedConditions));

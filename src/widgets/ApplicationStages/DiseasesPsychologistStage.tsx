@@ -22,6 +22,7 @@ import { RootState } from '@/redux/store'
 import { useState, useEffect } from "react"
 import { NoMatchError } from './NoMatchError'
 import { useSearchParams } from 'next/navigation'
+import axios from "axios"
 
 const FormSchema = z.object({
     diseases: z.enum(["diseases1", "diseases2", 'nothing'], {
@@ -38,6 +39,18 @@ const diseases = {
 
 export const DiseasesPsychologistStage = () => {
     const dispatch = useDispatch()
+
+    const ticketID = useSelector<RootState, string>(
+            state => state.applicationFormData.ticketID
+        );
+    
+    useEffect(()=>{
+    axios({
+      method: "PUT",
+      url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+      data: { step: "Психические заболевания", ticket_id:ticketID },
+    });
+    }, [])
 
     const searchParams = useSearchParams()
     // Проверяем, перешли ли мы из иммледовательской формы

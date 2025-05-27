@@ -23,6 +23,7 @@ import { RootState } from '@/redux/store'
 import React, { useEffect } from 'react'
 import { submitQuestionnaire, getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule'
 import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter'
+import axios from "axios"
 
 const FormSchema = z.object({
     gender: z.enum(['male', 'female', 'other', 'none'], {
@@ -32,6 +33,19 @@ const FormSchema = z.object({
 
 export const GenderStagePsychologist = () => {
     const dispatch = useDispatch()
+
+    const ticketID = useSelector<RootState, string>(
+        state => state.applicationFormData.ticketID
+    );
+
+    useEffect(() => {
+        axios({
+            method: "PUT",
+            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+            data: { step: "Пол психолога", ticket_id:ticketID },
+        });
+    }, [])
+
     const filtered_persons = useSelector((state: RootState) => state.filter.filtered_by_automatch_psy)
     const hasError = useSelector((state: RootState) => state.applicationFormData.has_matching_error)
     const formData = useSelector((state: RootState) => state.applicationFormData)

@@ -16,7 +16,7 @@ import { NoMatchError } from './NoMatchError';
 import { submitQuestionnaire, getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
 import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
 import { useSearchParams } from 'next/navigation'
-
+import axios from 'axios';
 
 const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
 
@@ -26,6 +26,22 @@ const FormSchema = z.object({
 
 export const PhoneStage = () => {
     const dispatch = useDispatch();
+
+    const ticketID = useSelector<RootState, string>(
+        state => state.applicationFormData.ticketID
+    );
+
+    useEffect(() => {
+        axios({
+            method: "PUT",
+            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+            data: { step: "Контакты клиента", ticket_id:ticketID },
+        });
+
+        if (typeof window !== 'undefined' && window.ym) {
+            window.ym(102105189, 'reachGoal', "svyaz");
+        }
+    }, [])
 
     const searchParams = useSearchParams()
     // Проверяем, перешли ли мы из иммледовательской формы

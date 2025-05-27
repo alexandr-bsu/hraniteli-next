@@ -9,6 +9,8 @@ import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 import { COLORS } from '@/shared/constants/colors';
+import axios from 'axios';
+import { RootState } from '@/redux/store';
 
 const TRAUMATIC_EVENTS = [
     {
@@ -45,6 +47,18 @@ type FormData = z.infer<typeof FormSchema>;
 
 export const TraumaticStage = () => {
     const dispatch = useDispatch();
+
+    const ticketID = useSelector<RootState, string>(
+        state => state.applicationFormData.ticketID
+    );
+
+    useEffect(() => {
+        axios({
+            method: "PUT",
+            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+            data: { step: "Травматическое событие", ticket_id:ticketID },
+        });
+    }, [])
 
     const savedTraumatic = typeof window !== 'undefined'
         ? JSON.parse(localStorage.getItem('app_traumatic') || '[]')

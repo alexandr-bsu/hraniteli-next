@@ -4,13 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
+    Form,
+    FormControl,
+    FormDescription,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
 } from "@/components/ui/form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { useDispatch } from "react-redux"
@@ -18,6 +18,11 @@ import { setApplicationStage } from "@/redux/slices/application_form"
 import { setGenderUser } from "@/redux/slices/application_form_data"
 import { Gender } from "@/shared/types/application.types"
 import { COLORS } from '@/shared/constants/colors';
+
+import axios from 'axios';
+import { useEffect } from 'react';
+import { RootState } from "@/redux/store";
+import { useSelector } from 'react-redux';
 
 const FormSchema = z.object({
     gender: z.enum(["male", "female"], {
@@ -28,7 +33,19 @@ const FormSchema = z.object({
 export const GenderStageApplication = () => {
     const dispatch = useDispatch();
 
-    const savedGender = typeof window !== 'undefined' 
+    const ticketID = useSelector<RootState, string>(
+        state => state.applicationFormData.ticketID
+    );
+
+    useEffect(() => {
+        axios({
+            method: "PUT",
+            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+            data: { step: "Пол клиента", ticket_id: ticketID },
+        });
+    }, [])
+
+    const savedGender = typeof window !== 'undefined'
         ? localStorage.getItem('app_gender') || 'male'
         : 'female'
 
@@ -76,7 +93,7 @@ export const GenderStageApplication = () => {
                                                 </FormLabel>
                                             </FormItem>
                                             <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
-                                                <FormControl> 
+                                                <FormControl>
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="female" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
@@ -85,27 +102,27 @@ export const GenderStageApplication = () => {
                                             </FormItem>
                                         </RadioGroup>
                                     </FormControl>
-                                    {!form.formState.errors.gender && 
+                                    {!form.formState.errors.gender &&
                                         <span className='mt-[10px] max-lg:text-[14px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
                                             Поле обязательное для заполнения
                                         </span>
                                     }
-                                    <FormMessage className="mt-[10px] max-lg:text-[14px]"/>
+                                    <FormMessage className="mt-[10px] max-lg:text-[14px]" />
                                 </FormItem>
                             </div>
                         )}
                     />
                     <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
-                        <button 
+                        <button
                             type='button'
-                            onClick={() => dispatch(setApplicationStage('age'))} 
+                            onClick={() => dispatch(setApplicationStage('age'))}
                             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Назад
                         </button>
 
-                        <button 
-                            type='submit' 
+                        <button
+                            type='submit'
                             className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Продолжить

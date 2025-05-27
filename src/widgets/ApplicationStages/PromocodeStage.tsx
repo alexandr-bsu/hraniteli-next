@@ -11,6 +11,7 @@ import { RootState } from '@/redux/store';
 import { z } from 'zod';
 import { COLORS } from '@/shared/constants/colors';
 import styles from '@/styles/input.module.scss';
+import axios from 'axios';
 
 const FormSchema = z.object({
     promocode: z.string()
@@ -18,6 +19,24 @@ const FormSchema = z.object({
 
 const PromocodeStage = () => {
     const dispatch = useDispatch();
+
+    const ticketID = useSelector<RootState, string>(
+        state => state.applicationFormData.ticketID
+    );
+
+    useEffect(() => {
+        axios({
+            method: "PUT",
+            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+            data: { step: "Промокод", ticket_id: ticketID },
+        });
+
+        if (typeof window !== 'undefined' && window.ym) {
+            window.ym(102105189, 'reachGoal', "promo");
+        }
+
+    }, [])
+
     const filtered_persons = useSelector((state: RootState) => state.filter.filtered_by_automatch_psy);
 
     // 1. Загружаем сохраненные данные из localStorage
