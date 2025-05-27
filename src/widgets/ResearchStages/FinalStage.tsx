@@ -183,7 +183,7 @@ export const FinalStage = () => {
 
       <button
         onClick={handleContinueClick}
-        className={`w-full text-[#FFFFFF] p-[14px] max-lg:text-[14px] shrink-0 ${hasSheetsIds ? '' : 'opacity-50'} bg-[#116466] rounded-[50px] font-normal text-[18px] leading-[25px]`}
+        className={`w-full text-[#FFFFFF] p-[14px] max-lg:text-[14px] shrink-0 bg-[#116466] rounded-[50px] font-normal text-[18px] leading-[25px]`}
       >
         Да
       </button>
