@@ -136,10 +136,12 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
     // Очищаем предзаполненные блокирующие показ слотов поля из localstorage 
     useEffect(() => {
         
-        const has_selected_psychologist = searchParams.get('selected_psychologist')?.length != 0
-        if (!has_selected_psychologist) {
+      
+        if (!searchParams.get('selected_psychologist')) {
             clearStorage(false)
         }
+
+        
     }, [])
 
     // Инициализация данных
