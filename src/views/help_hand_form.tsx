@@ -20,7 +20,8 @@ import { ApplicationStage } from '@/redux/slices/application_form';
 import { PhoneStage } from "@/widgets/HelpHandStages/PhoneStage";
 import { NoMatchError } from "@/widgets/HelpHandStages/NoMatchError";
 
-
+import { useSearchParams } from "next/navigation";
+import { clearStorage } from "@/features/utils";
 
 const STAGES_WITH_PROGRESS = [
     'name',
@@ -55,6 +56,15 @@ export default function HelpHandForm() {
         state => state.applicationFormData.has_matching_error
     );
     const formData = useSelector((state: RootState) => state.applicationFormData);
+
+    const searchParams = useSearchParams()
+        // Проверяем, перешли ли мы из иммледовательской формы
+        const isResearchRedirect = searchParams.get('research') == 'true'
+    
+
+    useEffect(() => {
+            clearStorage(isResearchRedirect)
+        }, [])
 
     useEffect(() => {
         if (!ticketID) {

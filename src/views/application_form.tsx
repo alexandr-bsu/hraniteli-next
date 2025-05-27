@@ -28,6 +28,8 @@ import { setApplicationStage } from "@/redux/slices/application_form";
 import { NoMatchError } from "@/widgets/ApplicationStages/NoMatchError";
 import { EmergencyContacts } from "@/widgets/ApplicationStages/EmergencyContacts";
 
+import { useSearchParams } from "next/navigation";
+import { clearStorage } from "@/features/utils";
 
 // Только три ключевых экрана, которые влияют на подбор психологов
 const KEY_STAGES = [
@@ -54,10 +56,10 @@ const STAGES_WITH_PROGRESS = [
 export default function ApplicationForm() {
     const router = useRouter();
     const dispatch = useDispatch();
-    
-    // const searchParams = useSearchParams()
+
+    const searchParams = useSearchParams()
     // Проверяем, перешли ли мы из иммледовательской формы
-    // const isResearchRedirect = searchParams.get('research') == 'true'
+    const isResearchRedirect = searchParams.get('research') == 'true'
 
 
     const prevStage = useRef<ApplicationStage | null>(null);
@@ -76,6 +78,10 @@ export default function ApplicationForm() {
         state => state.applicationFormData.has_matching_error
     );
     const formData = useSelector((state: RootState) => state.applicationFormData);
+
+    useEffect(() => {
+        clearStorage(isResearchRedirect)
+    }, [])
 
     useEffect(() => {
         if (!ticketID) {

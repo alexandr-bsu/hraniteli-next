@@ -31,6 +31,9 @@ const STAGES_WITH_PROGRESS = [
     'occupation'
 ] as const satisfies readonly ApplicationStage[];
 
+import { useSearchParams } from "next/navigation";
+import { clearStorage } from "@/features/utils";
+
 export default function ResearchForm() {
     const router = useRouter();
     const dispatch = useDispatch();
@@ -41,8 +44,13 @@ export default function ResearchForm() {
         state => state.applicationForm.application_stage
     );
 
+    const searchParams = useSearchParams()
+        // Проверяем, перешли ли мы из иммледовательской формы
+        const isResearchRedirect = searchParams.get('research') == 'true'
+    
     useEffect(() => {
         dispatch(setApplicationStage('city'))
+        clearStorage(isResearchRedirect)
     }, [])
 
     const ticketID = useSelector<RootState, string>(

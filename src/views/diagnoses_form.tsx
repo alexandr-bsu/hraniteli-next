@@ -28,6 +28,9 @@ import { setApplicationStage } from "@/redux/slices/application_form";
 import { NoMatchError } from "@/widgets/DiagnosesStages/NoMatchError";
 import { EmergencyContacts } from "@/widgets/DiagnosesStages/EmergencyContacts";
 
+import { useSearchParams } from "next/navigation";
+import { clearStorage } from "@/features/utils";
+
 // Только три ключевых экрана, которые влияют на подбор психологов
 const KEY_STAGES = [
     'gender_psychologist',
@@ -70,6 +73,15 @@ export default function DiagnosesForm() {
         state => state.applicationFormData.has_matching_error
     );
     const formData = useSelector((state: RootState) => state.applicationFormData);
+
+    const searchParams = useSearchParams()
+        // Проверяем, перешли ли мы из иммледовательской формы
+        const isResearchRedirect = searchParams.get('research') == 'true'
+    
+
+    useEffect(() => {
+            clearStorage(isResearchRedirect)
+        }, [])
 
     useEffect(() => {
         if (!ticketID) {
