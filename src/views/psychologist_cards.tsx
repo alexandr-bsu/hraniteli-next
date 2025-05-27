@@ -11,14 +11,16 @@ import Image from "next/image";
 import { getPsychologistAll } from '@/features/actions/getPsychologistAll';
 import { getAvailableRequests } from '@/shared/api/requests';
 import { submitQuestionnaire } from '@/features/actions/getPsychologistSchedule';
+import { clearStorage } from "@/features/utils";
+import { useSearchParams } from "next/navigation";
 
 type Props = {
     data?: IPsychologist[];
     isLoaded?: boolean;
 }
 
- //Сортируем психологов по наличию слотов (сначала показываем психологов со слотами потом без)
- const sort_persons_by_slot_having = (persons: Array<IPsychologist>):Array<IPsychologist> => {
+//Сортируем психологов по наличию слотов (сначала показываем психологов со слотами потом без)
+const sort_persons_by_slot_having = (persons: Array<IPsychologist>): Array<IPsychologist> => {
     const result: Array<IPsychologist> = [...persons].sort((a, b) => {
         const aSlots = a.schedule?.days?.length || 0;
         const bSlots = b.schedule?.days?.length || 0;
@@ -26,26 +28,26 @@ type Props = {
     });
 
     return result
- }
+}
 
-export const Psychologist_cards = ({data, isLoaded} : Props) => { 
+export const Psychologist_cards = ({ data, isLoaded }: Props) => {
     const filter = useSelector<RootState, any>(state => state.filter);
     const formData = useSelector((state: RootState) => state.applicationFormData);
     const [isLoading, setLoading] = useState(!isLoaded);
     const [isScheduleLoaded, setScheduleLoaded] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const dispatch = useDispatch();
-    
+
     // Проверка активности фильтров по цене или запросам
     const hasActiveFilters = filter.price > 0 || (filter.requests?.length > 0);
-    
+
     // Определяем отображаемый список карточек с учётом всех фильтров
     const filtered_persons = useMemo(() => {
         let result = [...filter.filtered_by_automatch_psy];
-        
+
         // Применяем фильтр по полу
         if (filter.gender !== 'other' && filter.filtered_by_gender?.length > 0) {
-            result = result.filter(item => 
+            result = result.filter(item =>
                 filter.filtered_by_gender.some((f: IPsychologist) => f.id === item.id)
             );
         }
@@ -56,51 +58,51 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
             const favoriteIds = filter.filtered_by_favorites?.map((f: IPsychologist) => f.id) || [];
             result = result.filter(item => favoriteIds.includes(item.id));
         }
-        
+
         // Применяем фильтр по запросам
         if (filter.requests?.length > 0 && filter.filtered_by_requests?.length > 0) {
-            result = result.filter(item => 
+            result = result.filter(item =>
                 filter.filtered_by_requests.some((f: IPsychologist) => f.id === item.id)
             );
         }
-        
+
         // Применяем фильтр по цене
         if (filter.price > 0 && filter.filtered_by_price?.length > 0) {
-            result = result.filter(item => 
+            result = result.filter(item =>
                 filter.filtered_by_price.some((f: IPsychologist) => f.id === item.id)
             );
         }
-        
+
         // Применяем фильтр по времени
         if (filter.times?.length > 0 && filter.filtered_by_time?.length > 0) {
-            result = result.filter(item => 
+            result = result.filter(item =>
                 filter.filtered_by_time.some((f: IPsychologist) => f.id === item.id)
             );
         }
-        
+
         // Применяем фильтр по дате
         if (filter.dates?.length > 0 && filter.filtered_by_date?.length > 0) {
-            result = result.filter(item => 
+            result = result.filter(item =>
                 filter.filtered_by_date.some((f: IPsychologist) => f.id === item.id)
             );
         }
-        
+
         // Применяем фильтр по видео
         if (filter.video && filter.filtered_by_video?.length > 0) {
-            result = result.filter(item => 
+            result = result.filter(item =>
                 filter.filtered_by_video.some((f: IPsychologist) => f.id === item.id)
             );
         }
-        
+
         // Применяем фильтр по психиатрическим заболеваниям
         if (filter.mental_illness && filter.filtered_by_mental_illness?.length > 0) {
-            result = result.filter(item => 
+            result = result.filter(item =>
                 filter.filtered_by_mental_illness.some((f: IPsychologist) => f.id === item.id)
             );
         }
 
-       
-        
+
+
         return result;
     }, [
         filter.filtered_by_automatch_psy,
@@ -121,7 +123,7 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
         filter.mental_illness,
         filter.favorites
     ]);
-    
+
     // Сортировка психологов по цене
     const sortedPersons = useMemo(() => {
         if (filter.price > 0) {
@@ -129,7 +131,17 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
         }
         return filtered_persons;
     }, [filtered_persons, filter.price]);
-    
+
+    const searchParams = useSearchParams()
+    // Очищаем предзаполненные блокирующие показ слотов поля из localstorage 
+    useEffect(() => {
+        
+        const has_selected_psychologist = searchParams.get('selected_psychologist')?.length != 0
+        if (!has_selected_psychologist) {
+            clearStorage(false)
+        }
+    }, [])
+
     // Инициализация данных
     useEffect(() => {
         // Если данные уже загружены из родительского компонента, пропускаем загрузку
@@ -145,7 +157,7 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
                     getPsychologistAll(),
                     getAvailableRequests()
                 ]);
-                
+
                 if (!psychologists?.length) {
                     setError('Не удалось загрузить данные психологов');
                     return;
@@ -229,21 +241,21 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
     // Эффект для скролла к выбранному психологу
     useEffect(() => {
         const selectedPsychologist = filter.selected_psychologist;
-        if (selectedPsychologist && !isLoading) {            
+        if (selectedPsychologist && !isLoading) {
             setTimeout(() => {
                 const selectedCardId = `psychologist-card-${selectedPsychologist.id}`;
-                
+
                 const selectedCard = document.getElementById(selectedCardId);
                 if (selectedCard) {
                     selectedCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 } else {
                     console.error('Элемент не найден:', selectedCardId);
-                    
+
                     // Если карточка не найдена по ID, пробуем найти по имени
                     if (selectedPsychologist.name) {
                         const nameBasedId = `psychologist-card-${selectedPsychologist.name.replace(/\s+/g, '_')}`;
                         const cardByName = document.getElementById(nameBasedId);
-                        
+
                         if (cardByName) {
                             cardByName.scrollIntoView({ behavior: 'smooth', block: 'start' });
                         }
@@ -252,6 +264,8 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
             }, 1000); // Увеличиваем время ожидания до 1 секунды
         }
     }, [filter.selected_psychologist, isScheduleLoaded]);
+
+
 
     if (isLoading) {
         return (
@@ -264,10 +278,10 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
     if (error) {
         return (
             <div className="flex flex-col items-center justify-center p-8 bg-white rounded-[20px] min-h-[400px]">
-                <Image 
-                    src="/error.svg" 
-                    alt="Ошибка" 
-                    width={200} 
+                <Image
+                    src="/error.svg"
+                    alt="Ошибка"
+                    width={200}
                     height={200}
                     className="mb-6 opacity-80"
                 />
@@ -283,47 +297,47 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
 
     const EmptyState = () => {
         const hasActiveFilters = Boolean(
-            filter.requests?.length || 
-            filter.gender !== 'other' || 
-            filter.price > 0 || 
-            filter.dates?.length || 
-            filter.times?.length || 
-            filter.video || 
-            filter.mental_illness || 
+            filter.requests?.length ||
+            filter.gender !== 'other' ||
+            filter.price > 0 ||
+            filter.dates?.length ||
+            filter.times?.length ||
+            filter.video ||
+            filter.mental_illness ||
             filter.favorites
         );
 
         // Проверяем, выбран ли фильтр "Только избранные" и пуст ли список избранных
-        const isEmptyFavorites = filter.favorites && 
+        const isEmptyFavorites = filter.favorites &&
             (!filter.filtered_by_favorites || filter.filtered_by_favorites.length === 0);
 
         return (
             <>
-            <h1 className="text-2xl font-bold text-white pb-[20px] hidden">Подбор психолога и запись на консультацию онлайн</h1>
-            <div className="flex flex-col items-center justify-center p-8 bg-white rounded-[20px] min-h-[400px]">
-                <Image 
-                    src={hasActiveFilters ? "/not-found.svg" : "/empty.svg"} 
-                    alt="Ничего не найдено" 
-                    width={200} 
-                    height={200}
-                    className="mb-6 opacity-80"
-                />
-                <h2 className="text-[24px] font-semibold text-[#116466] mb-2">
-                    {isEmptyFavorites 
-                        ? "Нет избранных Хранителей" 
-                        : hasActiveFilters 
-                            ? "Упс! Ничего не найдено" 
-                            : "Нет доступных специалистов"}
-                </h2>
-                <p className="text-[16px] text-gray-500 text-center max-w-[400px]">
-                    {isEmptyFavorites 
-                        ? "Добавьте Хранителей в избранное, чтобы они отображались здесь" 
-                        : hasActiveFilters 
-                            ? "Попробуйте изменить параметры фильтрации или сбросить фильтры" 
-                            : "В данный момент нет доступных специалистов. Пожалуйста, попробуйте позже"
-                    }
-                </p>
-            </div>
+                <h1 className="text-2xl font-bold text-white pb-[20px] hidden">Подбор психолога и запись на консультацию онлайн</h1>
+                <div className="flex flex-col items-center justify-center p-8 bg-white rounded-[20px] min-h-[400px]">
+                    <Image
+                        src={hasActiveFilters ? "/not-found.svg" : "/empty.svg"}
+                        alt="Ничего не найдено"
+                        width={200}
+                        height={200}
+                        className="mb-6 opacity-80"
+                    />
+                    <h2 className="text-[24px] font-semibold text-[#116466] mb-2">
+                        {isEmptyFavorites
+                            ? "Нет избранных Хранителей"
+                            : hasActiveFilters
+                                ? "Упс! Ничего не найдено"
+                                : "Нет доступных специалистов"}
+                    </h2>
+                    <p className="text-[16px] text-gray-500 text-center max-w-[400px]">
+                        {isEmptyFavorites
+                            ? "Добавьте Хранителей в избранное, чтобы они отображались здесь"
+                            : hasActiveFilters
+                                ? "Попробуйте изменить параметры фильтрации или сбросить фильтры"
+                                : "В данный момент нет доступных специалистов. Пожалуйста, попробуйте позже"
+                        }
+                    </p>
+                </div>
             </>
         );
     };
@@ -342,13 +356,13 @@ export const Psychologist_cards = ({data, isLoaded} : Props) => {
                             if (!item.id && item.name) {
                                 item.id = `id_${item.name.replace(/\s+/g, '_')}`;
                             }
-                            
+
                             return (
-                                <Card 
-                                    key={item.id} 
-                                    psychologist={item} 
-                                    id={`psychologist-card-${item.id}`} 
-                                    isSelected={filter.selected_psychologist?.id === item.id} 
+                                <Card
+                                    key={item.id}
+                                    psychologist={item}
+                                    id={`psychologist-card-${item.id}`}
+                                    isSelected={filter.selected_psychologist?.id === item.id}
                                     showBestMatch={hasActiveFilters && index < 3}
                                 />
                             );

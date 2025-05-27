@@ -84,8 +84,8 @@ export const submitQuestionnaire = async (formData: IApplicationFormData, from_c
             formPsyClientInfo: {
                 age: formData.age,
                 city: '',
-                sex: formData.gender_user === 'male' ? 'Мужской' : 
-                     formData.gender_user === 'female' ? 'Женский' : '',
+                sex: formData.gender_user === 'male' ? 'Мужской' :
+                    formData.gender_user === 'female' ? 'Женский' : '',
                 psychoEducated: '',
                 anxieties: [],
                 customAnexiety: '',
@@ -96,9 +96,9 @@ export const submitQuestionnaire = async (formData: IApplicationFormData, from_c
                 importancePsycho: formData.preferences,
                 customImportance: formData.custom_preferences,
                 agePsycho: '',
-                sexPsycho: formData.gender_psychologist === 'male' ? 'Мужской' : 
-                          formData.gender_psychologist === 'female' ? 'Женский' : 
-                          'Не имеет значения',
+                sexPsycho: formData.gender_psychologist === 'male' ? 'Мужской' :
+                    formData.gender_psychologist === 'female' ? 'Женский' :
+                        'Не имеет значения',
                 priceLastSession: '',
                 durationSession: '',
                 reasonCancel: '',
@@ -109,7 +109,11 @@ export const submitQuestionnaire = async (formData: IApplicationFormData, from_c
                 name: formData.username,
                 is_adult: parseInt(formData.age) >= 18,
                 is_last_page: false,
-                occupation: ''
+                occupation: localStorage.getItem('app_occupation') === 'fulltime' ? 'Постоянная работа в найме' :
+                    localStorage.getItem('app_occupation') === 'freelance' ? 'Фрилансер/самозанятый/работаю на себя' :
+                        localStorage.getItem('app_occupation') === 'business' ? 'Предприниматель' :
+                            localStorage.getItem('app_occupation') === 'additional income' ? 'Не работаю, есть доп. источник дохода' :
+                                localStorage.getItem('app_occupation') === 'no income' ? 'Не работаю, нет доп. источников доходов' : ''
             },
             form: {
                 anxieties: [],
@@ -133,7 +137,7 @@ export const submitQuestionnaire = async (formData: IApplicationFormData, from_c
                 promocode: formData.promocode,
                 ticket_id: formData.ticketID,
                 emptySlots: false,
-                userTimeZone: "МСК" + (getTimeDifference() > 0 ? '+'+getTimeDifference() : getTimeDifference() < 0 ? getTimeDifference() : ''),
+                userTimeZone: "МСК" + (getTimeDifference() > 0 ? '+' + getTimeDifference() : getTimeDifference() < 0 ? getTimeDifference() : ''),
                 bid: 0,
                 rid: 0,
                 categoryType: '',
@@ -150,9 +154,9 @@ export const submitQuestionnaire = async (formData: IApplicationFormData, from_c
 
         const response = await fetch(
 
-            from_cards ? 'https://n8n-v2.hrani.live/webhook/get-aggregated-all' 
-            : from_diagnostic_form ? 'https://n8n-v2.hrani.live/webhook/schedule-diagnosis-v2' 
-            : 'https://n8n-v2.hrani.live/webhook/get-agregated-schedule-v2', {
+            from_cards ? 'https://n8n-v2.hrani.live/webhook/get-aggregated-all'
+                : from_diagnostic_form ? 'https://n8n-v2.hrani.live/webhook/schedule-diagnosis-v2'
+                    : 'https://n8n-v2.hrani.live/webhook/get-agregated-schedule-v2', {
 
             method: 'POST',
             headers: {

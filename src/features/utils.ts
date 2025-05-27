@@ -32,6 +32,7 @@ export const getAgeWord = (age: number): string => {
 
 export const clearStorage = (is_research_redirect: boolean = false) => {
   localStorage.removeItem('app_age')
+  localStorage.removeItem('app_diseases_psychologist')
   localStorage.removeItem('app_traumatic')
   localStorage.removeItem('app_conditions')
   localStorage.removeItem('app_gender_psychologist')

@@ -78,7 +78,7 @@ export const LastSessionPriceStage = () => {
                                         {localStorage.getItem('app_experience') == 'earlier' ? 'Сколько стоила одна сессия?' : 'В какой ценовой категории специалиста вы искали?'}
                                     </FormLabel>
                                     <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
-                                        Вознаграждение влияет на скорость подбора психолога - оно должно быть комфортным для всех сторон.
+                                        Выберите один вариант ответа
                                     </FormDescription>
                                     <FormControl className="mt-[20px] max-lg:mt-[16px]">
                                         <RadioGroup
