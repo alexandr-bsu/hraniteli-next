@@ -48,12 +48,13 @@ export const FinalStage = () => {
     // Возвращаемся на главную
     router.push('/')
   }
+  
 
   const handleContinueClick = () => {
     // Открываем телеграм бота с тикетом
     // window.open(`https://psy.hrani.live/application_form`)
     dispatch(setApplicationStage('name'))
-    router.push('/application_form/?research=true')
+    router.push('/application_form/?research=true'+'&utm_client='+utm_client+'&utm_campaign='+utm_campaign+'&utm_content='+utm_content+'&utm_medium='+utm_medium+'&utm_source='+utm_source+'&utm_term='+utm_term)
   }
 
   useEffect(() => {
