@@ -707,7 +707,7 @@ export const PsychologistStage = () => {
         <div className="pb-[20px] flex gap-[10px]">
           <button
             type='button'
-            onClick={() => dispatch(setApplicationStage('phone'))}
+            onClick={() => dispatch(setApplicationStage('diseases_psychologist'))}
             disabled={isSubmitting}
             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
           >

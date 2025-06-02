@@ -100,7 +100,7 @@ const PromocodeStage = () => {
                     <div className="shrink-0 mt-[30px] pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
                         <button
                             type='button'
-                            onClick={() => dispatch(setApplicationStage('diseases_psychologist'))}
+                            onClick={() => dispatch(setApplicationStage('psychologist'))}
                             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Назад
