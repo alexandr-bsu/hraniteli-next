@@ -132,7 +132,7 @@ export const PsychologistStage = () => {
 
   const { reachGoal } = useYandexMetrika(102105189)
   const searchParams = useSearchParams()
-  
+
   const utm_client = searchParams.get('utm_client')
   const utm_campaign = searchParams.get('utm_campaign')
   const utm_content = searchParams.get('utm_content')
@@ -516,12 +516,13 @@ export const PsychologistStage = () => {
         const response = await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka-diagnostic-v2', requestData);
 
         if (response.status === 200) {
-
+          reachGoal('submit_form_diasgnostic')
+          
           dispatch(setSelectedSlots([formattedSlot]));
           dispatch(setSelectedSlotsObjects([]));
           dispatch(setApplicationStage('gratitude'));
 
-          reachGoal('submit_form_diagnostic')
+
 
 
         } else {
