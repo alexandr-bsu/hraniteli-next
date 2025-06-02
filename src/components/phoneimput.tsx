@@ -10,19 +10,19 @@ const formatPhoneNumber = (value: string): string => {
     const cleaned = value.replace(/[^\d+]/g, '');
     
     // Если нет +7 в начале, добавляем
-    const withPrefix = cleaned.startsWith('+7') ? cleaned : `+7${cleaned.replace(/[^\d]/g, '')}`;
+    const withPrefix = cleaned.startsWith('7') ? cleaned : `7${cleaned.replace(/[^\d]/g, '')}`;
     
     // Ограничиваем длину до 12 символов (+7 и 10 цифр)
     return withPrefix.slice(0, 12);
 };
 
 const validatePhone = (phone: string): boolean => {
-    const phoneRegex = /^\+7\d{10}$/;
+    const phoneRegex = /^7\d{10}$/;
     return phoneRegex.test(phone);
 };
 
 export const PhoneInput: React.FC<PhoneInputProps> = ({ onChange, className = '' }) => {
-    const [phone, setPhone] = useState('+7');
+    const [phone, setPhone] = useState('7');
     const [isValid, setIsValid] = useState(false);
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
