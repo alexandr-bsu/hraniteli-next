@@ -38,9 +38,9 @@ export const PhoneStage = () => {
         state => state.applicationFormData.selected_slots
     );
 
-      const currentPsychologist = useSelector<RootState, any>(
-          state => state.filter
-      ).selected_psychologist;
+    const currentPsychologist = useSelector<RootState, any>(
+        state => state.filter
+    ).selected_psychologist;
 
 
 
@@ -82,6 +82,8 @@ export const PhoneStage = () => {
         }
     })
 
+    const [isSubmitting, setIsSubmitting] = React.useState(false);
+
     // 3. Сохраняем данные при изменении
     useEffect(() => {
         const subscription = form.watch((value) => {
@@ -101,6 +103,7 @@ export const PhoneStage = () => {
         dispatch(setPhone(data.phone));
 
         try {
+            setIsSubmitting(true)
             // Получаем запросы из localStorage
             const storedRequests = localStorage.getItem('app_request') ?
                 [JSON.parse(localStorage.getItem('app_request') || '[]')?.request] : [];
@@ -336,13 +339,15 @@ export const PhoneStage = () => {
 
 
             if (response.status === 200) {
+                setIsSubmitting(false)
                 dispatch(setApplicationStage('gratitude'));
 
                 if (typeof window !== 'undefined' && window.ym) {
-                  window.ym(102105189, 'reachGoal', "submit_form_podbor_bes_issledovanie");
+                    window.ym(102105189, 'reachGoal', "submit_form_podbor_bes_issledovanie");
                 }
 
             } else {
+                setIsSubmitting(false)
                 throw new Error('Ошибка при отправке заявки');
             }
         } catch (error) {
@@ -362,11 +367,11 @@ export const PhoneStage = () => {
         <div className='px-[50px] max-lg:px-[20px] flex w-full grow'>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmit)} className="mt-[15px] w-full flex flex-col relative">
-                    {isLoading && (
-                        <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50 rounded-[10px]">
+                    {isSubmitting && (
+                        <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50">
                             <div className="flex flex-col items-center gap-[10px]">
                                 <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
-                                <span className="text-[18px] text-[#116466] max-lg:text-[14px]">Подбираем психологов...</span>
+                                <span className="text-[18px] text-[#116466]">Отправка заявки...</span>
                             </div>
                         </div>
                     )}

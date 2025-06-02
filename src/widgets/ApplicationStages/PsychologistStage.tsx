@@ -442,16 +442,7 @@ export const PsychologistStage = () => {
     // Время уже в нужном формате, не нужно комментировать
     setSelectedSlot(slot);
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full">
-        <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
-        <span className="mt-4 text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[14px] text-[#116466]">Загрузка психологов...</span>
-      </div>
-    );
-  }
-
+  
   if (showEmergency) {
     return <EmergencyContacts onClose={handleCloseEmergency} />;
   }

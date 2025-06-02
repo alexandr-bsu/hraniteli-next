@@ -116,9 +116,9 @@ export const DiseasesPsychologistStage = () => {
         dispatch(setHasMatchingError(false))
 
         setIsLoading(true);
-          
 
-          try {
+
+        try {
             // Отправляем анкету и получаем расписание
             const schedule = await submitQuestionnaire({
                 ...formData
@@ -208,12 +208,24 @@ export const DiseasesPsychologistStage = () => {
         } finally {
             setIsLoading(false);
         }
-        
+
         dispatch(setApplicationStage('psychologist'))
     }
 
+
+
     return (
         <div className='px-[50px] max-lg:px-[20px] flex w-full grow max-lg:overflow-y-auto'>
+            
+            {isLoading && (
+                <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="w-16 h-16 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-[18px] text-[#116466] max-lg:text-[14px]">Подбираем психологов...</p>
+                    </div>
+                </div>
+            )}
+
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(handleSubmit)} className="w-full flex flex-col min-h-min mt-[15px]">
                     <FormField
