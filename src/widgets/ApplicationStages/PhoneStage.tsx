@@ -66,6 +66,13 @@ export const PhoneStage = () => {
     // Проверяем, перешли ли мы из иммледовательской формы
     const isResearchRedirect = searchParams.get('research') == 'true'
 
+    const utm_client = searchParams.get('utm_client')
+    const utm_campaign = searchParams.get('utm_campaign')
+    const utm_content = searchParams.get('utm_content')
+    const utm_medium = searchParams.get('utm_medium')
+    const utm_source = searchParams.get('utm_source')
+    const utm_term = searchParams.get('utm_term')
+
     const formData = useSelector((state: RootState) => state.applicationFormData);
     const [showNoMatch, setShowNoMatch] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
@@ -110,6 +117,12 @@ export const PhoneStage = () => {
                 [JSON.parse(localStorage.getItem('app_request') || '[]')?.request] : [];
 
             const requestData = {
+                "utm_client": utm_client || 'null',
+                "utm_campaign": utm_campaign || 'null',
+                "utm_content": utm_content || 'null',
+                "utm_medium": utm_medium || 'null',
+                "utm_source": utm_source || 'null',
+                "utm_term": utm_term || 'null',
                 anxieties: [],
                 questions: storedRequests,
                 customQuestion: [],
@@ -341,10 +354,10 @@ export const PhoneStage = () => {
 
             if (response.status === 200) {
                 setIsSubmitting(false)
-                if (!isResearchRedirect){
+                if (!isResearchRedirect) {
                     reachGoal('submit_form_podbor_bes_issledovanie')
                 }
-                else{
+                else {
                     reachGoal('submit_form_podbor_issledovanie')
                 }
                 dispatch(setApplicationStage('gratitude'));

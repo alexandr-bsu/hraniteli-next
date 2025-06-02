@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useSelector } from "react-redux"
 import { RootState } from "@/redux/store"
 import { useDispatch } from "react-redux"
@@ -12,19 +12,28 @@ export const FinalStage = () => {
   const dispatch = useDispatch()
 
   const ticketID = useSelector<RootState, string>(
-        state => state.applicationFormData.ticketID
-    );
+    state => state.applicationFormData.ticketID
+  );
 
-    useEffect(() => {
-        axios({
-            method: "PUT",
-            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
-            data: { step: "Исследовательская часть отправлена", ticket_id: ticketID },
-        });
-    }, [])
+  const searchParams = useSearchParams()
+
+  const utm_client = searchParams.get('utm_client')
+  const utm_campaign = searchParams.get('utm_campaign')
+  const utm_content = searchParams.get('utm_content')
+  const utm_medium = searchParams.get('utm_medium')
+  const utm_source = searchParams.get('utm_source')
+  const utm_term = searchParams.get('utm_term')
+
+  useEffect(() => {
+    axios({
+      method: "PUT",
+      url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+      data: { step: "Исследовательская часть отправлена", ticket_id: ticketID },
+    });
+  }, [])
 
   const router = useRouter()
-  
+
 
   const handleClose = () => {
     // Очищаем localStorage
@@ -126,12 +135,12 @@ export const FinalStage = () => {
             localStorage.getItem('app_occupation') === 'additional income' ? 'Не работаю, есть доп. источник дохода' :
               localStorage.getItem('app_occupation') === 'no income' ? 'Не работаю, нет доп. источников доходов' : 'Постоянная работа в найме',
 
-      "utm_client": "null",
-      "utm_campaign": "null",
-      "utm_content": "null",
-      "utm_medium": "null",
-      "utm_source": "null",
-      "utm_term": "null",
+      "utm_client": utm_client || 'null',
+      "utm_campaign": utm_campaign || 'null',
+      "utm_content": utm_content || 'null',
+      "utm_medium": utm_medium || 'null',
+      "utm_source": utm_source || 'null',
+      "utm_term": utm_term || 'null',
       "referer": "https://hrani.live/psy-client-info"
     }
 

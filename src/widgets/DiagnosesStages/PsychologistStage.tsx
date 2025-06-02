@@ -21,6 +21,7 @@ import { format } from 'date-fns';
 import { getAgeWord } from '@/features/utils';
 
 import useYandexMetrika from '@/components/yandex/useYandexMetrika'
+import { useRouter, useSearchParams } from "next/navigation"
 
 
 interface Slot {
@@ -130,7 +131,14 @@ export const PsychologistStage = () => {
   );
 
   const { reachGoal } = useYandexMetrika(102105189)
-
+  const searchParams = useSearchParams()
+  
+  const utm_client = searchParams.get('utm_client')
+  const utm_campaign = searchParams.get('utm_campaign')
+  const utm_content = searchParams.get('utm_content')
+  const utm_medium = searchParams.get('utm_medium')
+  const utm_source = searchParams.get('utm_source')
+  const utm_term = searchParams.get('utm_term')
 
   useEffect(() => {
 
@@ -216,7 +224,13 @@ export const PsychologistStage = () => {
         is_adult: parseInt(localStorage.getItem('app_age') || '0') >= 18,
         is_last_page: true,
         occupation: ""
-      }
+      },
+      "utm_client": utm_client || 'null',
+      "utm_campaign": utm_campaign || 'null',
+      "utm_content": utm_content || 'null',
+      "utm_medium": utm_medium || 'null',
+      "utm_source": utm_source || 'null',
+      "utm_term": utm_term || 'null',
     };
 
     axios({
