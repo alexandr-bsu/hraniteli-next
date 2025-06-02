@@ -29,6 +29,7 @@ const initialState: IApplicationFormData = {
   phone: '',
   selected_slots: [],
   selected_slots_objects: [],
+  selected_psychologist: [],
   index_phyc: 0,
   has_matching_error: false,
   matching_attempts: 0
@@ -120,6 +121,11 @@ export const applicationFormDataSlice = createSlice({
     setSelectedSlotsObjects: (state, action: PayloadAction<string[]>) => {
       state.selected_slots_objects = action.payload;
     },
+
+    setSelectedPsychologistForm: (state, action: PayloadAction<any[]>) => {
+      state.selected_psychologist = action.payload;
+    },
+
     setHasMatchingError: (state, action: PayloadAction<boolean>) => {
       state.has_matching_error = action.payload;
     },
@@ -154,6 +160,7 @@ export const {
   setPhone,
   setSelectedSlots,
   setSelectedSlotsObjects,
+  setSelectedPsychologistForm,
   setHasMatchingError,
   setSessionDuration,
   setCity,

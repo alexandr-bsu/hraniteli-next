@@ -17,6 +17,9 @@ import { submitQuestionnaire, getFilteredPsychologists } from '@/features/action
 import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
 import { useSearchParams } from 'next/navigation'
 import axios from 'axios';
+import { toast } from 'sonner';
+import { getTimeDifference } from '@/features/utils';
+
 
 const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
 
@@ -31,11 +34,26 @@ export const PhoneStage = () => {
         state => state.applicationFormData.ticketID
     );
 
+    const selected_slots = useSelector<RootState, string[]>(
+        state => state.applicationFormData.selected_slots
+    );
+
+      const currentPsychologist = useSelector<RootState, any>(
+          state => state.filter
+      ).selected_psychologist;
+
+
+
+    const timeDifference = getTimeDifference();
+
+    const ridId = useSelector((state: RootState) => state.applicationForm.rid)
+    const bidId = useSelector((state: RootState) => state.applicationForm.bid)
+
     useEffect(() => {
         axios({
             method: "PUT",
             url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
-            data: { step: "Контакты клиента", ticket_id:ticketID },
+            data: { step: "Контакты клиента", ticket_id: ticketID },
         });
 
         if (typeof window !== 'undefined' && window.ym) {
@@ -79,102 +97,262 @@ export const PhoneStage = () => {
 
     // 4. Отправка формы
     const handleSubmit = async (data: z.infer<typeof FormSchema>) => {
-        setIsLoading(true);
         localStorage.setItem('app_phone', JSON.stringify(data.phone));
         dispatch(setPhone(data.phone));
 
         try {
-            // Отправляем анкету и получаем расписание
-            const schedule = await submitQuestionnaire({
-                ...formData,
-                phone: data.phone
-            });
+            // Получаем запросы из localStorage
+            const storedRequests = localStorage.getItem('app_request') ?
+                [JSON.parse(localStorage.getItem('app_request') || '[]')?.request] : [];
 
-            // Проверяем наличие слотов
-            let hasSlots = false;
-            if (schedule[0]?.items) {
-                hasSlots = schedule[0].items.some((day: any) => {
-                    if (!day.slots) return false;
-                    return Object.entries(day.slots).some(([time, slots]) => {
-                        if (!Array.isArray(slots)) return false;
-                        return slots.some(slot => slot.state === 'Свободен');
-                    });
-                });
-            }
+            const requestData = {
+                anxieties: [],
+                questions: storedRequests,
+                customQuestion: [],
+                diagnoses: localStorage.getItem('app_diseases') ?
+                    JSON.parse(localStorage.getItem('app_diseases') || '[]') : [],
+                diagnoseInfo: "",
+                diagnoseMedicaments: localStorage.getItem('app_diseases_psychologist') ?
+                    JSON.parse(localStorage.getItem('app_diseases_psychologist') || '{}').medications : '',
+                traumaticEvents: localStorage.getItem('app_traumatic') ?
+                    JSON.parse(localStorage.getItem('app_traumatic') || '[]') : [],
+                clientStates: localStorage.getItem('app_conditions') ?
+                    JSON.parse(localStorage.getItem('app_conditions') || '[]') : [],
+                selectedPsychologistsNames: [currentPsychologist?.name],
+                shownPsychologists: currentPsychologist?.name || "",
+                lastExperience: localStorage.getItem('app_experience') === 'earlier' ? 'Да, я работал(а) с психологом/психотерапевтом.' + (localStorage.getItem('app_experience') == 'earlier' ?
+                    localStorage.getItem('app_session_duration') === '<1 month' ? 'До месяца' :
+                        localStorage.getItem('app_session_duration') === '2-3 months' ? '2-3 месяца' :
+                            localStorage.getItem('app_session_duration') === '<1 year' ? 'До года' :
+                                localStorage.getItem('app_session_duration') === '>1 year' ? 'Более года' : ''
+                    : '') :
+                    localStorage.getItem('app_experience') === 'supposed' ? 'Нет, я не работал(а) с психологом/психотерапевтом' : '',
+                amountExpectations: "",
+                age: localStorage.getItem('app_age') || '',
+                slots: Array.isArray(selected_slots) ? selected_slots : [selected_slots],
+                slots_objects: [],
+                contactType: "Telegram",
+                contact: localStorage.getItem('app_phone') || '',
+                name: localStorage.getItem('app_username') || '',
+                promocode: isResearchRedirect ? 'Клиент перешёл из исследовательской анкеты' : localStorage.getItem('app_promocode') || '',
+                // UPDATE: устанавливаем ticket_id из redux 
+                ticket_id: ticketID || '',
 
-            // Получаем список психологов
-            const result = await getFilteredPsychologists();
+                // ticket_id: localStorage.getItem('app_ticket_id') || '',
+                emptySlots: false,
+                userTimeZone: "МСК" + (+timeDifference > 0 ? '+' + timeDifference : timeDifference == 0 ? '' : timeDifference),
+                userTimeOffsetMsk: timeDifference.toString(),
+                bid: bidId,
+                rid: ridId,
+                categoryType: "",
+                customCategory: "",
+                question_to_psychologist: storedRequests.join('; '),
+                filtered_by_automatch_psy_names: [currentPsychologist?.name],
+                _queries: "",
+                customTraumaticEvent: "",
+                customState: "",
+                formPsyClientInfo: {
+                    age: localStorage.getItem('app_age') || '',
+                    city: "",
+                    sex: localStorage.getItem('app_gender') === 'male' ? 'Мужской' :
+                        localStorage.getItem('app_gender') === 'female' ? 'Женский' : '',
 
-            // Если нет слотов вообще - показываем ошибку
-            if (!hasSlots) {
-                dispatch(setHasMatchingError(true));
-                setShowNoMatch(true);
-                return;
-            }
+                    psychoEducated: localStorage.getItem('app_psychologist_education') === 'practic' ? 'Да, я практикующий специалист' :
+                        localStorage.getItem('app_psychologist_education') === 'other_speciality' ? 'Да, но работаю в другой сфере' :
+                            localStorage.getItem('app_psychologist_education') === 'student' ? 'В процессе получения' :
+                                localStorage.getItem('app_psychologist_education') === 'no' ? 'Нет' : '',
 
-            // Собираем все id психологов из слотов и их расписания
-            const psychologistSchedules = new Map<string, any>();
-            schedule[0].items.forEach((day: any) => {
-                if (!day.slots) return;
-                Object.entries(day.slots).forEach(([time, slots]) => {
-                    if (!Array.isArray(slots)) return;
-                    slots.forEach((slot: any) => {
-                        if (slot.psychologist) {
-                            if (!psychologistSchedules.has(slot.psychologist)) {
-                                const psychologistSchedule: { [date: string]: { [time: string]: any } } = {};
-                                schedule[0].items.forEach((d: any) => {
-                                    if (d.slots) {
-                                        psychologistSchedule[d.pretty_date] = {};
-                                        Object.entries(d.slots).forEach(([t, s]) => {
-                                            if (Array.isArray(s)) {
-                                                const psychologistSlots = s.filter(sl => sl.psychologist === slot.psychologist && sl.state === 'Свободен');
-                                                if (psychologistSlots.length > 0) {
-                                                    psychologistSchedule[d.pretty_date][t] = psychologistSlots[0];
-                                                }
-                                            }
-                                        });
-                                    }
-                                });
-                                psychologistSchedules.set(slot.psychologist, psychologistSchedule);
-                            }
+                    anxieties: [],
+                    customAnexiety: "",
+                    hasPsychoExperience: localStorage.getItem('app_experience') === 'earlier' ? 'Да, я работал(а) с психологом/психотерапевтом' :
+                        localStorage.getItem('app_experience') === 'supposed' ? 'Нет, но рассматривал(а) такую возможность' : '',
+
+                    meetType: localStorage.getItem('app_meeting_type') === 'online' ? 'Онлайн' :
+                        localStorage.getItem('app_meeting_type') === 'offline' ? 'Оффлайн' :
+                            localStorage.getItem('app_meeting_type') === 'both' ? 'И так и так' : '',
+
+                    selectionСriteria: localStorage.getItem('app_choose_preferences') === 'friends' ? 'По рекомендациям знакомых' :
+                        localStorage.getItem('app_choose_preferences') === 'self' ? 'Самостоятельно просматривал(а) анкеты в интернете или читал(а) отзывы' :
+                            localStorage.getItem('app_choose_preferences') === 'service' ? 'Через сервис, который сам подбирает подходящего специалиста' : '',
+
+                    custmCreteria: "",
+                    importancePsycho: localStorage.getItem('app_preferences') ?
+                        JSON.parse(localStorage.getItem('app_preferences') || '[]') : [],
+
+                    customImportance: localStorage.getItem('app_custom_preferences') || '',
+                    agePsycho: "",
+                    sexPsycho: localStorage.getItem('app_gender_psychologist') === 'male' ? 'Мужчина' :
+                        localStorage.getItem('app_gender_psychologist') === 'female' ? 'Женщина' : 'Не имеет значения',
+
+                    priceLastSession: localStorage.getItem('app_experience') == 'earlier' ?
+                        localStorage.getItem('app_last_session_price') === 'free' ? 'Бесплатно' :
+                            localStorage.getItem('app_last_session_price') === '<1000' ? 'Меньше 1000 руб.' :
+                                localStorage.getItem('app_last_session_price') === '<3000' ? 'Меньше 3000 руб.' :
+                                    localStorage.getItem('app_last_session_price') === '<5000' ? 'Меньше 5000 руб.' :
+                                        localStorage.getItem('app_last_session_price') === '5000+' ? '5000 руб. и более' : ''
+                        : '',
+
+                    durationSession: localStorage.getItem('app_experience') == 'earlier' ?
+                        localStorage.getItem('app_session_duration') === '<1 month' ? 'До месяца' :
+                            localStorage.getItem('app_session_duration') === '2-3 months' ? '2-3 месяца' :
+                                localStorage.getItem('app_session_duration') === '<1 year' ? 'До года' :
+                                    localStorage.getItem('app_session_duration') === '>1 year' ? 'Более года' : ''
+                        : '',
+
+                    reasonCancel: localStorage.getItem('app_experience') == 'earlier' ?
+                        localStorage.getItem('app_cancel_reason') === 'solved' ? 'Помогло, проблема была решена' :
+                            localStorage.getItem('app_cancel_reason') === 'new_psychologist' ? 'Не помогло, выбрал(а) нового' :
+                                localStorage.getItem('app_cancel_reason') === 'full_cancel' ? 'Не помогло, вообще прекратил(а)' :
+                                    localStorage.getItem('app_cancel_reason') === 'expensive' ? 'Дорого' :
+                                        localStorage.getItem('app_cancel_reason') === 'uncomfortable' ? 'Неудобно по времени/формату/месту' :
+                                            localStorage.getItem('app_cancel_reason') === 'in_therapy' ? 'Я всё еще в терапии' : ''
+                        : '',
+
+                    pricePsycho: localStorage.getItem('app_experience') == 'supposed' ?
+                        localStorage.getItem('app_last_session_price') === 'free' ? 'Бесплатно' :
+                            localStorage.getItem('app_last_session_price') === '<1000' ? 'Меньше 1000 руб.' :
+                                localStorage.getItem('app_last_session_price') === '<3000' ? 'Меньше 3000 руб.' :
+                                    localStorage.getItem('app_last_session_price') === '<5000' ? 'Меньше 5000 руб.' :
+                                        localStorage.getItem('app_last_session_price') === '5000+' ? '5000 руб. и более' : ''
+                        : '',
+
+                    reasonNonApplication: localStorage.getItem('app_experience') == 'supposed' ?
+                        localStorage.getItem('app_cancel_reason') === 'solved' ? 'Проблемы сами разрешились' :
+                            localStorage.getItem('app_cancel_reason') === 'no trust' ? 'Не было доверия' :
+                                localStorage.getItem('app_cancel_reason') === 'expensive' ? 'Дорого' :
+                                    localStorage.getItem('app_cancel_reason') === 'other' ? 'Другая причина' : ''
+                        : '',
+
+                    contactType: "Telegram",
+                    contact: localStorage.getItem('app_phone') || '',
+                    name: localStorage.getItem('app_username') || '',
+                    is_adult: parseInt(localStorage.getItem('app_age') || '0') >= 18,
+                    is_last_page: true,
+                    occupation: localStorage.getItem('app_occupation') === 'fulltime' ? 'Постоянная работа в найме' :
+                        localStorage.getItem('app_occupation') === 'freelance' ? 'Фрилансер/самозанятый/работаю на себя' :
+                            localStorage.getItem('app_occupation') === 'business' ? 'Предприниматель' :
+                                localStorage.getItem('app_occupation') === 'additional income' ? 'Не работаю, есть доп. источник дохода' :
+                                    localStorage.getItem('app_occupation') === 'no income' ? 'Не работаю, нет доп. источников доходов' : ''
+                }
+            };
+
+            const response = await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka', requestData);
+
+            if (ridId && bidId) {
+                await axios.put('https://n8n-v2.hrani.live/webhook/update-contacts-stb',
+                    {
+                        rid: ridId,
+                        bid: bidId,
+                        contact: localStorage.getItem('app_phone') || '',
+                        contactType: "Telegram",
+                        name: localStorage.getItem('app_username') || '',
+                        age: localStorage.getItem('app_age') || '',
+                        formPsyClientInfo: {
+                            age: localStorage.getItem('app_age') || '',
+                            city: "",
+                            sex: localStorage.getItem('app_gender') === 'male' ? 'Мужской' :
+                                localStorage.getItem('app_gender') === 'female' ? 'Женский' : '',
+
+                            psychoEducated: localStorage.getItem('app_psychologist_education') === 'practic' ? 'Да, я практикующий специалист' :
+                                localStorage.getItem('app_psychologist_education') === 'other_speciality' ? 'Да, но работаю в другой сфере' :
+                                    localStorage.getItem('app_psychologist_education') === 'student' ? 'В процессе получения' :
+                                        localStorage.getItem('app_psychologist_education') === 'no' ? 'Нет' : '',
+
+                            anxieties: [],
+                            customAnexiety: "",
+                            hasPsychoExperience: localStorage.getItem('app_experience') === 'earlier' ? 'Да, я работал(а) с психологом/психотерапевтом' :
+                                localStorage.getItem('app_experience') === 'supposed' ? 'Нет, но рассматривал(а) такую возможность' : '',
+
+                            meetType: localStorage.getItem('app_meeting_type') === 'online' ? 'Онлайн' :
+                                localStorage.getItem('app_meeting_type') === 'offline' ? 'Оффлайн' :
+                                    localStorage.getItem('app_meeting_type') === 'both' ? 'И так и так' : '',
+
+                            selectionСriteria: localStorage.getItem('app_choose_preferences') === 'friends' ? 'По рекомендациям знакомых' :
+                                localStorage.getItem('app_choose_preferences') === 'self' ? 'Самостоятельно просматривал(а) анкеты в интернете или читал(а) отзывы' :
+                                    localStorage.getItem('app_choose_preferences') === 'service' ? 'Через сервис, который сам подбирает подходящего специалиста' : '',
+
+                            custmCreteria: "",
+                            importancePsycho: localStorage.getItem('app_preferences') ?
+                                JSON.parse(localStorage.getItem('app_preferences') || '[]') : [],
+
+                            customImportance: localStorage.getItem('app_custom_preferences') || '',
+                            agePsycho: "",
+                            sexPsycho: localStorage.getItem('app_gender_psychologist') === 'male' ? 'Мужчина' :
+                                localStorage.getItem('app_gender_psychologist') === 'female' ? 'Женщина' : 'Не имеет значения',
+
+                            priceLastSession: localStorage.getItem('app_experience') == 'earlier' ?
+                                localStorage.getItem('app_last_session_price') === 'free' ? 'Бесплатно' :
+                                    localStorage.getItem('app_last_session_price') === '<1000' ? 'Меньше 1000 руб.' :
+                                        localStorage.getItem('app_last_session_price') === '<3000' ? 'Меньше 3000 руб.' :
+                                            localStorage.getItem('app_last_session_price') === '<5000' ? 'Меньше 5000 руб.' :
+                                                localStorage.getItem('app_last_session_price') === '5000+' ? '5000 руб. и более' : ''
+                                : '',
+
+                            durationSession: localStorage.getItem('app_experience') == 'earlier' ?
+                                localStorage.getItem('app_session_duration') === '<1 month' ? 'До месяца' :
+                                    localStorage.getItem('app_session_duration') === '2-3 months' ? '2-3 месяца' :
+                                        localStorage.getItem('app_session_duration') === '<1 year' ? 'До года' :
+                                            localStorage.getItem('app_session_duration') === '>1 year' ? 'Более года' : ''
+                                : '',
+
+                            reasonCancel: localStorage.getItem('app_experience') == 'earlier' ?
+                                localStorage.getItem('app_cancel_reason') === 'solved' ? 'Помогло, проблема была решена' :
+                                    localStorage.getItem('app_cancel_reason') === 'new_psychologist' ? 'Не помогло, выбрал(а) нового' :
+                                        localStorage.getItem('app_cancel_reason') === 'full_cancel' ? 'Не помогло, вообще прекратил(а)' :
+                                            localStorage.getItem('app_cancel_reason') === 'expensive' ? 'Дорого' :
+                                                localStorage.getItem('app_cancel_reason') === 'uncomfortable' ? 'Неудобно по времени/формату/месту' :
+                                                    localStorage.getItem('app_cancel_reason') === 'in_therapy' ? 'Я всё еще в терапии' : ''
+                                : '',
+
+                            pricePsycho: localStorage.getItem('app_experience') == 'supposed' ?
+                                localStorage.getItem('app_last_session_price') === 'free' ? 'Бесплатно' :
+                                    localStorage.getItem('app_last_session_price') === '<1000' ? 'Меньше 1000 руб.' :
+                                        localStorage.getItem('app_last_session_price') === '<3000' ? 'Меньше 3000 руб.' :
+                                            localStorage.getItem('app_last_session_price') === '<5000' ? 'Меньше 5000 руб.' :
+                                                localStorage.getItem('app_last_session_price') === '5000+' ? '5000 руб. и более' : ''
+                                : '',
+
+                            reasonNonApplication: localStorage.getItem('app_experience') == 'supposed' ?
+                                localStorage.getItem('app_cancel_reason') === 'solved' ? 'Проблемы сами разрешились' :
+                                    localStorage.getItem('app_cancel_reason') === 'no trust' ? 'Не было доверия' :
+                                        localStorage.getItem('app_cancel_reason') === 'expensive' ? 'Дорого' :
+                                            localStorage.getItem('app_cancel_reason') === 'other' ? 'Другая причина' : ''
+                                : '',
+
+                            contactType: "Telegram",
+                            contact: localStorage.getItem('app_phone') || '',
+                            name: localStorage.getItem('app_username') || '',
+                            is_adult: parseInt(localStorage.getItem('app_age') || '0') >= 18,
+                            is_last_page: true,
+                            occupation: localStorage.getItem('app_occupation') === 'fulltime' ? 'Постоянная работа в найме' :
+                                localStorage.getItem('app_occupation') === 'freelance' ? 'Фрилансер/самозанятый/работаю на себя' :
+                                    localStorage.getItem('app_occupation') === 'business' ? 'Предприниматель' :
+                                        localStorage.getItem('app_occupation') === 'additional income' ? 'Не работаю, есть доп. источник дохода' :
+                                            localStorage.getItem('app_occupation') === 'no income' ? 'Не работаю, нет доп. источников доходов' : ''
                         }
-                    });
-                });
-            });
-
-            // Фильтруем психологов у которых есть слоты
-            const psychologistsWithSlots = result.items.map((psy: any) => {
-                const schedule = psychologistSchedules.get(psy.name);
-                return {
-                    ...psy,
-                    schedule: schedule
-                };
-            }).filter((psy: any) => {
-                const schedule = psychologistSchedules.get(psy.name);
-                if (!schedule) return false;
-                return Object.values(schedule).some((daySlots: any) =>
-                    // @ts-expect-error
-                    Object.values(daySlots).some(slot => slot && slot.state === 'Свободен')
-                );
-            });
-
-            if (psychologistsWithSlots.length === 0) {
-                dispatch(setHasMatchingError(true));
-                setShowNoMatch(true);
-                return;
+                    }
+                )
             }
 
-            dispatch(fill_filtered_by_automatch_psy(psychologistsWithSlots));
-            dispatch(setHasMatchingError(false));
-            dispatch(setApplicationStage('psychologist'));
+
+            if (response.status === 200) {
+                dispatch(setApplicationStage('gratitude'));
+
+                if (typeof window !== 'undefined' && window.ym) {
+                  window.ym(102105189, 'reachGoal', "submit_form_podbor_bes_issledovanie");
+                }
+
+            } else {
+                throw new Error('Ошибка при отправке заявки');
+            }
         } catch (error) {
-            console.error('Ошибка при подборе психологов:', error);
-            dispatch(setHasMatchingError(true));
-            setShowNoMatch(true);
-        } finally {
-            setIsLoading(false);
+            console.error('Ошибка при отправке заявки:', error);
+            toast.error('Произошла ошибка при отправке заявки. Пожалуйста, попробуйте еще раз.');
         }
-    }
+
+    };
+
+
 
     if (showNoMatch) {
         return <NoMatchError onClose={handleCloseNoMatch} />;

@@ -147,7 +147,7 @@ export default function ApplicationForm() {
                 });
 
                 // Берем текущий список психологов из стора
-                const currentPsychologists = store.getState().filter.filtered_by_automatch_psy;
+                // const currentPsychologists = store.getState().filter.filtered_by_automatch_psy;
 
                 // Фильтруем психологов у которых есть слоты
                 const psychologistsWithSlots = Array.from(psychologistSchedules.entries()).map(([name, schedule]) => ({

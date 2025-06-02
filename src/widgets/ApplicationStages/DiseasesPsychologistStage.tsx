@@ -1,5 +1,5 @@
 "use client"
-
+import React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -24,6 +24,9 @@ import { NoMatchError } from './NoMatchError'
 import { useSearchParams } from 'next/navigation'
 import axios from "axios"
 
+import { submitQuestionnaire, getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
+import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
+
 const FormSchema = z.object({
     diseases: z.enum(["diseases1", "diseases2", 'nothing'], {
         required_error: "Вы не заполнили обязательное поле",
@@ -37,19 +40,21 @@ const diseases = {
     ['nothing']: ['Не имеет значения']
 }
 
+
+
 export const DiseasesPsychologistStage = () => {
     const dispatch = useDispatch()
-
+    const formData = useSelector((state: RootState) => state.applicationFormData);
     const ticketID = useSelector<RootState, string>(
-            state => state.applicationFormData.ticketID
-        );
-    
-    useEffect(()=>{
-    axios({
-      method: "PUT",
-      url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
-      data: { step: "Психические заболевания", ticket_id:ticketID },
-    });
+        state => state.applicationFormData.ticketID
+    );
+
+    useEffect(() => {
+        axios({
+            method: "PUT",
+            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+            data: { step: "Психические заболевания", ticket_id: ticketID },
+        });
     }, [])
 
     const searchParams = useSearchParams()
@@ -96,8 +101,10 @@ export const DiseasesPsychologistStage = () => {
         return () => subscription.unsubscribe()
     }, [form.watch])
 
+    const [isLoading, setIsLoading] = React.useState(false);
+
     // 4. Отправка формы
-    const handleSubmit = (data: z.infer<typeof FormSchema>) => {
+    const handleSubmit = async (data: z.infer<typeof FormSchema>) => {
         localStorage.setItem('app_diseases_psychologist', JSON.stringify(data))
 
         const result = [...diseases[data.diseases]]
@@ -107,21 +114,102 @@ export const DiseasesPsychologistStage = () => {
 
         dispatch(setDiseases(result))
         dispatch(setHasMatchingError(false))
-        if (isResearchRedirect) {
-            dispatch(setApplicationStage('phone'))
-        } else {
-            dispatch(setApplicationStage('promocode'))
+
+        setIsLoading(true);
+          
+
+          try {
+            // Отправляем анкету и получаем расписание
+            const schedule = await submitQuestionnaire({
+                ...formData
+            });
+
+            // Проверяем наличие слотов
+            let hasSlots = false;
+            if (schedule[0]?.items) {
+                hasSlots = schedule[0].items.some((day: any) => {
+                    if (!day.slots) return false;
+                    return Object.entries(day.slots).some(([time, slots]) => {
+                        if (!Array.isArray(slots)) return false;
+                        return slots.some(slot => slot.state === 'Свободен');
+                    });
+                });
+            }
+
+            // Получаем список психологов
+            const result = await getFilteredPsychologists();
+
+            // Если нет слотов вообще - показываем ошибку
+            if (!hasSlots) {
+                dispatch(setHasMatchingError(true));
+                setShowNoMatch(true);
+                return;
+            }
+
+            // Собираем все id психологов из слотов и их расписания
+            const psychologistSchedules = new Map<string, any>();
+            schedule[0].items.forEach((day: any) => {
+                if (!day.slots) return;
+                Object.entries(day.slots).forEach(([time, slots]) => {
+                    if (!Array.isArray(slots)) return;
+                    slots.forEach((slot: any) => {
+                        if (slot.psychologist) {
+                            if (!psychologistSchedules.has(slot.psychologist)) {
+                                const psychologistSchedule: { [date: string]: { [time: string]: any } } = {};
+                                schedule[0].items.forEach((d: any) => {
+                                    if (d.slots) {
+                                        psychologistSchedule[d.pretty_date] = {};
+                                        Object.entries(d.slots).forEach(([t, s]) => {
+                                            if (Array.isArray(s)) {
+                                                const psychologistSlots = s.filter(sl => sl.psychologist === slot.psychologist && sl.state === 'Свободен');
+                                                if (psychologistSlots.length > 0) {
+                                                    psychologistSchedule[d.pretty_date][t] = psychologistSlots[0];
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                                psychologistSchedules.set(slot.psychologist, psychologistSchedule);
+                            }
+                        }
+                    });
+                });
+            });
+
+            // Фильтруем психологов у которых есть слоты
+            const psychologistsWithSlots = result.items.map((psy: any) => {
+                const schedule = psychologistSchedules.get(psy.name);
+                return {
+                    ...psy,
+                    schedule: schedule
+                };
+            }).filter((psy: any) => {
+                const schedule = psychologistSchedules.get(psy.name);
+                if (!schedule) return false;
+                return Object.values(schedule).some((daySlots: any) =>
+                    // @ts-expect-error
+                    Object.values(daySlots).some(slot => slot && slot.state === 'Свободен')
+                );
+            });
+
+            if (psychologistsWithSlots.length === 0) {
+                dispatch(setHasMatchingError(true));
+                setShowNoMatch(true);
+                return;
+            }
+
+            dispatch(fill_filtered_by_automatch_psy(psychologistsWithSlots));
+            dispatch(setHasMatchingError(false));
+            dispatch(setApplicationStage('psychologist'));
+        } catch (error) {
+            console.error('Ошибка при подборе психологов:', error);
+            dispatch(setHasMatchingError(true));
+            setShowNoMatch(true);
+        } finally {
+            setIsLoading(false);
         }
-
-    }
-
-    const handleCloseNoMatch = () => {
-        setShowNoMatch(false)
-        dispatch(setHasMatchingError(false))
-    }
-
-    if (showNoMatch) {
-        return <NoMatchError onClose={handleCloseNoMatch} />
+        
+        dispatch(setApplicationStage('psychologist'))
     }
 
     return (

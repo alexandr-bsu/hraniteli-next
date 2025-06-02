@@ -1,4 +1,5 @@
 import { ApplicationStage } from '@/redux/slices/application_form';
+import { IPsychologist } from './psychologist.types';
 
 export type Gender = 'male' | 'female' | 'other' | 'none';
 export type ClientExperience = 'earlier' | 'in_therapy' | 'supposed' | 'no' | 'none';
@@ -37,6 +38,7 @@ export interface IApplicationFormData {
   phone: string;
   selected_slots: string[];
   selected_slots_objects: string[];
+  selected_psychologist: any[];
   index_phyc: number;
   has_matching_error: boolean;
   matching_attempts: number;
