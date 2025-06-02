@@ -187,7 +187,7 @@ export const DiseasesPsychologistStage = () => {
                 const schedule = psychologistSchedules.get(psy.name);
                 if (!schedule) return false;
                 return Object.values(schedule).some((daySlots: any) =>
-                    // @ts-expect-error
+                    // @ts-expect-error: We expecting error because of error type
                     Object.values(daySlots).some(slot => slot && slot.state === 'Свободен')
                 );
             });
