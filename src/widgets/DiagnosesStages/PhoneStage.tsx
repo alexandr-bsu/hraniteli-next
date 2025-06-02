@@ -16,6 +16,7 @@ import { NoMatchError } from './NoMatchError';
 import { submitQuestionnaire, getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
 import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
 import axios from 'axios';
+import useYandexMetrika from '@/components/yandex/useYandexMetrika'
 
 const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
 
@@ -29,16 +30,17 @@ export const PhoneStage = () => {
         state => state.applicationFormData.ticketID
     );
 
+    const { reachGoal } = useYandexMetrika(102105189)
+
     useEffect(() => {
         axios({
             method: "PUT",
             url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
-            data: { step: "Контакты клиента", ticket_id:ticketID },
+            data: { step: "Контакты клиента", ticket_id: ticketID },
         });
 
-        if (typeof window !== 'undefined' && window.ym) {
-            window.ym(102105189, 'reachGoal', "svyaz");
-        }
+        reachGoal('svyaz')
+
     }, [])
 
     const formData = useSelector((state: RootState) => state.applicationFormData);

@@ -14,9 +14,10 @@ import { IMaskInput } from 'react-imask';
 import { RootState } from '@/redux/store';
 import { NoMatchError } from './NoMatchError';
 import { submitQuestionnaire, getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
-import {submitHelpHandQuestionnaire} from '@/features/actions/HelpHand'
+import { submitHelpHandQuestionnaire } from '@/features/actions/HelpHand'
 import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
 import axios from 'axios';
+import useYandexMetrika from '@/components/yandex/useYandexMetrika'
 
 const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
 
@@ -30,16 +31,17 @@ export const PhoneStage = () => {
         state => state.applicationFormData.ticketID
     );
 
+    const { reachGoal } = useYandexMetrika(102105189)
+
+
     useEffect(() => {
         axios({
             method: "PUT",
             url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
-            data: { step: "Контакты клиента", ticket_id:ticketID },
+            data: { step: "Контакты клиента", ticket_id: ticketID },
         });
 
-        if (typeof window !== 'undefined' && window.ym) {
-            window.ym(102105189, 'reachGoal', "svyaz");
-        }
+        reachGoal('svyaz')
     }, [])
 
     const formData = useSelector((state: RootState) => state.applicationFormData);
@@ -80,12 +82,14 @@ export const PhoneStage = () => {
 
         try {
             // Отправляем анкету и получаем расписание
-             const formRequestResult = await submitHelpHandQuestionnaire({
-                 ...formData,
-                 phone: data.phone
+            const formRequestResult = await submitHelpHandQuestionnaire({
+                ...formData,
+                phone: data.phone
             });
-  
+
             dispatch(setHasMatchingError(false));
+            reachGoal('submit_help_hand_form')
+
             dispatch(setApplicationStage('gratitude'));
 
 

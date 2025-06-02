@@ -19,6 +19,7 @@ import { useSearchParams } from 'next/navigation'
 import axios from 'axios';
 import { toast } from 'sonner';
 import { getTimeDifference } from '@/features/utils';
+import useYandexMetrika from '@/components/yandex/useYandexMetrika'
 
 
 const phoneRegex = /^\+7 \(\d{3}\) \d{3}-\d{2}-\d{2}$/;
@@ -48,6 +49,7 @@ export const PhoneStage = () => {
 
     const ridId = useSelector((state: RootState) => state.applicationForm.rid)
     const bidId = useSelector((state: RootState) => state.applicationForm.bid)
+    const { reachGoal } = useYandexMetrika(102105189)
 
     useEffect(() => {
         axios({
@@ -56,9 +58,8 @@ export const PhoneStage = () => {
             data: { step: "Контакты клиента", ticket_id: ticketID },
         });
 
-        if (typeof window !== 'undefined' && window.ym) {
-            window.ym(102105189, 'reachGoal', "svyaz");
-        }
+        reachGoal('svyaz')
+
     }, [])
 
     const searchParams = useSearchParams()
@@ -340,11 +341,13 @@ export const PhoneStage = () => {
 
             if (response.status === 200) {
                 setIsSubmitting(false)
-                dispatch(setApplicationStage('gratitude'));
-
-                if (typeof window !== 'undefined' && window.ym) {
-                    window.ym(102105189, 'reachGoal', "submit_form_podbor_bes_issledovanie");
+                if (!isResearchRedirect){
+                    reachGoal('submit_form_podbor_bes_issledovanie')
                 }
+                else{
+                    reachGoal('submit_form_podbor_issledovanie')
+                }
+                dispatch(setApplicationStage('gratitude'));
 
             } else {
                 setIsSubmitting(false)

@@ -14,6 +14,7 @@ import axios from 'axios';
 import { useEffect } from 'react';
 import { RootState } from "@/redux/store";
 import { useDispatch, useSelector } from 'react-redux';
+import useYandexMetrika from '@/components/yandex/useYandexMetrika'
 
 const FormSchema = z.object({
     age: z.string()
@@ -34,6 +35,8 @@ const AgeStageApplication = () => {
         state => state.applicationFormData.ticketID
     );
 
+    const {reachGoal} = useYandexMetrika(102105189)
+
     useEffect(() => {
         axios({
             method: "PUT",
@@ -41,9 +44,7 @@ const AgeStageApplication = () => {
             data: { step: "Возраст клиента", ticket_id: ticketID },
         });
 
-        if (typeof window !== 'undefined' && window.ym) {
-            window.ym(102105189, 'reachGoal', "age");
-        }
+        reachGoal('age')
 
     }, [])
 

@@ -429,10 +429,6 @@ export const PsychologistStage = () => {
       } else {
         dispatch(setApplicationStage('promocode'))
       }
-
-      if (typeof window !== 'undefined' && window.ym) {
-        window.ym(102105189, 'reachGoal', "submit_form_podbor_bes_issledovanie");
-      }
     }
 
   }

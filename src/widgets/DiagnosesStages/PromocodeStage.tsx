@@ -12,6 +12,7 @@ import { z } from 'zod';
 import { COLORS } from '@/shared/constants/colors';
 import styles from '@/styles/input.module.scss';
 import axios from 'axios';
+import useYandexMetrika from '@/components/yandex/useYandexMetrika'
 
 
 const FormSchema = z.object({
@@ -23,6 +24,8 @@ const PromocodeStage = () => {
     const ticketID = useSelector<RootState, string>(
         state => state.applicationFormData.ticketID
     );
+    const { reachGoal } = useYandexMetrika(102105189)
+
 
     useEffect(() => {
         axios({
@@ -31,9 +34,7 @@ const PromocodeStage = () => {
             data: { step: "Промокод", ticket_id: ticketID },
         });
 
-        if (typeof window !== 'undefined' && window.ym) {
-            window.ym(102105189, 'reachGoal', "promo");
-        }
+        reachGoal('promo')
 
     }, [])
 

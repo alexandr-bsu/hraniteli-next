@@ -14,6 +14,7 @@ import axios from 'axios';
 import { useEffect } from 'react';
 import { RootState } from "@/redux/store";
 import { useDispatch, useSelector } from 'react-redux';
+import useYandexMetrika from '@/components/yandex/useYandexMetrika'
 
 const FormSchema = z.object({
     city: z.string()
@@ -29,6 +30,9 @@ const CityStage = () => {
         state => state.applicationFormData.ticketID
     );
 
+    const { reachGoal } = useYandexMetrika(102105189)
+
+
     useEffect(() => {
         axios({
             method: "PUT",
@@ -36,9 +40,7 @@ const CityStage = () => {
             data: { step: "Город клиента", ticket_id: ticketID },
         });
 
-        if (typeof window !== 'undefined' && window.ym) {
-            window.ym(102105189, 'reachGoal', "city");
-        }
+        reachGoal('city')
 
     }, [])
 
@@ -102,7 +104,7 @@ const CityStage = () => {
                         )}
                     />
                     <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
-                        
+
                         <button
                             type='submit'
                             className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}

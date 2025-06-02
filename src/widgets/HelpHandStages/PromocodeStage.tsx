@@ -13,6 +13,9 @@ import { COLORS } from '@/shared/constants/colors';
 import styles from '@/styles/input.module.scss';
 import axios from 'axios';
 
+import useYandexMetrika from '@/components/yandex/useYandexMetrika'
+
+
 
 const FormSchema = z.object({
     promocode: z.string()
@@ -24,6 +27,8 @@ const PromocodeStage = () => {
         state => state.applicationFormData.ticketID
     );
 
+    const { reachGoal } = useYandexMetrika(102105189)
+
     useEffect(() => {
         axios({
             method: "PUT",
@@ -31,9 +36,8 @@ const PromocodeStage = () => {
             data: { step: "Промокод", ticket_id: ticketID },
         });
 
-        if (typeof window !== 'undefined' && window.ym) {
-            window.ym(102105189, 'reachGoal', "promo");
-        }
+        reachGoal('promo')
+
 
     }, [])
 

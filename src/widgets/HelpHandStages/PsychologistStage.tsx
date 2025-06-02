@@ -19,6 +19,7 @@ import styles from './PsychologistStage.module.scss';
 import styles_cards from '../Card/Card.module.scss';
 import { format } from 'date-fns';
 import { getAgeWord } from '@/features/utils';
+import useYandexMetrika from '@/components/yandex/useYandexMetrika'
 
 
 
@@ -127,13 +128,14 @@ export const PsychologistStage = () => {
   const filtered_by_automatch_psy = useSelector<RootState, any[]>(
     state => state.filter.filtered_by_automatch_psy
   );
-
+  const { reachGoal } = useYandexMetrika(102105189)
   useEffect(() => {
 
     // Отправляем данные в трекер до выбора слотов
     // Получаем запросы из localStorage
     const storedRequests = localStorage.getItem('app_requests') ?
       JSON.parse(localStorage.getItem('app_requests') || '[]') : [];
+
 
     const getNames = (users: IPsychologist[]): string[] => {
       return users.map(user => user.name);
@@ -143,45 +145,45 @@ export const PsychologistStage = () => {
 
     const requestData = {
       form: {
-      anxieties: [],
-      questions: storedRequests,
-      customQuestion: [],
-      diagnoses: localStorage.getItem('app_diseases') ?
-        JSON.parse(localStorage.getItem('app_diseases') || '[]') : [],
-      diagnoseInfo: "",
-      diagnoseMedicaments: localStorage.getItem('app_diseases_psychologist') ?
-        JSON.parse(localStorage.getItem('app_diseases_psychologist') || '{}').medications : '',
-      traumaticEvents: localStorage.getItem('app_traumatic') ?
-        JSON.parse(localStorage.getItem('app_traumatic') || '[]') : [],
-      clientStates: localStorage.getItem('app_conditions') ?
-        JSON.parse(localStorage.getItem('app_conditions') || '[]') : [],
-      selectedPsychologistsNames: psy_names,
-      shownPsychologists: "",
-      lastExperience: "",
-      amountExpectations: "",
-      age: localStorage.getItem('app_age') || '',
-      slots: [],
-      slots_objects: [],
-      contactType: "Telegram",
-      contact: localStorage.getItem('app_phone') || '',
-      name: localStorage.getItem('app_username') || '',
-      promocode: localStorage.getItem('app_promocode') || '',
-      // UPDATE: устанавливаем ticket_id из redux 
-      ticket_id: ticketID || '',
+        anxieties: [],
+        questions: storedRequests,
+        customQuestion: [],
+        diagnoses: localStorage.getItem('app_diseases') ?
+          JSON.parse(localStorage.getItem('app_diseases') || '[]') : [],
+        diagnoseInfo: "",
+        diagnoseMedicaments: localStorage.getItem('app_diseases_psychologist') ?
+          JSON.parse(localStorage.getItem('app_diseases_psychologist') || '{}').medications : '',
+        traumaticEvents: localStorage.getItem('app_traumatic') ?
+          JSON.parse(localStorage.getItem('app_traumatic') || '[]') : [],
+        clientStates: localStorage.getItem('app_conditions') ?
+          JSON.parse(localStorage.getItem('app_conditions') || '[]') : [],
+        selectedPsychologistsNames: psy_names,
+        shownPsychologists: "",
+        lastExperience: "",
+        amountExpectations: "",
+        age: localStorage.getItem('app_age') || '',
+        slots: [],
+        slots_objects: [],
+        contactType: "Telegram",
+        contact: localStorage.getItem('app_phone') || '',
+        name: localStorage.getItem('app_username') || '',
+        promocode: localStorage.getItem('app_promocode') || '',
+        // UPDATE: устанавливаем ticket_id из redux 
+        ticket_id: ticketID || '',
 
-      // ticket_id: localStorage.getItem('app_ticket_id') || '',
-      emptySlots: false,
-      userTimeZone: "МСК" + (+timeDifference > 0 ? '+' + timeDifference : timeDifference == 0 ? '' : timeDifference),
-      userTimeOffsetMsk: timeDifference.toString(),
-      bid: 0,
-      rid: 0,
-      categoryType: "",
-      customCategory: "",
-      question_to_psychologist: storedRequests.join('; '),
-      filtered_by_automatch_psy_names: [currentPsychologist?.name],
-      _queries: "",
-      customTraumaticEvent: "",
-      customState: ""
+        // ticket_id: localStorage.getItem('app_ticket_id') || '',
+        emptySlots: false,
+        userTimeZone: "МСК" + (+timeDifference > 0 ? '+' + timeDifference : timeDifference == 0 ? '' : timeDifference),
+        userTimeOffsetMsk: timeDifference.toString(),
+        bid: 0,
+        rid: 0,
+        categoryType: "",
+        customCategory: "",
+        question_to_psychologist: storedRequests.join('; '),
+        filtered_by_automatch_psy_names: [currentPsychologist?.name],
+        _queries: "",
+        customTraumaticEvent: "",
+        customState: ""
       },
       formPsyClientInfo: {
         age: localStorage.getItem('app_age') || '',
@@ -217,7 +219,7 @@ export const PsychologistStage = () => {
 
     axios({
       method: "put",
-      data: { ...requestData, ticket_id: ticketID},
+      data: { ...requestData, ticket_id: ticketID },
       url: "https://n8n-v2.hrani.live/webhook/update-tracker",
     });
 
@@ -502,10 +504,8 @@ export const PsychologistStage = () => {
           dispatch(setSelectedSlots([formattedSlot]));
           dispatch(setSelectedSlotsObjects([]));
           dispatch(setApplicationStage('gratitude'));
-          
-          if (typeof window !== 'undefined' && window.ym) {
-            window.ym(102105189, 'reachGoal', "submit_form_diagnostic");
-          }
+
+          reachGoal('submit_form_help_hand')
 
         } else {
           throw new Error('Ошибка при отправке заявки');
