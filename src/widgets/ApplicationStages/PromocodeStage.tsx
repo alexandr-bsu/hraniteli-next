@@ -83,7 +83,7 @@ const PromocodeStage = () => {
                                         Введите промокод или номер подарочного сертификата
                                     </FormLabel>
                                     <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
-                                        Вы можете не указывать код, если у вас его нет
+                                        Позволяет получить сессию со скидкой или бесплатно. Вы можете пропустить шаг если у вас нет кода
                                     </FormDescription>
                                     <div className={styles.input__text_container}>
                                         <Input 
