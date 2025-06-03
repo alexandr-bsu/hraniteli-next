@@ -32,7 +32,7 @@ declare const ym: (
   ...params: unknown[]
 ) => void;
 
-const enabled = !!(process.env.NODE_ENV === "production");
+const enabled = true;
 
 const useYandexMetrika = (id: number) => {
   const hit = (url?: string, options?: YandexMetrikaHitOptions) => {
