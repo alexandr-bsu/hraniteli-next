@@ -500,12 +500,12 @@ export const PsychologistStage = () => {
         const response = await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka-diagnostic-v2', requestData);
 
         if (response.status === 200) {
-
+          reachGoal('submit_form_help_hand')
           dispatch(setSelectedSlots([formattedSlot]));
           dispatch(setSelectedSlotsObjects([]));
           dispatch(setApplicationStage('gratitude'));
 
-          reachGoal('submit_form_help_hand')
+
 
         } else {
           throw new Error('Ошибка при отправке заявки');
