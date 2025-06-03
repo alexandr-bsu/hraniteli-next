@@ -17,7 +17,7 @@ const formatPhoneNumber = (value: string): string => {
 };
 
 const validatePhone = (phone: string): boolean => {
-    const phoneRegex = /^7\d{10}$/;
+    const phoneRegex = /^\+7\d{10}$/;
     return phoneRegex.test(phone);
 };
 

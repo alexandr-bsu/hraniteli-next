@@ -22,7 +22,7 @@ import { getTimeDifference } from '@/features/utils';
 import useYandexMetrika from '@/components/yandex/useYandexMetrika'
 
 
-const phoneRegex = /^7\d{10}$/;
+const phoneRegex = /^\+7\d{10}$/;
 
 const FormSchema = z.object({
     phone: z.string().nonempty("Вы не заполнили обязательное поле").regex(phoneRegex, 'Введите корректный номер телефона')
@@ -406,7 +406,7 @@ export const PhoneStage = () => {
                                     </FormDescription>
                                     <div className={styles.input__text_container}>
                                         <IMaskInput
-                                            mask="70000000000"
+                                            mask="+70000000000"
                                             value={value}
                                             unmask={false}
                                             onAccept={(value) => onChange(value)}
