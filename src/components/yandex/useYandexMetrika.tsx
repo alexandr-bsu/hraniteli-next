@@ -51,6 +51,7 @@ const useYandexMetrika = (id: number) => {
   ) => {
     if (enabled) {
       ym(id, "reachGoal", target, params, callback, ctx);
+      console.log(`%c[YandexMetrika](reachGoal)`, `color: orange`, target);
     } else {
       console.log(`%c[YandexMetrika](reachGoal)`, `color: orange`, target);
     }
