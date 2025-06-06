@@ -14,15 +14,12 @@ import { Tooltip } from '@/shared/ui/Tooltip';
 import { NoMatchError } from './NoMatchError';
 import { EmergencyContacts } from './EmergencyContacts';
 import axios from 'axios';
-import { toast } from 'sonner';
+
 import styles from './PsychologistStage.module.scss';
 import styles_cards from '../Card/Card.module.scss';
 import { format } from 'date-fns';
 import { getAgeWord } from '@/features/utils';
-
-import useYandexMetrika from '@/components/yandex/useYandexMetrika'
-import { useRouter, useSearchParams } from "next/navigation"
-
+import { useSearchParams } from 'next/navigation';
 
 interface Slot {
   id: string;
@@ -122,30 +119,23 @@ const getPsychologistDeclension = (count: number): string => {
 
 export const PsychologistStage = () => {
   const dispatch = useDispatch();
+
   const ticketID = useSelector<RootState, string>(
     state => state.applicationFormData.ticketID
   );
 
-  const filtered_by_automatch_psy = useSelector<RootState, any[]>(
-    state => state.filter.filtered_by_automatch_psy
-  );
 
-  const { reachGoal } = useYandexMetrika(102105189)
+
+
   const searchParams = useSearchParams()
-
-  const utm_client = searchParams.get('utm_client')
-  const utm_campaign = searchParams.get('utm_campaign')
-  const utm_content = searchParams.get('utm_content')
-  const utm_medium = searchParams.get('utm_medium')
-  const utm_source = searchParams.get('utm_source')
-  const utm_term = searchParams.get('utm_term')
-
+  const isResearchRedirect = searchParams.get('research') == 'true'
+  
   useEffect(() => {
 
     // Отправляем данные в трекер до выбора слотов
     // Получаем запросы из localStorage
-    const storedRequests = localStorage.getItem('app_requests') ?
-      JSON.parse(localStorage.getItem('app_requests') || '[]') : [];
+    const storedRequests = localStorage.getItem('app_request') ?
+      [JSON.parse(localStorage.getItem('app_request') || '[]')?.request] : [];
 
     const getNames = (users: IPsychologist[]): string[] => {
       return users.map(user => user.name);
@@ -224,13 +214,7 @@ export const PsychologistStage = () => {
         is_adult: parseInt(localStorage.getItem('app_age') || '0') >= 18,
         is_last_page: true,
         occupation: ""
-      },
-      "utm_client": utm_client || 'null',
-      "utm_campaign": utm_campaign || 'null',
-      "utm_content": utm_content || 'null',
-      "utm_medium": utm_medium || 'null',
-      "utm_source": utm_source || 'null',
-      "utm_term": utm_term || 'null',
+      }
     };
 
     axios({
@@ -256,7 +240,9 @@ export const PsychologistStage = () => {
 
 
 
-
+  const filtered_by_automatch_psy = useSelector<RootState, any[]>(
+    state => state.filter.filtered_by_automatch_psy
+  );
   const currentIndex = useSelector((state: RootState) => state.applicationFormData.index_phyc);
 
   useEffect(() => {
@@ -368,8 +354,6 @@ export const PsychologistStage = () => {
 
   const currentPsychologist = filtered_by_automatch_psy[currentIndex];
 
-
-
   const getFilterQueryParams = () => {
     const params = new URLSearchParams();
 
@@ -432,125 +416,29 @@ export const PsychologistStage = () => {
 
   const handleSubmit = async () => {
     if (selectedSlot) {
-      setIsSubmitting(true);
-      try {
-        // Время уже в нужном формате, не конвертируем
-        const formattedSlot = `${selectedSlot.moscow_datetime_formatted}`;
+      // Время уже в нужном формате, не конвертируем
+      const formattedSlot = `${selectedSlot.moscow_datetime_formatted}`;
 
-        // Получаем запросы из localStorage
-        const storedRequests = localStorage.getItem('app_request') ?
-          [JSON.parse(localStorage.getItem('app_request') || '')?.request] : [];
+      dispatch(setSelectedSlots([formattedSlot]));
+      dispatch(setSelectedSlotsObjects([]));
 
-        const requestData = {
-          anxieties: [],
-          questions: storedRequests,
-          customQuestion: [],
-          diagnoses: localStorage.getItem('app_diseases') ?
-            JSON.parse(localStorage.getItem('app_diseases') || '[]') : [],
-          diagnoseInfo: "",
-          diagnoseMedicaments: localStorage.getItem('app_diseases_psychologist') ?
-            JSON.parse(localStorage.getItem('app_diseases_psychologist') || '{}').medications : '',
-          traumaticEvents: localStorage.getItem('app_traumatic') ?
-            JSON.parse(localStorage.getItem('app_traumatic') || '[]') : [],
-          clientStates: localStorage.getItem('app_conditions') ?
-            JSON.parse(localStorage.getItem('app_conditions') || '[]') : [],
-          selectedPsychologistsNames: [currentPsychologist?.name],
-          shownPsychologists: currentPsychologist?.name || "",
-          lastExperience: "",
-          amountExpectations: "",
-          age: localStorage.getItem('app_age') || '',
-          slots: [formattedSlot],
-          slots_objects: [],
-          contactType: "Telegram",
-          contact: localStorage.getItem('app_phone') || '',
-          name: localStorage.getItem('app_username') || '',
-          promocode: localStorage.getItem('app_promocode') || '',
-          // UPDATE: устанавливаем ticket_id из redux 
-          ticket_id: ticketID || '',
+      dispatch(setSelectedPsychologist(currentPsychologist))
 
-          // ticket_id: localStorage.getItem('app_ticket_id') || '',
-          emptySlots: false,
-          userTimeZone: "МСК" + (+timeDifference > 0 ? '+' + timeDifference : timeDifference == 0 ? '' : timeDifference),
-          userTimeOffsetMsk: timeDifference.toString(),
-          bid: 0,
-          rid: 0,
-          categoryType: "",
-          customCategory: "",
-          question_to_psychologist: storedRequests,
-          filtered_by_automatch_psy_names: [currentPsychologist?.name],
-          _queries: "",
-          customTraumaticEvent: "",
-          customState: "",
-          formPsyClientInfo: {
-            age: localStorage.getItem('app_age') || '',
-            city: "",
-            sex: localStorage.getItem('app_gender') === 'male' ? 'Мужской' :
-              localStorage.getItem('app_gender') === 'female' ? 'Женский' : '',
-            psychoEducated: "",
-            anxieties: [],
-            customAnexiety: "",
-            hasPsychoExperience: "",
-            meetType: "",
-            selectionСriteria: "",
-            custmCreteria: "",
-            importancePsycho: localStorage.getItem('app_preferences') ?
-              JSON.parse(localStorage.getItem('app_preferences') || '[]') : [],
-            customImportance: localStorage.getItem('app_custom_preferences') || '',
-            agePsycho: "",
-            sexPsycho: localStorage.getItem('app_gender_psychologist') === 'male' ? 'Мужчина' :
-              localStorage.getItem('app_gender_psychologist') === 'female' ? 'Женщина' : 'Не имеет значения',
-            priceLastSession: "",
-            durationSession: "",
-            reasonCancel: "",
-            pricePsycho: "",
-            reasonNonApplication: "",
-            contactType: "Telegram",
-            contact: localStorage.getItem('app_phone') || '',
-            name: localStorage.getItem('app_username') || '',
-            is_adult: parseInt(localStorage.getItem('app_age') || '0') >= 18,
-            is_last_page: true,
-            occupation: ""
-          }
-        };
-
-        const response = await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka-diagnostic-v2', requestData);
-
-        if (response.status === 200) {
-          reachGoal('submit_form_diasgnostic')
-          
-          dispatch(setSelectedSlots([formattedSlot]));
-          dispatch(setSelectedSlotsObjects([]));
-          dispatch(setApplicationStage('gratitude'));
-
-
-
-
-        } else {
-          throw new Error('Ошибка при отправке заявки');
-        }
-      } catch (error) {
-        console.error('Ошибка при отправке заявки:', error);
-        toast.error('Произошла ошибка при отправке заявки. Пожалуйста, попробуйте еще раз.');
-      } finally {
-        setIsSubmitting(false);
+      if (isResearchRedirect) {
+        dispatch(setApplicationStage('phone'))
+      } else {
+        dispatch(setApplicationStage('promocode'))
       }
     }
-  };
+
+  }
+
 
   const handleSlotSelect = (slot: SimpleSlot) => {
     // Время уже в нужном формате, не нужно комментировать
     setSelectedSlot(slot);
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-full">
-        <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
-        <span className="mt-4 text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[14px] text-[#116466]">Загрузка психологов...</span>
-      </div>
-    );
-  }
-
+  
   if (showEmergency) {
     return <EmergencyContacts onClose={handleCloseEmergency} />;
   }
@@ -697,7 +585,7 @@ export const PsychologistStage = () => {
             </div>
             <button
               onClick={handleOpenPsychologistCard}
-              className="hover:opacity-80 transition-opacity cursor-pointer text-[14px] lg:text-[14px] md:text-[12px] max-lg:text-[12px] text-[#116466] flex text-left"
+              className="hover:opacity-80 transition-opacity text-left cursor-pointer text-[14px] lg:text-[14px] md:text-[12px] max-lg:text-[12px] text-[#116466] flex"
             >
               Перейти на карточку психолога
             </button>
@@ -806,7 +694,7 @@ export const PsychologistStage = () => {
         <div className="pb-[20px] flex gap-[10px]">
           <button
             type='button'
-            onClick={() => dispatch(setApplicationStage('phone'))}
+            onClick={() => dispatch(setApplicationStage('diseases_psychologist'))}
             disabled={isSubmitting}
             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
           >

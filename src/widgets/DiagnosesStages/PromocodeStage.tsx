@@ -14,18 +14,19 @@ import styles from '@/styles/input.module.scss';
 import axios from 'axios';
 import useYandexMetrika from '@/components/yandex/useYandexMetrika'
 
-
 const FormSchema = z.object({
     promocode: z.string()
 });
 
 const PromocodeStage = () => {
     const dispatch = useDispatch();
+
     const ticketID = useSelector<RootState, string>(
         state => state.applicationFormData.ticketID
     );
-    const { reachGoal } = useYandexMetrika(102105189)
 
+
+    const {reachGoal} = useYandexMetrika(102105189)
 
     useEffect(() => {
         axios({
@@ -41,7 +42,7 @@ const PromocodeStage = () => {
     const filtered_persons = useSelector((state: RootState) => state.filter.filtered_by_automatch_psy);
 
     // 1. Загружаем сохраненные данные из localStorage
-    const savedData = typeof window !== 'undefined'
+    const savedData = typeof window !== 'undefined' 
         ? JSON.parse(localStorage.getItem('app_promocode') || '{}')
         : {}
 
@@ -85,7 +86,7 @@ const PromocodeStage = () => {
                                         Позволяет получить сессию со скидкой или бесплатно. Вы можете пропустить шаг если у вас нет кода
                                     </FormDescription>
                                     <div className={styles.input__text_container}>
-                                        <Input
+                                        <Input 
                                             {...field}
                                             placeholder=" "
                                             className={`${styles.input__text} text-[14px] w-full h-full px-[20px] bg-[#FAFAFA] rounded-[10px] border-none`}
@@ -101,7 +102,7 @@ const PromocodeStage = () => {
                     <div className="shrink-0 mt-[30px] pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
                         <button
                             type='button'
-                            onClick={() => dispatch(setApplicationStage('diseases_psychologist'))}
+                            onClick={() => dispatch(setApplicationStage('psychologist'))}
                             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Назад
