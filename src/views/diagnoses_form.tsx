@@ -459,7 +459,7 @@ export default function DiagnosesForm() {
                                         Подходящие специалисты:
                                     </span>
                                     <div className="bg-[#116466] p-[10px] max-lg:h-[39px] max-lg:text-[14px] rounded-[6px] font-normal text-[18px] text-[white]">
-                                        {filtered_by_automatch_psy?.length || 0}
+                                        {currentStage == 'promocode' || currentStage == 'phone' ? 1 : filtered_by_automatch_psy?.length || 0 }
                                     </div>
                                 </li>
                             </ul>
