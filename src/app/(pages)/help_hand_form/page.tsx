@@ -16,22 +16,26 @@ export default function ApplicationFormLayout() {
         state => state.applicationFormData.ticketID
     );
 
-    if (!ticketID) {
-        dispatch(generateTicketId('hh_'));
+     if (!ticketID) {
+        dispatch(generateTicketId(''));
     }
 
     useEffect(() => {
         if (!ticketID) {
-            dispatch(generateTicketId('hh_'));
+            dispatch(generateTicketId(''));
         }
-        // Инициализируем трекер формы
-        axios({
-            method: "POST",
-            url: "https://n8n-v2.hrani.live/webhook/init-form-tracking",
-            data: { ticket_id: ticketID, form_type: 'Заявка на Руку помощи', step: "Начало" },
-        });
-
     }, []);
+
+    // Инициализируем трекер формы
+    useEffect(() => {
+        if (ticketID != "") {
+            axios({
+                method: "POST",
+                url: "https://n8n-v2.hrani.live/webhook/init-form-tracking",
+                data: { ticket_id: ticketID, form_type: 'Заявка на руку помощи', step: "Начало" },
+            });
+        }
+    }, [ticketID])
 
     return (
         // <div className="w-full min-h-[100svh] max-lg:flex-col  max-lg:justify-start  min-lg:flex justify-center items-center">
