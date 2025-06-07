@@ -25,16 +25,17 @@ export default function ApplicationFormLayout() {
         if (!ticketID) {
             dispatch(generateTicketId(''));
         }
-        // Инициализируем трекер формы
+    }, []);
+
+    // Инициализируем трекер формы
+    useEffect(() => {
         axios({
             method: "POST",
             url: "https://n8n-v2.hrani.live/webhook/init-form-tracking",
             data: { ticket_id: ticketID, form_type: 'Исследовательская анкета', step: "Начало" },
         });
+    }, [ticketID])
 
-
-
-    }, []);
 
     return (
         // <div className="w-full min-h-[100svh] max-lg:flex-col  max-lg:justify-start  min-lg:flex justify-center items-center">
