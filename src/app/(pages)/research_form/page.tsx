@@ -29,11 +29,13 @@ export default function ApplicationFormLayout() {
 
     // Инициализируем трекер формы
     useEffect(() => {
-        axios({
-            method: "POST",
-            url: "https://n8n-v2.hrani.live/webhook/init-form-tracking",
-            data: { ticket_id: ticketID, form_type: 'Исследовательская анкета', step: "Начало" },
-        });
+        if (ticketID != "") {
+            axios({
+                method: "POST",
+                url: "https://n8n-v2.hrani.live/webhook/init-form-tracking",
+                data: { ticket_id: ticketID, form_type: 'Исследовательская анкета', step: "Начало" },
+            });
+        }
     }, [ticketID])
 
 
