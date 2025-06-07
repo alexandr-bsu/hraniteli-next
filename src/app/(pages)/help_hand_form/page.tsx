@@ -17,12 +17,12 @@ export default function ApplicationFormLayout() {
     );
 
      if (!ticketID) {
-        dispatch(generateTicketId(''));
+        dispatch(generateTicketId('hh_'));
     }
 
     useEffect(() => {
         if (!ticketID) {
-            dispatch(generateTicketId(''));
+            dispatch(generateTicketId('hh_'));
         }
     }, []);
 
