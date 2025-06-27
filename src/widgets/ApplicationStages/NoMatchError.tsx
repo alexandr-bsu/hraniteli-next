@@ -5,6 +5,7 @@ import { COLORS } from '@/shared/constants/colors';
 import { useEffect, useState } from 'react';
 import { EmergencyContacts } from './EmergencyContacts';
 import { RootState } from '@/redux/store';
+import axios from 'axios';
 
 interface NoMatchErrorProps {
     onClose?: () => void;
@@ -14,6 +15,18 @@ export const NoMatchError = ({ onClose }: NoMatchErrorProps) => {
     const dispatch = useDispatch();
     const [showEmergency, setShowEmergency] = useState(false);
     const [matchingAttempts, setMatchingAttempts] = useState(0);
+    
+    const ticketID = useSelector<RootState, string>(
+        state => state.applicationFormData.ticketID
+    );
+
+    useEffect(() => {
+        axios({
+            method: "PUT",
+            url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
+            data: { step: "Изменение критериев подбора", ticket_id: ticketID },
+        });
+    }, [])
 
     useEffect(() => {
         const attempts = Number(localStorage.getItem('matching_attempts') || '0');
