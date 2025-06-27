@@ -2,6 +2,7 @@
 
 import ApplicationForm from "@/views/application_form";
 import { generateTicketId } from "@/redux/slices/application_form_data";
+import { setInitTrackerStatusLaunched } from "@/redux/slices/application_form";
 import { Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
@@ -16,6 +17,8 @@ export default function ApplicationFormLayout() {
         state => state.applicationFormData.ticketID
     );
 
+    const is_tracker_launched = useSelector((state: RootState) => state.applicationForm.is_tracker_launched)
+
     if (!ticketID) {
         dispatch(generateTicketId(''));
     }
@@ -28,11 +31,13 @@ export default function ApplicationFormLayout() {
 
     // Инициализируем трекер формы
     useEffect(() => {
-        if (ticketID != "") {
+        if (ticketID != "" && !is_tracker_launched) {           
             axios({
                 method: "POST",
                 url: "https://n8n-v2.hrani.live/webhook/init-form-tracking",
                 data: { ticket_id: ticketID, form_type: 'Заявка на подбор психолога', step: "Начало" },
+            }).then(r => {
+                dispatch(setInitTrackerStatusLaunched())
             });
         }
     }, [ticketID])

@@ -33,12 +33,14 @@ interface ApplicationFormState {
     application_stage: ApplicationStage;
     rid: number;
     bid: number;
+    is_tracker_launched: boolean
 }
 
 const initialState: ApplicationFormState = {
     application_stage: 'name',
     rid: 0,
-    bid:0
+    bid:0,
+    is_tracker_launched: false
 };
 
 export const applicationFormSlice = createSlice({
@@ -56,10 +58,14 @@ export const applicationFormSlice = createSlice({
         setBid: (state, action: PayloadAction<number>) => {
             state.bid = action.payload;
         },
+
+        setInitTrackerStatusLaunched(state){
+            state.is_tracker_launched = true
+        }
     }
 });
 
-export const { setApplicationStage, setRid, setBid} = applicationFormSlice.actions;
+export const { setApplicationStage, setRid, setBid, setInitTrackerStatusLaunched} = applicationFormSlice.actions;
 export const applicationFormReducer = applicationFormSlice.reducer;
 
 // Селектор для получения текущего этапа

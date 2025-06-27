@@ -1,7 +1,7 @@
 "use client"
 
 import ResearchForm from "@/views/research_form";
-
+import { setInitTrackerStatusLaunched } from "@/redux/slices/application_form";
 import { generateTicketId } from "@/redux/slices/application_form_data";
 import { Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -13,6 +13,7 @@ export default function ApplicationFormLayout() {
 
     const dispatch = useDispatch()
 
+    const is_tracker_launched = useSelector((state: RootState) => state.applicationForm.is_tracker_launched)
     const ticketID = useSelector<RootState, string>(
         state => state.applicationFormData.ticketID
     );
@@ -29,11 +30,13 @@ export default function ApplicationFormLayout() {
 
     // Инициализируем трекер формы
     useEffect(() => {
-        if (ticketID != "") {
+        if (ticketID != "" && !is_tracker_launched) {
             axios({
                 method: "POST",
                 url: "https://n8n-v2.hrani.live/webhook/init-form-tracking",
                 data: { ticket_id: ticketID, form_type: 'Исследовательская анкета', step: "Начало" },
+            }).then(r=>{
+                dispatch(setInitTrackerStatusLaunched())
             });
         }
     }, [ticketID])
