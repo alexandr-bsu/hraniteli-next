@@ -1,6 +1,6 @@
 export async function getPsychologistAll() {
     try {
-        const res = await fetch('https://n8n-v2.hrani.live/webhook/get-filtered-psychologists', {
+        const res = await fetch('https://n8n-v2.hrani.live/webhook/get-cards-cashed', {
             cache: 'no-cache'
         });
 

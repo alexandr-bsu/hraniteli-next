@@ -194,7 +194,7 @@ export const submitQuestionnaire = async (formData: IApplicationFormData, from_c
 // Получение отфильтрованных психологов
 export const getFilteredPsychologists = async () => {
     try {
-        const response = await fetch('https://n8n-v2.hrani.live/webhook/get-filtered-psychologists', {
+        const response = await fetch('https://n8n-v2.hrani.live/webhook/get-cards-cashed', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

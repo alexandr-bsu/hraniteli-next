@@ -3,7 +3,7 @@ import axios from 'axios';
 export const getAvailableRequests = async (): Promise<string[]> => {
   try {
     // Получаем всех психологов
-    const response = await axios.get('https://n8n-v2.hrani.live/webhook/get-filtered-psychologists');
+    const response = await axios.get('https://n8n-v2.hrani.live/webhook/get-cards-cashed');
     const psychologists = response.data;
 
     // Собираем все уникальные запросы
