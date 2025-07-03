@@ -82,7 +82,7 @@ export const PreferencesStage = () => {
   // 3. Сохраняем данные при изменении
   const saveData = (data: z.infer<typeof FormSchema>) => {
     localStorage.setItem('app_preferences', JSON.stringify(data))
-    let res = data.preferences.join(';')+';'+data.customPreferences
+    const res = data.preferences.join(';')+';'+data.customPreferences
     axios({
       url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
       method: 'PUT',
