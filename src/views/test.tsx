@@ -309,8 +309,8 @@ export default function ApplicationForm() {
 
                     {showProgress && (
                         <>
-                            <ul className="mt-[10px] min-lg:px-[50px] max-lg:px-[20px] gap-[10px] max-lg:flex max-lg:flex-col flex w-full ">
-                                <li className="w-auto border-[1px] max-lg:h-[59px] border-[#D4D4D4] h-[85px] rounded-[15px] flex justify-between items-center p-[20px] w-full">
+                            <ul className="mt-[10px] min-lg:px-[50px] max-lg:px-[20px] gap-[10px] max-lg:flex max-lg:flex-col grid grid-cols-2 w-full justify-items-stretch">
+                                <li className="w-auto border-[1px] max-lg:h-[59px] border-[#D4D4D4] h-[85px] rounded-[15px] flex justify-between items-center p-[20px]">
                                     <span className="font-normal max-lg:text-[14px] text-[18px] leading-[25px]">
                                         Заявка заполнена на:
                                     </span>

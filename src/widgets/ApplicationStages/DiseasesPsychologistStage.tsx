@@ -44,6 +44,8 @@ const diseases = {
 
 export const DiseasesPsychologistStage = () => {
     const dispatch = useDispatch()
+    const currentAttempts = Number(localStorage.getItem('matching_attempts') || '0');
+
     const formData = useSelector((state: RootState) => state.applicationFormData);
     const ticketID = useSelector<RootState, string>(
         state => state.applicationFormData.ticketID
@@ -148,8 +150,15 @@ export const DiseasesPsychologistStage = () => {
 
             // Если нет слотов вообще - показываем ошибку
             if (!hasSlots) {
+                localStorage.setItem('matching_attempts', (currentAttempts + 1).toString());
                 dispatch(setHasMatchingError(true));
                 setShowNoMatch(true);
+                if(Number(localStorage.getItem('matching_attempts') || '0') < 3){
+                    dispatch(setApplicationStage('error'))
+                } else {
+                    dispatch(setApplicationStage('emergency'))
+                }
+                
                 return;
             }
 
@@ -200,8 +209,14 @@ export const DiseasesPsychologistStage = () => {
             });
 
             if (psychologistsWithSlots.length === 0) {
+                localStorage.setItem('matching_attempts', (currentAttempts + 1).toString());
                 dispatch(setHasMatchingError(true));
                 setShowNoMatch(true);
+                if(Number(localStorage.getItem('matching_attempts') || '0') < 3){
+                    dispatch(setApplicationStage('error'))
+                } else {
+                    dispatch(setApplicationStage('emergency'))
+                }
                 return;
             }
 
