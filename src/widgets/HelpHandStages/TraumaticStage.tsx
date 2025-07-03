@@ -55,7 +55,7 @@ export const TraumaticStage = () => {
         axios({
             method: "PUT",
             url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
-            data: { step: "Травматическое событие", ticket_id:ticketID },
+            data: { step: "Травматическое событие", ticket_id: ticketID },
         });
     }, [])
 
@@ -97,7 +97,12 @@ export const TraumaticStage = () => {
 
         // Сохраняем только в localStorage
         localStorage.setItem('app_traumatic', JSON.stringify(selectedEvents));
-
+        axios({
+            url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
+            method: 'PUT',
+            data: { ticketID, field: 'traumatic_events', value: selectedEvents }
+        }
+        )
         // Сохраняем в Redux
         dispatch(setTraumatic(selectedEvents));
 

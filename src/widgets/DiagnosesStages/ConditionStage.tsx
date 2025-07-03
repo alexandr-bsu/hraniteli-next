@@ -122,7 +122,12 @@ export const ConditionStage = () => {
 
         // Сохраняем только в localStorage
         localStorage.setItem('app_conditions', JSON.stringify(selectedConditions));
-
+        axios({
+            url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
+            method: 'PUT',
+            data: { ticketID, field: 'client_state', value: selectedConditions }
+            }
+          )  
         // Сохраняем в Redux
         dispatch(setConditions(selectedConditions));
 

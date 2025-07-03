@@ -57,6 +57,12 @@ export const PriceSessionStage = () => {
     const handleSubmit = (data: { price_session: Price }) => {
         localStorage.setItem('app_price_session', data.price_session)
         dispatch(setPriceSession(data.price_session))
+        axios({
+            url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
+            method: 'PUT',
+            data: { ticketID, field: 'psychologist_category', value: data.price_session }
+            }
+          )
         dispatch(setApplicationStage('phone'))
     }
 

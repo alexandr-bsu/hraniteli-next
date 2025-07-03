@@ -57,6 +57,13 @@ export const LastSessionPriceStage = () => {
     const handleSubmit = (data: { last_session_price: LastSessionPriceResearch }) => {
         localStorage.setItem('app_last_session_price', data.last_session_price)
         dispatch(setLastSessionPrice(data.last_session_price))
+        axios({
+            url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
+            method: 'PUT',
+            data: { ticketID, field: 'psychologist_category', value: data.last_session_price}
+            }
+          )
+
         if (localStorage.getItem('app_experience') == 'earlier') {
             dispatch(setApplicationStage('session_duration'))
         } else{

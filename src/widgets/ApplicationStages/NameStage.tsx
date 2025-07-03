@@ -5,9 +5,11 @@ import { setApplicationStage } from '@/redux/slices/application_form'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { RootState } from "@/redux/store";
 import { setUsername } from '@/redux/slices/application_form_data'
 import styles from '@/styles/input.module.scss'
+import axios from 'axios'
 
 const FormSchema = z.object({
   username: z.string().optional()
@@ -15,6 +17,10 @@ const FormSchema = z.object({
 
 export default function NameStageApplication() {
   const dispatch = useDispatch()
+
+  const ticketID = useSelector<RootState, string>(
+    state => state.applicationFormData.ticketID
+  );
 
   // 1. Загружаем сохраненное имя при инициализации
   const savedName = typeof window !== 'undefined'
@@ -40,6 +46,13 @@ export default function NameStageApplication() {
       const key = localStorage.key(i);
       console.log('Данные локалстореж')
     }
+
+    axios({
+      url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
+      method: 'PUT',
+      data: { ticketID, field: 'client_name', value: data.username }
+      }
+    )
   }
 
   return (

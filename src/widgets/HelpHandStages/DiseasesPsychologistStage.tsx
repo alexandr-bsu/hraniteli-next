@@ -99,6 +99,13 @@ export const DiseasesPsychologistStage = () => {
             result.push(data.medications === 'yes' ? 'Принимает медикаменты' : 'Не принимает медикаменты')
         }
 
+        axios({
+            url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
+            method: 'PUT',
+            data: { ticketID, field: 'diagnose', value: result }
+            }
+          )
+          
         dispatch(setDiseases(result))
         dispatch(setHasMatchingError(false))
         dispatch(setApplicationStage('condition'))

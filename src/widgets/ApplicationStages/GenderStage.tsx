@@ -58,6 +58,14 @@ export const GenderStageApplication = () => {
 
     const handleSubmit = (data: { gender: Gender }) => {
         localStorage.setItem('app_gender', data.gender)
+
+        axios({
+            url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
+            method: 'PUT',
+            data: { ticketID, field: 'client_sex', value: data.gender == 'male' ? 'Мужской' : 'Женский' }
+            }
+          )
+
         dispatch(setGenderUser(data.gender))
         dispatch(setApplicationStage('preferences'))
     }

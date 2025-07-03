@@ -63,6 +63,13 @@ const AgeStageApplication = () => {
 
     const handleSubmit = (data: FormData) => {
         localStorage.setItem('app_age', data.age) // Сохраняем в localStorage
+        axios({
+            url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
+            method: 'PUT',
+            data: { ticketID, field: 'client_age', value: data.age }
+            }
+          )
+
         dispatch(setAge(data.age)) // Сохраняем в Redux (если нужно)
         dispatch(setApplicationStage('gender')) // Переход на следующую страницу
     }

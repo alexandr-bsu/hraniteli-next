@@ -37,7 +37,7 @@ const FormSchema = z.object({
 const diseases = {
     ['diseases1']: ['Есть диагностированное психическое заболевание'],
     ['diseases2']: ['Есть диагностированное психиатрическое заболевание'],
-    ['nothing']: ['Не имеет значения']
+    ['nothing']: ['Нет диагноза']
 }
 
 
@@ -111,6 +111,13 @@ export const DiseasesPsychologistStage = () => {
         if (data.diseases === 'diseases2' && data.medications) {
             result.push(data.medications === 'yes' ? 'Принимает медикаменты' : 'Не принимает медикаменты')
         }
+
+        axios({
+            url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
+            method: 'PUT',
+            data: { ticketID, field: 'diagnose', value: result }
+            }
+          )
 
         dispatch(setDiseases(result))
         dispatch(setHasMatchingError(false))

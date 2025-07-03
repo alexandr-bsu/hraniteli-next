@@ -57,6 +57,14 @@ const SessionDurationStage = () => {
     const handleSubmit = (data: { session_duration: SessionDuration }) => {
         localStorage.setItem('app_session_duration', data.session_duration)
         dispatch(setSessionDuration(data.session_duration))
+        
+        axios({
+            url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
+            method: 'PUT',
+            data: { ticketID, field: 'client_experience', value: (localStorage.getItem('app_experience') ==  'earlier' ? 'Да, я работал(а) с психологом/психотерапевтом' : 'Нет, но рассматривал(а) такую возможность')+ '.' + data.session_duration}
+            }
+          )
+
         dispatch(setApplicationStage('cancelation'))
     }
 

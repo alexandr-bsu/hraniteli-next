@@ -70,6 +70,12 @@ const RequestStage = () => {
    
      // 4. Отправка формы
      const handleSubmit = (data: z.infer<typeof FormSchema>) => {
+        axios({
+            url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
+            method: 'PUT',
+            data: { ticketID, field: 'psy_queries', value: data.request }
+            }
+          )
         dispatch(setRequests([data.request]))
         dispatch(setApplicationStage('condition'))
     }

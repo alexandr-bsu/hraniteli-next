@@ -217,11 +217,11 @@ export const PsychologistStage = () => {
       }
     };
 
-    axios({
-      method: "put",
-      data: { ...requestData, ticket_id: ticketID },
-      url: "https://n8n-v2.hrani.live/webhook/update-tracker",
-    });
+    // axios({
+    //   method: "put",
+    //   data: { ...requestData, ticket_id: ticketID },
+    //   url: "https://n8n-v2.hrani.live/webhook/update-tracker",
+    // });
 
     axios({
       method: "PUT",

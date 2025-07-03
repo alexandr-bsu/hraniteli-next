@@ -57,6 +57,14 @@ export const ExperienceStage = () => {
     const handleSubmit = (data: { experience: ClientExperience }) => {
         localStorage.setItem('app_experience', data.experience)
         dispatch(setExperienceUser(data.experience))
+
+        axios({
+            url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
+            method: 'PUT',
+            data: { ticketID, field: 'client_experience', value: data.experience ==  'earlier' ? 'Да, я работал(а) с психологом/психотерапевтом' : 'Нет, но рассматривал(а) такую возможность'}
+            }
+          )
+
         dispatch(setApplicationStage('meet_type'))
     }
 

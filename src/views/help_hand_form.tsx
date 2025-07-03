@@ -113,7 +113,6 @@ export default function HelpHandForm() {
                 return <FinalStage />;
             case 'error':
                 return <NoMatchError onClose={handleClose} />;
-           
             default:
                 return null;
         }
