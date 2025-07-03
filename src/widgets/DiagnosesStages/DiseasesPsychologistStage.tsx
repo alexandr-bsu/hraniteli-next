@@ -43,6 +43,7 @@ const diseases = {
 
 
 export const DiseasesPsychologistStage = () => {
+    const currentAttempts = Number(localStorage.getItem('matching_attempts') || '0');
     const dispatch = useDispatch()
     const formData = useSelector((state: RootState) => state.applicationFormData);
     const ticketID = useSelector<RootState, string>(
@@ -111,13 +112,13 @@ export const DiseasesPsychologistStage = () => {
         if (data.diseases === 'diseases2' && data.medications) {
             result.push(data.medications === 'yes' ? 'Принимает медикаменты' : 'Не принимает медикаменты')
         }
-        
+
         axios({
             url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
             method: 'PUT',
             data: { ticketID, field: 'diagnose', value: result }
-            }
-          )
+        }
+        )
 
         dispatch(setDiseases(result))
         dispatch(setHasMatchingError(false))
@@ -147,11 +148,18 @@ export const DiseasesPsychologistStage = () => {
             const result = await getFilteredPsychologists();
 
             // Если нет слотов вообще - показываем ошибку
-            if (!hasSlots) {
-                dispatch(setHasMatchingError(true));
-                setShowNoMatch(true);
-                return;
-            }
+                        if (!hasSlots) {
+                            localStorage.setItem('matching_attempts', (currentAttempts + 1).toString());
+                            dispatch(setHasMatchingError(true));
+                            setShowNoMatch(true);
+                            if(Number(localStorage.getItem('matching_attempts') || '0') < 3){
+                                dispatch(setApplicationStage('error'))
+                            } else {
+                                dispatch(setApplicationStage('emergency'))
+                            }
+                            
+                            return;
+                        }
 
             // Собираем все id психологов из слотов и их расписания
             const psychologistSchedules = new Map<string, any>();
@@ -200,8 +208,14 @@ export const DiseasesPsychologistStage = () => {
             });
 
             if (psychologistsWithSlots.length === 0) {
+                localStorage.setItem('matching_attempts', (currentAttempts + 1).toString());
                 dispatch(setHasMatchingError(true));
                 setShowNoMatch(true);
+                if (Number(localStorage.getItem('matching_attempts') || '0') < 3) {
+                    dispatch(setApplicationStage('error'))
+                } else {
+                    dispatch(setApplicationStage('emergency'))
+                }
                 return;
             }
 
@@ -223,7 +237,7 @@ export const DiseasesPsychologistStage = () => {
 
     return (
         <div className='px-[50px] max-lg:px-[20px] flex w-full grow max-lg:overflow-y-auto'>
-            
+
             {isLoading && (
                 <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
                     <div className="flex flex-col items-center gap-4">
