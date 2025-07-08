@@ -4,6 +4,7 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
+
     const response = await fetch('https://n8n-v2.hrani.live/webhook/get-agregated-schedule-v2', {
       method: 'POST',
       headers: {

@@ -183,6 +183,32 @@ export const submitQuestionnaire = async (formData: IApplicationFormData, from_c
             });
         }
 
+        // Сортируем психологов по name_order если он есть в ответе
+        if (data[0]?.name_order && Array.isArray(data[0].name_order)) {
+            const nameOrder = data[0].name_order;
+            
+            // Сортируем слоты по порядку психологов в name_order
+            data[0].items.forEach((day: any) => {
+                if (day.slots) {
+                    Object.keys(day.slots).forEach((time) => {
+                        if (Array.isArray(day.slots[time])) {
+                            day.slots[time].sort((a: any, b: any) => {
+                                const aIndex = nameOrder.indexOf(a.psychologist);
+                                const bIndex = nameOrder.indexOf(b.psychologist);
+                                
+                                // Если психолог не найден в name_order, помещаем его в конец
+                                if (aIndex === -1 && bIndex === -1) return 0;
+                                if (aIndex === -1) return 1;
+                                if (bIndex === -1) return -1;
+                                
+                                return aIndex - bIndex;
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
         return data;
 
     } catch (error) {

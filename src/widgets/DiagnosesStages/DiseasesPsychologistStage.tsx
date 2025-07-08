@@ -207,6 +207,22 @@ export const DiseasesPsychologistStage = () => {
                 );
             });
 
+            // Сортируем психологов по name_order если он есть в ответе
+            if (schedule[0]?.name_order && Array.isArray(schedule[0].name_order)) {
+                const nameOrder = schedule[0].name_order;
+                psychologistsWithSlots.sort((a: any, b: any) => {
+                    const aIndex = nameOrder.indexOf(a.name);
+                    const bIndex = nameOrder.indexOf(b.name);
+                    
+                    // Если психолог не найден в name_order, помещаем его в конец
+                    if (aIndex === -1 && bIndex === -1) return 0;
+                    if (aIndex === -1) return 1;
+                    if (bIndex === -1) return -1;
+                    
+                    return aIndex - bIndex;
+                });
+            }
+
             if (psychologistsWithSlots.length === 0) {
                 localStorage.setItem('matching_attempts', (currentAttempts + 1).toString());
                 dispatch(setHasMatchingError(true));
