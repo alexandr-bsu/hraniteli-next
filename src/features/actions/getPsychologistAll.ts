@@ -1,6 +1,6 @@
 export async function getPsychologistAll() {
     try {
-        const res = await fetch('https://n8n-v2.hrani.live/webhook/get-cards-cashed', {
+        const res = await fetch('http://127.0.0.1:8000/cards', {
             cache: 'no-cache'
         });
 

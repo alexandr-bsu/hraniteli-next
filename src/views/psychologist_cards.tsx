@@ -13,6 +13,7 @@ import { getAvailableRequests } from '@/shared/api/requests';
 import { submitQuestionnaire } from '@/features/actions/getPsychologistSchedule';
 import { clearStorage } from "@/features/utils";
 import { useSearchParams } from "next/navigation";
+import { useWindowVirtualizer } from '@tanstack/react-virtual';
 
 type Props = {
     data?: IPsychologist[];
@@ -131,6 +132,15 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
         }
         return filtered_persons;
     }, [filtered_persons, filter.price]);
+
+    // Виртуализатор для window
+    const virtualizer = useWindowVirtualizer({
+        count: sortedPersons.length,
+        estimateSize: () => 350, // средняя высота карточки
+        overscan: 5,
+        getItemKey: (index) => sortedPersons[index]?.id || index,
+        gap: 20, // гарантированный отступ между карточками
+    });
 
     const searchParams = useSearchParams()
     // Очищаем предзаполненные блокирующие показ слотов поля из localstorage 
@@ -351,24 +361,55 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
             </aside>
             <main className="min-lg:max-w-[790px] w-full">
                 <h1 className="text-2xl font-bold text-white pb-[20px] hidden">Подбор психолога и запись на консультацию онлайн</h1>
-                <div className="flex flex-col gap-[20px] pb-[50px]">
+                <div style={{ width: '100%' }}>
                     {sortedPersons && sortedPersons.length > 0 ? (
-                        sort_persons_by_slot_having(sortedPersons).map((item: IPsychologist, index: number) => {
-                            // Убедимся, что у каждого психолога есть ID
-                            if (!item.id && item.name) {
-                                item.id = `id_${item.name.replace(/\s+/g, '_')}`;
-                            }
-
-                            return (
-                                <Card
-                                    key={item.id}
-                                    psychologist={item}
-                                    id={`psychologist-card-${item.id}`}
-                                    isSelected={filter.selected_psychologist?.id === item.id}
-                                    showBestMatch={hasActiveFilters && index < 3}
-                                />
-                            );
-                        })
+                        <div
+                            style={{
+                                height: virtualizer.getTotalSize(),
+                                position: 'relative',
+                                width: '100%',
+                            }}
+                        >
+                            {virtualizer.getVirtualItems().map((virtualRow) => {
+                                const index = virtualRow.index;
+                                const item = sort_persons_by_slot_having(sortedPersons)[index];
+                                if (!item) return null;
+                                if (!item.id && item.name) {
+                                    item.id = `id_${item.name.replace(/\s+/g, '_')}`;
+                                }
+                                // создаём ref для каждой карточки
+                                const cardRef = (el: HTMLDivElement | null) => {
+                                    virtualizer.measureElement(el);
+                                };
+                                // функция для обновления высоты карточки
+                                const handleCardExpand = () => {
+                                    const el = document.querySelector(`[data-index='${index}']`);
+                                    if (el) virtualizer.measureElement(el as HTMLElement);
+                                };
+                                return (
+                                    <div
+                                        key={virtualRow.key}
+                                        data-index={index}
+                                        ref={cardRef}
+                                        style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            width: '100%',
+                                            transform: `translateY(${virtualRow.start}px)`
+                                        }}
+                                        id={`psychologist-card-${item.id}`}
+                                    >
+                                        <Card
+                                            psychologist={item}
+                                            isSelected={filter.selected_psychologist?.id === item.id}
+                                            showBestMatch={hasActiveFilters && index < 3}
+                                            onExpand={handleCardExpand}
+                                        />
+                                    </div>
+                                );
+                            })}
+                        </div>
                     ) : (
                         <EmptyState />
                     )}

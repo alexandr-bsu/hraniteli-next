@@ -1,7 +1,7 @@
 'use client'
 
 import Image from "next/image";
-import { FC, useEffect, useState, useRef } from 'react';
+import { FC, useEffect, useState, useRef, forwardRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { openModal, closeModal, setSelectedPsychologist as setModalSelectedPsychologist, setSelectedDate, setSelectedSlot } from "@/redux/slices/modal";
 import { addFavorite, removeFavorite } from "@/redux/slices/favorites";
@@ -106,9 +106,11 @@ interface CardProps {
     id?: string;
     isSelected?: boolean;
     showBestMatch?: boolean;
+    onExpand?: () => void;
 }
 
-export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatch = false }) => {
+export const Card = forwardRef<HTMLDivElement, CardProps>(
+  ({ psychologist, id, isSelected, showBestMatch = false, onExpand }, ref) => {
     const dispatch = useDispatch();
     const searchParams = useSearchParams()
 
@@ -278,8 +280,12 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
         }
     }, [isScrolledPsychologist])
 
+    useEffect(() => {
+        if (onExpand) onExpand();
+    }, [isDescriptionExpanded, isExpanded, expandedEducationItems]);
+
     return (
-        <div id={id} className={`${styles.card} ${isSelected ? 'animate-pulse-highlight bg-[#F5F5F5]' : ''}`}>
+        <div ref={ref} id={id} className={`${styles.card} ${isSelected ? 'animate-pulse-highlight bg-[#F5F5F5]' : ''}`}>
             {/* Верхняя часть с фото и основной инфой */}
             <div className={styles.header}>
                 <div className={styles.avatarSection}>
@@ -628,4 +634,5 @@ export const Card: FC<CardProps> = ({ psychologist, id, isSelected, showBestMatc
             </div>
         </div>
     );
-};
+  }
+);
