@@ -638,4 +638,6 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
   }
 );
 
+CardInner.displayName = "CardInner";
+
 export const Card = React.memo(CardInner);

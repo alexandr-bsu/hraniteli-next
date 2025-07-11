@@ -287,7 +287,6 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
             virtualizer.measure();
             virtualizer.scrollToIndex(selectedIndex, { align: 'start', behavior: 'auto' });
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedIndex, fullySortedPersons.length, JSON.stringify(fullySortedPersons.map(p => p.id)), virtualizer]);
 
 
