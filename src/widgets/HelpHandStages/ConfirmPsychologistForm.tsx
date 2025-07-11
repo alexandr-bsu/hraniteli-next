@@ -1,0 +1,22 @@
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { setApplicationStage } from '@/redux/slices/application_form';
+import { setIndexPhyc, setHasMatchingError, setSelectedSlots, setSelectedSlotsObjects } from '@/redux/slices/application_form_data';
+import { getTimeDifference } from '@/features/utils';
+import { getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
+import { IPsychologist } from '@/shared/types/psychologist.types';
+import Image from 'next/image';
+import { COLORS } from '@/shared/constants/colors';
+import Link from 'next/link';
+import { RootState } from '@/redux/store';
+import { fill_filtered_by_automatch_psy, setSelectedPsychologist } from '@/redux/slices/filter';
+import { Tooltip } from '@/shared/ui/Tooltip';
+import { NoMatchError } from './NoMatchError';
+import { EmergencyContacts } from './EmergencyContacts';
+import axios from 'axios';
+import { toast } from 'sonner';
+import styles from './PsychologistStage.module.scss';
+import styles_cards from '../Card/Card.module.scss';
+import { format } from 'date-fns';
+import { getAgeWord } from '@/features/utils';
+import useYandexMetrika from '@/components/yandex/useYandexMetrika' 
