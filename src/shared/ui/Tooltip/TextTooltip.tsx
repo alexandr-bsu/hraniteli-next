@@ -87,12 +87,12 @@ export const TextTooltip: FC<TextTooltipProps> = ({ text, children }) => {
             })}
         >
             {children}
-            {isVisible && (
+            {isVisible && ((isMobile || coords.top !== 0) && (
                 <>
                     {isMobile && createPortal(overlayContent, document.body)}
                     {createPortal(tooltipContent, document.body)}
                 </>
-            )}
+            ))}
         </div>
     );
 }; 

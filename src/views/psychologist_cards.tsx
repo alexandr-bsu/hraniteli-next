@@ -13,7 +13,8 @@ import { getAvailableRequests } from '@/shared/api/requests';
 import { submitQuestionnaire } from '@/features/actions/getPsychologistSchedule';
 import { clearStorage } from "@/features/utils";
 import { useSearchParams } from "next/navigation";
-import { useWindowVirtualizer } from '@tanstack/react-virtual';
+import { useWindowVirtualizer, elementScroll, Virtualizer } from '@tanstack/react-virtual';
+import React from "react";
 
 type Props = {
     data?: IPsychologist[];
@@ -30,6 +31,12 @@ const sort_persons_by_slot_having = (persons: Array<IPsychologist>): Array<IPsyc
 
     return result
 }
+
+function easeInOutQuint(t: number) {
+  return t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * --t * t * t * t * t;
+}
+
+const scrollingRef = typeof window !== 'undefined' ? { current: 0 } : { current: 0 };
 
 export const Psychologist_cards = ({ data, isLoaded }: Props) => {
     const filter = useSelector<RootState, any>(state => state.filter);
@@ -133,13 +140,33 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
         return filtered_persons;
     }, [filtered_persons, filter.price]);
 
+    // Полная сортировка: сначала по цене, потом по слотам
+    const fullySortedPersons = useMemo(() => {
+        let arr = [...filtered_persons];
+        if (filter.price > 0) {
+            arr = arr.sort((a, b) => (a.min_session_price || 0) - (b.min_session_price || 0));
+        }
+        arr = sort_persons_by_slot_having(arr);
+        return arr;
+    }, [filtered_persons, filter.price]);
+
+    const scrollToFn = React.useCallback(
+  (offset: number, options: { behavior?: 'auto' | 'smooth'; adjustments?: number }, instance: any) => {
+    // Принудительно отключаем smooth scroll для стабильности
+    const opts = { ...options, behavior: 'auto' as const };
+    elementScroll(offset, opts, instance);
+  },
+  []
+);
+
     // Виртуализатор для window
     const virtualizer = useWindowVirtualizer({
-        count: sortedPersons.length,
+        count: fullySortedPersons.length,
         estimateSize: () => 350, // средняя высота карточки
         overscan: 5,
-        getItemKey: (index) => sortedPersons[index]?.id || index,
+        getItemKey: (index) => fullySortedPersons[index]?.id || index,
         gap: 20, // гарантированный отступ между карточками
+        scrollToFn, // добавляем кастомный scrollToFn
     });
 
     const searchParams = useSearchParams()
@@ -250,32 +277,18 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
         loadSchedules();
     }, [filter.filtered_by_automatch_psy.length, dispatch, formData]);
 
+    // Вычисляем id и индекс выбранного психолога
+    const selectedId = filter.selected_psychologist?.id || (filter.selected_psychologist?.name ? `id_${filter.selected_psychologist.name.replace(/\s+/g, '_')}` : undefined);
+    const selectedIndex = fullySortedPersons.findIndex(p => p.id === selectedId);
+
     // Эффект для скролла к выбранному психологу
     useEffect(() => {
-        const selectedPsychologist = filter.selected_psychologist;
-        if (selectedPsychologist && !isLoading) {
-            setTimeout(() => {
-                const selectedCardId = `psychologist-card-${selectedPsychologist.id}`;
-
-                const selectedCard = document.getElementById(selectedCardId);
-                if (selectedCard) {
-                    selectedCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                } else {
-                    console.error('Элемент не найден:', selectedCardId);
-
-                    // Если карточка не найдена по ID, пробуем найти по имени
-                    if (selectedPsychologist.name) {
-                        const nameBasedId = `psychologist-card-${selectedPsychologist.name.replace(/\s+/g, '_')}`;
-                        const cardByName = document.getElementById(nameBasedId);
-
-                        if (cardByName) {
-                            cardByName.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
-                    }
-                }
-            }, 1000); // Увеличиваем время ожидания до 1 секунды
+        if (selectedIndex >= 0 && selectedIndex < fullySortedPersons.length) {
+            virtualizer.measure();
+            virtualizer.scrollToIndex(selectedIndex, { align: 'start', behavior: 'auto' });
         }
-    }, [filter.selected_psychologist, isScheduleLoaded]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedIndex, fullySortedPersons.length, JSON.stringify(fullySortedPersons.map(p => p.id)), virtualizer]);
 
 
 
@@ -362,7 +375,7 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
             <main className="min-lg:max-w-[790px] w-full">
                 <h1 className="text-2xl font-bold text-white pb-[20px] hidden">Подбор психолога и запись на консультацию онлайн</h1>
                 <div style={{ width: '100%' }}>
-                    {sortedPersons && sortedPersons.length > 0 ? (
+                    {fullySortedPersons && fullySortedPersons.length > 0 ? (
                         <div
                             style={{
                                 height: virtualizer.getTotalSize(),
@@ -372,7 +385,7 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
                         >
                             {virtualizer.getVirtualItems().map((virtualRow) => {
                                 const index = virtualRow.index;
-                                const item = sort_persons_by_slot_having(sortedPersons)[index];
+                                const item = fullySortedPersons[index];
                                 if (!item) return null;
                                 if (!item.id && item.name) {
                                     item.id = `id_${item.name.replace(/\s+/g, '_')}`;

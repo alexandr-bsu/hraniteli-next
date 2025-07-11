@@ -92,12 +92,12 @@ export const Tooltip: FC<TooltipProps> = ({ text, children, customMargin, classN
             <div className={styles.iconWrapper}>
                 {children ? children : <Image src="/card/hint.svg" alt="hint" width={24} height={24} />}
             </div>
-            {isVisible && (
+            {isVisible && ((isMobile || coords.top !== 0) && (
                 <>
                     {isMobile && createPortal(overlayContent, document.body)}
                     {createPortal(tooltipContent, document.body)}
                 </>
-            )}
+            ))}
         </div>
     );
 }; 
