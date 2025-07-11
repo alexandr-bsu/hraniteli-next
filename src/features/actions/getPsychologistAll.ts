@@ -1,6 +1,6 @@
 export async function getPsychologistAll() {
     try {
-        const res = await fetch('http://51.250.42.45:8077/cards', {
+        const res = await fetch('https://cache-api.hrani.live/cards', {
             cache: 'no-cache'
         });
 
