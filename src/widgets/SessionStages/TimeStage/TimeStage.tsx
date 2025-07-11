@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import axios from 'axios';
 import { RootState } from '@/redux/store';
+import { getSchedule } from '@/features/actions/getSchedule';
 
 interface Slot {
     date: string;
@@ -27,53 +28,57 @@ export const TimeStage = () => {
     const modalType = useSelector((state: RootState) => state.modal.type);
     const timeDifference = getTimeDifference();
     const [groupedSlots, setGroupedSlots] = useState<GroupedSlots>({});
+    const [allSchedule, setAllSchedule] = useState<any[] | null>(null);
     const [isLoading, setIsLoading] = useState(false);
 
-    const loadSlots = async () => {
-        if (!selectedPsychologist || !isOpen || modalType !== 'Time') return;
-
+    // Загрузка общего расписания один раз
+    const loadAllSchedule = async () => {
         setIsLoading(true);
         try {
-            const response = await axios.get(
-                `https://n8n-v2.hrani.live/webhook/get-aggregated-schedule-by-psychologist?utm_psy=${encodeURIComponent(selectedPsychologist)}&userTimeOffsetMsk=${timeDifference}`
-            );
-
-            if (response.data?.[0]?.items?.length) {
-                const grouped: GroupedSlots = {};
-                
-                response.data[0].items.forEach((item: any) => {
-                    if (item.slots) {
-                        const slots: Slot[] = [];
-                        Object.entries(item.slots).forEach(([_, slotArray]: [string, any]) => {
-                            if (Array.isArray(slotArray) && slotArray.length > 0) {
-                                slotArray.forEach(slot => {
-                                    if (slot.state === 'Свободен') {
-                                        slots.push({
-                                            date: item.pretty_date,
-                                            time: slot.time
-                                        });
-                                    }
-                                });
-                            }
-                        });
-                        if (slots.length > 0) {
-                            grouped[item.pretty_date] = slots;
-                        }
-                    }
-                });
-                
-                setGroupedSlots(grouped);
-            }
-        } catch (error) {
-            console.error('Ошибка при загрузке слотов:', error);
+            const data = await getSchedule();
+            setAllSchedule(data);
+        } catch (e) {
+            // обработка ошибки
+            setAllSchedule(null);
         } finally {
             setIsLoading(false);
         }
     };
 
+    // Загружаем расписание при открытии модального окна
     useEffect(() => {
-        loadSlots();
-    }, [isOpen, selectedPsychologist, timeDifference, modalType]);
+        if (isOpen && modalType === 'Time' && !allSchedule) {
+            loadAllSchedule();
+        }
+    }, [isOpen, modalType]);
+
+    // Фильтрация по выбранному психологу
+    useEffect(() => {
+        if (!allSchedule || !selectedPsychologist) return;
+
+        const grouped: GroupedSlots = {};
+        allSchedule[0]?.items.forEach((item: any) => {
+            if (item.slots) {
+                const slots: Slot[] = [];
+                Object.entries(item.slots).forEach(([_, slotArray]: [string, any]) => {
+                    if (Array.isArray(slotArray) && slotArray.length > 0) {
+                        slotArray
+                            .filter((slot: any) => slot.psychologist === selectedPsychologist && slot.state === 'Свободен')
+                            .forEach((slot: any) => {
+                                slots.push({
+                                    date: item.pretty_date,
+                                    time: slot.time
+                                });
+                            });
+                    }
+                });
+                if (slots.length > 0) {
+                    grouped[item.pretty_date] = slots;
+                }
+            }
+        });
+        setGroupedSlots(grouped);
+    }, [allSchedule, selectedPsychologist]);
 
     const handleSlotSelect = (slot: Slot) => {
         dispatch(setSelectedSlot(slot));
