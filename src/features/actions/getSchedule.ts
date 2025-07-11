@@ -46,10 +46,11 @@ export const getSchedule = async () => {
       return userOffset-moscowOffset;
     };  
 
-    const response = await axios.post('https://n8n-v2.hrani.live/webhook/get-aggregated-all', {
+    const offset = getTimeDifference();
+    const response = await axios.post(`http://127.0.0.1:8001/schedule/${offset}`, {
       startDate,
       endDate,
-      userTimeOffsetMsk: getTimeDifference(),
+      userTimeOffsetMsk: offset,
       ageFilter: "",
       formPsyClientInfo: {
         age: "",
@@ -60,7 +61,7 @@ export const getSchedule = async () => {
       },
       form: {
         emptySlots: false,
-        userTimeZone: "МСК" + (getTimeDifference() > 0 ? '+'+getTimeDifference() : getTimeDifference() < 0 ? getTimeDifference() : '')
+        userTimeZone: "МСК" + (offset > 0 ? '+'+offset : offset < 0 ? offset : '')
       }
     });
 

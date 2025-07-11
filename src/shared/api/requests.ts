@@ -3,7 +3,7 @@ import axios from 'axios';
 export const getAvailableRequests = async (): Promise<string[]> => {
   try {
     // Получаем всех психологов
-    const response = await axios.get('http://127.0.0.1:8000/cards');
+    const response = await axios.get('http://127.0.0.1:8001/cards');
     const psychologists = response.data;
 
     // Собираем все уникальные запросы

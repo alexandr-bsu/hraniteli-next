@@ -1,6 +1,6 @@
 export async function getPsychologistAll() {
     try {
-        const res = await fetch('http://127.0.0.1:8000/cards', {
+        const res = await fetch('http://127.0.0.1:8001/cards', {
             cache: 'no-cache'
         });
 
@@ -27,7 +27,7 @@ export async function getPsychologistAll() {
                 link_video: null
             };
         }
-
+        
         return data;
     } catch (error) {
         console.error('Error fetching psychologists:', error);
