@@ -47,7 +47,7 @@ export const getSchedule = async () => {
     };  
 
     const offset = getTimeDifference();
-    const response = await axios.post(`http://127.0.0.1:8001/schedule/${offset}`, {
+    const response = await axios.post(`http://51.250.42.45:8077/schedule/${offset}`, {
       startDate,
       endDate,
       userTimeOffsetMsk: offset,

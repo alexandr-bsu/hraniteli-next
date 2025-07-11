@@ -1,6 +1,6 @@
 export async function getPsychologistAll() {
     try {
-        const res = await fetch('http://127.0.0.1:8001/cards', {
+        const res = await fetch('http://51.250.42.45:8077/cards', {
             cache: 'no-cache'
         });
 

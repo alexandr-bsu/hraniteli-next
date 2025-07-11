@@ -154,7 +154,7 @@ export const submitQuestionnaire = async (formData: IApplicationFormData, from_c
 
         const offset = getTimeDifference();
         const response = await fetch(
-            from_cards ? `http://127.0.0.1:8001/schedule/${offset}`
+            from_cards ? `http://51.250.42.45:8077/schedule/${offset}`
                 : from_diagnostic_form ? 'https://n8n-v2.hrani.live/webhook/schedule-diagnosis-v2'
                     : 'https://n8n-v2.hrani.live/webhook/get-agregated-schedule-v2', {
 
@@ -220,7 +220,7 @@ export const submitQuestionnaire = async (formData: IApplicationFormData, from_c
 // Получение отфильтрованных психологов
 export const getFilteredPsychologists = async () => {
     try {
-        const response = await fetch('http://127.0.0.1:8001/cards', {
+        const response = await fetch('http://51.250.42.45:8077/cards', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
