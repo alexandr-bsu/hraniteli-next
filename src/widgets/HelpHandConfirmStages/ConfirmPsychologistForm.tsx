@@ -549,7 +549,7 @@ export const ConfirmPsychologistForm = () => {
                       : 'border-[#D4D4D4] text-[#116466] hover:bg-[#116466] hover:text-white hover:border-[#116466]'
                       }`}
                   >
-                    {`${slot.date.split('.').slice(0, 2).join('.')} / ${slot.time}`}
+                    {`${format(new Date(slot.date + 'T' + slot.time), 'dd.MM')} / ${slot.time}`}
                   </button>
                 ))}
               </div>
