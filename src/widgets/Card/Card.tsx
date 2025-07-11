@@ -16,6 +16,7 @@ import { Tooltip } from '@/shared/ui/Tooltip/Tooltip';
 import { TextTooltip } from '@/shared/ui/Tooltip/TextTooltip';
 import { setSelectedPsychologist } from "@/redux/slices/filter";
 import { useSearchParams, usePathname } from 'next/navigation'
+import React from 'react';
 
 const getAgeWord = (age: number): string => {
     const lastDigit = age % 10;
@@ -109,7 +110,7 @@ interface CardProps {
     onExpand?: () => void;
 }
 
-export const Card = forwardRef<HTMLDivElement, CardProps>(
+const CardInner = forwardRef<HTMLDivElement, CardProps>(
   ({ psychologist, id, isSelected, showBestMatch = false, onExpand }, ref) => {
     const dispatch = useDispatch();
     const searchParams = useSearchParams()
@@ -636,3 +637,5 @@ export const Card = forwardRef<HTMLDivElement, CardProps>(
     );
   }
 );
+
+export const Card = React.memo(CardInner);
