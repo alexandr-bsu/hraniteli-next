@@ -597,10 +597,15 @@
     padding: 15px;
     margin-bottom: 24px;
     position: relative;
+    min-height: 80px;
+    padding-bottom: 32px;
 }
 
 .educationItem {
     margin-bottom: 15px;
+    &:last-child {
+        margin-bottom: 0;
+    }
 }
 
 .educationGradient {
@@ -618,7 +623,7 @@
     position: relative;
     max-height: 44px; // Высота двух строк
     overflow: hidden;
-    transition: max-height 0.3s ease;
+    // transition: max-height 0.3s ease; // УБРАНО
 
     p {
         font-size: 14px;
@@ -640,6 +645,7 @@
     width: 100%;
     height: 22px; // Высота одной строки
     background: linear-gradient(180deg, transparent, #FAFAFA);
+    pointer-events: none;
 }
 
 .readMoreButton {
@@ -652,6 +658,11 @@
     padding: 0;
     cursor: pointer;
     transition: opacity 0.2s;
+    outline: none;
+    user-select: none;
+    display: block;
+    width: 100%;
+    text-align: left;
 
     &:hover {
         opacity: 0.8;
