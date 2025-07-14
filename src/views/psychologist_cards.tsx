@@ -220,7 +220,7 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
     useEffect(() => {
         const loadEducation = async () => {
             try {
-                const { data } = await axios.get('http://cache-api.hrani.live/edu-keys-pipeline-batch?batch_size=1000&use_cache=true');
+                const { data } = await axios.get('https://cache-api.hrani.live/edu-keys-pipeline-batch?batch_size=1000&use_cache=true');
                 const map: { [key: string]: any[] } = {};
                 data.forEach((item: any) => {
                     const key = item.psychologist;
