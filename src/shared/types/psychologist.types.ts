@@ -119,6 +119,7 @@ export interface IPsychologist {
       pretty_date: string;
     }[];
   };
+  education?: import("@/entities/IEducation").IEducation[];
 }
 
 // Типы для фильтрации психологов

@@ -10,7 +10,6 @@ import { ROUTES } from '@/shared/constants/routes';
 import Link from 'next/link';
 import { RootState } from "@/redux/store";
 import styles from './Card.module.scss';
-import { getPsychologistEducation } from '@/shared/api/psychologist';
 import { toast } from "sonner";
 import { Tooltip } from '@/shared/ui/Tooltip/Tooltip';
 import { TextTooltip } from '@/shared/ui/Tooltip/TextTooltip';
@@ -120,7 +119,6 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
     const videoRef = useRef<HTMLVideoElement>(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [isExpanded, setIsExpanded] = useState(false);
-    const [education, setEducation] = useState<any[]>([]);
     const [showVideo, setShowVideo] = useState(false);
     const [availableSlots, setAvailableSlots] = useState<{ date: string, time: string }[]>([]);
 
@@ -143,24 +141,6 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
 
     const imageUrl = getGoogleDriveImageUrl(psychologist.link_photo);
     const videoUrl = psychologist.link_video;
-
-    useEffect(() => {
-        const loadExpandedData = async () => {
-            if (isExpanded && psychologist.id) {
-                try {
-                    const educationData = await getPsychologistEducation(psychologist.id);
-                    console.log(educationData)
-                    setEducation(educationData || []);
-
-                } catch (error) {
-                    console.error('Error loading education data:', error);
-                    setEducation([]);
-                }
-            }
-        };
-
-        loadExpandedData();
-    }, [isExpanded, psychologist.id]);
 
     useEffect(() => {
         const loadSlots = async () => {
@@ -516,26 +496,22 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                 {/* UPDATE Правильно разобрал информацию об образовании психолога */}
                 <div className={styles.section}>
                     <h3 className={styles.sectionTitle}>Образование</h3>
-                    {education && education.length > 0 && (
-                        <div className={styles.education}>
-                            {education.map((item, index) => (
-                                <div key={index} className={styles.educationItem}>
-                                    <h3><b>{item.educationItemProgramTitle}, {item.educationItemYear}</b></h3>
-                                    <div className={`${styles.educationText} ${expandedEducationItems[index] ? styles.expanded : ''}`}>
-                                        <p>{item.educationItemTitle}, {item.educationItemType}</p>
-                                    </div>
-                                    {education.length > 0 && (
-                                        <button
-                                            className={styles.readMoreButton}
-                                            onClick={() => toggleEducationItem(index)}
-                                        >
-                                            {expandedEducationItems[index] ? 'Свернуть' : 'Смотреть все'}
-                                        </button>
-                                    )}
-                                </div>
-                            ))}
+                    {(psychologist.education ?? []).map((item, index) => (
+                        <div key={index} className={styles.educationItem}>
+                            <h3><b>{item.educationItemProgramTitle}, {item.educationItemYear}</b></h3>
+                            <div className={`${styles.educationText} ${expandedEducationItems[index] ? styles.expanded : ''}`}>
+                                <p>{item.educationItemType}</p>
+                            </div>
+                            {(psychologist.education ?? []).length > 0 && (
+                                <button
+                                    className={styles.readMoreButton}
+                                    onClick={() => toggleEducationItem(index)}
+                                >
+                                    {expandedEducationItems[index] ? 'Свернуть' : 'Смотреть все'}
+                                </button>
+                            )}
                         </div>
-                    )}
+                    ))}
                 </div>
 
                 {/* Запросы */}

@@ -45,6 +45,7 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
     const [isScheduleLoaded, setScheduleLoaded] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const dispatch = useDispatch();
+    const [educationMap, setEducationMap] = useState<{ [key: string]: any[] }>({});
 
     // Проверка активности фильтров по цене или запросам
     const hasActiveFilters = filter.price > 0 || (filter.requests?.length > 0);
@@ -215,6 +216,30 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
         loadData();
     }, [dispatch, isLoaded]);
 
+    // Загрузка образования для всех психологов
+    useEffect(() => {
+        const loadEducation = async () => {
+            try {
+                const { data } = await axios.get('http://cache-api.hrani.live/edu-keys-pipeline-batch?batch_size=1000&use_cache=true');
+                const map: { [key: string]: any[] } = {};
+                data.forEach((item: any) => {
+                    const key = item.psychologist;
+                    if (!map[key]) map[key] = [];
+                    map[key].push({
+                        educationItemProgramTitle: item.program_title,
+                        educationItemYear: item.year,
+                        educationItemTitle: item.title,
+                        educationItemType: item.doc_type,
+                    });
+                });
+                setEducationMap(map);
+            } catch (e) {
+                setEducationMap({});
+            }
+        };
+        loadEducation();
+    }, []);
+
     // Загрузка расписания
     useEffect(() => {
         const loadSchedules = async () => {
@@ -260,11 +285,15 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
                         });
                     });
 
-                    // Обновляем психологов с их расписаниями
-                    const updatedPsychologists = filter.filtered_by_automatch_psy.map((psy: any) => ({
-                        ...psy,
-                        schedule: psychologistSchedules.get(psy.name) || { days: [] }
-                    }));
+                    // Обновляем психологов с их расписаниями и образованием
+                    const updatedPsychologists = filter.filtered_by_automatch_psy.map((psy: any) => {
+                        const educationKey = psy.name?.replace(/\s+/g, '_');
+                        return {
+                            ...psy,
+                            schedule: psychologistSchedules.get(psy.name) || { days: [] },
+                            education: educationMap[educationKey] || [],
+                        };
+                    });
 
                     setScheduleLoaded(true)
                     dispatch(fill_filtered_by_automatch_psy(updatedPsychologists));
@@ -275,7 +304,7 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
         };
 
         loadSchedules();
-    }, [filter.filtered_by_automatch_psy.length, dispatch, formData]);
+    }, [filter.filtered_by_automatch_psy.length, dispatch, formData, educationMap]);
 
     // Вычисляем id и индекс выбранного психолога
     const selectedId = filter.selected_psychologist?.id || (filter.selected_psychologist?.name ? `id_${filter.selected_psychologist.name.replace(/\s+/g, '_')}` : undefined);
