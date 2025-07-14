@@ -277,7 +277,6 @@ export const ConfirmPsychologistForm = () => {
       }
     };
     fetchHelpfulHandSlots();
-    // eslint-disable-next-line
   }, [currentIndex, filtered_by_automatch_psy, ticketID]);
 
   useEffect(() => {
