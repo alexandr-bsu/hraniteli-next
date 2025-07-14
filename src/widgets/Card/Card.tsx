@@ -496,22 +496,24 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                 {/* UPDATE Правильно разобрал информацию об образовании психолога */}
                 <div className={styles.section}>
                     <h3 className={styles.sectionTitle}>Образование</h3>
-                    {(psychologist.education ?? []).map((item, index) => (
-                        <div key={index} className={styles.educationItem}>
-                            <h3><b>{item.educationItemProgramTitle}, {item.educationItemYear}</b></h3>
-                            <div className={`${styles.educationText} ${expandedEducationItems[index] ? styles.expanded : ''}`}>
-                                <p>{item.educationItemType}</p>
+                    <div className={styles.education} style={{ marginBottom: 24 }}>
+                        {(psychologist.education ?? []).map((item, index) => (
+                            <div key={index} className={styles.educationItem}>
+                                <h3><b>{item.educationItemProgramTitle}, {item.educationItemYear}</b></h3>
+                                <div className={`${styles.educationText} ${expandedEducationItems[index] ? styles.expanded : ''}`}>
+                                    <p>{item.educationItemTitle}, {item.educationItemType}</p>
+                                </div>
+                                {(psychologist.education ?? []).length > 0 && (
+                                    <button
+                                        className={styles.readMoreButton}
+                                        onClick={() => toggleEducationItem(index)}
+                                    >
+                                        {expandedEducationItems[index] ? 'Свернуть' : 'Смотреть все'}
+                                    </button>
+                                )}
                             </div>
-                            {(psychologist.education ?? []).length > 0 && (
-                                <button
-                                    className={styles.readMoreButton}
-                                    onClick={() => toggleEducationItem(index)}
-                                >
-                                    {expandedEducationItems[index] ? 'Свернуть' : 'Смотреть все'}
-                                </button>
-                            )}
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
 
                 {/* Запросы */}
