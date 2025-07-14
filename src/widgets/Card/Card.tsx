@@ -122,7 +122,7 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
     const [showVideo, setShowVideo] = useState(false);
     const [availableSlots, setAvailableSlots] = useState<{ date: string, time: string }[]>([]);
 
-    const [expandedEducationItems, setExpandedEducationItems] = useState<{ [key: number]: boolean }>({});
+    const [showAllEducation, setShowAllEducation] = useState(false);
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
     const descriptionRef = useRef<HTMLParagraphElement>(null);
     const [shouldShowGradient, setShouldShowGradient] = useState(false);
@@ -245,13 +245,6 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
         dispatch(openModal('Time'));
     };
 
-    const toggleEducationItem = (index: number) => {
-        setExpandedEducationItems(prev => ({
-            ...prev,
-            [index]: !prev[index]
-        }));
-    };
-
     const scrolledPsychologist = searchParams.get('selected_psychologist')
     const isScrolledPsychologist = scrolledPsychologist == psychologist.name
 
@@ -263,7 +256,7 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
 
     useEffect(() => {
         if (onExpand) onExpand();
-    }, [isDescriptionExpanded, isExpanded, expandedEducationItems]);
+    }, [isDescriptionExpanded, isExpanded]);
 
     return (
         <div ref={ref} id={id} className={`${styles.card} ${isSelected ? 'animate-pulse-highlight bg-[#F5F5F5]' : ''}`}>
@@ -496,23 +489,28 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                 {/* UPDATE Правильно разобрал информацию об образовании психолога */}
                 <div className={styles.section}>
                     <h3 className={styles.sectionTitle}>Образование</h3>
-                    <div className={styles.education} style={{ marginBottom: 24 }}>
-                        {(psychologist.education ?? []).map((item, index) => (
-                            <div key={index} className={styles.educationItem}>
-                                <h3><b>{item.educationItemProgramTitle}, {item.educationItemYear}</b></h3>
-                                <div className={`${styles.educationText} ${expandedEducationItems[index] ? styles.expanded : ''}`}>
-                                    <p>{item.educationItemTitle}, {item.educationItemType}</p>
-                                </div>
-                                {(psychologist.education ?? []).length > 0 && (
-                                    <button
-                                        className={styles.readMoreButton}
-                                        onClick={() => toggleEducationItem(index)}
-                                    >
-                                        {expandedEducationItems[index] ? 'Свернуть' : 'Смотреть все'}
-                                    </button>
-                                )}
-                            </div>
-                        ))}
+                    <div className={styles.education}>
+                        {(psychologist.education ?? [])
+                            .slice(0, showAllEducation ? undefined : 2)
+                            .map((item, index, arr) => {
+                                const isLastVisible = !showAllEducation && index === arr.length - 1 && (psychologist.education ?? []).length > 2;
+                                return (
+                                    <div key={index} className={styles.educationItem}>
+                                        <h3><b>{item.educationItemProgramTitle}, {item.educationItemYear}</b></h3>
+                                        <div className={isLastVisible ? `${styles.educationText} ${styles.withGradient}` : styles.educationText}>
+                                            <p>{item.educationItemTitle}, {item.educationItemType}</p>
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        {(psychologist.education ?? []).length > 2 && (
+                            <button
+                                className={styles.readMoreButton}
+                                onClick={() => setShowAllEducation((prev) => !prev)}
+                            >
+                                {showAllEducation ? 'Свернуть' : 'Смотреть все'}
+                            </button>
+                        )}
                     </div>
                 </div>
 

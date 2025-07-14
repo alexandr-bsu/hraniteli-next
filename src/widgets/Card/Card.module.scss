@@ -592,20 +592,26 @@
 }
 
 .education {
-    .educationItem {
-        margin-bottom: 15px;
-        padding: 15px;
-        background: #FAFAFA;
-        border-radius: 10px;
+    background: #FAFAFA;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 24px;
+    position: relative;
+}
 
-        h4 {
-            font-weight: 600;
-            font-size: 16px;
-            line-height: 22px;
-            margin-bottom: 10px;
-            color: #151515;
-        }
-    }
+.educationItem {
+    margin-bottom: 15px;
+}
+
+.educationGradient {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 40px;
+    background: linear-gradient(180deg, rgba(250,250,250,0), #FAFAFA 90%);
+    pointer-events: none;
+    border-radius: 0 0 10px 10px;
 }
 
 .educationText {
@@ -624,16 +630,16 @@
     &.expanded {
         max-height: 1000px; // Достаточно большое значение
     }
+}
 
-    &:not(.expanded)::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 22px; // Высота одной строки
-        background: linear-gradient(180deg, transparent, #FAFAFA);
-    }
+.educationText.withGradient::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 22px; // Высота одной строки
+    background: linear-gradient(180deg, transparent, #FAFAFA);
 }
 
 .readMoreButton {
