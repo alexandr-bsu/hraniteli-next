@@ -452,8 +452,12 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                                 {availableSlots.map((slot, index) => (
                                     <button
                                         key={index}
-                                        className={`${styles.dateButton} bg-[#FAFAFA] cursor-pointer hover:bg-[#116466] hover:text-white transition-colors rounded-[50px] px-[15px] py-[10px]`}
-                                        onClick={() => handleSlotClick(slot)}
+                                        className={
+                                          `${styles.dateButton} bg-[#FAFAFA] rounded-[50px] px-[15px] py-[10px] transition-colors ` +
+                                          (inPopup ? 'cursor-default opacity-60 pointer-events-none' : 'cursor-pointer hover:bg-[#116466] hover:text-white')
+                                        }
+                                        onClick={inPopup ? undefined : () => handleSlotClick(slot)}
+                                        disabled={inPopup}
                                     >
                                         {slot.date.split('.').slice(0, 2).join('.')}/{slot.time}
                                     </button>
@@ -613,16 +617,18 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
             {/* Кнопки действий */}
             <div className={styles.actions}>
                 {!inPopup && (
-                    <button
-                        className={styles.detailsButton}
-                        onClick={() => setIsExpanded(!isExpanded)}
-                    >
-                        {isExpanded ? 'Свернуть' : 'Подробнее о Хранителе'}
-                    </button>
+                    <>
+                        <button
+                            className={styles.detailsButton}
+                            onClick={() => setIsExpanded(!isExpanded)}
+                        >
+                            {isExpanded ? 'Свернуть' : 'Подробнее о Хранителе'}
+                        </button>
+                        <button className={styles.appointmentButton} onClick={handleOpenModal}>
+                            Записаться на сессию
+                        </button>
+                    </>
                 )}
-                <button className={styles.appointmentButton} onClick={handleOpenModal}>
-                    Записаться на сессию
-                </button>
             </div>
         </div>
     );
