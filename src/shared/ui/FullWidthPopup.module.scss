@@ -1,0 +1,30 @@
+.simplebar-scrollbar:before {
+  background: #b0b8c1;
+  border-radius: 8px;
+  transition: background 0.3s, opacity 0.3s;
+}
+.simplebar-scrollbar {
+  width: 6px;
+  right: 2px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.simplebar-hover .simplebar-scrollbar,
+.simplebar-scrollbar.simplebar-visible {
+  opacity: 1;
+}
+.simplebar-scrollbar:before {
+  background: #b0b8c1;
+}
+.simplebar-scrollbar.simplebar-visible:before,
+.simplebar-hover .simplebar-scrollbar:before {
+  background: #8a94a6;
+}
+.simplebar-track.simplebar-vertical {
+  width: 8px;
+  background: transparent;
+}
+.simplebar-track .simplebar-scrollbar.simplebar-visible:after,
+.simplebar-track .simplebar-scrollbar:after {
+  display: none;
+} 

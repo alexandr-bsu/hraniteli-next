@@ -107,10 +107,12 @@ interface CardProps {
     isSelected?: boolean;
     showBestMatch?: boolean;
     onExpand?: () => void;
+    inPopup?: boolean;
+    onClose?: () => void;
 }
 
 const CardInner = forwardRef<HTMLDivElement, CardProps>(
-  ({ psychologist, id, isSelected, showBestMatch = false, onExpand }, ref) => {
+  ({ psychologist, id, isSelected, showBestMatch = false, onExpand, inPopup = false, onClose }, ref) => {
     const dispatch = useDispatch();
     const searchParams = useSearchParams()
 
@@ -245,8 +247,8 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
         dispatch(openModal('Time'));
     };
 
-    const scrolledPsychologist = searchParams.get('selected_psychologist')
-    const isScrolledPsychologist = scrolledPsychologist == psychologist.name
+    const scrolledPsychologist = searchParams.get('selected_psychologist');
+    const isScrolledPsychologist = scrolledPsychologist === String(psychologist.id) || scrolledPsychologist === psychologist.name;
 
     useEffect(() => {
         if (isScrolledPsychologist) {
@@ -259,7 +261,7 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
     }, [isDescriptionExpanded, isExpanded]);
 
     return (
-        <div ref={ref} id={id} className={`${styles.card} ${isSelected ? 'animate-pulse-highlight bg-[#F5F5F5]' : ''}`}>
+        <div ref={ref} id={id} className={`${styles.card} ${isSelected ? 'animate-pulse-highlight bg-[#F5F5F5]' : ''} ${isScrolledPsychologist ? styles.expanded : ''}`}>
             {/* Верхняя часть с фото и основной инфой */}
             <div className={styles.header}>
                 <div className={styles.avatarSection}>
@@ -352,19 +354,30 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                             {psychologist.name}
                             {psychologist.age !== undefined && `, ${psychologist.age} ${getAgeWord(psychologist.age)}`}
                         </h2>
-                        <button
-                            className={styles.favoriteButton}
-                            onClick={handleFavoriteClick}
-                            aria-label={isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}
-                        >
-                            <Image
-                                src={isFavorite ? '/card/heart-filled.svg' : '/card/heart-outline.svg'}
-                                alt="Избранное"
-                                width={24}
-                                height={24}
-                                unoptimized
-                            />
-                        </button>
+                        {inPopup ? (
+                            <button
+                                className={"bg-gray-100 rounded-full p-2 hover:bg-gray-200 block lg:inline-block absolute right-4 top-4 z-10 lg:static"}
+                                onClick={onClose}
+                                aria-label="Закрыть"
+                                style={{ border: "none" }}
+                            >
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                            </button>
+                        ) : (
+                            <button
+                                className={styles.favoriteButton}
+                                onClick={handleFavoriteClick}
+                                aria-label={isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}
+                            >
+                                <Image
+                                    src={isFavorite ? '/card/heart-filled.svg' : '/card/heart-outline.svg'}
+                                    alt="Избранное"
+                                    width={24}
+                                    height={24}
+                                    unoptimized
+                                />
+                            </button>
+                        )}
                     </div>
                     <Tooltip
                         text={`${psychologist.name.split(" ")[1]} как Хранитель придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`}
@@ -520,7 +533,7 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                     <div className={styles.queriesList}>
                         {psychologist.queries?.split(';').slice(0, 6).map((query, index) => (
                             <TextTooltip key={index} text={query.trim()}>
-                                <button className={styles.queryButton}>
+                                <button className={styles.queryButton + " w-full block text-left"}>
                                     {query.trim()}
                                 </button>
                             </TextTooltip>
@@ -599,12 +612,14 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
 
             {/* Кнопки действий */}
             <div className={styles.actions}>
-                <button
-                    className={styles.detailsButton}
-                    onClick={() => setIsExpanded(!isExpanded)}
-                >
-                    {isExpanded ? 'Свернуть' : 'Подробнее о Хранителе'}
-                </button>
+                {!inPopup && (
+                    <button
+                        className={styles.detailsButton}
+                        onClick={() => setIsExpanded(!isExpanded)}
+                    >
+                        {isExpanded ? 'Свернуть' : 'Подробнее о Хранителе'}
+                    </button>
+                )}
                 <button className={styles.appointmentButton} onClick={handleOpenModal}>
                     Записаться на сессию
                 </button>

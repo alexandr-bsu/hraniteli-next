@@ -5,8 +5,9 @@ import '../shared/styles/main.scss';
 import { Providers } from "@/shared/Providers/Providers";
 import YandexMetrikaContainer from "@/components/yandex/YandexMetrikaContainer";
 import { Suspense } from "react";
-import { StagewiseToolbar } from "@stagewise/toolbar-next";
-import ReactPlugin from "@stagewise-plugins/react";
+import { StagewiseToolbar } from '@stagewise/toolbar-next';
+import ReactPlugin from '@stagewise-plugins/react';
+
 
 const open_sans = Open_Sans({
   weight: ['300', '400', '500', '600', '700', '800'],
@@ -37,10 +38,10 @@ export default function RootLayout({
       <body
         className={`${open_sans.className} antialiased`}
       >
-        <StagewiseToolbar config={{ plugins: [ReactPlugin] }} />
         <Providers>
           {children}
         </Providers>
+        <StagewiseToolbar config={{ plugins: [ReactPlugin] }} />
       </body>
     </html>
   );
