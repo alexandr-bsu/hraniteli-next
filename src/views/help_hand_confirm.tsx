@@ -32,7 +32,7 @@ export default function HelpHandConfirm() {
                         <h2 className="font-semibold text-[20px] max-lg:text-[14px] max-lg:leading-[22px] leading-[27px]">
                             Подтверждение слота психолога
                         </h2>
-                        <span className="font-normal text-[18px] hidden md:block max-lg:text-[14px] leading-[25px] max-[360px]:w-[192px]">
+                        <span className="font-normal text-[18px] max-lg:text-[14px] leading-[25px] max-[360px]:w-[192px]">
                             Стоимость 8 сессий по цене, указаннной вами в заявке. Далее - по цене указанной в карточке психолога
                         </span>
                     </div>

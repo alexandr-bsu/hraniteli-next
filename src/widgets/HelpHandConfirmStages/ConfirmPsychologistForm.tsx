@@ -56,6 +56,7 @@ interface Schedule {
 }
 
 interface SimpleSlot {
+  id: string;
   date: string;
   time: string;
   moscow_datetime_formatted: string;
@@ -258,16 +259,24 @@ export const ConfirmPsychologistForm = () => {
                   slotArr.forEach((slot: any) => {
                     // Логирование каждого слота
                     console.log('slot:', slot);
+                    console.log('slot.id:', slot.id);
                     if (slot.state && slot.state.trim().includes('Свободен')) {
                       // Используем локальные дату и время из слота
                       const slotDate = slot['Дата Локальная'] || slot.date;
                       const slotTime = slot['Время Локальное'] || slot.time;
                       const moscow_datetime = new Date(`${slotDate}T${slotTime}`);
-                      slots.push({
-                        date: slotDate,
-                        time: slotTime,
-                        moscow_datetime_formatted: format(moscow_datetime, 'dd.MM / HH:mm'),
-                      });
+                      
+                      // Проверяем, что у слота есть ID
+                      if (slot.id) {
+                        slots.push({
+                          id: slot.id, // Используем именно ID слота из API (UUID)
+                          date: slotDate,
+                          time: slotTime,
+                          moscow_datetime_formatted: format(moscow_datetime, 'dd.MM / HH:mm'),
+                        });
+                      } else {
+                        console.warn('Слот без ID:', slot);
+                      }
                     }
                   });
                 }
@@ -354,14 +363,101 @@ export const ConfirmPsychologistForm = () => {
 
   const handleSubmit = async () => {
     if (selectedSlot) {
-      const formattedSlot = `${selectedSlot.moscow_datetime_formatted}`;
-      dispatch(setSelectedSlots([formattedSlot]));
-      dispatch(setSelectedSlotsObjects([]));
-      dispatch(setSelectedPsychologist(currentPsychologist))
-      if (isResearchRedirect) {
-        dispatch(setApplicationStage('phone'))
-      } else {
-        dispatch(setApplicationStage('promocode'))
+      setIsSubmitting(true);
+      
+      try {
+        // Форматируем слот в правильном формате (дата и время по МСК)
+        // Используем 'd.M' для формата "23.7" (без ведущего нуля для месяца)
+        // Конвертируем в московское время
+        // Если timeDifference = +5, то нужно вычесть 5 часов для получения МСК
+        const localDateTime = new Date(selectedSlot.date + 'T' + selectedSlot.time);
+        const moscowDateTime = new Date(localDateTime.getTime() - (timeDifference * 60 * 60 * 1000));
+        const formattedSlot = `${format(moscowDateTime, 'd.M')} ${format(moscowDateTime, 'HH:mm')}`;
+        console.log('Форматированный слот (МСК):', formattedSlot);
+        console.log('Исходная дата:', selectedSlot.date);
+        console.log('Исходное время:', selectedSlot.time);
+        console.log('Разница с МСК:', timeDifference);
+        console.log('Локальное время:', localDateTime.toISOString());
+        console.log('Московское время:', moscowDateTime.toISOString());
+        console.log('ID выбранного слота:', selectedSlot.id);
+        
+        // Сохраняем в Redux
+        dispatch(setSelectedSlots([formattedSlot]));
+        dispatch(setSelectedSlotsObjects([selectedSlot.id])); // Сохраняем ID выбранного слота
+        dispatch(setSelectedPsychologist(currentPsychologist));
+
+        // Формируем данные для отправки на API
+        const requestData = {
+          anxieties: [],
+          questions: formData.requests || [],
+          customQuestion: [],
+          diagnoses: formData.diseases || [],
+          diagnoseInfo: "",
+          diagnoseMedicaments: "",
+          traumaticEvents: formData.traumatic || [],
+          clientStates: formData.conditions || [],
+          selectedPsychologistsNames: [],
+          shownPsychologists: "",
+          psychos: [],
+          lastExperience: "",
+          amountExpectations: "",
+          age: formData.age || "",
+          slots: [formattedSlot], // Формат "23.7 19:00"
+          slots_objects: [selectedSlot.id], // ID выбранного слота
+          contactType: "Telegram",
+          contact: formData.phone || "",
+          name: formData.username || "",
+          promocode: formData.promocode || "",
+          ticket_id: ticketID || "",
+          emptySlots: false,
+          userTimeZone: "МСК" + (timeDifference > 0 ? '+' + timeDifference : timeDifference < 0 ? timeDifference : ''),
+          bid: 0,
+          rid: 0,
+          categoryType: formData.price_session === 'free' ? 'Бесплатно' :
+                       formData.price_session === '300' ? '300 руб' :
+                       formData.price_session === '500' ? '500 руб' :
+                       formData.price_session === '1000' ? '1000 руб' :
+                       formData.price_session === '1500' ? '1500 руб' :
+                       formData.price_session === '2000' ? '2000 руб' :
+                       formData.price_session === '3000' ? '3000 руб' : 'Бесплатно',
+          customCategory: "",
+          question_to_psychologist: formData.requests?.join('; ') || "",
+          filtered_by_automatch_psy_names: currentPsychologist?.name ? [currentPsychologist.name] : [],
+          _queries: "",
+          customTraumaticEvent: "",
+          customState: "",
+          utm_psy: currentPsychologist?.name || ""
+        };
+
+        console.log('Отправляем данные на API:', requestData);
+
+        // Отправляем данные на API
+        const response = await axios.post(
+          'https://n8n-v2.hrani.live/webhook/helpful-hand-zayavka-new',
+          requestData
+        );
+
+        console.log('Ответ от API:', response.data);
+
+        if (response.status === 200) {
+          // Обновляем tracking step
+          await axios.put(
+            'https://n8n-v2.hrani.live/webhook/update-tracking-step',
+            { step: "Заявка отправлена", ticket_id: ticketID }
+          );
+
+          // Переходим к следующему этапу
+          if (isResearchRedirect) {
+            dispatch(setApplicationStage('phone'));
+          } else {
+            dispatch(setApplicationStage('promocode'));
+          }
+        }
+      } catch (error) {
+        console.error('Ошибка при отправке заявки:', error);
+        // Можно добавить обработку ошибок, например показать toast
+      } finally {
+        setIsSubmitting(false);
       }
     }
   }
