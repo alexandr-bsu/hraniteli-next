@@ -21,6 +21,7 @@ import styles_cards from '../Card/Card.module.scss';
 import { format, startOfWeek, addMonths } from 'date-fns';
 import { getAgeWord } from '@/features/utils';
 import { useSearchParams } from 'next/navigation';
+import { FinalStage } from './FinalStage';
 
 // --- Типы и утилиты ---
 interface Slot {
@@ -115,6 +116,7 @@ export const ConfirmPsychologistForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [availableSlots, setAvailableSlots] = useState<SimpleSlot[]>([]);
+  const [showFinalStage, setShowFinalStage] = useState(false);
 
   const filtered_by_automatch_psy = useSelector<RootState, any[]>(state => state.filter.filtered_by_automatch_psy);
   const currentIndex = useSelector((state: RootState) => state.applicationFormData.index_phyc);
@@ -445,13 +447,8 @@ export const ConfirmPsychologistForm = () => {
             'https://n8n-v2.hrani.live/webhook/update-tracking-step',
             { step: "Заявка отправлена", ticket_id: ticketID }
           );
-
-          // Переходим к следующему этапу
-          if (isResearchRedirect) {
-            dispatch(setApplicationStage('phone'));
-          } else {
-            dispatch(setApplicationStage('promocode'));
-          }
+          setShowFinalStage(true);
+          return;
         }
       } catch (error) {
         console.error('Ошибка при отправке заявки:', error);
@@ -479,6 +476,9 @@ export const ConfirmPsychologistForm = () => {
         <span className="mt-4 text-[18px] lg:text-[18px] md:text-[16px] max-lg:text-[14px] text-[#116466]">Загрузка психологов...</span>
       </div>
     );
+  }
+  if (showFinalStage) {
+    return <FinalStage ticket_id={ticketID || ''} />;
   }
   const remainingPsychologists = filtered_by_automatch_psy.length - (currentIndex + 1);
   const method_description = {
@@ -667,21 +667,21 @@ export const ConfirmPsychologistForm = () => {
           </div>
         </div>
         <div className="pb-[20px] flex gap-[10px]">
-          <button
+          {/* <button
             type='button'
             onClick={() => dispatch(setApplicationStage('diseases_psychologist'))}
             disabled={isSubmitting}
             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
           >
             Назад
-          </button>
+          </button> */}
           <button
             type='submit'
             disabled={!selectedSlot || isSubmitting}
             className={`cursor-pointer flex-1 border-[1px] bg-[${COLORS.primary}] p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] flex justify-center items-center gap-[10px] ${!selectedSlot || isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={handleSubmit}
           >
-            Продолжить
+            Забронировать слот
           </button>
         </div>
       </div>
