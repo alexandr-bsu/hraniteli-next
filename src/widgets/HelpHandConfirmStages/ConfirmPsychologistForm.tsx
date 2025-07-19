@@ -14,7 +14,7 @@ import { RootState } from '@/redux/store';
 import { fill_filtered_by_automatch_psy, setSelectedPsychologist } from '@/redux/slices/filter';
 import { Tooltip } from '@/shared/ui/Tooltip';
 import { NoMatchError } from '../HelpHandStages/NoMatchError';
-import { EmergencyContacts } from '../HelpHandStages/EmergencyContacts';
+import { EmergencyContactsClone } from '../HelpHandStages/EmergencyContactsClone';
 import axios from 'axios';
 import styles from '../HelpHandStages/PsychologistStage.module.scss';
 import styles_cards from '../Card/Card.module.scss';
@@ -90,11 +90,14 @@ const getPsychologistDeclension = (count: number): string => {
 
 export const ConfirmPsychologistForm = () => {
   const dispatch = useDispatch();
-  const ticketID = useSelector<RootState, string>(state => state.applicationFormData.ticketID);
   const formData = useSelector((state: RootState) => state.applicationFormData);
   const searchParams = useSearchParams();
   const isResearchRedirect = searchParams.get('research') == 'true';
   const utm_psy = searchParams.get('utm_psy');
+  const ticketID = searchParams.get('ticket_id');
+
+  // Проверяем наличие обязательных параметров
+  const hasRequiredParams = utm_psy || ticketID;
 
   useEffect(() => {
     axios({
@@ -109,7 +112,7 @@ export const ConfirmPsychologistForm = () => {
   const [showEmergency, setShowEmergency] = useState(false);
   const [retryCount, setRetryCount] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [availableSlots, setAvailableSlots] = useState<SimpleSlot[]>([]);
 
   const filtered_by_automatch_psy = useSelector<RootState, any[]>(state => state.filter.filtered_by_automatch_psy);
@@ -207,7 +210,7 @@ export const ConfirmPsychologistForm = () => {
           contact: formData.phone,
           name: formData.username,
           promocode: formData.promocode,
-          ticket_id: formData.ticketID,
+          ticket_id: ticketID,
           emptySlots: false,
           userTimeZone: "МСК" + (userTimeOffsetMsk > 0 ? '+' + userTimeOffsetMsk : userTimeOffsetMsk < 0 ? userTimeOffsetMsk : ''),
           bid: 0,
@@ -250,15 +253,19 @@ export const ConfirmPsychologistForm = () => {
           data[0].items.forEach((day: any) => {
             if (day.slots) {
               Object.entries(day.slots).forEach(([time, slotArr]: [string, any]) => {
-                if (Array.isArray(slotArr)) {
+                // Если слот - массив с объектами, проверяем каждый объект
+                if (Array.isArray(slotArr) && slotArr.length > 0) {
                   slotArr.forEach((slot: any) => {
                     // Логирование каждого слота
                     console.log('slot:', slot);
                     if (slot.state && slot.state.trim().includes('Свободен')) {
-                      const moscow_datetime = new Date(`${slot.date}T${slot.time}`);
+                      // Используем локальные дату и время из слота
+                      const slotDate = slot['Дата Локальная'] || slot.date;
+                      const slotTime = slot['Время Локальное'] || slot.time;
+                      const moscow_datetime = new Date(`${slotDate}T${slotTime}`);
                       slots.push({
-                        date: slot.date,
-                        time: slot.time,
+                        date: slotDate,
+                        time: slotTime,
                         moscow_datetime_formatted: format(moscow_datetime, 'dd.MM / HH:mm'),
                       });
                     }
@@ -268,7 +275,11 @@ export const ConfirmPsychologistForm = () => {
             }
           });
         }
+        console.log('Found slots:', slots.length);
         setAvailableSlots(slots);
+        if (slots.length === 0) {
+          setShowEmergency(true);
+        }
         setIsLoading(false);
       } catch (error) {
         console.error('Error loading slots:', error);
@@ -279,17 +290,17 @@ export const ConfirmPsychologistForm = () => {
     fetchHelpfulHandSlots();
   }, [currentIndex, filtered_by_automatch_psy, ticketID]);
 
-  useEffect(() => {
-    if (!isLoading && filtered_by_automatch_psy.length === 0) {
-      setShowNoMatch(true);
-    }
-  }, [filtered_by_automatch_psy.length, isLoading]);
 
+
+
+  // Показываем экстренные контакты если нет обязательных параметров
   useEffect(() => {
-    if (!isLoading && filtered_by_automatch_psy.length === 0 && retryCount > 0) {
+    if (!hasRequiredParams) {
       setShowEmergency(true);
     }
-  }, [filtered_by_automatch_psy.length, retryCount, isLoading]);
+  }, [hasRequiredParams]);
+
+ 
 
   const getFilterQueryParams = () => {
     const params = new URLSearchParams();
@@ -360,12 +371,12 @@ export const ConfirmPsychologistForm = () => {
   };
 
   if (showEmergency) {
-    return <EmergencyContacts onClose={handleCloseEmergency} />;
+    return <EmergencyContactsClone onClose={handleCloseEmergency} />;
   }
   if (showNoMatch && availableSlots.length === 0) {
-    return <NoMatchError onClose={handleCloseNoMatch} />;
+    return <EmergencyContactsClone onClose={handleCloseNoMatch} />;
   }
-  if (!filtered_by_automatch_psy.length) {
+  if (!filtered_by_automatch_psy.length || isLoading) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>

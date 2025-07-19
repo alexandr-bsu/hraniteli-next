@@ -37,18 +37,7 @@ export default function HelpHandConfirm() {
                         </span>
                     </div>
                 </div>
-                {/* {showProgress && (
-          <ul className="mt-[10px] min-lg:px-[50px] max-lg:px-[20px] gap-[10px] flex w-full justify-items-stretch">
-            <li className="w-auto border-[1px] max-lg:h-[59px] border-[#D4D4D4] h-[85px] rounded-[15px] flex grow justify-between items-center p-[20px]">
-              <span className="font-normal max-lg:text-[14px] text-[18px] leading-[25px]">
-                Заявка заполнена на:
-              </span>
-              <div className="bg-[#116466] max-lg:h-[39px] max-lg:text-[14px] p-[10px] rounded-[6px] font-normal text-[18px] text-[white]">
-                {getProgressPercentage()}%
-              </div>
-            </li>
-          </ul>
-        )} */}
+               
                 <hr className="w-full border-t-[2px] border-dotted mt-[15px]" />
             </div>
             <ConfirmPsychologistForm />
