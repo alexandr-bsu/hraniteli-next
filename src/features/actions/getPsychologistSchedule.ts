@@ -154,7 +154,7 @@ export const submitQuestionnaire = async (formData: IApplicationFormData, from_c
 
         const offset = getTimeDifference();
         const response = await fetch(
-            from_cards ? `https://cache-api.hrani.live/schedule/${offset}`
+            from_cards ? `https://cache-api.hrani.live/convert-schedule-timezone/${offset}`
                 : from_diagnostic_form ? 'https://n8n-v2.hrani.live/webhook/schedule-diagnosis-v2'
                     : 'https://n8n-v2.hrani.live/webhook/get-agregated-schedule-v2', {
 

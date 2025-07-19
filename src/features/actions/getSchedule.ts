@@ -47,7 +47,7 @@ export const getSchedule = async () => {
     };  
 
     const offset = getTimeDifference();
-    const response = await axios.post(`https://cache-api.hrani.live/schedule/${offset}`, {
+    const response = await axios.post(`https://cache-api.hrani.live/convert-schedule-timezone/${offset}`, {
       startDate,
       endDate,
       userTimeOffsetMsk: offset,
