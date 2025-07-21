@@ -14,7 +14,8 @@ export interface RootState {
     application_stage: ApplicationStage;
     rid: number;
     bid: number;
-    is_tracker_launched: boolean
+    is_tracker_launched: boolean;
+    is_request_send: boolean; // добавлено
   };
   applicationFormData: IApplicationFormData;
   filter: {

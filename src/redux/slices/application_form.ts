@@ -33,14 +33,16 @@ interface ApplicationFormState {
     application_stage: ApplicationStage;
     rid: number;
     bid: number;
-    is_tracker_launched: boolean
+    is_tracker_launched: boolean;
+    is_request_send: boolean; // Новый флаг
 }
 
 const initialState: ApplicationFormState = {
     application_stage: 'name',
     rid: 0,
-    bid:0,
-    is_tracker_launched: false
+    bid: 0,
+    is_tracker_launched: false,
+    is_request_send: false // Значение по умолчанию
 };
 
 export const applicationFormSlice = createSlice({
@@ -61,11 +63,14 @@ export const applicationFormSlice = createSlice({
 
         setInitTrackerStatusLaunched(state){
             state.is_tracker_launched = true
+        },
+        setIsRequestSend: (state, action: PayloadAction<boolean>) => {
+            state.is_request_send = action.payload;
         }
     }
 });
 
-export const { setApplicationStage, setRid, setBid, setInitTrackerStatusLaunched} = applicationFormSlice.actions;
+export const { setApplicationStage, setRid, setBid, setInitTrackerStatusLaunched, setIsRequestSend } = applicationFormSlice.actions;
 export const applicationFormReducer = applicationFormSlice.reducer;
 
 // Селектор для получения текущего этапа

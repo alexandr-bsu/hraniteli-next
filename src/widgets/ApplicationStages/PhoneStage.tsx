@@ -20,6 +20,7 @@ import axios from 'axios';
 import { toast } from 'sonner';
 import { getTimeDifference } from '@/features/utils';
 import useYandexMetrika from '@/components/yandex/useYandexMetrika'
+import { setIsRequestSend } from '@/redux/slices/application_form';
 
 
 const phoneRegex = /^\+7\d{10}$/;
@@ -29,6 +30,7 @@ const FormSchema = z.object({
 });
 
 export const PhoneStage = () => {
+    const isRequestSend = useSelector<RootState, boolean>(state => state.applicationForm.is_request_send);
     const dispatch = useDispatch();
 
     const ticketID = useSelector<RootState, string>(
@@ -107,6 +109,8 @@ export const PhoneStage = () => {
 
     // 4. Отправка формы
     const handleSubmit = async (data: z.infer<typeof FormSchema>) => {
+        if (isRequestSend) return; // Не отправляем повторно
+        dispatch(setIsRequestSend(true));
         localStorage.setItem('app_phone', JSON.stringify(data.phone));
         dispatch(setPhone(data.phone));
 
@@ -369,6 +373,8 @@ export const PhoneStage = () => {
         } catch (error) {
             console.error('Ошибка при отправке заявки:', error);
             toast.error('Произошла ошибка при отправке заявки. Пожалуйста, попробуйте еще раз.');
+        } finally {
+            dispatch(setIsRequestSend(false));
         }
 
     };

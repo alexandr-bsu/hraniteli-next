@@ -6,7 +6,7 @@ import { setPhone, setHasMatchingError } from '@/redux/slices/application_form_d
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { z } from 'zod';
 import { COLORS } from '@/shared/constants/colors';
 import styles from '@/styles/input.module.scss';
@@ -19,6 +19,8 @@ import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
 import axios from 'axios';
 import useYandexMetrika from '@/components/yandex/useYandexMetrika'
 
+import { setIsRequestSend } from '@/redux/slices/application_form';
+
 const phoneRegex = /^\+7\d{10}$/;
 
 const FormSchema = z.object({
@@ -26,6 +28,7 @@ const FormSchema = z.object({
 });
 
 export const PhoneStage = () => {
+    const isRequestSend = useSelector<RootState, boolean>(state => state.applicationForm.is_request_send);
     const dispatch = useDispatch();
     const ticketID = useSelector<RootState, string>(
         state => state.applicationFormData.ticketID
@@ -76,7 +79,9 @@ export const PhoneStage = () => {
 
     // 4. Отправка формы
     const handleSubmit = async (data: z.infer<typeof FormSchema>) => {
+        if (isRequestSend) return; // Не отправляем повторно
         setIsLoading(true);
+        dispatch(setIsRequestSend(true));
         localStorage.setItem('app_phone', JSON.stringify(data.phone));
         dispatch(setPhone(data.phone));
 
@@ -99,6 +104,7 @@ export const PhoneStage = () => {
             setShowNoMatch(true);
         } finally {
             setIsLoading(false);
+            dispatch(setIsRequestSend(false));
         }
     }
 
