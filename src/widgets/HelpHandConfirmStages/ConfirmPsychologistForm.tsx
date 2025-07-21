@@ -117,6 +117,7 @@ export const ConfirmPsychologistForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [availableSlots, setAvailableSlots] = useState<SimpleSlot[]>([]);
   const [showFinalStage, setShowFinalStage] = useState(false);
+  const [isAllowedForSlots, setIsAllowedForSlots] = useState<boolean | null>(null); // Новый стейт
 
   const filtered_by_automatch_psy = useSelector<RootState, any[]>(state => state.filter.filtered_by_automatch_psy);
   const currentIndex = useSelector((state: RootState) => state.applicationFormData.index_phyc);
@@ -146,8 +147,39 @@ export const ConfirmPsychologistForm = () => {
 
   const currentPsychologist = filtered_by_automatch_psy[currentIndex];
 
+  // Проверка разрешения на показ слотов
+  useEffect(() => {
+    if (!ticketID) {
+      setIsAllowedForSlots(null);
+      return;
+    }
+    setIsLoading(true);
+    fetch(`https://n8n-v2.hrani.live/webhook/check-allotment-for-slot-confirmation?ticket_id=${encodeURIComponent(ticketID)}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.is_allowed === false || data.is_allowed === 'false') {
+          setIsAllowedForSlots(false);
+          setIsLoading(false);
+        } else {
+          setIsAllowedForSlots(true);
+        }
+      })
+      .catch(() => {
+        setIsAllowedForSlots(false);
+        setIsLoading(false);
+      });
+  }, [ticketID]);
+
   // Новый способ загрузки слотов через API
   useEffect(() => {
+    // Не загружаем слоты, если не разрешено
+    if (isAllowedForSlots === false) {
+      setAvailableSlots([]);
+      setShowEmergency(true);
+      setIsLoading(false);
+      return;
+    }
+    if (isAllowedForSlots !== true) return;
     const fetchHelpfulHandSlots = async () => {
       if (!currentPsychologist?.name) {
         setAvailableSlots([]);
@@ -299,7 +331,7 @@ export const ConfirmPsychologistForm = () => {
       }
     };
     fetchHelpfulHandSlots();
-  }, [currentIndex, filtered_by_automatch_psy, ticketID]);
+  }, [currentIndex, filtered_by_automatch_psy, ticketID, isAllowedForSlots]);
 
 
 
@@ -463,7 +495,7 @@ export const ConfirmPsychologistForm = () => {
     setSelectedSlot(slot);
   };
 
-  if (showEmergency) {
+  if (isAllowedForSlots === false || showEmergency) {
     return <EmergencyContactsClone onClose={handleCloseEmergency} />;
   }
   if (showNoMatch && availableSlots.length === 0) {
