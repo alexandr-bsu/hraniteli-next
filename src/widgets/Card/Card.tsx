@@ -386,15 +386,10 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                         <div className={`${styles.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
                             {psychologist.experience && (
                                 <span className={styles.experience}>
-                                    {psychologist.experience}
+                                    {psychologist.experience} в сообществе
                                 </span>
                             )}
-                            {psychologist.in_community && (
-                                <span className={styles.experience}>
-                                    в сообществе
-
-                                </span>
-                            )}
+                            
                             {psychologist.verified && (
                                 <Image
                                     src="/card/verified.svg"

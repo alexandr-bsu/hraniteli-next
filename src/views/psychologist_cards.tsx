@@ -183,6 +183,18 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
         
     }, [])
 
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const url = new URL(window.location.href);
+        const param = url.searchParams.get('selected_psychologist');
+        if (param && (param.includes('%2520') || param.includes('%20') || param.includes('_'))) {
+            let decoded = decodeURIComponent(decodeURIComponent(param));
+            decoded = decoded.replace(/(%2520|%20|_)+/g, ' ');
+            url.searchParams.set('selected_psychologist', decoded);
+            window.history.replaceState({}, '', url.toString());
+        }
+    }, []);
+
     // Инициализация данных
     useEffect(() => {
         // Если данные уже загружены из родительского компонента, пропускаем загрузку

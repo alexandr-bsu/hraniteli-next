@@ -408,12 +408,7 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
                     <span className='font-normal text-[16px] leading-[22px] max-md:text-[14px]'>
                         {psychologistData?.experience && (
                             <span className=''>
-                                {psychologistData.experience}{' '}
-                            </span>
-                        )}
-                        {psychologistData?.in_community && (
-                            <span className=''>
-                                в сообществе
+                                {psychologistData.experience}{' '}в сообществе
                             </span>
                         )}
                     </span>

@@ -620,9 +620,8 @@
 
 .educationText {
     position: relative;
-    max-height: 44px; // Высота двух строк
-    overflow: hidden;
-    // transition: max-height 0.3s ease; // УБРАНО
+    // max-height: 44px; // Высота двух строк
+    // overflow: hidden;
 
     p {
         font-size: 14px;
