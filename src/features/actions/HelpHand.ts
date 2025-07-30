@@ -40,6 +40,7 @@ interface HelpHandRequest {
     clientStates: string[];
     selectedPsychologistsNames: string[];
     shownPsychologists: string;
+    top_3_psychologists: string[];
     psychos: any[];
     lastExperience: string;
     amountExpectations: string;
@@ -113,6 +114,7 @@ export const submitHelpHandQuestionnaire = async (formData: IApplicationFormData
             clientStates: formData.conditions || [],
             selectedPsychologistsNames: [],
             shownPsychologists: '',
+            top_3_psychologists:[],
             psychos: [],
             lastExperience: '',
             amountExpectations: '',
