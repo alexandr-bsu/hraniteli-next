@@ -45,6 +45,10 @@ export const PhoneStage = () => {
         state => state.filter
     ).selected_psychologist;
 
+    // Add selector for all matched psychologists
+    const filtered_by_automatch_psy = useSelector<RootState, any[]>(
+        state => state.filter.filtered_by_automatch_psy
+    );
 
 
     const timeDifference = getTimeDifference();
@@ -141,6 +145,7 @@ export const PhoneStage = () => {
                     JSON.parse(localStorage.getItem('app_conditions') || '[]') : [],
                 selectedPsychologistsNames: [currentPsychologist?.name],
                 shownPsychologists: currentPsychologist?.name || "",
+                top_3_psychologists: Array.from(new Set((filtered_by_automatch_psy || []).map((psy: any) => psy.name).filter(Boolean))),
                 lastExperience: localStorage.getItem('app_experience') === 'earlier' ? 'Да, я работал(а) с психологом/психотерапевтом.' + (localStorage.getItem('app_experience') == 'earlier' ?
                     localStorage.getItem('app_session_duration') === '<1 month' ? 'До месяца' :
                         localStorage.getItem('app_session_duration') === '2-3 months' ? '2-3 месяца' :
