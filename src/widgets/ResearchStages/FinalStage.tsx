@@ -7,9 +7,13 @@ import { useDispatch } from "react-redux"
 import { setRid, setBid, setApplicationStage } from "@/redux/slices/application_form"
 import axios from "axios"
 import { useEffect } from "react"
+import { TextTooltip } from "@/shared/ui/Tooltip/TextTooltip";
+
 
 export const FinalStage = () => {
   const dispatch = useDispatch()
+
+  const occupation = typeof window !== 'undefined' ? localStorage.getItem('app_occupation') : null;
 
   const ticketID = useSelector<RootState, string>(
     state => state.applicationFormData.ticketID
@@ -173,26 +177,45 @@ export const FinalStage = () => {
 
           <div className="flex flex-col items-center gap-[10px]">
             <h2 className="font-semibold text-[26px] max-lg:text-[14px] max-lg:leading-[22px]">Спасибо!</h2>
-
-            {/* <span className="font-normal text-[18px] leading-[25px] text-center max-lg:text-[14px]">В знак благодарности мы обещали подарить бесплатную сессию с аналитическим психологом из Хранителей. Сессия - 55 минут, онлайн, по видеосвязи. Готовы сейчас оставить запрос и выбрать время?  */}
-            {/* <br />  */}
-            {/* </span> */}
           </div>
 
-          <div className="border-[#D4D4D4] border-[2px] p-[20px] text-center rounded-[30px] max-lg:text-[14px] mt-[30px] flex justify-center items-center text-[18px] leading-[25px] font-normal w-full">
-            В знак благодарности мы обещали подарить бесплатную сессию с аналитическим психологом из Хранителей. Сессия - 55 минут, онлайн, по видеосвязи. Готовы сейчас оставить запрос и выбрать время?
-          </div>
+          {occupation === 'no income' ? (
+            <>
+              <div className="border-[#D4D4D4] border-[2px] p-[20px] text-center rounded-[30px] max-lg:text-[14px] mt-[30px] flex flex-col justify-center items-center text-[18px] leading-[25px] font-normal w-full">
+                <span>Сейчас мы не можем подобрать подходящего для вас психолога 🙏 Вы можете подать заявку в Руку Помощи
+                  <TextTooltip text="В рамках проекта вы можете найти психолога для длительной терапии со стоимостью 8 сессий (2 месяца терапии) бесплатно или по своей цене">
+                    <span className="inline-flex align-middle ml-1"><img src='card/hint.svg' width={20} height={20} /></span>
+                  </TextTooltip>
+                  , и мы сообщим вам, когда психолог освободится
+                </span>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="border-[#D4D4D4] border-[2px] p-[20px] text-center rounded-[30px] max-lg:text-[14px] mt-[30px] flex justify-center items-center text-[18px] leading-[25px] font-normal w-full">
+                В знак благодарности мы обещали подарить бесплатную сессию с аналитическим психологом из Хранителей. Сессия - 55 минут, онлайн, по видеосвязи. Первая сессия - бесплатная, вторая и последующие - по цене психолога на карточке. Готовы сейчас оставить запрос и выбрать время?
+              </div>
+            </>
+          )}
         </div>
-
-
       </div>
-
-      <button
-        onClick={handleContinueClick}
-        className={`w-full text-[#FFFFFF] p-[14px] max-lg:text-[14px] shrink-0 bg-[#116466] rounded-[50px] font-normal text-[18px] leading-[25px]`}
-      >
-        Да
-      </button>
+      {occupation === 'no income' ? (
+        <a
+          href="https://hrani.live/help-hand-registration"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`w-full text-[#FFFFFF] p-[14px] max-lg:text-[14px] shrink-0 bg-[#116466] rounded-[50px] font-normal text-[18px] leading-[25px] flex items-center justify-center text-center`}
+        >
+          Оставить заявку
+        </a>
+      ) : (
+        <button
+          onClick={handleContinueClick}
+          className={`w-full text-[#FFFFFF] p-[14px] max-lg:text-[14px] shrink-0 bg-[#116466] rounded-[50px] font-normal text-[18px] leading-[25px]`}
+        >
+          Да
+        </button>
+      )}
     </div>
   )
 }
