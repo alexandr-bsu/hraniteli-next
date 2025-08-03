@@ -502,7 +502,8 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                 <div className={styles.section}>
                     <h3 className={styles.sectionTitle}>Образование</h3>
                     <div className={styles.education}>
-                        {(psychologist.education ?? [])
+                        {[...(psychologist.education ?? [])]
+                            .sort((a, b) => (b.educationItemYear || 0) - (a.educationItemYear || 0))
                             .slice(0, showAllEducation ? undefined : 2)
                             .map((item, index, arr) => {
                                 const isLastVisible = !showAllEducation && index === arr.length - 1 && (psychologist.education ?? []).length > 2;
