@@ -43,7 +43,8 @@ export const getSchedule = async () => {
       const userOffset = -(new Date().getTimezoneOffset() / 60);
       const moscowOffset = 3; // Москва UTC+3
       // Разница = Московское смещение - пользовательское смещение
-      return userOffset-moscowOffset;
+      // return userOffset-moscowOffset;
+      return 0;
     };  
 
     const offset = getTimeDifference();

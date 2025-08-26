@@ -118,7 +118,9 @@ export const TimeStage = () => {
         return (
             <span className="text-[18px] leading-[25px] font-normal text-[#151515] flex gap-[10px] max-lg:text-[14px]">
                 {/* Часовой пояс: <span className="text-[#116466]">{formattedTimeZone} ( МСК {timeDifference > 0 ? '+' : ''}{timeDifference} )</span> */}
-                Часовой пояс: <span className="text-[#116466]">{formattedTimeZone}</span>
+                {/* Часовой пояс: <span className="text-[#116466]">{formattedTimeZone}</span> */}
+                Часовой пояс: <span className="text-[#116466]">Москва</span>
+
 
             </span>
         );
