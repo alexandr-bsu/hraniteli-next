@@ -197,14 +197,14 @@ export const ConfirmPsychologistForm = () => {
           age: formData.age,
           city: formData.city,
           sex: formData.gender_user === 'male' ? 'Мужской' :
-               formData.gender_user === 'female' ? 'Женский' : '',
+            formData.gender_user === 'female' ? 'Женский' : '',
           psychoEducated: '',
           anxieties: [],
           customAnexiety: '',
           hasPsychoExperience: formData.experience === 'earlier' ? 'Да, обращался(ась) ранее' :
-                              formData.experience === 'in_therapy' ? 'Да, сейчас нахожусь в терапии' :
-                              formData.experience === 'supposed' ? 'Нет, но рассматривал(а) такую возможность' :
-                              formData.experience === 'no' ? 'Нет' : 'Нет',
+            formData.experience === 'in_therapy' ? 'Да, сейчас нахожусь в терапии' :
+              formData.experience === 'supposed' ? 'Нет, но рассматривал(а) такую возможность' :
+                formData.experience === 'no' ? 'Нет' : 'Нет',
           meetType: '',
           selectionСriteria: '',
           custmCreteria: '',
@@ -212,7 +212,7 @@ export const ConfirmPsychologistForm = () => {
           customImportance: formData.custom_preferences,
           agePsycho: '',
           sexPsycho: formData.gender_psychologist === 'male' ? 'Мужской' :
-                     formData.gender_psychologist === 'female' ? 'Женский' : 'Не имеет значения',
+            formData.gender_psychologist === 'female' ? 'Женский' : 'Не имеет значения',
           priceLastSession: '',
           durationSession: '',
           reasonCancel: '',
@@ -251,12 +251,12 @@ export const ConfirmPsychologistForm = () => {
           bid: 0,
           rid: 0,
           categoryType: formData.price_session === 'free' ? 'Бесплатно' :
-                       formData.price_session === '300' ? '300 руб' :
-                       formData.price_session === '500' ? '500 руб' :
-                       formData.price_session === '1000' ? '1000 руб' :
-                       formData.price_session === '1500' ? '1500 руб' :
-                       formData.price_session === '2000' ? '2000 руб' :
-                       formData.price_session === '3000' ? '3000 руб' : 'Бесплатно',
+            formData.price_session === '300' ? '300 руб' :
+              formData.price_session === '500' ? '500 руб' :
+                formData.price_session === '1000' ? '1000 руб' :
+                  formData.price_session === '1500' ? '1500 руб' :
+                    formData.price_session === '2000' ? '2000 руб' :
+                      formData.price_session === '3000' ? '3000 руб' : 'Бесплатно',
           customCategory: '',
           question_to_psychologist: formData.requests?.join('; ') || '',
           filtered_by_automatch_psy_names: [],
@@ -299,7 +299,7 @@ export const ConfirmPsychologistForm = () => {
                       const slotDate = slot['Дата Локальная'] || slot.date;
                       const slotTime = slot['Время Локальное'] || slot.time;
                       const moscow_datetime = new Date(`${slotDate}T${slotTime}`);
-                      
+
                       // Проверяем, что у слота есть ID
                       if (slot.id) {
                         slots.push({
@@ -343,7 +343,7 @@ export const ConfirmPsychologistForm = () => {
     }
   }, [hasRequiredParams]);
 
- 
+
 
   const getFilterQueryParams = () => {
     const params = new URLSearchParams();
@@ -398,7 +398,7 @@ export const ConfirmPsychologistForm = () => {
   const handleSubmit = async () => {
     if (selectedSlot) {
       setIsSubmitting(true);
-      
+
       try {
         // Форматируем слот в правильном формате (дата и время по МСК)
         // Используем 'd.M' для формата "23.7" (без ведущего нуля для месяца)
@@ -414,7 +414,7 @@ export const ConfirmPsychologistForm = () => {
         console.log('Локальное время:', localDateTime.toISOString());
         console.log('Московское время:', moscowDateTime.toISOString());
         console.log('ID выбранного слота:', selectedSlot.id);
-        
+
         // Сохраняем в Redux
         dispatch(setSelectedSlots([formattedSlot]));
         dispatch(setSelectedSlotsObjects([selectedSlot.id])); // Сохраняем ID выбранного слота
@@ -448,12 +448,12 @@ export const ConfirmPsychologistForm = () => {
           bid: 0,
           rid: 0,
           categoryType: formData.price_session === 'free' ? 'Бесплатно' :
-                       formData.price_session === '300' ? '300 руб' :
-                       formData.price_session === '500' ? '500 руб' :
-                       formData.price_session === '1000' ? '1000 руб' :
-                       formData.price_session === '1500' ? '1500 руб' :
-                       formData.price_session === '2000' ? '2000 руб' :
-                       formData.price_session === '3000' ? '3000 руб' : 'Бесплатно',
+            formData.price_session === '300' ? '300 руб' :
+              formData.price_session === '500' ? '500 руб' :
+                formData.price_session === '1000' ? '1000 руб' :
+                  formData.price_session === '1500' ? '1500 руб' :
+                    formData.price_session === '2000' ? '2000 руб' :
+                      formData.price_session === '3000' ? '3000 руб' : 'Бесплатно',
           customCategory: "",
           question_to_psychologist: formData.requests?.join('; ') || "",
           filtered_by_automatch_psy_names: currentPsychologist?.name ? [currentPsychologist.name] : [],
@@ -646,8 +646,17 @@ export const ConfirmPsychologistForm = () => {
             <div>
               <span className="text-[#9A9A9A] text-[16px]">Стоимость:</span>
               <div className="flex items-center gap-[10px] mt-[5px]">
-                <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p>
-                <Tooltip text="Стоимость сессии длительностью 50-55 минут в формате онлайн видеозвонка. Частоту и формат последующих встреч определяете вместе с психологом" />
+                {/* <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p> */}
+                <p className="font-semibold text-[18px]">От 0 ₽</p>
+                <Tooltip text={`Первая сессия - бесплатно. Последующие сессии по цене психолога - ${currentPsychologist.min_session_price || 0} ₽.
+
+Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности.
+
+Пример:
+Первая сессия - бесплатно. Последующие сессии по цене психолога - 2'000 рублей. 
+
+Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности.
+`} />
               </div>
             </div>
           </div>

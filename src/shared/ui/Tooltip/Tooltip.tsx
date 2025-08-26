@@ -68,7 +68,12 @@ export const Tooltip: FC<TooltipProps> = ({ text, children, customMargin, classN
             style={getTooltipStyle()}
             onClick={(e) => e.stopPropagation()}
         >
-            {text}
+            {text.split('\n').map((line, index) => (
+                <span key={index}>
+                    {line}
+                    {index < text.split('\n').length - 1 && <br />}
+                </span>
+            ))}
         </div>
     );
 

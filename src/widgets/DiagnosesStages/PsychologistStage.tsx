@@ -608,8 +608,17 @@ export const PsychologistStage = () => {
             <div>
               <span className="text-[#9A9A9A] text-[16px]">Стоимость:</span>
               <div className="flex items-center gap-[10px] mt-[5px]">
-                <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p>
-                <Tooltip text="Стоимость сессии длительностью 50-55 минут в формате онлайн видеозвонка. Частоту и формат последующих встреч определяете вместе с психологом" />
+                {/* <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p> */}
+                <p className="font-semibold text-[18px]">От 0 ₽</p>
+                <Tooltip text={`Первая сессия - бесплатно. Последующие сессии по цене психолога - ${currentPsychologist.min_session_price || 0} ₽.
+
+Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности.
+
+Пример:
+Первая сессия - бесплатно. Последующие сессии по цене психолога - 2'000 рублей. 
+
+Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности.
+`} />
               </div>
             </div>
           </div>
