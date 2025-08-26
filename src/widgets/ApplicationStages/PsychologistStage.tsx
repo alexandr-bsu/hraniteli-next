@@ -610,12 +610,7 @@ export const PsychologistStage = () => {
               <div className="flex items-center gap-[10px] mt-[5px]">
                 {/* <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p> */}
                 <p className="font-semibold text-[18px]">От 0 ₽</p>
-                <Tooltip text={`Первая сессия - бесплатно. Последующие сессии по цене психолога - ${currentPsychologist.min_session_price || 0} ₽.
-
-Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности.
-
-Пример:
-Первая сессия - бесплатно. Последующие сессии по цене психолога - 2'000 рублей. 
+                <Tooltip text={`<b>Первая сессия - бесплатно. Последующие сессии по цене психолога - ${currentPsychologist.min_session_price || 0} ₽.</b>
 
 Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности.
 `} />

@@ -67,14 +67,8 @@ export const Tooltip: FC<TooltipProps> = ({ text, children, customMargin, classN
             className={styles.tooltip}
             style={getTooltipStyle()}
             onClick={(e) => e.stopPropagation()}
-        >
-            {text.split('\n').map((line, index) => (
-                <span key={index}>
-                    {line}
-                    {index < text.split('\n').length - 1 && <br />}
-                </span>
-            ))}
-        </div>
+            dangerouslySetInnerHTML={{ __html: text.replace(/\n/g, '<br />') }}
+        />
     );
 
     const overlayContent = (
