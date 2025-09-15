@@ -336,7 +336,7 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
             const timeDifference = getTimeDifference();
             
             // UPDATE: перенёс генерацию выше
-            const ticketId = makeTicketId(7);
+            const ticketId = 'cd_'+makeTicketId(7);
 
             const requestData = {
                 ...getInitialFormData(ticketId, timeDifference),
