@@ -29,7 +29,7 @@ export const FullWidthPopup: React.FC<FullWidthPopupProps> = ({
       style={{ background: "rgba(0,0,0,0.35)" }}
       onClick={() => {
         if(!hideClose)  
-          onClose
+          onClose()
       }}
     >
       <div
