@@ -9,6 +9,8 @@ interface FullWidthPopupProps {
   padding?: string; // e.g., '32px'
   maxWidth?: string; // e.g., '100vw'
   className?: string;
+  hideClose?:boolean;
+  
 }
 
 export const FullWidthPopup: React.FC<FullWidthPopupProps> = ({
@@ -18,13 +20,17 @@ export const FullWidthPopup: React.FC<FullWidthPopupProps> = ({
   padding = "32px",
   maxWidth = "100vw",
   className = "",
+  hideClose = false
 }) => {
   if (!open) return null;
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur"
       style={{ background: "rgba(0,0,0,0.35)" }}
-      onClick={onClose}
+      onClick={() => {
+        if(!hideClose)  
+          onClose
+      }}
     >
       <div
         className={`relative w-full h-full flex items-center justify-center ${className} rounded-[20px]`}

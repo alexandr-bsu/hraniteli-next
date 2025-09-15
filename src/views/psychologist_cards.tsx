@@ -431,18 +431,20 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
             {selectedPsychologistId && popupPsychologist && (
                 <FullWidthPopup
                     open={true}
+                    hideClose={true}
                     onClose={() => {
                         // Remove selected_psychologist from URL
                         const url = new URL(window.location.href);
                         url.searchParams.delete('selected_psychologist');
                         window.history.replaceState({}, '', url.toString());
                     }}
+                    
                     padding="32px"
                     maxWidth="900px"
                     className="flex flex-col h-full p-0"
                 >
                     <div className="flex-1 overflow-y-auto h-full p-0">
-                        <Card psychologist={popupPsychologist} isSelected={true} inPopup={true} onClose={() => {
+                        <Card psychologist={popupPsychologist} isSelected={true} hideClose = {true} inPopup={true} onClose={() => {
                             const url = new URL(window.location.href);
                             url.searchParams.delete('selected_psychologist');
                             window.history.replaceState({}, '', url.toString());

@@ -108,11 +108,12 @@ interface CardProps {
     showBestMatch?: boolean;
     onExpand?: () => void;
     inPopup?: boolean;
+    hideClose?: boolean
     onClose?: () => void;
 }
 
 const CardInner = forwardRef<HTMLDivElement, CardProps>(
-  ({ psychologist, id, isSelected, showBestMatch = false, onExpand, inPopup = false, onClose }, ref) => {
+  ({ psychologist, id, isSelected, showBestMatch = false, onExpand, inPopup = false, hideClose=false, onClose }, ref) => {
     const dispatch = useDispatch();
     const searchParams = useSearchParams()
 
@@ -354,7 +355,7 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                             {psychologist.name}
                             {psychologist.age !== undefined && `, ${psychologist.age} ${getAgeWord(psychologist.age)}`}
                         </h2>
-                        {inPopup ? (
+                        {inPopup && !hideClose ? (
                             <button
                                 className={"bg-gray-100 rounded-full p-2 hover:bg-gray-200 block lg:inline-block absolute right-4 top-4 z-10 lg:static"}
                                 onClick={onClose}
