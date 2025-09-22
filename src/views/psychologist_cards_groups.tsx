@@ -1,6 +1,6 @@
 'use client'
 import { RootState } from "@/redux/store";
-import { Card, Filter } from "@/widgets";
+import { CardGroup, Filter } from "@/widgets";
 import { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from 'axios';
@@ -491,7 +491,7 @@ export const Psychologist_cards_groups = ({ data, isLoaded }: Props) => {
                     className="flex flex-col h-full p-0"
                 >
                     <div className="flex-1 overflow-y-auto h-full p-0">
-                        <Card psychologist={popupPsychologist} isSelected={true} hideClose = {true} inPopup={true} onClose={() => {
+                        <CardGroup psychologist={popupPsychologist} isSelected={true} hideClose = {true} inPopup={true} onClose={() => {
                             const url = new URL(window.location.href);
                             url.searchParams.delete('selected_psychologist');
                             window.history.replaceState({}, '', url.toString());
@@ -546,7 +546,7 @@ export const Psychologist_cards_groups = ({ data, isLoaded }: Props) => {
                                             }}
                                             id={`psychologist-card-${item.id}`}
                                         >
-                                            <Card
+                                            <CardGroup
                                                 psychologist={item}
                                                 isSelected={filter.selected_psychologist?.id === item.id}
                                                 showBestMatch={hasActiveFilters && index < 3}

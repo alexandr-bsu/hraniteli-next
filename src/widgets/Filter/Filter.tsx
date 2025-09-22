@@ -8,6 +8,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { usePathname } from "next/navigation";
 import { RootState } from "@/redux/store";
 import { openModal, closeModal, ModalType } from "@/redux/slices/modal";
 import { FilterRequest, FilterData } from "./FilterRequest";
@@ -37,6 +38,7 @@ export const Filter = () => {
     const { isOpen, type: modalType } = useSelector((state: RootState) => state.modal);
     const currentGender = useSelector((state: RootState) => state.filter.gender) as Gender;
     const favorites = useSelector((state: RootState) => state.favorites.items);
+    const pathname = usePathname();
 
     const [filterData, setFilterDate] = useState<{ date: string; slots?: string[] }[]>([]);
     const [filterPrice, setFilterPrice] = useState<string[]>([]);
@@ -154,7 +156,7 @@ export const Filter = () => {
                                 open={isOpen && modalType === 'FilterGender'}
                             >
                                 <SelectTrigger className="w-full min-h-[65px] font-normal border-none bg-[#FAFAFA] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px]">
-                                    <SelectValue placeholder="Выберите пол Хранителя" />
+                                    <SelectValue placeholder={pathname?.includes('/groups') ? "Выберите пол психолога" : "Выберите пол Хранителя"} />
                                 </SelectTrigger>
                             </Select>
                             {filterGender && filterGender !== 'other' && (
