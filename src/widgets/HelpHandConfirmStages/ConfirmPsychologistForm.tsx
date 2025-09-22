@@ -353,7 +353,10 @@ export const ConfirmPsychologistForm = () => {
       const generatedId = `id_${currentPsychologist.name.replace(/\s+/g, '_')}`;
       params.append('selected_psychologist', generatedId);
     }
-    return `/?${params.toString()}`;
+    
+    // Если психолог не из сообщества, направляем на страницу /groups
+    const basePath = currentPsychologist?.group !== "Сообщество" ? "/groups" : "/";
+    return `${basePath}?${params.toString()}`;
   };
 
   const handleOpenPsychologistCard = () => {
@@ -599,14 +602,11 @@ export const ConfirmPsychologistForm = () => {
                   {currentPsychologist?.name}
                   {currentPsychologist?.age && currentPsychologist.age !== 0 && `, ${currentPsychologist.age} ${getAgeWord(currentPsychologist.age)}`}
                 </h3>
-                <Tooltip
-                  text={`${currentPsychologist.name.split(" ")[1]} как Хранитель придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`}
-                  customMargin="35%"
-                >
+                {currentPsychologist.group !== "Сообщество" ? (
                   <div className={`${styles_cards.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
                     {currentPsychologist.experience && (
                       <span className={`${styles_cards.experience} text-[12px] whitespace-nowrap`}>
-                        {currentPsychologist.experience} в сообществе
+                        Участник супервизионной группы Хранителей {currentPsychologist.experience}
                       </span>
                     )}
                     {currentPsychologist.verified && (
@@ -620,7 +620,30 @@ export const ConfirmPsychologistForm = () => {
                       />
                     )}
                   </div>
-                </Tooltip>
+                ) : (
+                  <Tooltip
+                    text={`${currentPsychologist.name.split(" ")[1]} как Хранитель придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`}
+                    customMargin="35%"
+                  >
+                    <div className={`${styles_cards.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
+                      {currentPsychologist.experience && (
+                        <span className={`${styles_cards.experience} text-[12px] whitespace-nowrap`}>
+                          {currentPsychologist.experience} в сообществе
+                        </span>
+                      )}
+                      {currentPsychologist.verified && (
+                        <Image
+                          src="/card/verified.svg"
+                          alt="Verified"
+                          width={23}
+                          height={23}
+                          style={{ marginLeft: '6px' }}
+                          unoptimized
+                        />
+                      )}
+                    </div>
+                  </Tooltip>
+                )}
               </div>
             </div>
             <button
@@ -631,29 +654,33 @@ export const ConfirmPsychologistForm = () => {
             </button>
           </div>
           {/* Desktop */}
-          <div className="hidden lg:grid lg:grid-cols-3 lg:gap-[30px] lg:mb-[30px]">
+          <div className={`hidden lg:grid lg:gap-[30px] lg:mb-[30px] ${currentPsychologist.group !== "Сообщество" ? 'lg:grid-cols-2' : 'lg:grid-cols-3'}`}>
             <div>
               <span className="text-[#9A9A9A] text-[16px]">Основной подход:</span>
               <div className="flex items-center gap-[10px] mt-[5px]">
                 <p className="font-semibold text-[18px] leading-[25px]">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
-                <Tooltip text={getMethodDescription(currentPsychologist.main_modal) != '' ? getMethodDescription(currentPsychologist.main_modal) : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
+                {currentPsychologist.group === "Сообщество" && (
+                  <Tooltip text={getMethodDescription(currentPsychologist.main_modal) != '' ? getMethodDescription(currentPsychologist.main_modal) : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
+                )}
               </div>
             </div>
             <div>
               <span className="text-[#9A9A9A] text-[16px]">Формат встречи:</span>
               <p className="font-semibold text-[18px] leading-[25px] mt-[5px]">Онлайн</p>
             </div>
-            <div>
-              <span className="text-[#9A9A9A] text-[16px]">Стоимость:</span>
-              <div className="flex items-center gap-[10px] mt-[5px]">
-                {/* <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p> */}
-                <p className="font-semibold text-[18px]">От 0 ₽</p>
-                <Tooltip text={`<b>Первая сессия - бесплатно. Последующие сессии по цене психолога - ${currentPsychologist.min_session_price || 0} ₽.</b>
+            {currentPsychologist.group === "Сообщество" && (
+              <div>
+                <span className="text-[#9A9A9A] text-[16px]">Стоимость:</span>
+                <div className="flex items-center gap-[10px] mt-[5px]">
+                  {/* <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p> */}
+                  <p className="font-semibold text-[18px]">От 0 ₽</p>
+                  <Tooltip text={`<b>Первая сессия - бесплатно. Последующие сессии по цене психолога - ${currentPsychologist.min_session_price || 0} ₽.</b>
 
 Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности.
 `} />
+                </div>
               </div>
-            </div>
+            )}
           </div>
           {/* Tablet and Mobile */}
           <div className="lg:hidden block mb-[20px]">
@@ -662,20 +689,24 @@ export const ConfirmPsychologistForm = () => {
                 <span className="text-[#9A9A9A] text-[14px]">Основной подход:</span>
                 <div className="flex items-center gap-[10px]">
                   <p className="font-semibold text-[14px] leading-[20px]">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
-                  <Tooltip text={getMethodDescription(currentPsychologist.main_modal) != '' ? getMethodDescription(currentPsychologist.main_modal) : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
+                  {currentPsychologist.group === "Сообщество" && (
+                    <Tooltip text={getMethodDescription(currentPsychologist.main_modal) != '' ? getMethodDescription(currentPsychologist.main_modal) : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
+                  )}
                 </div>
               </div>
               <div className="flex flex-col w-fit">
                 <span className="text-[#9A9A9A] text-[14px]">Формат встречи:</span>
                 <p className="font-semibold text-[14px] leading-[20px]">Онлайн</p>
               </div>
-              <div className="flex flex-col w-fit">
-                <span className="text-[#9A9A9A] text-[14px]">Стоимость:</span>
-                <div className="flex items-center gap-[10px]">
-                  <p className="font-semibold text-[14px]">От {currentPsychologist.min_session_price || 0} ₽</p>
-                  <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
+              {currentPsychologist.group === "Сообщество" && (
+                <div className="flex flex-col w-fit">
+                  <span className="text-[#9A9A9A] text-[14px]">Стоимость:</span>
+                  <div className="flex items-center gap-[10px]">
+                    <p className="font-semibold text-[14px]">От {currentPsychologist.min_session_price || 0} ₽</p>
+                    <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
           <div className={styles.nextSession}>
