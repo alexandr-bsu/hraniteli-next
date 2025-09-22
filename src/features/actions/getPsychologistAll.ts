@@ -15,24 +15,15 @@ export async function getPsychologistAll(is_group: boolean = false) {
         });
 
         if (is_group){
-            console.log('=== BEFORE GROUP FILTERING ===')
-            console.log('Total psychologists:', data.length)
-            
-            const groups = Array.from(new Set(data.map((psy: any) => psy.group)))
-            console.log('Groups available:', groups)
-            
-            // Показываем количество психологов в каждой группе
-            groups.forEach(group => {
-                const count = data.filter((psy: any) => psy.group === group).length
-                console.log(`Group "${group}": ${count} psychologists`)
-            })
-            
-            console.log('Genders available:', Array.from(new Set(data.map((psy: any) => psy.sex))))
-            
-            // Восстанавливаем фильтрацию по группе "Супервизии"
+            // Фильтрация для страницы groups - показываем только "Супервизии"
             const beforeFilter = data.length
             data = data.filter((psy: any) => psy.group === 'Супервизии')
-            console.log(`After filtering for "Супервизии": ${data.length} psychologists (was ${beforeFilter})`)
+            console.log(`Groups page: filtered for "Супервизии": ${data.length} psychologists (was ${beforeFilter})`)
+        } else {
+            // Фильтрация для главной страницы - показываем только "Сообщество"
+            const beforeFilter = data.length
+            data = data.filter((psy: any) => psy.group === 'Сообщество')
+            console.log(`Main page: filtered for "Сообщество": ${data.length} psychologists (was ${beforeFilter})`)
         }
         console.log('API Response:',is_group, data)
         // Убедимся что данные - это массив

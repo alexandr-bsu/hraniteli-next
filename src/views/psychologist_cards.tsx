@@ -207,7 +207,7 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
             try {
                 setLoading(true);
                 const [psychologists, availableRequests] = await Promise.all([
-                    getPsychologistAll(),
+                    getPsychologistAll(false), // false означает что это НЕ группа "Супервизии"
                     getAvailableRequests()
                 ]);
 
