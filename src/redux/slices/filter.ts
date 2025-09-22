@@ -121,7 +121,8 @@ const filterSlice = createSlice({
           in_community: psy.in_community || existingPsy?.in_community,
           personal_therapy_duration: psy.personal_therapy_duration || existingPsy?.personal_therapy_duration,
           personal_therapy_type: psy.personal_therapy_type || existingPsy?.personal_therapy_type,
-          is_onboarding_finished: psy.is_onboarding_finished || existingPsy?.is_onboarding_finished
+          is_onboarding_finished: psy.is_onboarding_finished || existingPsy?.is_onboarding_finished,
+          group: psy.group || existingPsy?.group
         };
       });
       state.filtered_by_gender = state.filtered_by_automatch_psy;

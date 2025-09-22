@@ -92,6 +92,7 @@ export interface IPsychologist {
   help_hand?: boolean;
   personal_therapy_type?: string | null;
   is_onboarding_finished?: boolean;
+  group?:string;
   schedule?: {
     days: {
       date: string;
