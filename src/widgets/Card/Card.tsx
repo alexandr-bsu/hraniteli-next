@@ -559,11 +559,22 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                 <div className={styles.section}>
                     <h3 className={styles.sectionTitle}>Подробнее о Хранителе</h3>
                     <div className={styles.links}>
-                        {['vk', 'site', 'telegram'].map((platform) => (
-                            psychologist[platform as keyof IPsychologist] && (
+                        {['vk', 'site', 'telegram'].map((platform) => {
+                            const link = psychologist[platform as keyof IPsychologist];
+                            if (!link) return null;
+                            
+                            // Добавляем https:// если ссылка не содержит протокол
+                            const formatLink = (url: string) => {
+                                if (url.startsWith('http://') || url.startsWith('https://')) {
+                                    return url;
+                                }
+                                return `https://${url}`;
+                            };
+                            
+                            return (
                                 <Link
                                     key={platform}
-                                    href={String(psychologist[platform as keyof IPsychologist])}
+                                    href={formatLink(String(link))}
                                     className={styles.socialLink}
                                     target="_blank"
                                 >
@@ -576,8 +587,8 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                                     />
                                     {platform === 'vk' ? 'VK' : platform === 'site' ? 'Сайт' : 'Telegram'}
                                 </Link>
-                            )
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
 
