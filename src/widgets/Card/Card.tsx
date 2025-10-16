@@ -76,25 +76,25 @@ const method_description = {
     "КПТ": "Этот подход поможет вам скорректировать свое поведение и реакции, избавиться от симптомов, не затрагивая причин, что важно особенно если вы не готовы «идти туда» сейчас. В подходе огромное количество техник, которые помогают найти нерациональные негативные убеждения, а затем изменить их. Это очень логический и структурный подход, с большим объемом саморефлексии, а иногда и домашними заданиями в виде дневника мыслей и эмоций",
 }
 
-const getMethodDescription = (method:string | undefined): string => {
+const getMethodDescription = (method: string | undefined): string => {
     if (method == undefined) return ''
 
-    let description:string = ''
-    switch(method){
-        case 'Аналитическая психология': 
+    let description: string = ''
+    switch (method) {
+        case 'Аналитическая психология':
             description = method_description['Аналитическая психология']
             break
-        case 'Гештальт': 
+        case 'Гештальт':
             description = method_description['Гештальт']
             break
-        case 'Психоанализ': 
+        case 'Психоанализ':
             description = method_description['Психоанализ']
             break
-        case 'КПТ': 
+        case 'КПТ':
             description = method_description['КПТ']
             break
-        default: 
-            description =''
+        default:
+            description = ''
             break
     }
 
@@ -113,534 +113,537 @@ interface CardProps {
 }
 
 const CardInner = forwardRef<HTMLDivElement, CardProps>(
-  ({ psychologist, id, isSelected, showBestMatch = false, onExpand, inPopup = false, hideClose=false, onClose }, ref) => {
-    const dispatch = useDispatch();
-    const searchParams = useSearchParams()
+    ({ psychologist, id, isSelected, showBestMatch = false, onExpand, inPopup = false, hideClose = false, onClose }, ref) => {
+        const dispatch = useDispatch();
+        const searchParams = useSearchParams()
 
-    const modal = useSelector((state: RootState) => state.modal);
-    const favorites = useSelector((state: RootState) => state.favorites.items);
-    const videoRef = useRef<HTMLVideoElement>(null);
-    const [isPlaying, setIsPlaying] = useState(false);
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [showVideo, setShowVideo] = useState(false);
-    const [availableSlots, setAvailableSlots] = useState<{ date: string, time: string }[]>([]);
+        const modal = useSelector((state: RootState) => state.modal);
+        const favorites = useSelector((state: RootState) => state.favorites.items);
+        const videoRef = useRef<HTMLVideoElement>(null);
+        const [isPlaying, setIsPlaying] = useState(false);
+        const [isExpanded, setIsExpanded] = useState(false);
+        const [showVideo, setShowVideo] = useState(false);
+        const [availableSlots, setAvailableSlots] = useState<{ date: string, time: string }[]>([]);
 
-    const [showAllEducation, setShowAllEducation] = useState(false);
-    const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-    const descriptionRef = useRef<HTMLParagraphElement>(null);
-    const [shouldShowGradient, setShouldShowGradient] = useState(false);
+        const [showAllEducation, setShowAllEducation] = useState(false);
+        const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+        const descriptionRef = useRef<HTMLParagraphElement>(null);
+        const [shouldShowGradient, setShouldShowGradient] = useState(false);
 
 
 
-    // Если ID не задан, создаем его из имени
-    useEffect(() => {
-        if (!psychologist.id && psychologist.name) {
-            psychologist.id = `id_${psychologist.name.replace(/\s+/g, '_')}`;
-        }
-    }, [psychologist]);
+        // Если ID не задан, создаем его из имени
+        useEffect(() => {
+            if (!psychologist.id && psychologist.name) {
+                psychologist.id = `id_${psychologist.name.replace(/\s+/g, '_')}`;
+            }
+        }, [psychologist]);
 
-    // Проверяем, находится ли психолог в избранном
-    const isFavorite = favorites.some(item => item.id === psychologist.id);
+        // Проверяем, находится ли психолог в избранном
+        const isFavorite = favorites.some(item => item.id === psychologist.id);
 
-    const imageUrl = getGoogleDriveImageUrl(psychologist.link_photo);
-    const videoUrl = psychologist.link_video;
+        const imageUrl = getGoogleDriveImageUrl(psychologist.link_photo);
+        const videoUrl = psychologist.link_video;
 
-    useEffect(() => {
-        const loadSlots = async () => {
-            try {
-                if (!psychologist.schedule?.days) {
-                    setAvailableSlots([]);
-                    return;
-                }
-
-                const slots: { date: string; time: string }[] = [];
-
-                psychologist.schedule.days.forEach((day) => {
-                    if (day.slots) {
-                        Object.entries(day.slots).forEach(([time, slotArray]) => {
-                            if (Array.isArray(slotArray)) {
-                                slotArray.forEach((slot) => {
-                                    if (slot && slot.state === 'Свободен') {
-                                        slots.push({
-                                            date: day.pretty_date,
-                                            time: time
-                                        });
-                                    }
-                                });
-                            }
-                        });
+        useEffect(() => {
+            const loadSlots = async () => {
+                try {
+                    if (!psychologist.schedule?.days) {
+                        setAvailableSlots([]);
+                        return;
                     }
-                });
 
-                const sortedSlots = slots.sort((a, b) => {
-                    const dateA = new Date(a.date.split('.').reverse().join('-') + ' ' + a.time);
-                    const dateB = new Date(b.date.split('.').reverse().join('-') + ' ' + b.time);
-                    return dateA.getTime() - dateB.getTime();
-                });
+                    const slots: { date: string; time: string }[] = [];
 
-                setAvailableSlots(sortedSlots.slice(0, 3));
-            } catch (error) {
-                console.error('Error loading slots:', error);
-                setAvailableSlots([]);
-            }
-        };
-
-        loadSlots();
-    }, [psychologist.schedule]);
-
-    useEffect(() => {
-        if (descriptionRef.current) {
-            const height = descriptionRef.current.scrollHeight;
-            setShouldShowGradient(height > 44); // 44px - это высота двух строк
-            if (height > 44) {
-                descriptionRef.current.style.height = '44px';
-            }
-        }
-    }, [psychologist.short_description]);
-
-    const handleOpenModal = () => {
-        dispatch(setModalSelectedPsychologist(psychologist.name));
-        dispatch(setSelectedPsychologist(psychologist));
-        dispatch(openModal('Time'));
-    };
-
-    const handleTimeStageComplete = () => {
-        dispatch(closeModal());
-        dispatch(openModal('FilterTime'));
-    };
-
-    const handleVideoClick = () => {
-        if (!videoUrl) return;
-
-        setShowVideo(true);
-        setIsPlaying(true);
-
-        // Даем немного времени для рендера видео
-        setTimeout(() => {
-            if (videoRef.current) {
-                videoRef.current.play();
-            }
-        }, 100);
-    };
-
-    const handleFavoriteClick = () => {
-        if (!psychologist.id) return;
-
-        if (isFavorite) {
-            dispatch(removeFavorite(psychologist.id));
-            toast.success('Психолог удален из избранного');
-        } else {
-            dispatch(addFavorite(psychologist));
-            toast.success('Психолог добавлен в избранное');
-        }
-    };
-
-    const handleSlotClick = (slot: { date: string; time: string }) => {
-        const localSlot = {
-            ...slot,
-            time: slot.time
-        };
-
-        dispatch(setModalSelectedPsychologist(psychologist.name));
-        dispatch(setSelectedPsychologist(psychologist));
-        dispatch(setSelectedDate(localSlot.date));
-        dispatch(setSelectedSlot(localSlot));
-        dispatch(openModal('Time'));
-    };
-
-    const scrolledPsychologist = searchParams.get('selected_psychologist');
-    const isScrolledPsychologist = scrolledPsychologist === String(psychologist.id) || scrolledPsychologist === psychologist.name;
-
-    useEffect(() => {
-        if (isScrolledPsychologist) {
-            setIsExpanded(true)
-        }
-    }, [isScrolledPsychologist])
-
-    useEffect(() => {
-        if (onExpand) onExpand();
-    }, [isDescriptionExpanded, isExpanded]);
-
-    return (
-        <div ref={ref} id={id} className={`${styles.card} ${isSelected ? 'animate-pulse-highlight bg-[#F5F5F5]' : ''} ${isScrolledPsychologist ? styles.expanded : ''}`}>
-            {/* Верхняя часть с фото и основной инфой */}
-            <div className={styles.header}>
-                <div className={styles.avatarSection}>
-                    <div className={styles.avatar} onClick={videoUrl ? handleVideoClick : undefined}>
-                        {/* Плашка "Подходит больше всего" */}
-                        {showBestMatch && (
-                            <div className={styles.bestMatch}>
-                                Подходит больше всего
-                            </div>
-                        )}
-
-                        {showVideo && videoUrl ? (
-                            <div className={styles.videoWrapper}>
-                                <video
-                                    ref={videoRef}
-                                    src={getGoogleDriveVideoUrl(videoUrl) || undefined}
-                                    playsInline
-                                    loop
-                                    // muted
-                                    preload="metadata"
-                                    className={styles.video}
-                                    autoPlay
-                                />
-                                <button
-                                    className={styles.playPauseButton}
-                                    onClick={(e) => {
-                                        e.stopPropagation();
-                                        if (videoRef.current) {
-                                            if (isPlaying) {
-                                                videoRef.current.pause();
-                                            } else {
-                                                const playPromise = videoRef.current.play();
-                                                if (playPromise !== undefined) {
-                                                    playPromise
-                                                        .then(() => {
-                                                            setIsPlaying(true);
-                                                        })
-                                                        .catch(error => {
-                                                            console.error("Error playing video:", error);
-                                                        });
-                                                }
-                                            }
-                                            setIsPlaying(!isPlaying);
+                    psychologist.schedule.days.forEach((day) => {
+                        if (day.slots) {
+                            Object.entries(day.slots).forEach(([time, slotArray]) => {
+                                if (Array.isArray(slotArray)) {
+                                    slotArray.forEach((slot) => {
+                                        if (slot && slot.state === 'Свободен') {
+                                            slots.push({
+                                                date: day.pretty_date,
+                                                time: time
+                                            });
                                         }
+                                    });
+                                }
+                            });
+                        }
+                    });
+
+                    const sortedSlots = slots.sort((a, b) => {
+                        const dateA = new Date(a.date.split('.').reverse().join('-') + ' ' + a.time);
+                        const dateB = new Date(b.date.split('.').reverse().join('-') + ' ' + b.time);
+                        return dateA.getTime() - dateB.getTime();
+                    });
+
+                    setAvailableSlots(sortedSlots.slice(0, 3));
+                } catch (error) {
+                    console.error('Error loading slots:', error);
+                    setAvailableSlots([]);
+                }
+            };
+
+            loadSlots();
+        }, [psychologist.schedule]);
+
+        useEffect(() => {
+            if (descriptionRef.current) {
+                const height = descriptionRef.current.scrollHeight;
+                setShouldShowGradient(height > 44); // 44px - это высота двух строк
+                if (height > 44) {
+                    descriptionRef.current.style.height = '44px';
+                }
+            }
+        }, [psychologist.short_description]);
+
+        const handleOpenModal = () => {
+            dispatch(setModalSelectedPsychologist(psychologist.name));
+            dispatch(setSelectedPsychologist(psychologist));
+            dispatch(openModal('Time'));
+        };
+
+        const handleTimeStageComplete = () => {
+            dispatch(closeModal());
+            dispatch(openModal('FilterTime'));
+        };
+
+        const handleVideoClick = () => {
+            if (!videoUrl) return;
+
+            setShowVideo(true);
+            setIsPlaying(true);
+
+            // Даем немного времени для рендера видео
+            setTimeout(() => {
+                if (videoRef.current) {
+                    videoRef.current.play();
+                }
+            }, 100);
+        };
+
+        const handleFavoriteClick = () => {
+            if (!psychologist.id) return;
+
+            if (isFavorite) {
+                dispatch(removeFavorite(psychologist.id));
+                toast.success('Психолог удален из избранного');
+            } else {
+                dispatch(addFavorite(psychologist));
+                toast.success('Психолог добавлен в избранное');
+            }
+        };
+
+        const handleSlotClick = (slot: { date: string; time: string }) => {
+            const localSlot = {
+                ...slot,
+                time: slot.time
+            };
+
+            dispatch(setModalSelectedPsychologist(psychologist.name));
+            dispatch(setSelectedPsychologist(psychologist));
+            dispatch(setSelectedDate(localSlot.date));
+            dispatch(setSelectedSlot(localSlot));
+            dispatch(openModal('Time'));
+        };
+
+        const scrolledPsychologist = searchParams.get('selected_psychologist');
+        const isScrolledPsychologist = scrolledPsychologist === String(psychologist.id) || scrolledPsychologist === psychologist.name;
+
+        useEffect(() => {
+            if (isScrolledPsychologist) {
+                setIsExpanded(true)
+            }
+        }, [isScrolledPsychologist])
+
+        useEffect(() => {
+            if (onExpand) onExpand();
+        }, [isDescriptionExpanded, isExpanded]);
+
+        return (
+            <div ref={ref} id={id} className={`${styles.card} ${isSelected ? 'animate-pulse-highlight bg-[#F5F5F5]' : ''} ${isScrolledPsychologist ? styles.expanded : ''}`}>
+                {/* Верхняя часть с фото и основной инфой */}
+                <div className={styles.header}>
+                    <div className={styles.avatarSection}>
+                        <div className={styles.avatar} onClick={videoUrl ? handleVideoClick : undefined}>
+                            {/* Плашка "Подходит больше всего" */}
+                            {showBestMatch && (
+                                <div className={styles.bestMatch}>
+                                    Подходит больше всего
+                                </div>
+                            )}
+
+                            {showVideo && videoUrl ? (
+                                <div className={styles.videoWrapper}>
+                                    <video
+                                        ref={videoRef}
+                                        src={getGoogleDriveVideoUrl(videoUrl) || undefined}
+                                        playsInline
+                                        loop
+                                        // muted
+                                        preload="metadata"
+                                        className={styles.video}
+                                        autoPlay
+                                    />
+                                    <button
+                                        className={styles.playPauseButton}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            if (videoRef.current) {
+                                                if (isPlaying) {
+                                                    videoRef.current.pause();
+                                                } else {
+                                                    const playPromise = videoRef.current.play();
+                                                    if (playPromise !== undefined) {
+                                                        playPromise
+                                                            .then(() => {
+                                                                setIsPlaying(true);
+                                                            })
+                                                            .catch(error => {
+                                                                console.error("Error playing video:", error);
+                                                            });
+                                                    }
+                                                }
+                                                setIsPlaying(!isPlaying);
+                                            }
+                                        }}
+                                    >
+                                        <Image
+                                            src={isPlaying ? "/card/pause.svg" : "/card/play.svg"}
+                                            alt={isPlaying ? "Пауза" : "Воспроизвести"}
+                                            width={42}
+                                            height={43}
+                                            unoptimized
+                                        />
+                                    </button>
+                                </div>
+                            ) : (
+                                <Image
+                                    src={imageUrl.trimEnd()}
+                                    alt={psychologist.name}
+                                    width={214}
+                                    height={351}
+                                    className={styles.image}
+                                    onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        target.src = '/images/default.jpg';
                                     }}
+                                />
+                            )}
+
+                            {videoUrl && !showVideo && (
+                                <button
+                                    className={styles.playButton}
+                                    onClick={() => setShowVideo(true)}
                                 >
                                     <Image
-                                        src={isPlaying ? "/card/pause.svg" : "/card/play.svg"}
-                                        alt={isPlaying ? "Пауза" : "Воспроизвести"}
+                                        src="/card/play.svg"
+                                        alt="Play"
                                         width={42}
                                         height={43}
                                         unoptimized
                                     />
                                 </button>
-                            </div>
-                        ) : (
-                            <Image
-                                src={imageUrl.trimEnd()}
-                                alt={psychologist.name}
-                                width={214}
-                                height={351}
-                                className={styles.image}
-                                onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = '/images/default.jpg';
-                                }}
-                            />
-                        )}
-
-                        {videoUrl && !showVideo && (
-                            <button
-                                className={styles.playButton}
-                                onClick={() => setShowVideo(true)}
-                            >
-                                <Image
-                                    src="/card/play.svg"
-                                    alt="Play"
-                                    width={42}
-                                    height={43}
-                                    unoptimized
-                                />
-                            </button>
-                        )}
-                    </div>
-                </div>
-
-                <div className={styles.info}>
-                    <div className={styles.nameRow}>
-                        <h2 className={styles.name}>
-                            {psychologist.name}
-                            {psychologist.age !== undefined && `, ${psychologist.age} ${getAgeWord(psychologist.age)}`}
-                        </h2>
-                        {inPopup && !hideClose ? (
-                            <button
-                                className={"bg-gray-100 rounded-full p-2 hover:bg-gray-200 block lg:inline-block absolute right-4 top-4 z-10 lg:static"}
-                                onClick={onClose}
-                                aria-label="Закрыть"
-                                style={{ border: "none" }}
-                            >
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-                            </button>
-                        ) : (
-                            <button
-                                className={styles.favoriteButton}
-                                onClick={handleFavoriteClick}
-                                aria-label={isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}
-                            >
-                                <Image
-                                    src={isFavorite ? '/card/heart-filled.svg' : '/card/heart-outline.svg'}
-                                    alt="Избранное"
-                                    width={24}
-                                    height={24}
-                                    unoptimized
-                                />
-                            </button>
-                        )}
-                    </div>
-                    <Tooltip
-                        text={`${psychologist.name.split(" ")[1]} как Хранитель придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`}
-                        customMargin="35%"
-                    >
-                        <div className={`${styles.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
-                            {psychologist.experience && (
-                                <span className={styles.experience}>
-                                    {psychologist.experience} в сообществе
-                                </span>
-                            )}
-                            
-                            {psychologist.verified && (
-                                <Image
-                                    src="/card/verified.svg"
-                                    alt="Verified"
-                                    width={23}
-                                    height={23}
-                                    style={{ marginLeft: '6px' }}
-                                    unoptimized
-                                />
                             )}
                         </div>
-                    </Tooltip>
-
-                    <div className={styles.approach}>
-                        <div className={styles.approachBlock}>
-                            <span className={styles.label}>Основной подход:</span>
-                            <div className={styles.value}>
-                                {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
-                                {psychologist.main_modal ? psychologist.main_modal : ''}
-                                <Tooltip text={getMethodDescription(psychologist.main_modal) != '' ? getMethodDescription(psychologist.main_modal) : 'Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов.'} />
-                            </div>
-                        </div>
-                        <div className={styles.approachBlock}>
-                            <span className={styles.label}>Стоимость:</span>
-                            <div className={styles.value}>
-                                От {psychologist.min_session_price || 0} ₽
-                                <Tooltip text="Стоимость сессии длительностью 50-55 минут в формате онлайн видеозвонка. Частоту и формат последующих встреч определяете вместе с психологом" />
-                            </div>
-                        </div>
                     </div>
 
-                    <div className={styles.additionalApproaches}>
-                        <span className={styles.label}>Дополнительные подходы:</span>
-                        <div className={styles.approaches}>
-                            {(Array.isArray(psychologist.additional_modals)
-                                ? psychologist.additional_modals
-                                // UPDATE: По-умолчанию значение - Нет дополнительной модальности
-                                : psychologist.additional_modals?.split(';') || ["Нет дополнительной модальности"]
-                            ).map((approach: string, index: number) => (
-                                <div key={index} className={styles.approachItem}>
-                                    {approach.trim()}
-                                    <Tooltip text={getMethodDescription(approach.trim()) ? getMethodDescription(approach.trim()) : "Дополнительные подходы, которые психолог использует в своей работе для более эффективной помощи клиентам."} />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* UPDATE: Временно скрываем ближайшую запись если не нашли слоты */}
-                    {/* {availableSlots?.length != 0 &&  */}
-                    <div className={styles.nextSession}>
-                        <span className={styles.label}>Ближайшая запись:</span>
-                        {/* UPDATE: добавил надпись у У психолога пока нет свободного времени для записи если нет слотов */}
-                        {availableSlots?.length ?
-                            <div className={styles.dates}>
-                                {availableSlots.map((slot, index) => (
-                                    <button
-                                        key={index}
-                                        className={
-                                          `${styles.dateButton} bg-[#FAFAFA] rounded-[50px] px-[15px] py-[10px] transition-colors ` +
-                                          (inPopup ? 'cursor-default opacity-60 pointer-events-none' : 'cursor-pointer hover:bg-[#116466] hover:text-white')
-                                        }
-                                        onClick={inPopup ? undefined : () => handleSlotClick(slot)}
-                                        disabled={inPopup}
-                                    >
-                                        {slot.date.split('.').slice(0, 2).join('.')}/{slot.time}
-                                    </button>
-                                ))}
-                            </div> :
-                            // ''
-                            <p>У психолога пока нет свободного времени для записи</p>
-                        }
-                    </div>
-                    {/* } */}
-                </div>
-            </div>
-
-
-
-
-            {/* О Хранителе */}
-            {psychologist.short_description && (
-                <div className={styles.section}>
-                    <h3 className={styles.sectionTitle}>О Хранителе</h3>
-                    <p
-                        ref={descriptionRef}
-                        className={`${styles.description} ${isDescriptionExpanded ? styles.expanded : ''}`}
-                        style={shouldShowGradient ? { height: isDescriptionExpanded ? 'auto' : '44px' } : undefined}
-                    >
-                        {psychologist.short_description}
-                    </p>
-                    {shouldShowGradient && (
-                        <button
-                            className={styles.readMoreButton}
-                            onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                        >
-                            {isDescriptionExpanded ? 'Свернуть' : 'Читать еще'}
-                        </button>
-                    )}
-                </div>
-            )}
-
-
-
-            {/* Дополнительная информация (показывается при раскрытии) */}
-            <div className={`${styles.expandedContent} ${isExpanded ? styles.expanded : ''}`}>
-
-
-                {/* Образование */}
-                {/* UPDATE Правильно разобрал информацию об образовании психолога */}
-                <div className={styles.section}>
-                    <h3 className={styles.sectionTitle}>Образование</h3>
-                    <div className={styles.education}>
-                        {[...(psychologist.education ?? [])]
-                            .sort((a, b) => (b.educationItemYear || 0) - (a.educationItemYear || 0))
-                            .slice(0, showAllEducation ? undefined : 2)
-                            .map((item, index, arr) => {
-                                const isLastVisible = !showAllEducation && index === arr.length - 1 && (psychologist.education ?? []).length > 2;
-                                return (
-                                    <div key={index} className={styles.educationItem}>
-                                        <h3><b>{item.educationItemProgramTitle}, {item.educationItemYear}</b></h3>
-                                        <div className={isLastVisible ? `${styles.educationText} ${styles.withGradient}` : styles.educationText}>
-                                            <p>{item.educationItemTitle}, {item.educationItemType}</p>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        {(psychologist.education ?? []).length > 2 && (
-                            <button
-                                className={styles.readMoreButton}
-                                onClick={() => setShowAllEducation((prev) => !prev)}
-                            >
-                                {showAllEducation ? 'Свернуть' : 'Смотреть все'}
-                            </button>
-                        )}
-                    </div>
-                </div>
-
-                {/* Запросы */}
-                <div className={styles.queries}>
-                    <h3 className={styles.sectionTitle}>Запросы</h3>
-                    <div className={styles.queriesList}>
-                        {psychologist.queries?.split(';').slice(0, 6).map((query, index) => (
-                            <TextTooltip key={index} text={query.trim()}>
-                                <button className={styles.queryButton + " w-full block text-left"}>
-                                    {query.trim()}
+                    <div className={styles.info}>
+                        <div className={styles.nameRow}>
+                            <h2 className={styles.name}>
+                                {psychologist.name}
+                                {psychologist.age !== undefined && `, ${psychologist.age} ${getAgeWord(psychologist.age)}`}
+                            </h2>
+                            {inPopup && !hideClose ? (
+                                <button
+                                    className={"bg-gray-100 rounded-full p-2 hover:bg-gray-200 block lg:inline-block absolute right-4 top-4 z-10 lg:static"}
+                                    onClick={onClose}
+                                    aria-label="Закрыть"
+                                    style={{ border: "none" }}
+                                >
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18" /><line x1="6" y1="6" x2="18" y2="18" /></svg>
                                 </button>
-                            </TextTooltip>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Диагностированные заболевания */}
-                {psychologist.works_with?.includes('Есть диагностированное психиатрическое заболевание (ПРЛ, БАР, ПТСР и др)') && (
-                    <div className={styles.diagnoses}>
-                        <h3 className={styles.sectionTitle}>Диагностированные заболевания</h3>
-                        <div className={styles.diagnosesList}>
-                            <div className={styles.diagnosisItem}>
-                                Работает с психическими заболеваниями (ПРЛ, БАР, ПТСР и др)
-                                <Tooltip text="Психолог работает с пациентами, у которых диагностированно психическое заболевание" />
-                            </div>
-                        </div>
-                    </div>
-                )}
-
-                {/* Подробнее о Хранителе */}
-                <div className={styles.section}>
-                    <h3 className={styles.sectionTitle}>Подробнее о Хранителе</h3>
-                    <div className={styles.links}>
-                        {['vk', 'site', 'telegram'].map((platform) => {
-                            const link = psychologist[platform as keyof IPsychologist];
-                            if (!link) return null;
-                            
-                            // Добавляем https:// если ссылка не содержит протокол
-                            const formatLink = (url: string) => {
-                                if (url.startsWith('http://') || url.startsWith('https://')) {
-                                    return url;
-                                }
-                                return `https://${url}`;
-                            };
-                            
-                            return (
-                                <Link
-                                    key={platform}
-                                    href={formatLink(String(link))}
-                                    className={styles.socialLink}
-                                    target="_blank"
+                            ) : (
+                                <button
+                                    className={styles.favoriteButton}
+                                    onClick={handleFavoriteClick}
+                                    aria-label={isFavorite ? 'Удалить из избранного' : 'Добавить в избранное'}
                                 >
                                     <Image
-                                        src={`/card/heart-outline.svg`}
-                                        alt={platform}
+                                        src={isFavorite ? '/card/heart-filled.svg' : '/card/heart-outline.svg'}
+                                        alt="Избранное"
                                         width={24}
                                         height={24}
                                         unoptimized
                                     />
-                                    {platform === 'vk' ? 'VK' : platform === 'site' ? 'Сайт' : 'Telegram'}
-                                </Link>
-                            );
-                        })}
-                    </div>
-                </div>
-
-                {/* Личная информация */}
-                <div className={styles.section}>
-                    <div className={styles.personalInfo}>
-                        <div className={styles.infoRow}>
-                            <span className={styles.infoLabel}>Личная терапия:</span>
-                            <span className={styles.infoValue}>
-                                {psychologist.personal_therapy_duration ? 'Да' : 'Нет'}
-                                <Tooltip text="Психолог находится в личной терапии более 6 месяцев" />
-                            </span>
+                                </button>
+                            )}
                         </div>
-                        <div className={styles.infoRow}>
-                            <span className={styles.infoLabel}>Посещает супервизию:</span>
-                            <span className={styles.infoValue}>
-                                {/* {psychologist.supervision ? 'Да' : 'Нет'} */}
-                                Да
-                                <Tooltip text="Психолог посещает групповые супервизии в сообществе" />
-                            </span>
-                        </div>
-                        {psychologist.is_married && <div className={styles.infoRow}>
-                            <span className={styles.infoLabel}>Семейное положение:</span>
-                            <span className={styles.infoValue}>{psychologist.is_married == null ? '-' : psychologist.is_married ? 'В браке' : 'Не в браке'} </span>
-                        </div>}
-                        {psychologist.has_children && <div className={styles.infoRow}>
-                            <span className={styles.infoLabel}>Есть дети:</span>
-                            <span className={styles.infoValue}>{psychologist.has_children == null ? '-' : psychologist.has_children ? 'Да' : 'Нет'}</span>
-                        </div>}
-                    </div>
-                </div>
-            </div>
-
-            {/* Кнопки действий */}
-            <div className={styles.actions}>
-                {!inPopup && (
-                    <>
-                        <button
-                            className={styles.detailsButton}
-                            onClick={() => setIsExpanded(!isExpanded)}
+                        <Tooltip
+                            text={`${psychologist.name.split(" ")[1]} как Хранитель придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`}
+                            customMargin="35%"
                         >
-                            {isExpanded ? 'Свернуть' : 'Подробнее о Хранителе'}
-                        </button>
-                        <button className={styles.appointmentButton} onClick={handleOpenModal}>
-                            Записаться на сессию
-                        </button>
-                    </>
+                            <div className={`${styles.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
+                                {psychologist.experience && (
+                                    <span className={styles.experience}>
+                                        {psychologist.experience} в сообществе
+                                    </span>
+                                )}
+
+                                {psychologist.verified && (
+                                    <Image
+                                        src="/card/verified.svg"
+                                        alt="Verified"
+                                        width={23}
+                                        height={23}
+                                        style={{ marginLeft: '6px' }}
+                                        unoptimized
+                                    />
+                                )}
+                            </div>
+                        </Tooltip>
+
+                        <div className={styles.approach}>
+                            <div className={styles.approachBlock}>
+                                <span className={styles.label}>Основной подход:</span>
+                                <div className={styles.value}>
+                                    {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
+                                    {psychologist.main_modal ? psychologist.main_modal : ''}
+                                    <Tooltip text={getMethodDescription(psychologist.main_modal) != '' ? getMethodDescription(psychologist.main_modal) : 'Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов.'} />
+                                </div>
+                            </div>
+                            <div className={styles.approachBlock}>
+                                <span className={styles.label}>Стоимость:</span>
+                                <div className={styles.value}>
+                                    От {psychologist.min_session_price || 0} ₽
+                                    <Tooltip text="Стоимость сессии длительностью 50-55 минут в формате онлайн видеозвонка. Частоту и формат последующих встреч определяете вместе с психологом" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className={styles.additionalApproaches}>
+                            <span className={styles.label}>Дополнительные подходы:</span>
+                            <div className={styles.approaches}>
+                                {(Array.isArray(psychologist.additional_modals)
+                                    ? psychologist.additional_modals
+                                    // UPDATE: По-умолчанию значение - Нет дополнительной модальности
+                                    : psychologist.additional_modals?.split(';') || ["Нет дополнительной модальности"]
+                                ).map((approach: string, index: number) => (
+                                    <div key={index} className={styles.approachItem}>
+                                        {approach.trim()}
+                                        <Tooltip text={getMethodDescription(approach.trim()) ? getMethodDescription(approach.trim()) : "Дополнительные подходы, которые психолог использует в своей работе для более эффективной помощи клиентам."} />
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* UPDATE: Временно скрываем ближайшую запись если не нашли слоты */}
+                        {/* {availableSlots?.length != 0 &&  */}
+                        <div className={styles.nextSession}>
+                            <span className={styles.label}>Ближайшая запись:</span>
+                            {/* UPDATE: добавил надпись у У психолога пока нет свободного времени для записи если нет слотов */}
+                            {availableSlots?.length ?
+                                <div className={styles.dates}>
+                                    {availableSlots.map((slot, index) => (
+                                        <button
+                                            key={index}
+                                            className={
+                                                `${styles.dateButton} bg-[#FAFAFA] rounded-[50px] px-[15px] py-[10px] transition-colors ` +
+                                                (inPopup ? 'cursor-default opacity-60 pointer-events-none' : 'cursor-pointer hover:bg-[#116466] hover:text-white')
+                                            }
+                                            onClick={inPopup ? undefined : () => handleSlotClick(slot)}
+                                            disabled={inPopup}
+                                        >
+                                            {slot.date.split('.').slice(0, 2).join('.')}/{slot.time}
+                                        </button>
+                                    ))}
+                                </div> :
+                                // ''
+                                <p>У психолога пока нет свободного времени для записи</p>
+                            }
+                        </div>
+                        {/* } */}
+                    </div>
+                </div>
+
+
+
+
+                {/* О Хранителе */}
+                {psychologist.short_description && (
+                    <div className={styles.section}>
+                        <h3 className={styles.sectionTitle}>О Хранителе</h3>
+                        <div
+                            ref={descriptionRef}
+                            className={`${styles.description} ${isDescriptionExpanded ? styles.expanded : ''}`}
+                            style={{
+                                whiteSpace: 'pre-line',
+                                ...(shouldShowGradient ? { height: isDescriptionExpanded ? 'auto' : '44px' } : {})
+                            }}
+                        >
+                            {psychologist.short_description}
+                        </div>
+                        {shouldShowGradient && (
+                            <button
+                                className={styles.readMoreButton}
+                                onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                            >
+                                {isDescriptionExpanded ? 'Свернуть' : 'Читать еще'}
+                            </button>
+                        )}
+                    </div>
                 )}
+
+
+
+                {/* Дополнительная информация (показывается при раскрытии) */}
+                <div className={`${styles.expandedContent} ${isExpanded ? styles.expanded : ''}`}>
+
+
+                    {/* Образование */}
+                    {/* UPDATE Правильно разобрал информацию об образовании психолога */}
+                    <div className={styles.section}>
+                        <h3 className={styles.sectionTitle}>Образование</h3>
+                        <div className={styles.education}>
+                            {[...(psychologist.education ?? [])]
+                                .sort((a, b) => (b.educationItemYear || 0) - (a.educationItemYear || 0))
+                                .slice(0, showAllEducation ? undefined : 2)
+                                .map((item, index, arr) => {
+                                    const isLastVisible = !showAllEducation && index === arr.length - 1 && (psychologist.education ?? []).length > 2;
+                                    return (
+                                        <div key={index} className={styles.educationItem}>
+                                            <h3><b>{item.educationItemProgramTitle}, {item.educationItemYear}</b></h3>
+                                            <div className={isLastVisible ? `${styles.educationText} ${styles.withGradient}` : styles.educationText}>
+                                                <p>{item.educationItemTitle}, {item.educationItemType}</p>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            {(psychologist.education ?? []).length > 2 && (
+                                <button
+                                    className={styles.readMoreButton}
+                                    onClick={() => setShowAllEducation((prev) => !prev)}
+                                >
+                                    {showAllEducation ? 'Свернуть' : 'Смотреть все'}
+                                </button>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Запросы */}
+                    <div className={styles.queries}>
+                        <h3 className={styles.sectionTitle}>Запросы</h3>
+                        <div className={styles.queriesList}>
+                            {psychologist.queries?.split(';').slice(0, 6).map((query, index) => (
+                                <TextTooltip key={index} text={query.trim()}>
+                                    <button className={styles.queryButton + " w-full block text-left"}>
+                                        {query.trim()}
+                                    </button>
+                                </TextTooltip>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Диагностированные заболевания */}
+                    {psychologist.works_with?.includes('Есть диагностированное психиатрическое заболевание (ПРЛ, БАР, ПТСР и др)') && (
+                        <div className={styles.diagnoses}>
+                            <h3 className={styles.sectionTitle}>Диагностированные заболевания</h3>
+                            <div className={styles.diagnosesList}>
+                                <div className={styles.diagnosisItem}>
+                                    Работает с психическими заболеваниями (ПРЛ, БАР, ПТСР и др)
+                                    <Tooltip text="Психолог работает с пациентами, у которых диагностированно психическое заболевание" />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Подробнее о Хранителе */}
+                    <div className={styles.section}>
+                        <h3 className={styles.sectionTitle}>Подробнее о Хранителе</h3>
+                        <div className={styles.links}>
+                            {['vk', 'site', 'telegram'].map((platform) => {
+                                const link = psychologist[platform as keyof IPsychologist];
+                                if (!link) return null;
+
+                                // Добавляем https:// если ссылка не содержит протокол
+                                const formatLink = (url: string) => {
+                                    if (url.startsWith('http://') || url.startsWith('https://')) {
+                                        return url;
+                                    }
+                                    return `https://${url}`;
+                                };
+
+                                return (
+                                    <Link
+                                        key={platform}
+                                        href={formatLink(String(link))}
+                                        className={styles.socialLink}
+                                        target="_blank"
+                                    >
+                                        <Image
+                                            src={`/card/heart-outline.svg`}
+                                            alt={platform}
+                                            width={24}
+                                            height={24}
+                                            unoptimized
+                                        />
+                                        {platform === 'vk' ? 'VK' : platform === 'site' ? 'Сайт' : 'Telegram'}
+                                    </Link>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Личная информация */}
+                    <div className={styles.section}>
+                        <div className={styles.personalInfo}>
+                            <div className={styles.infoRow}>
+                                <span className={styles.infoLabel}>Личная терапия:</span>
+                                <span className={styles.infoValue}>
+                                    {psychologist.personal_therapy_duration ? 'Да' : 'Нет'}
+                                    <Tooltip text="Психолог находится в личной терапии более 6 месяцев" />
+                                </span>
+                            </div>
+                            <div className={styles.infoRow}>
+                                <span className={styles.infoLabel}>Посещает супервизию:</span>
+                                <span className={styles.infoValue}>
+                                    {/* {psychologist.supervision ? 'Да' : 'Нет'} */}
+                                    Да
+                                    <Tooltip text="Психолог посещает групповые супервизии в сообществе" />
+                                </span>
+                            </div>
+                            {psychologist.is_married && <div className={styles.infoRow}>
+                                <span className={styles.infoLabel}>Семейное положение:</span>
+                                <span className={styles.infoValue}>{psychologist.is_married == null ? '-' : psychologist.is_married ? 'В браке' : 'Не в браке'} </span>
+                            </div>}
+                            {psychologist.has_children && <div className={styles.infoRow}>
+                                <span className={styles.infoLabel}>Есть дети:</span>
+                                <span className={styles.infoValue}>{psychologist.has_children == null ? '-' : psychologist.has_children ? 'Да' : 'Нет'}</span>
+                            </div>}
+                        </div>
+                    </div>
+                </div>
+
+                {/* Кнопки действий */}
+                <div className={styles.actions}>
+                    {!inPopup && (
+                        <>
+                            <button
+                                className={styles.detailsButton}
+                                onClick={() => setIsExpanded(!isExpanded)}
+                            >
+                                {isExpanded ? 'Свернуть' : 'Подробнее о Хранителе'}
+                            </button>
+                            <button className={styles.appointmentButton} onClick={handleOpenModal}>
+                                Записаться на сессию
+                            </button>
+                        </>
+                    )}
+                </div>
             </div>
-        </div>
-    );
-  }
+        );
+    }
 );
 
 CardInner.displayName = "CardInner";
