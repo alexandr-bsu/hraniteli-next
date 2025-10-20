@@ -7,14 +7,27 @@ import FormBase from "../../../shared/ui/FormBase"
 import { StageProvider } from "../../..//features/MultiStepForm/StageContext"
 import { useStage } from "../../../features/MultiStepForm/StageContext"
 import { SurveyStage } from "../../../widgets/SurveyStages/Survey"
+import { StepItem } from "../../../features/MultiStepForm/types"
+import { transformJsonToFormStructure } from "../../../features/utils"
 
+const jsonData: StepItem[] = [
+    {
+        "step_id": "hiring_skills",
+        "step_name": "Какие сферы вы хотите чтобы закрыл партнер?",
+        "step_description": "Это слабые стороны или вы просто не хотите этим заниматься",
+        "step_type": "multiple",
+        "step_items": ['Разработка ПО', 'Маркетинг', 'Продажи']
+    },
+    {
+        "step_id": "hiring_status",
+        "step_name": "bla-bla-bla-bla?",
+        "step_description": "Это слабые стороны или вы просто не хотите этим заниматься",
+        "step_type": "multiple",
+        "step_items": ['Разработка ПО', 'Маркетинг', 'Продажи']
+    }
+]
 
-const defaultProfileFormOptions = formOptions({
-    defaultValues: {
-        hiring_skills: [] as string[],
-        hiring_status: [] as string[]
-        },
-})
+const defaultProfileFormOptions = formOptions(transformJsonToFormStructure(jsonData))
 
 const MultiStepForm = () => {
     const { currentStage, getProgressPercentage, goTo, formOptions } = useStage()
@@ -23,55 +36,38 @@ const MultiStepForm = () => {
         ...formOptions,
         onSubmit: async ({ value }) => {
             // goTo('congrats', value as Record<string, any>)
-            // console.log(value)
+            console.log(value)
         }
     })
 
-    const t = [
-        {
-            "step_id":"hiring_skills",
-            "step_name":"Какие сферы вы хотите чтобы закрыл партнер?",
-            "step_description":"Это слабые стороны или вы просто не хотите этим заниматься",
-            "step_type":"multiple",
-            "step_items": {['Разработка ПО', 'Маркетинг', 'Продажи']}
-        },
-        {
-            "step_id":"hiring_status",
-            "step_name":"bla-bla-bla-bla?",
-            "step_description":"Это слабые стороны или вы просто не хотите этим заниматься",
-            "step_type":"multiple",
-            "step_items": {['Разработка ПО', 'Маркетинг', 'Продажи']}
-        }
-    ]
-
     const renderStage = () => {
-        switch (currentStage) {
-            case 'hiring_skills':
-                return (<Suspense>
-                    <SurveyStage
-                        form={form}
-                        step_id="hiring_skills"
-                        step_name="Какие сферы вы хотите чтобы закрыл партнер?"
-                        step_description="Это слабые стороны или вы просто не хотите этим заниматься"
-                        step_type="multiple"
-                        step_items={['Разработка ПО', 'Маркетинг', 'Продажи']}
-                    />
-                </Suspense>)
-            case 'hiring_status':
-                return (<Suspense>
-                    <SurveyStage
-                        form={form}
-                        step_id="hiring_status"
-                        step_name="bla-bla-bla-bla?"
-                        step_description="Это слабые стороны или вы просто не хотите этим заниматься"
-                        step_type="multiple"
-                        step_items={['Разработка ПО', 'Маркетинг', 'Продажи']}
-                        to_submit={true}
-                    />
-                </Suspense>)
+
+        const stages: Record<string, any> = {
+            'hiring_skills': (<Suspense>
+                <SurveyStage
+                    form={form}
+                    step_id="hiring_skills"
+                    step_name="Какие сферы вы хотите чтобы закрыл партнер?"
+                    step_description="Это слабые стороны или вы просто не хотите этим заниматься"
+                    step_type="multiple"
+                    step_items={['Разработка ПО', 'Маркетинг', 'Продажи']}
+                />
+            </Suspense>),
+            'hiring_status': (<Suspense>
+                <SurveyStage
+                    form={form}
+                    step_id="hiring_status"
+                    step_name="bla-bla-bla-bla?"
+                    step_description="Это слабые стороны или вы просто не хотите этим заниматься"
+                    step_type="multiple"
+                    step_items={['Разработка ПО', 'Маркетинг', 'Продажи']}
+                    to_submit={true}
+                />
+            </Suspense>),
+
         }
-
-
+        
+        return stages[currentStage]
     }
 
     return (
@@ -94,7 +90,6 @@ export default function SurveyLayout() {
         'hiring_skills',
         'hiring_status'
     ]
-
 
     return (
         <div className="w-full h-full flex justify-center items-center">

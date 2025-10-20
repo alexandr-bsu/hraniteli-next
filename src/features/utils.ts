@@ -1,7 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-
-
+import {StepItem, FormDefaultValues, FormStructure} from "./MultiStepForm/types"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -41,5 +40,23 @@ export const clearStorage = (is_research_redirect: boolean = false) => {
   
   if(!is_research_redirect){
     localStorage.removeItem('app_occupation')
+  }
+}
+
+
+// Function to transform JSON data to form structure
+export const transformJsonToFormStructure = (jsonData: StepItem[]): FormStructure => {
+  const defaultValues: FormDefaultValues = {}
+  
+  jsonData.forEach(item => {
+    if (item.step_type === 'multiple') {
+      defaultValues[item.step_id] = [] as string[]
+    } else {
+      defaultValues[item.step_id] = '' as string
+    }
+  })
+  
+  return {
+    defaultValues
   }
 }
