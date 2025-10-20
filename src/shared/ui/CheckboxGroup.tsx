@@ -91,10 +91,10 @@ const CheckboxGroup = React.forwardRef<HTMLDivElement, CheckboxGroupProps>(
                         {isCustomOptionSelected && (
                             <div className="mt-2">
                                 {/* <LabeledInput */}
-                                    {/* label={customOptionLabel ? customOptionLabel : 'Введите свой вариант'} */}
-                                    {/* value={customValue} */}
-                                    {/* onChange={(e) => handleCustomInputChange(e.target.value)} */}
-                                    {/* disabled={disabled} */}
+                                {/* label={customOptionLabel ? customOptionLabel : 'Введите свой вариант'} */}
+                                {/* value={customValue} */}
+                                {/* onChange={(e) => handleCustomInputChange(e.target.value)} */}
+                                {/* disabled={disabled} */}
                                 {/* /> */}
                             </div>
                         )}
@@ -120,5 +120,7 @@ const CheckboxItem = ({ label, value, checked, onChange, name, disabled }: { lab
         </label>
     )
 }
+
+CheckboxGroup.displayName = "CheckboxGroup"
 
 export { CheckboxGroup, type ICheckboxItem, type CheckboxGroupProps }

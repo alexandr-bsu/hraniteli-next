@@ -1,7 +1,7 @@
 import * as React from "react"
 
 import { cn } from "../../features/utils"
-import { LabeledInput } from "./Input"
+
 
 interface IRadioItem {
     label: string
@@ -72,12 +72,12 @@ const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
 
                         {isCustomOptionSelected && (
                             <div className="mt-2">
-                                <LabeledInput
+                                {/* <LabeledInput
                                     label={customOptionLabel ? customOptionLabel : 'Введите свой вариант'}
                                     value={customValue}
                                     onChange={(e) => handleCustomInputChange(e.target.value)}
                                     disabled={disabled}
-                                />
+                                /> */}
                             </div>
                         )}
                     </div>
@@ -101,4 +101,5 @@ const RadioItem = ({ label, value, checked, onChange, name, disabled }: { label:
     )
 }
 
+RadioGroup.displayName = "RadioGroup"
 export { RadioGroup, type IRadioItem, type RadioGroupProps }
