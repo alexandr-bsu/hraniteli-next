@@ -15,7 +15,6 @@ interface StageContextType {
     isInitialStage: () => boolean
     jsonData: StepItem[]
     calculateTotalCoins: (formData: Record<string, any>) => number
-    formData: Record<string, any>
 }
 
 const StageContext = createContext<StageContextType | undefined>(undefined)
