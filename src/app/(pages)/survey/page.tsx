@@ -117,7 +117,8 @@ function SurveyContent() {
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-
+        
+        
 
         const fetchSurveyData = async () => {
             try {

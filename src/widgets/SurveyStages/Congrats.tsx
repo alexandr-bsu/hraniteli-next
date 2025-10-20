@@ -1,8 +1,9 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { withForm } from "../../features/MultiStepForm/appForm"
 import { useStage } from "@/features/MultiStepForm/StageContext"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
+import axios from "axios"
 
 interface CongratsStageContentProps {
     form: any
@@ -18,6 +19,15 @@ const CongratsStageContent = ({ form }: CongratsStageContentProps) => {
     const totalCoins = calculateTotalCoins(form.state.values)
     const currentResult = getCurrentResult(totalCoins)
     const router = useRouter()
+
+    const searchParams = useSearchParams()
+    const slugFromParams = searchParams.get('slug')
+
+    useEffect(() => {
+        axios.get('https://n8n-v2.hrani.live/webhook/check-fill-survey', {params: {slug: slugFromParams}})
+    }, [])
+
+
 
     const handleContinueClick = () => {
         router.push('/application_form/?research=true')
@@ -43,7 +53,7 @@ const CongratsStageContent = ({ form }: CongratsStageContentProps) => {
 
                             <>
                                 <div className="border-[#116466] border-[2px] whitespace-pre-line p-[20px] rounded-[30px] max-lg:text-[14px] mt-[30px] text-[18px] leading-[25px] font-normal w-full">
-                                В качестве поддержки, мы бы хотели подарить вам <b className="font-bold">бесплатную сессию</b> с психологом из Хранителей. Сессия - 55 минут, онлайн, по видеосвязи. Готовы сейчас оставить запрос и выбрать время?
+                                    В качестве поддержки, мы бы хотели подарить вам <b className="font-bold">бесплатную сессию</b> с психологом из Хранителей. Сессия - 55 минут, онлайн, по видеосвязи. Готовы сейчас оставить запрос и выбрать время?
                                 </div>
                             </>
 
