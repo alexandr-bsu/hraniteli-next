@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useRef, useMemo } from 'react'
-import type { StageMiddleware, StepItem } from './types'
+import type { StageMiddleware, StepItem, ResultItem } from './types'
 import { MiddlewareManager } from './MiddlewareManager'
 
 interface StageContextType {
@@ -15,6 +15,8 @@ interface StageContextType {
     isInitialStage: () => boolean
     jsonData: StepItem[]
     calculateTotalCoins: (formData: Record<string, any>) => number
+    results: ResultItem[]
+    getCurrentResult: (totalCoins: number) => ResultItem | null
 }
 
 const StageContext = createContext<StageContextType | undefined>(undefined)
@@ -25,6 +27,7 @@ interface StageProviderProps {
     initialStage?: string,
     middlewares?: StageMiddleware[]
     jsonData: StepItem[]
+    results?: ResultItem[]
 }
 
 export const StageProvider: React.FC<StageProviderProps> = ({
@@ -32,7 +35,8 @@ export const StageProvider: React.FC<StageProviderProps> = ({
     stages,
     initialStage,
     middlewares,
-    jsonData
+    jsonData,
+    results = []
 }) => {
     // Generate stages from jsonData if not provided
     const generatedStages = useMemo(() => {
@@ -136,6 +140,23 @@ export const StageProvider: React.FC<StageProviderProps> = ({
         return currentStage === initialStageRef.current
     }, [currentStage])
 
+    const getCurrentResult = useCallback((totalCoins: number): ResultItem | null => {
+        if (!results || results.length === 0) return null
+        
+        // Сортируем результаты по убыванию поля from
+        const sortedResults = [...results].sort((a, b) => b.from - a.from)
+        
+        // Находим первый результат, где totalCoins >= from
+        for (const result of sortedResults) {
+            if (totalCoins >= result.from) {
+                return result
+            }
+        }
+        
+        // Если не найден подходящий результат, возвращаем последний (с наименьшим from)
+        return sortedResults[sortedResults.length - 1] || null
+    }, [results])
+
     const contextValue: StageContextType = {
         currentStage,
         goTo,
@@ -148,7 +169,9 @@ export const StageProvider: React.FC<StageProviderProps> = ({
         getProgressPercentage,
         isInitialStage,
         jsonData,
-        calculateTotalCoins
+        calculateTotalCoins,
+        results,
+        getCurrentResult
     }
 
     return (

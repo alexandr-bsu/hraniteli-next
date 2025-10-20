@@ -34,3 +34,9 @@ export interface FormDefaultValues {
 export interface FormStructure {
   defaultValues: FormDefaultValues
 }
+
+export interface ResultItem {
+  from: number
+  title: string
+  description: string
+}

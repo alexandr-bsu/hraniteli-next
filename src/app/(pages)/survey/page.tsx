@@ -8,44 +8,16 @@ import FormBase from "../../../shared/ui/FormBase"
 import { StageProvider } from "../../..//features/MultiStepForm/StageContext"
 import { useStage } from "../../../features/MultiStepForm/StageContext"
 import { SurveyStage } from "../../../widgets/SurveyStages/Survey"
-import { StepItem } from "../../../features/MultiStepForm/types"
+import { StepItem, ResultItem } from "../../../features/MultiStepForm/types"
 import { transformJsonToFormStructure, transformJsonToFormStagesConfig } from "../../../features/utils"
 import {CongratsStage} from "../../../widgets/SurveyStages/Congrats";
 import axios from "axios"
 
-
-// Статические данные для fallback (можно удалить после тестирования)
-const fallbackJsonData: StepItem[] = [
-    {
-        "step_id": "hiring_status",
-        "step_name": "bla-bla-bla-bla?",
-        "step_description": "Это слабые стороны или вы просто не хотите этим заниматься",
-        "step_type": "single",
-        "step_items": [{title: "Разработка ПО", coins: 2}, {title: "Маркетинг", coins: 3}]
-    },
-    {
-        "step_id": "hiring_skills",
-        "step_name": "Какие сферы вы хотите чтобы закрыл партнер?",
-        "step_description": "Это слабые стороны или вы просто не хотите этим заниматься",
-        "step_type": "multiple",
-        "step_items": [{title: "Разработка ПО", coins: 2}, {title: "Маркетинг", coins: 3},  {title: "Продажи", coins: 3}]
-    },
-]
-
 const MultiStepForm = () => {
     const { currentStage, getProgressPercentage, goTo, jsonData, calculateTotalCoins } = useStage()
 
-    // Показываем форму только когда данные загружены
-    if (!jsonData || jsonData.length === 0) {
-        return (
-            <div className="w-full flex flex-col h-screen justify-center items-center">
-                <div className="text-lg">Загрузка анкеты...</div>
-            </div>
-        )
-    }
-
     const form = useAppForm({
-        ...formOptions(transformJsonToFormStructure(jsonData)),
+        ...formOptions(transformJsonToFormStructure(jsonData || [])),
         onSubmit: async ({ value }) => {
             const formData = value as Record<string, any>
             const finalTotalCoins = calculateTotalCoins(formData)
@@ -96,13 +68,22 @@ const MultiStepForm = () => {
         return stages
     }, [form, jsonData])
 
+    // Показываем форму только когда данные загружены
+    if (!jsonData || jsonData.length === 0) {
+        return (
+            <div className="w-full flex flex-col h-screen justify-center items-center">
+                <div className="text-lg">Загрузка анкеты...</div>
+            </div>
+        )
+    }
+
     const renderStage = () => {
         console.log('Рендер этапа:', currentStage, 'Доступные этапы:', Object.keys(stages))
         const stage = stages[currentStage]
 
         if (!stage) {
             console.warn('Этап не найден:', currentStage)
-            return <div>Этап "{currentStage}" не найден</div>
+            return <div>Этап &quot;{currentStage}&quot; не найден</div>
         }
 
         return stage
@@ -128,6 +109,7 @@ function SurveyContent() {
     const surveySlug = searchParams.get('slug') || ""
 
     const [jsonData, setJsonData] = useState<StepItem[]>([])
+    const [results, setResults] = useState<ResultItem[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
@@ -147,6 +129,12 @@ function SurveyContent() {
                 console.log('Содержимое анкеты:', response.data.content)
 
                 const surveyData = response.data.content || []
+                const resultsData = response.data.results || [
+                    {"from": 0, "title": "Вы ничего не знаете", "description": "Наверно вы плохо учились в школе"},
+                    {"from": 3, "title": "Вы что-то да знаете", "description": "Вы, конечно, не гений, но тоже ничего"},
+                    {"from": 7, "title": "Вы выше среднего", "description": "В школе явно преуспевали"},
+                    {"from": 10, "title": "Вы - гений", "description": "Вашим способностям может позавидовать даже Эйнштейн!"}
+                ]
 
                 // Проверяем, что данные имеют правильную структуру
                 if (Array.isArray(surveyData) && surveyData.length > 0) {
@@ -154,7 +142,9 @@ function SurveyContent() {
                     const firstItem = surveyData[0]
                     if (firstItem.step_id && firstItem.step_name && firstItem.step_type && firstItem.step_items) {
                         setJsonData(surveyData)
+                        setResults(resultsData)
                         console.log('Данные анкеты успешно загружены:', surveyData.length, 'этапов')
+                        console.log('Результаты загружены:', resultsData.length, 'вариантов')
                     } else {
                         console.error('Неправильная структура данных:', firstItem)
                         throw new Error('Неправильная структура данных анкеты')
@@ -166,6 +156,7 @@ function SurveyContent() {
             } catch (err) {
                 console.error('Ошибка загрузки анкеты:', err)
                 setError('Не удалось загрузить анкету')
+            
                 
             } finally {
                 setLoading(false)
@@ -202,7 +193,7 @@ function SurveyContent() {
     }
 
     return (
-        <StageProvider jsonData={jsonData}>
+        <StageProvider jsonData={jsonData} results={results}>
             <MultiStepForm />
         </StageProvider>
     )
