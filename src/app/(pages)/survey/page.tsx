@@ -1,5 +1,5 @@
 "use client"
-import { Suspense } from "react"
+import { Suspense, useMemo } from "react"
 
 import { useAppForm } from "../../../features/MultiStepForm/appForm"
 import { formOptions } from "@tanstack/react-form"
@@ -8,7 +8,7 @@ import { StageProvider } from "../../..//features/MultiStepForm/StageContext"
 import { useStage } from "../../../features/MultiStepForm/StageContext"
 import { SurveyStage } from "../../../widgets/SurveyStages/Survey"
 import { StepItem } from "../../../features/MultiStepForm/types"
-import { transformJsonToFormStructure } from "../../../features/utils"
+import { transformJsonToFormStructure, transformJsonToFormStagesConfig } from "../../../features/utils"
 
 const jsonData: StepItem[] = [
     {
@@ -40,33 +40,31 @@ const MultiStepForm = () => {
         }
     })
 
-    const renderStage = () => {
-
-        const stages: Record<string, any> = {
-            'hiring_skills': (<Suspense>
-                <SurveyStage
-                    form={form}
-                    step_id="hiring_skills"
-                    step_name="Какие сферы вы хотите чтобы закрыл партнер?"
-                    step_description="Это слабые стороны или вы просто не хотите этим заниматься"
-                    step_type="multiple"
-                    step_items={['Разработка ПО', 'Маркетинг', 'Продажи']}
-                />
-            </Suspense>),
-            'hiring_status': (<Suspense>
-                <SurveyStage
-                    form={form}
-                    step_id="hiring_status"
-                    step_name="bla-bla-bla-bla?"
-                    step_description="Это слабые стороны или вы просто не хотите этим заниматься"
-                    step_type="multiple"
-                    step_items={['Разработка ПО', 'Маркетинг', 'Продажи']}
-                    to_submit={true}
-                />
-            </Suspense>),
-
-        }
+    const stages = useMemo(() => {
+        const stagesConfig = transformJsonToFormStagesConfig(jsonData)
         
+        const stages: Record<string, any> = {}
+        Object.keys(stagesConfig).forEach(stepId => {
+            const config = stagesConfig[stepId]
+            stages[stepId] = (
+                <Suspense key={stepId}>
+                    <SurveyStage
+                        form={form}
+                        step_id={config.step_id}
+                        step_name={config.step_name}
+                        step_description={config.step_description}
+                        step_type={config.step_type as "multiple" | "single"}
+                        step_items={config.step_items}
+                        to_submit={config.to_submit}
+                    />
+                </Suspense>
+            )
+        })
+        
+        return stages
+    }, [form])
+
+    const renderStage = () => {
         return stages[currentStage]
     }
 
