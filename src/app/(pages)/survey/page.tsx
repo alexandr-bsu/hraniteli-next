@@ -10,7 +10,7 @@ import { useStage } from "../../../features/MultiStepForm/StageContext"
 import { SurveyStage } from "../../../widgets/SurveyStages/Survey"
 import { StepItem, ResultItem } from "../../../features/MultiStepForm/types"
 import { transformJsonToFormStructure, transformJsonToFormStagesConfig } from "../../../features/utils"
-import {CongratsStage} from "../../../widgets/SurveyStages/Congrats";
+import { CongratsStage } from "../../../widgets/SurveyStages/Congrats";
 import axios from "axios"
 
 const MultiStepForm = () => {
@@ -21,12 +21,12 @@ const MultiStepForm = () => {
         onSubmit: async ({ value }) => {
             const formData = value as Record<string, any>
             const finalTotalCoins = calculateTotalCoins(formData)
-            
+
             const submissionData = {
                 ...formData,
                 total_coins: finalTotalCoins
             }
-            
+
             goTo('congrats', submissionData)
         }
     })
@@ -61,7 +61,7 @@ const MultiStepForm = () => {
 
 
         stages['congrats'] = (
-            <CongratsStage form={form}/>
+            <CongratsStage form={form} />
         )
 
         console.log('Созданные этапы:', Object.keys(stages))
@@ -151,8 +151,8 @@ function SurveyContent() {
             } catch (err) {
                 console.error('Ошибка загрузки анкеты:', err)
                 setError('Не удалось загрузить анкету')
-            
-                
+
+
             } finally {
                 setLoading(false)
             }
@@ -170,11 +170,11 @@ function SurveyContent() {
     if (loading) {
         return (
             <div className="w-full h-full flex flex-col justify-center items-center bg-white">
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="w-16 h-16 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
-                        <p className="text-[18px] text-[#116466] max-lg:text-[14px]">Загружаем анкету...</p>
-                    </div>
+                <div className="flex flex-col items-center gap-4">
+                    <div className="w-16 h-16 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-[18px] text-[#116466] max-lg:text-[14px]">Загружаем анкету...</p>
                 </div>
+            </div>
         )
     }
 

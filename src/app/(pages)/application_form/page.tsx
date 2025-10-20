@@ -19,15 +19,11 @@ export default function ApplicationFormLayout() {
 
     const is_tracker_launched = useSelector((state: RootState) => state.applicationForm.is_tracker_launched)
 
-    if (!ticketID) {
-        dispatch(generateTicketId(''));
-    }
-
     useEffect(() => {
         if (!ticketID) {
             dispatch(generateTicketId(''));
         }
-    }, []);
+    }, [ticketID, dispatch]);
 
     // Инициализируем трекер формы
     useEffect(() => {
