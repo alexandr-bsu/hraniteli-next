@@ -1,6 +1,7 @@
 import React from "react"
 import { withForm } from "../../features/MultiStepForm/appForm"
 import { useStage } from "@/features/MultiStepForm/StageContext"
+import Image from "next/image"
 import { useRouter } from "next/navigation"
 
 interface CongratsStageContentProps {
@@ -16,39 +17,42 @@ const CongratsStageContent = ({ form }: CongratsStageContentProps) => {
     
     const totalCoins = calculateTotalCoins(form.state.values)
     const currentResult = getCurrentResult(totalCoins)
+    const router = useRouter()
 
+    const handleContinueClick = () => {
+        router.push('/application_form/?research=true')
+    }
 
     return (
         <form.AppField name="is_congrats">
             {() => (
-                <div className="flex flex-col items-center justify-center w-full h-full grow p-4 overflow-y-auto">
-                    <div className="flex flex-col items-center justify-center gap-[30px] text-center max-w-2xl">
-                        <div className="text-3xl font-bold text-[#116466] mb-4">
-                            Поздравляем!
-                        </div>
-                        
-                        <div className="text-xl text-gray-600 mb-6">
-                            Ваш результат: <span className="font-semibold text-[#116466]">{totalCoins} очков</span>
-                        </div>
-                        
-                        {currentResult ? (
-                            <div className="bg-white rounded-lg shadow-lg p-8 border-2 border-[#116466]/20">
-                                <h3 className="text-2xl font-semibold text-[#116466] mb-4">
-                                    {currentResult.title}
-                                </h3>
-                                <p className="text-lg text-gray-700 leading-relaxed">
-                                    {currentResult.description}
-                                </p>
-                            </div>
-                        ) : (
-                            <div className="bg-gray-100 rounded-lg p-6">
-                                <p className="text-gray-600">
-                                    Результаты пока не загружены
-                                </p>
-                            </div>
-                        )}
+                <div className='relative min-lg:p-[50px] p-[20px] max-lg:px-[20px] flex-col min-h-full h-[100svh] justify-between  flex w-full grow'>
+                <div className=" flex h-full w-full justify-center items-center flex-col px-[30px] gap-[30px]">
+                  <div className="grow w-full flex flex-col items-center justify-center">
+                    <Image className="max-lg:w-[140px] max-lg:h-[140px]" src={'/card/thanks.svg'} alt="Спасибо" height={210} width={210} />
+          
+                    <div className="flex flex-col items-center gap-[10px]">
+                      <h2 className="font-semibold text-[26px] max-lg:text-[14px] max-lg:leading-[22px]">{currentResult?.title}</h2>
                     </div>
+          
+                    
+                      <>
+                        <div className="border-[#D4D4D4] border-[2px] p-[20px] text-center rounded-[30px] max-lg:text-[14px] mt-[30px] flex justify-center items-center text-[18px] leading-[25px] font-normal w-full">
+                          <p>{currentResult?.description}</p>
+                        </div>
+                      </>
+                  
+                  </div>
                 </div>
+                
+                  <button
+                    onClick={handleContinueClick}
+                    className={`w-full text-[#FFFFFF] p-[14px] max-lg:text-[14px] shrink-0 bg-[#116466] rounded-[50px] font-normal text-[18px] leading-[25px]`}
+                  >
+                    Оставить заявку
+                  </button>
+             
+              </div>
             )}
         </form.AppField>
     )

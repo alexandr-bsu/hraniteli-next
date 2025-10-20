@@ -129,12 +129,7 @@ function SurveyContent() {
                 console.log('Содержимое анкеты:', response.data.content)
 
                 const surveyData = response.data.content || []
-                const resultsData = response.data.results || [
-                    {"from": 0, "title": "Вы ничего не знаете", "description": "Наверно вы плохо учились в школе"},
-                    {"from": 3, "title": "Вы что-то да знаете", "description": "Вы, конечно, не гений, но тоже ничего"},
-                    {"from": 7, "title": "Вы выше среднего", "description": "В школе явно преуспевали"},
-                    {"from": 10, "title": "Вы - гений", "description": "Вашим способностям может позавидовать даже Эйнштейн!"}
-                ]
+                const resultsData = response.data.results || []
 
                 // Проверяем, что данные имеют правильную структуру
                 if (Array.isArray(surveyData) && surveyData.length > 0) {
