@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useRef } from 'react'
+import React, { createContext, useContext, useState, useCallback, useRef, useMemo } from 'react'
 import type { StageMiddleware, StepItem } from './types'
 import { MiddlewareManager } from './MiddlewareManager'
 
@@ -20,7 +20,7 @@ const StageContext = createContext<StageContextType | undefined>(undefined)
 
 interface StageProviderProps {
     children: React.ReactNode
-    stages: string[]
+    stages?: string[]
     initialStage?: string,
     middlewares?: StageMiddleware[]
     jsonData: StepItem[]
@@ -33,8 +33,16 @@ export const StageProvider: React.FC<StageProviderProps> = ({
     middlewares,
     jsonData
 }) => {
-    const [currentStage, setCurrentStage] = useState<string>(initialStage || stages[0])
-    const initialStageRef = useRef<string>(initialStage || stages[0])
+    // Generate stages from jsonData if not provided
+    const generatedStages = useMemo(() => {
+        if (stages && stages.length > 0) {
+            return stages;
+        }
+        return jsonData.map(item => item.step_id);
+    }, [stages, jsonData]);
+
+    const [currentStage, setCurrentStage] = useState<string>(initialStage || generatedStages[0])
+    const initialStageRef = useRef<string>(initialStage || generatedStages[0])
     const middlewareManager = useRef(new MiddlewareManager(middlewares || []))
 
     const executeStageTransition = useCallback(async (fromStage: string, toStage: string, formData: Record<string, any> = {}) => {
@@ -53,10 +61,10 @@ export const StageProvider: React.FC<StageProviderProps> = ({
     }, [])
 
     const getProgressPercentage = useCallback(() => {
-        const currentIndex = stages.indexOf(currentStage);
+        const currentIndex = generatedStages.indexOf(currentStage);
         if (currentIndex === -1) return 0;
-        return Math.round(((currentIndex + 1) / stages.length) * 100);
-    }, [stages, currentStage]);
+        return Math.round(((currentIndex + 1) / generatedStages.length) * 100);
+    }, [generatedStages, currentStage]);
 
     /* Намеренно нет проверки на наличие этапа в массиве stages. 
     Нужно для перехода на шаги формы, которые не входят в массив stages (например, CongratsStage)
@@ -64,23 +72,23 @@ export const StageProvider: React.FC<StageProviderProps> = ({
     */
     const goTo = useCallback(async (stageName: string, formData: Record<string, any> = {}) => {
         await executeStageTransition(currentStage, stageName, formData)
-    }, [stages, currentStage, executeStageTransition])
+    }, [generatedStages, currentStage, executeStageTransition])
 
     const goNext = useCallback(async (formData: Record<string, any> = {}) => {
-        const currentIndex = stages.indexOf(currentStage)
-        if (currentIndex !== -1 && currentIndex < stages.length - 1) {
-            const nextStage = stages[currentIndex + 1]
+        const currentIndex = generatedStages.indexOf(currentStage)
+        if (currentIndex !== -1 && currentIndex < generatedStages.length - 1) {
+            const nextStage = generatedStages[currentIndex + 1]
             await executeStageTransition(currentStage, nextStage, formData)
         }
-    }, [stages, currentStage, executeStageTransition])
+    }, [generatedStages, currentStage, executeStageTransition])
 
     const goBack = useCallback(async (formData: Record<string, any> = {}) => {
-        const currentIndex = stages.indexOf(currentStage)
+        const currentIndex = generatedStages.indexOf(currentStage)
         if (currentIndex > 0) {
-            const prevStage = stages[currentIndex - 1]
+            const prevStage = generatedStages[currentIndex - 1]
             await executeStageTransition(currentStage, prevStage, formData)
         }
-    }, [stages, currentStage, executeStageTransition])
+    }, [generatedStages, currentStage, executeStageTransition])
 
     const addMiddleware = useCallback((middleware: StageMiddleware) => {
         middlewareManager.current.addMiddleware(middleware)
@@ -103,7 +111,7 @@ export const StageProvider: React.FC<StageProviderProps> = ({
         goTo,
         goNext,
         goBack,
-        availableStages: stages,
+        availableStages: generatedStages,
         addMiddleware,
         removeMiddleware,
         getMiddlewares,

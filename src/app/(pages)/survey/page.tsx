@@ -40,9 +40,9 @@ const MultiStepForm = () => {
 
     const stages = useMemo(() => {
         if (!jsonData) return {}
-        
+
         const stagesConfig = transformJsonToFormStagesConfig(jsonData)
-        
+
         const stages: Record<string, any> = {}
         Object.keys(stagesConfig).forEach(stepId => {
             const config = stagesConfig[stepId]
@@ -60,7 +60,7 @@ const MultiStepForm = () => {
                 </Suspense>
             )
         })
-        
+
         return stages
     }, [form, jsonData])
 
@@ -84,17 +84,10 @@ const MultiStepForm = () => {
 }
 
 export default function SurveyLayout() {
-    const stages: string[] = [
-        'hiring_skills',
-        'hiring_status'
-    ]
-
-
     return (
         <div className="w-full h-full flex justify-center items-center">
             <Suspense>
                 <StageProvider
-                    stages={stages}
                     jsonData={jsonData}
                 >
                     <MultiStepForm />
