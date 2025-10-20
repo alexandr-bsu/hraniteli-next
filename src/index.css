@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #1a1a1d;
+  --color-foreground: #ffffff;
+  --color-secondary-foreground: #949494;
+  --color-border: #515151;
+  --color-accent: #eb7200;
+  --color-accent-foreground: #ffffff;
+  --color-input-background: transparent;
+  --color-input-border: #515151;
+  --color-placeholder: #ffffff;
+  --color-input-text: #ffffff;
+  /* Текст в имени поля */
+  --color-input-label: #ffa550;
+  --color-error-foreground: #ff9595;
+}
