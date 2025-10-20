@@ -27,13 +27,11 @@ const jsonData: StepItem[] = [
     }
 ]
 
-const defaultProfileFormOptions = formOptions(transformJsonToFormStructure(jsonData))
-
 const MultiStepForm = () => {
-    const { currentStage, getProgressPercentage, goTo, formOptions } = useStage()
+    const { currentStage, getProgressPercentage, goTo, jsonData } = useStage()
 
     const form = useAppForm({
-        ...formOptions,
+        ...formOptions(transformJsonToFormStructure(jsonData)),
         onSubmit: async ({ value }) => {
             // goTo('congrats', value as Record<string, any>)
             console.log(value)
@@ -41,6 +39,8 @@ const MultiStepForm = () => {
     })
 
     const stages = useMemo(() => {
+        if (!jsonData) return {}
+        
         const stagesConfig = transformJsonToFormStagesConfig(jsonData)
         
         const stages: Record<string, any> = {}
@@ -62,7 +62,7 @@ const MultiStepForm = () => {
         })
         
         return stages
-    }, [form])
+    }, [form, jsonData])
 
     const renderStage = () => {
         return stages[currentStage]
@@ -89,13 +89,13 @@ export default function SurveyLayout() {
         'hiring_status'
     ]
 
+
     return (
         <div className="w-full h-full flex justify-center items-center">
             <Suspense>
                 <StageProvider
                     stages={stages}
-                    middlewares={[]}
-                    formOptions={defaultProfileFormOptions}
+                    jsonData={jsonData}
                 >
                     <MultiStepForm />
                 </StageProvider>

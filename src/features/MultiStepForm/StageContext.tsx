@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, useRef } from 'react'
-import type { StageMiddleware } from './types'
+import type { StageMiddleware, StepItem } from './types'
 import { MiddlewareManager } from './MiddlewareManager'
 
 interface StageContextType {
@@ -13,7 +13,7 @@ interface StageContextType {
     getMiddlewares: () => StageMiddleware[]
     getProgressPercentage: () => number
     isInitialStage: () => boolean
-    formOptions: any
+    jsonData: StepItem[]
 }
 
 const StageContext = createContext<StageContextType | undefined>(undefined)
@@ -23,7 +23,7 @@ interface StageProviderProps {
     stages: string[]
     initialStage?: string,
     middlewares?: StageMiddleware[]
-    formOptions: any
+    jsonData: StepItem[]
 }
 
 export const StageProvider: React.FC<StageProviderProps> = ({
@@ -31,7 +31,7 @@ export const StageProvider: React.FC<StageProviderProps> = ({
     stages,
     initialStage,
     middlewares,
-    formOptions
+    jsonData
 }) => {
     const [currentStage, setCurrentStage] = useState<string>(initialStage || stages[0])
     const initialStageRef = useRef<string>(initialStage || stages[0])
@@ -109,7 +109,7 @@ export const StageProvider: React.FC<StageProviderProps> = ({
         getMiddlewares,
         getProgressPercentage,
         isInitialStage,
-        formOptions
+        jsonData
     }
 
     return (
