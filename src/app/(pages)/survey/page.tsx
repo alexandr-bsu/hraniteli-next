@@ -12,19 +12,19 @@ import { transformJsonToFormStructure, transformJsonToFormStagesConfig } from ".
 
 const jsonData: StepItem[] = [
     {
+        "step_id": "hiring_status",
+        "step_name": "bla-bla-bla-bla?",
+        "step_description": "Это слабые стороны или вы просто не хотите этим заниматься",
+        "step_type": "multiple",
+        "step_items": ['Разработка ПО', 'Маркетинг', 'Продажи']
+    },
+    {
         "step_id": "hiring_skills",
         "step_name": "Какие сферы вы хотите чтобы закрыл партнер?",
         "step_description": "Это слабые стороны или вы просто не хотите этим заниматься",
         "step_type": "multiple",
         "step_items": ['Разработка ПО', 'Маркетинг', 'Продажи']
     },
-    {
-        "step_id": "hiring_status",
-        "step_name": "bla-bla-bla-bla?",
-        "step_description": "Это слабые стороны или вы просто не хотите этим заниматься",
-        "step_type": "multiple",
-        "step_items": ['Разработка ПО', 'Маркетинг', 'Продажи']
-    }
 ]
 
 const MultiStepForm = () => {
