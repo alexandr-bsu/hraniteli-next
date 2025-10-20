@@ -98,11 +98,11 @@ const RadioItem = ({ label, value, checked, onChange, name, disabled, coins }: {
             </span>
             <span className="flex items-center gap-2 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal">
                 {label}
-                {coins !== undefined && (
+                {/* {coins !== undefined && (
                     <span className="ml-2 px-2 py-1 bg-accent/10 text-accent rounded-full text-sm font-medium">
                         {coins} 🪙
                     </span>
-                )}
+                )} */}
             </span>
         </label>
     )
