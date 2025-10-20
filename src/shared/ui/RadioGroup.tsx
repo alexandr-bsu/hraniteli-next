@@ -49,7 +49,7 @@ const RadioGroup = React.forwardRef<HTMLDivElement, RadioGroupProps>(
         }, [value])
 
         return (
-            <div ref={ref} className={cn("flex flex-col gap-[10px]", className)} {...props}>
+            <div ref={ref} className={cn("flex flex-col gap-[20px]", className)} {...props}>
                 {items.map((item) => (
                     <RadioItem
                         key={item.value}
@@ -91,7 +91,7 @@ const RadioItem = ({ label, value, checked, onChange, name, disabled }: { label:
     return (
         <label data-slot="form-item" className="gap-2 flex flex-row items-start space-x-3 space-y-0 cursor-pointer">
             <input disabled={disabled} onChange={onChange} type="radio" name={name} value={value} checked={checked} style={{ position: "absolute", opacity: 0, margin: 0, width: "30px", height: "30px" }} />
-            <span className="peer border-input data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground data-[state=checked]:border-accent focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive size-4 shrink-0 rounded-full border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px] flex items-center justify-center" aria-hidden="true" style={{ backgroundColor: checked ? 'var(--color-background)' : 'transparent', borderColor: 'var(--color-accent)', color: checked ? 'var(--color-background)' : 'transparent' }}>
+            <span className="peer border-input data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground data-[state=checked]:border-accent focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive size-4 shrink-0 rounded-full border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px] flex items-center justify-center" aria-hidden="true" style={{ backgroundColor: checked ? 'var(--color-background)' : 'transparent', borderColor: 'var(--color-input-border)', color: checked ? 'var(--color-background)' : 'transparent' }}>
                 <div className="w-[12px] h-[12px] max-lg:w-[8px] max-lg:h-[8px] rounded-full" style={{ backgroundColor: checked ? 'var(--color-accent)' : 'transparent', opacity: checked ? 1 : 0 }}></div>
             </span>
             <span className="flex items-center gap-2 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal">

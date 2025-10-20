@@ -65,7 +65,7 @@ const CheckboxGroup = React.forwardRef<HTMLDivElement, CheckboxGroupProps>(
         }, [value])
 
         return (
-            <div ref={ref} className={cn("flex flex-col gap-[10px]", className)} {...props}>
+            <div ref={ref} className={cn("flex flex-col gap-[20px]", className)} {...props}>
                 {items.map((item) => (
 
                     <CheckboxItem
@@ -109,7 +109,7 @@ const CheckboxItem = ({ label, value, checked, onChange, name, disabled }: { lab
     return (
         <label data-slot="form-item" className="gap-2 flex flex-row items-start space-x-3 space-y-0 cursor-pointer">
             <input disabled={disabled} onChange={onChange} type="checkbox" name={name} value={value} checked={checked} style={{ position: "absolute", opacity: 0, margin: 0, width: "30px", height: "30px" }} />
-            <span className="peer border-input data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground data-[state=checked]:border-accent focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px] flex items-center justify-center" aria-hidden="true" style={{ backgroundColor: checked ? 'var(--color-accent)' : 'transparent', borderColor: 'var(--color-accent)', color: checked ? 'var(--color-accent-foreground)' : 'transparent' }}>
+            <span className="peer border-input data-[state=checked]:bg-accent data-[state=checked]:text-accent-foreground data-[state=checked]:border-accent focus-visible:border-ring focus-visible:ring-ring/50 aria-invalid:ring-destructive/20 aria-invalid:border-destructive size-4 shrink-0 rounded-[4px] border shadow-xs transition-shadow outline-none focus-visible:ring-[3px] disabled:cursor-not-allowed disabled:opacity-50 h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px] flex items-center justify-center" aria-hidden="true" style={{ backgroundColor: checked ? 'var(--color-accent)' : 'transparent', borderColor: 'var(--color-input-border)', color: checked ? 'var(--color-accent-foreground)' : 'transparent' }}>
                 <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-check">
                     <path d="M20 6 9 17l-5-5"></path>
                 </svg>

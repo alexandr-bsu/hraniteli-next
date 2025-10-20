@@ -8,7 +8,7 @@ const FormBase = ({ children, title, description, progress, showOnlyChildren }: 
     return (
         <>
             {!showOnlyChildren && <div className="w-full overflow-hidden h-full bg-background text-foreground flex flex-col relative">
-                <div className="w-full pt-[30px] pb-[30px] border-b border-border border-dashed">
+                <div className="w-full pt-[30px] pb-[15px] border-b border-border border-dashed">
                     <div className="w-full flex flex-col gap-[10px] justify-between min-lg:px-[50px] max-lg:px-[20px]">
                         <div className="flex flex-col md:gap-[10px] justify-center">
                             <h2 className="font-semibold text-[20px] max-lg:text-[14px] max-lg:leading-[22px] leading-[27px]">
@@ -30,7 +30,7 @@ const FormBase = ({ children, title, description, progress, showOnlyChildren }: 
                     </div>
                 </div>
 
-                <div className="w-full min-lg:px-[50px] max-lg:px-[20px] pt-[30px] flex-1 flex flex-col overflow-y-auto">
+                <div className="w-full min-lg:px-[50px] max-lg:px-[20px] pt-[15px] flex-1 flex flex-col overflow-y-auto">
                     {children}
                 </div>
             </div>}
