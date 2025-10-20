@@ -10,6 +10,7 @@ import { useStage } from "../../../features/MultiStepForm/StageContext"
 import { SurveyStage } from "../../../widgets/SurveyStages/Survey"
 import { StepItem } from "../../../features/MultiStepForm/types"
 import { transformJsonToFormStructure, transformJsonToFormStagesConfig } from "../../../features/utils"
+import {CongratsStage} from "../../../widgets/SurveyStages/Congrats";
 import axios from "axios"
 
 
@@ -32,7 +33,7 @@ const fallbackJsonData: StepItem[] = [
 ]
 
 const MultiStepForm = () => {
-    const { currentStage, getProgressPercentage, goTo, jsonData } = useStage()
+    const { currentStage, getProgressPercentage, goTo, jsonData, calculateTotalCoins } = useStage()
 
     // Показываем форму только когда данные загружены
     if (!jsonData || jsonData.length === 0) {
@@ -46,8 +47,15 @@ const MultiStepForm = () => {
     const form = useAppForm({
         ...formOptions(transformJsonToFormStructure(jsonData)),
         onSubmit: async ({ value }) => {
-            // goTo('congrats', value as Record<string, any>)
-            console.log(value)
+            const formData = value as Record<string, any>
+            const finalTotalCoins = calculateTotalCoins(formData)
+            
+            const submissionData = {
+                ...formData,
+                total_coins: finalTotalCoins
+            }
+            
+            goTo('congrats', submissionData)
         }
     })
 
@@ -78,6 +86,11 @@ const MultiStepForm = () => {
                 </Suspense>
             )
         })
+
+
+        stages['congrats'] = (
+            <CongratsStage />
+        )
 
         console.log('Созданные этапы:', Object.keys(stages))
         return stages
@@ -119,11 +132,7 @@ function SurveyContent() {
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        if (!surveySlug) {
-            setError('Не удалось загрузить анкету')
-            setLoading(false)
-            return
-        }
+
 
         const fetchSurveyData = async () => {
             try {
@@ -166,8 +175,8 @@ function SurveyContent() {
         if (surveySlug) {
             fetchSurveyData()
         } else {
-            // Если нет slug, используем fallback данные
-            setJsonData(fallbackJsonData)
+            // Если нет slug
+            setError('Не удалось загрузить анкету')
             setLoading(false)
         }
     }, [surveySlug])

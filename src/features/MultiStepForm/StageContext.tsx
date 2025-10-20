@@ -14,6 +14,8 @@ interface StageContextType {
     getProgressPercentage: () => number
     isInitialStage: () => boolean
     jsonData: StepItem[]
+    calculateTotalCoins: (formData: Record<string, any>) => number
+    formData: Record<string, any>
 }
 
 const StageContext = createContext<StageContextType | undefined>(undefined)
@@ -45,13 +47,42 @@ export const StageProvider: React.FC<StageProviderProps> = ({
     const initialStageRef = useRef<string>(initialStage || generatedStages[0])
     const middlewareManager = useRef(new MiddlewareManager(middlewares || []))
 
+    const calculateTotalCoins = useCallback((formData: Record<string, any>) => {
+        let total = 0
+
+        // Проходим по всем шагам в jsonData
+        jsonData.forEach(step => {
+            const stepValue = formData[step.step_id]
+
+            if (stepValue) {
+                if (step.step_type === 'multiple' && Array.isArray(stepValue)) {
+                    // Для множественного выбора суммируем очки всех выбранных вариантов
+                    stepValue.forEach(selectedTitle => {
+                        const selectedItem = step.step_items.find(item => item.title === selectedTitle)
+                        if (selectedItem) {
+                            total += selectedItem.coins
+                        }
+                    })
+                } else if (step.step_type === 'single' && typeof stepValue === 'string') {
+                    // Для одиночного выбора добавляем очки выбранного варианта
+                    const selectedItem = step.step_items.find(item => item.title === stepValue)
+                    if (selectedItem) {
+                        total += selectedItem.coins
+                    }
+                }
+            }
+        })
+
+        return total
+    }, [jsonData])
+
     const executeStageTransition = useCallback(async (fromStage: string, toStage: string, formData: Record<string, any> = {}) => {
         const context = { fromStage, toStage, formData }
-        
+
         Promise.resolve().then(async () => {
             await middlewareManager.current.executeBefore(context)  // последовательно, но не блокирует UI
         })
-        
+
         setCurrentStage(toStage)
 
         Promise.resolve().then(async () => {
@@ -117,7 +148,8 @@ export const StageProvider: React.FC<StageProviderProps> = ({
         getMiddlewares,
         getProgressPercentage,
         isInitialStage,
-        jsonData
+        jsonData,
+        calculateTotalCoins
     }
 
     return (
