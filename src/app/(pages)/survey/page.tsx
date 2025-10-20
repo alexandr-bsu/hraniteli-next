@@ -13,7 +13,7 @@ import { transformJsonToFormStructure, transformJsonToFormStagesConfig } from ".
 import { CongratsStage } from "../../../widgets/SurveyStages/Congrats";
 import axios from "axios"
 
-const MultiStepForm = () => {
+const MultiStepForm = ({ title, description }: { title?: string; description?: string }) => {
     const { currentStage, getProgressPercentage, goTo, jsonData, calculateTotalCoins } = useStage()
 
     const form = useAppForm({
@@ -92,7 +92,8 @@ const MultiStepForm = () => {
     return (
         <div className="w-full flex flex-col h-screen">
             <FormBase
-                title="Анкета для сооснователей"
+                title={title || "Анкета"}
+                description={description}
                 progress={getProgressPercentage()}
                 showOnlyChildren={currentStage === 'congrats'}
             >
@@ -110,6 +111,8 @@ function SurveyContent() {
 
     const [jsonData, setJsonData] = useState<StepItem[]>([])
     const [results, setResults] = useState<ResultItem[]>([])
+    const [surveyTitle, setSurveyTitle] = useState<string>("")
+    const [surveyDescription, setSurveyDescription] = useState<string>("")
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
@@ -130,6 +133,8 @@ function SurveyContent() {
 
                 const surveyData = response.data.content || []
                 const resultsData = response.data.results || []
+                const title = response.data.title || ""
+                const description = response.data.description || ""
 
                 // Проверяем, что данные имеют правильную структуру
                 if (Array.isArray(surveyData) && surveyData.length > 0) {
@@ -138,8 +143,12 @@ function SurveyContent() {
                     if (firstItem.step_id && firstItem.step_name && firstItem.step_type && firstItem.step_items) {
                         setJsonData(surveyData)
                         setResults(resultsData)
+                        setSurveyTitle(title)
+                        setSurveyDescription(description)
                         console.log('Данные анкеты успешно загружены:', surveyData.length, 'этапов')
                         console.log('Результаты загружены:', resultsData.length, 'вариантов')
+                        console.log('Заголовок:', title)
+                        console.log('Описание:', description)
                     } else {
                         console.error('Неправильная структура данных:', firstItem)
                         throw new Error('Неправильная структура данных анкеты')
@@ -189,7 +198,7 @@ function SurveyContent() {
 
     return (
         <StageProvider jsonData={jsonData} results={results}>
-            <MultiStepForm />
+            <MultiStepForm title={surveyTitle} description={surveyDescription} />
         </StageProvider>
     )
 }
