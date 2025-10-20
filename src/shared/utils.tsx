@@ -12,7 +12,7 @@ export const validateStage = (value: any, schema: z.ZodSchema) => {
 export const StageError = ({ message }: { message?: string }) => {
     if (!message) return null
     return (
-        <div className="mt-2 text-error-foreground text-sm">
+        <div className="mt-[10px] text-error-foreground text-sm">
             {message}
         </div>
     )

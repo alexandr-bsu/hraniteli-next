@@ -116,9 +116,9 @@
 }
 
 @theme inline {
-  /* --color-background: #1a1a1d;
-  --color-foreground: #ffffff; */
-  --color-secondary-foreground: #949494;
+  /* --color-background: #1a1a1d;*/
+  /* color-foreground: #737373; */
+  --color-secondary-foreground: #737373;
   --color-border: #D4D4D4;
   --color-accent: #116466;
   --color-accent-foreground: #ffffff;
@@ -128,7 +128,7 @@
   --color-input-text: #ffffff;
   /* Текст в имени поля */
   --color-input-label: #ffa550;
-  --color-error-foreground: #ff9595;
+  --color-error-foreground: #fb2c36;
 }
 
 @layer base {
