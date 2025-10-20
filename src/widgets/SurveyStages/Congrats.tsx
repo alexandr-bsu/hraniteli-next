@@ -43,7 +43,7 @@ const CongratsStageContent = ({ form }: CongratsStageContentProps) => {
 
                             <>
                                 <div className="border-[#116466] border-[2px] whitespace-pre-line p-[20px] rounded-[30px] max-lg:text-[14px] mt-[30px] text-[18px] leading-[25px] font-normal w-full">
-                                В знак качестве поддержки, мы бы хотели подарить вам <b className="font-bold">бесплатную сессию</b> с психологом из Хранителей. Сессия - 55 минут, онлайн, по видеосвязи. Готовы сейчас оставить запрос и выбрать время?
+                                В качестве поддержки, мы бы хотели подарить вам <b className="font-bold">бесплатную сессию</b> с психологом из Хранителей. Сессия - 55 минут, онлайн, по видеосвязи. Готовы сейчас оставить запрос и выбрать время?
                                 </div>
                             </>
 
@@ -54,7 +54,7 @@ const CongratsStageContent = ({ form }: CongratsStageContentProps) => {
                         onClick={handleContinueClick}
                         className={`w-full text-[#FFFFFF] p-[14px] max-lg:text-[14px] shrink-0 bg-[#116466] rounded-[50px] font-normal text-[18px] leading-[25px] sticky bottom-[30px]`}
                     >
-                        Оставить заявку
+                        Подобрать психолога
                     </button>
 
                 </div>

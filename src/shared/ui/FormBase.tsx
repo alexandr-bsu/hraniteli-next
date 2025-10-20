@@ -21,7 +21,7 @@ const FormBase = ({ children, title, description, progress, showOnlyChildren }: 
                         {progress &&
                             <div className="w-auto border-[1px] max-lg:h-[59px] border-border h-[85px] rounded-[15px] flex justify-between items-center p-[20px] w-full">
                                 <span className="font-normal max-lg:text-[14px] text-[18px] leading-[25px]">
-                                    Заявка заполнена на:
+                                    Тест заполнен на:
                                 </span>
                                 <div className="bg-accent max-lg:h-[39px] max-lg:text-[14px] p-[10px] rounded-[6px] font-normal text-[18px] text-accent-foreground">
                                     {progress}%
