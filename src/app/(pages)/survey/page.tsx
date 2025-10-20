@@ -89,7 +89,7 @@ const MultiStepForm = () => {
 
 
         stages['congrats'] = (
-            <CongratsStage />
+            <CongratsStage form={form}/>
         )
 
         console.log('Созданные этапы:', Object.keys(stages))

@@ -56,6 +56,8 @@ export const transformJsonToFormStructure = (jsonData: StepItem[]): FormStructur
     }
   })
   
+  // Добавил is_congrats чтобы на заключительном шаге (гапример результаты опроса), был доступ к полям из формы 
+  defaultValues['is_congrats'] = 'false' as string
   return {
     defaultValues
   }
