@@ -20,14 +20,14 @@ const fallbackJsonData: StepItem[] = [
         "step_name": "bla-bla-bla-bla?",
         "step_description": "Это слабые стороны или вы просто не хотите этим заниматься",
         "step_type": "single",
-        "step_items": ['Разработка ПО', 'Маркетинг']
+        "step_items": [{title: "Разработка ПО", coins: 2}, {title: "Маркетинг", coins: 3}]
     },
     {
         "step_id": "hiring_skills",
         "step_name": "Какие сферы вы хотите чтобы закрыл партнер?",
         "step_description": "Это слабые стороны или вы просто не хотите этим заниматься",
         "step_type": "multiple",
-        "step_items": ['Разработка ПО', 'Маркетинг', 'Продажи']
+        "step_items": [{title: "Разработка ПО", coins: 2}, {title: "Маркетинг", coins: 3},  {title: "Продажи", coins: 3}]
     },
 ]
 

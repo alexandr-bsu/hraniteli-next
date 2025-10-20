@@ -8,6 +8,7 @@ import { CheckboxGroup } from "../../shared/ui/CheckboxGroup"
 import { RadioGroup } from "../../shared/ui/RadioGroup"
 import { transformArrToLabels } from "../../shared/utils"
 import { checkboxSchema, radioboxSchema } from "./validation"
+import { StepItemOption } from "../../features/MultiStepForm/types"
 
 interface SurveyStageContentProps {
     form: any
@@ -15,7 +16,7 @@ interface SurveyStageContentProps {
     step_name: string
     step_description?: string
     step_type: "multiple" | "single"
-    step_items: string[],
+    step_items: StepItemOption[],
     to_submit?: boolean
 }
 
@@ -25,7 +26,7 @@ interface SurveyStageProps {
     step_name: string
     step_description?: string
     step_type: "multiple" | "single"
-    step_items: string[],
+    step_items: StepItemOption[],
     to_submit?: boolean
 }
 

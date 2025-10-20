@@ -5,6 +5,7 @@ import { cn } from "../../features/utils"
 interface ICheckboxItem {
     label: string
     value: string
+    coins?: number
 }
 
 interface CheckboxGroupProps {
@@ -72,6 +73,7 @@ const CheckboxGroup = React.forwardRef<HTMLDivElement, CheckboxGroupProps>(
                         key={item.value}
                         label={item.label}
                         value={item.value}
+                        coins={item.coins}
                         checked={value.includes(item.value)}
                         onChange={(e) => handleCheckboxChange(item.value, e.target.checked)}
                         name={name || ''}
@@ -105,7 +107,7 @@ const CheckboxGroup = React.forwardRef<HTMLDivElement, CheckboxGroupProps>(
     }
 )
 
-const CheckboxItem = ({ label, value, checked, onChange, name, disabled }: { label: string; name: string; value: string; checked: boolean; onChange?: React.ChangeEventHandler<HTMLInputElement>; disabled?: boolean }) => {
+const CheckboxItem = ({ label, value, checked, onChange, name, disabled, coins }: { label: string; name: string; value: string; checked: boolean; onChange?: React.ChangeEventHandler<HTMLInputElement>; disabled?: boolean; coins?: number }) => {
     return (
         <label data-slot="form-item" className="gap-2 flex flex-row items-start space-x-3 space-y-0 cursor-pointer">
             <input disabled={disabled} onChange={onChange} type="checkbox" name={name} value={value} checked={checked} style={{ position: "absolute", opacity: 0, margin: 0, width: "30px", height: "30px" }} />
@@ -116,6 +118,11 @@ const CheckboxItem = ({ label, value, checked, onChange, name, disabled }: { lab
             </span>
             <span className="flex items-center gap-2 select-none group-data-[disabled=true]:pointer-events-none group-data-[disabled=true]:opacity-50 peer-disabled:cursor-not-allowed peer-disabled:opacity-50 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal">
                 {label}
+                {coins !== undefined && (
+                    <span className="ml-2 px-2 py-1 bg-accent/10 text-accent rounded-full text-sm font-medium">
+                        {coins} 🪙
+                    </span>
+                )}
             </span>
         </label>
     )

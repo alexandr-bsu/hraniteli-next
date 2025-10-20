@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { StepItemOption } from "../features/MultiStepForm/types"
  
 
 export const validateStage = (value: any, schema: z.ZodSchema) => {
@@ -18,6 +19,11 @@ export const StageError = ({ message }: { message?: string }) => {
     )
 }
 
-export const transformArrToLabels = (arr: string[]) => {
-    return arr.map(item => ({ label: item, value: item }))
+
+export const transformArrToLabels = (arr: StepItemOption[]) => {
+    return arr.map(item => ({ 
+        label: item.title, 
+        value: item.title,
+        coins: item.coins 
+    }))
 }

@@ -12,13 +12,19 @@ export abstract class StageMiddleware {
   after?(context: StageTransitionContext): Promise<void> | void
 }
 
+// Define the type for step item option
+export interface StepItemOption {
+  title: string
+  coins: number
+}
+
 // Define the type for our JSON structure
 export interface StepItem {
   step_id: string
   step_name: string
   step_description: string
   step_type: string
-  step_items: string[]
+  step_items: StepItemOption[]
 }
 
 export interface FormDefaultValues {
