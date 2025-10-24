@@ -24,7 +24,7 @@ import { RootState } from "@/redux/store";
 import { useDispatch, useSelector } from 'react-redux';
 
 const FormSchema = z.object({
-    price_session: z.enum(['free' , '300' , '500' , '1000' , '1500' , '2000' , '3000'], {
+    price_session: z.enum(['free', '300', '500', '1000', '1500', '2000', '3000'], {
         required_error: "Вы не заполнили обязательное поле",
     }),
 })
@@ -39,7 +39,7 @@ export const PriceSessionStage = () => {
         axios({
             method: "PUT",
             url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
-            data: { step: "Сумма за сессию", ticket_id:ticketID },
+            data: { step: "Сумма за сессию", ticket_id: ticketID },
         });
     }, [])
 
@@ -50,7 +50,7 @@ export const PriceSessionStage = () => {
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {
-            price_session: savedPriceSession as 'free' | '300' | '500' | '1000' | '1500' | '2000' | '3000'  || undefined,
+            price_session: savedPriceSession as 'free' | '300' | '500' | '1000' | '1500' | '2000' | '3000' || undefined,
         }
     })
 
@@ -61,8 +61,8 @@ export const PriceSessionStage = () => {
             url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
             method: 'PUT',
             data: { ticketID, field: 'psychologist_category', value: data.price_session }
-            }
-          )
+        }
+        )
         dispatch(setApplicationStage('phone'))
     }
 
@@ -80,7 +80,7 @@ export const PriceSessionStage = () => {
                                         Какую сумму вы готовы выделить на каждую сессию?
                                     </FormLabel>
                                     <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
-                                        Вознаграждение влияет на скорость подбора психолога - оно должно быть комфортным для всех сторон.
+                                        Вознаграждение влияет на опыт работы и скорость подбора психолога - оно должно быть комфортным для всех сторон.
                                     </FormDescription>
                                     <FormControl className="mt-[20px] max-lg:mt-[16px]">
                                         <RadioGroup
@@ -93,7 +93,8 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="free" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
-                                                    Бесплатно
+                                                    Бесплатно 
+                                                    <span className="text-neutral-500">- начинающие и обучающиеся психологи </span>
                                                 </FormLabel>
                                             </FormItem>
 
@@ -102,7 +103,8 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="500" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
-                                                    500 руб
+                                                    500 руб 
+                                                    <span className="text-neutral-500">- участники супервизионной группы Хранителей</span>
                                                 </FormLabel>
                                             </FormItem>
 
@@ -111,7 +113,8 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="1000" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
-                                                    1000 руб
+                                                    1000 руб 
+                                                    <span className="text-neutral-500">- опытные психологи - Хранители</span>
                                                 </FormLabel>
                                             </FormItem>
 
@@ -120,7 +123,8 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="1500" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
-                                                    1500 руб
+                                                    1500 руб 
+                                                    <span className="text-neutral-500">- опытные психологи - Хранители</span>
                                                 </FormLabel>
                                             </FormItem>
 
@@ -130,6 +134,7 @@ export const PriceSessionStage = () => {
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
                                                     2000 руб
+                                                    <span className="text-neutral-500">- опытные психологи - Хранители</span>
                                                 </FormLabel>
                                             </FormItem>
 
@@ -138,10 +143,11 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="3000" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
-                                                    3000 руб
+                                                    3000 руб 
+                                                    <span className="text-neutral-500">- опытные психологи - Хранители</span>
                                                 </FormLabel>
                                             </FormItem>
-                                            
+
                                         </RadioGroup>
                                     </FormControl>
                                     {!form.formState.errors.price_session &&
