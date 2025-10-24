@@ -92,9 +92,9 @@ export const PriceSessionStage = () => {
                                                 <FormControl>
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="free" />
                                                 </FormControl>
-                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
+                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
                                                     Бесплатно 
-                                                    <span className="text-neutral-500">- начинающие и обучающиеся психологи </span>
+                                                    <span className="text-neutral-500">- начинающие психологи </span>
                                                 </FormLabel>
                                             </FormItem>
 
@@ -102,9 +102,9 @@ export const PriceSessionStage = () => {
                                                 <FormControl>
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="500" />
                                                 </FormControl>
-                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
+                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
                                                     500 руб 
-                                                    <span className="text-neutral-500">- участники супервизионной группы Хранителей</span>
+                                                    <span className="text-neutral-500">- участники супервизионной группы</span>
                                                 </FormLabel>
                                             </FormItem>
 
@@ -112,7 +112,7 @@ export const PriceSessionStage = () => {
                                                 <FormControl>
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="1000" />
                                                 </FormControl>
-                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
+                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
                                                     1000 руб 
                                                     <span className="text-neutral-500">- опытные психологи - Хранители</span>
                                                 </FormLabel>
@@ -122,7 +122,7 @@ export const PriceSessionStage = () => {
                                                 <FormControl>
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="1500" />
                                                 </FormControl>
-                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
+                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
                                                     1500 руб 
                                                     <span className="text-neutral-500">- опытные психологи - Хранители</span>
                                                 </FormLabel>
@@ -132,7 +132,7 @@ export const PriceSessionStage = () => {
                                                 <FormControl>
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="2000" />
                                                 </FormControl>
-                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
+                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
                                                     2000 руб
                                                     <span className="text-neutral-500">- опытные психологи - Хранители</span>
                                                 </FormLabel>
@@ -142,7 +142,7 @@ export const PriceSessionStage = () => {
                                                 <FormControl>
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="3000" />
                                                 </FormControl>
-                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}]`}>
+                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
                                                     3000 руб 
                                                     <span className="text-neutral-500">- опытные психологи - Хранители</span>
                                                 </FormLabel>
