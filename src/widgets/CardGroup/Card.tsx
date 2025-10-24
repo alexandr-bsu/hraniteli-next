@@ -387,7 +387,10 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                             <div className={`${styles.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
                                 {psychologist.experience && (
                                     <span className={styles.experience}>
-                                        Участник супервизионной группы Хранителей {psychologist.experience}
+                                        {
+                                            (psychologist.group == "Супервизии" ? `Участник супервизионной группы Хранителей ${psychologist.experience}` : `Участник проекта Рука помощи ${psychologist.experience}`)
+                                        }
+
                                     </span>
                                 )}
 

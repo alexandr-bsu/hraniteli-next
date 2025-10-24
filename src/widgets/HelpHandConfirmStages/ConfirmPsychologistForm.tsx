@@ -284,6 +284,7 @@ export const ConfirmPsychologistForm = () => {
         console.log('API schedule response:', data);
         // Парсим ответ: ищем свободные слоты
         const slots: SimpleSlot[] = [];
+
         if (Array.isArray(data) && data.length > 0 && data[0].items) {
           data[0].items.forEach((day: any) => {
             if (day.slots) {
@@ -300,16 +301,25 @@ export const ConfirmPsychologistForm = () => {
                       const slotTime = slot['Время Локальное'] || slot.time;
                       const moscow_datetime = new Date(`${slotDate}T${slotTime}`);
 
-                      // Проверяем, что у слота есть ID
-                      if (slot.id) {
-                        slots.push({
-                          id: slot.id, // Используем именно ID слота из API (UUID)
-                          date: slotDate,
-                          time: slotTime,
-                          moscow_datetime_formatted: format(moscow_datetime, 'dd.MM / HH:mm'),
-                        });
+                      // Фильтруем устаревшие слоты (старше 24 часов)
+                      const timeDifference = moscow_datetime.getTime() - now.getTime();
+                      const hoursUntilSlot = timeDifference / (1000 * 60 * 60); // Разница в часах
+
+                      // Показываем только слоты, которые начинаются не раньше чем через 24 часа от текущего времени
+                      if (hoursUntilSlot >= 24) {
+                        // Проверяем, что у слота есть ID
+                        if (slot.id) {
+                          slots.push({
+                            id: slot.id, // Используем именно ID слота из API (UUID)
+                            date: slotDate,
+                            time: slotTime,
+                            moscow_datetime_formatted: format(moscow_datetime, 'dd.MM / HH:mm'),
+                          });
+                        } else {
+                          console.warn('Слот без ID:', slot);
+                        }
                       } else {
-                        console.warn('Слот без ID:', slot);
+                        console.log(`Слот ${slotDate} ${slotTime} отфильтрован как устаревший (${hoursUntilSlot.toFixed(1)} часов до начала)`);
                       }
                     }
                   });
@@ -353,7 +363,7 @@ export const ConfirmPsychologistForm = () => {
       const generatedId = `id_${currentPsychologist.name.replace(/\s+/g, '_')}`;
       params.append('selected_psychologist', generatedId);
     }
-    
+
     // Если психолог не из сообщества, направляем на страницу /groups
     const basePath = currentPsychologist?.group !== "Сообщество" ? "/groups" : "/";
     return `${basePath}?${params.toString()}`;
@@ -606,7 +616,9 @@ export const ConfirmPsychologistForm = () => {
                   <div className={`${styles_cards.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
                     {currentPsychologist.experience && (
                       <span className={`${styles_cards.experience} text-[12px] whitespace-nowrap`}>
-                        Участник супервизионной группы Хранителей {currentPsychologist.experience}
+                        {
+                          (currentPsychologist.group == "Супервизии" ? `Участник супервизионной группы Хранителей ${currentPsychologist.experience}` : `Участник проекта Рука помощи ${currentPsychologist.experience}`)
+                        }
                       </span>
                     )}
                     {currentPsychologist.verified && (

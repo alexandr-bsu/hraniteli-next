@@ -17,7 +17,7 @@ export async function getPsychologistAll(is_group: boolean = false) {
         if (is_group){
             // Фильтрация для страницы groups - показываем только "Супервизии"
             const beforeFilter = data.length
-            data = data.filter((psy: any) => psy.group === 'Супервизии')
+            data = data.filter((psy: any) => psy.group !== 'Сообщество')
             console.log(`Groups page: filtered for "Супервизии": ${data.length} psychologists (was ${beforeFilter})`)
         } else {
             // Фильтрация для главной страницы - показываем только "Сообщество"
