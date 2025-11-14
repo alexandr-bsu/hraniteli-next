@@ -425,23 +425,26 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                                     <Tooltip text="Стоимость сессии длительностью 50-55 минут в формате онлайн видеозвонка. Частоту и формат последующих встреч определяете вместе с психологом" />
                                 </div>
                             </div>
+
+                            <div className={styles.additionalApproaches}>
+                                <span className={styles.label}>Дополнительные подходы:</span>
+                                <div className={styles.approaches}>
+                                    {(Array.isArray(psychologist.additional_modals)
+                                        ? psychologist.additional_modals
+                                        // UPDATE: По-умолчанию значение - Нет дополнительной модальности
+                                        : psychologist.additional_modals?.split(';') || ["Нет дополнительной модальности"]
+                                    ).map((approach: string, index: number) => (
+                                        <div key={index} className={styles.approachItem}>
+                                            {approach.trim()}
+                                            <Tooltip text={getMethodDescription(approach.trim()) ? getMethodDescription(approach.trim()) : "Дополнительные подходы, которые психолог использует в своей работе для более эффективной помощи клиентам."} />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+
                         </div>
 
-                        <div className={styles.additionalApproaches}>
-                            <span className={styles.label}>Дополнительные подходы:</span>
-                            <div className={styles.approaches}>
-                                {(Array.isArray(psychologist.additional_modals)
-                                    ? psychologist.additional_modals
-                                    // UPDATE: По-умолчанию значение - Нет дополнительной модальности
-                                    : psychologist.additional_modals?.split(';') || ["Нет дополнительной модальности"]
-                                ).map((approach: string, index: number) => (
-                                    <div key={index} className={styles.approachItem}>
-                                        {approach.trim()}
-                                        <Tooltip text={getMethodDescription(approach.trim()) ? getMethodDescription(approach.trim()) : "Дополнительные подходы, которые психолог использует в своей работе для более эффективной помощи клиентам."} />
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
+
 
                         {/* UPDATE: Временно скрываем ближайшую запись если не нашли слоты */}
                         {/* {availableSlots?.length != 0 &&  */}
@@ -542,7 +545,7 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                         <div className={styles.queriesList}>
                             {psychologist.queries?.split(';').slice(0, 6).map((query, index) => (
                                 <TextTooltip key={index} text={query.trim()}>
-                                    <button className={styles.queryButton + " w-full block text-left"}>
+                                    <button className={styles.queryButton + " w-full block text-left grow"}>
                                         {query.trim()}
                                     </button>
                                 </TextTooltip>
