@@ -18,6 +18,8 @@
   border-radius: 20px;
   padding: 20px;
   padding-right: calc(20px + var(--scrollbar-compensation, 0px));
+  display: flex;
+  flex-direction: column;
 
   @include tablet {
     font-size: 14px;
@@ -26,6 +28,20 @@
   @include mobile {
     padding: 16px;
     border-radius: 16px;
+  }
+
+  // Полноэкранный режим когда карточка занимает всю высоту
+  &.grow {
+    min-height: 100vh;
+    
+    .expandedContent {
+      max-height: none;
+      opacity: 1;
+    }
+    
+    .header {
+      margin-bottom: 32px;
+    }
   }
 }
 
@@ -546,6 +562,7 @@
     overflow: hidden;
     max-height: 0;
     opacity: 0;
+    flex: 1;
     // transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
 
     &.expanded {

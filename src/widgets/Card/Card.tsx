@@ -121,7 +121,12 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
         const favorites = useSelector((state: RootState) => state.favorites.items);
         const videoRef = useRef<HTMLVideoElement>(null);
         const [isPlaying, setIsPlaying] = useState(false);
-        const [isExpanded, setIsExpanded] = useState(false);
+
+        // Проверяем, указан ли параметр psychologist в URL
+        const cardPsychologistName = searchParams.get('psychologist');
+        const isFullCardMode = Boolean(cardPsychologistName);
+
+        const [isExpanded, setIsExpanded] = useState(isFullCardMode);
         const [showVideo, setShowVideo] = useState(false);
         const [availableSlots, setAvailableSlots] = useState<{ date: string, time: string }[]>([]);
 
@@ -252,17 +257,17 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
         const isScrolledPsychologist = scrolledPsychologist === String(psychologist.id) || scrolledPsychologist === psychologist.name;
 
         useEffect(() => {
-            if (isScrolledPsychologist) {
+            if (isScrolledPsychologist || isFullCardMode) {
                 setIsExpanded(true)
             }
-        }, [isScrolledPsychologist])
+        }, [isScrolledPsychologist, isFullCardMode])
 
         useEffect(() => {
             if (onExpand) onExpand();
         }, [isDescriptionExpanded, isExpanded]);
 
         return (
-            <div ref={ref} id={id} className={`${styles.card} ${isSelected ? 'animate-pulse-highlight bg-[#F5F5F5]' : ''} ${isScrolledPsychologist ? styles.expanded : ''}`}>
+            <div ref={ref} id={id} className={`${styles.card} ${isSelected ? 'animate-pulse-highlight bg-[#F5F5F5]' : ''} ${isScrolledPsychologist ? styles.expanded : ''} ${isFullCardMode ? 'grow h-full' : ''}`}>
                 {/* Верхняя часть с фото и основной инфой */}
                 <div className={styles.header}>
                     <div className={styles.avatarSection}>
@@ -629,12 +634,14 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                 <div className={styles.actions}>
                     {!inPopup && (
                         <>
-                            <button
-                                className={styles.detailsButton}
-                                onClick={() => setIsExpanded(!isExpanded)}
-                            >
-                                {isExpanded ? 'Свернуть' : 'Подробнее о Хранителе'}
-                            </button>
+                            {!isFullCardMode && (
+                                <button
+                                    className={styles.detailsButton}
+                                    onClick={() => setIsExpanded(!isExpanded)}
+                                >
+                                    {isExpanded ? 'Свернуть' : 'Подробнее о Хранителе'}
+                                </button>
+                            )}
                             <button className={styles.appointmentButton} onClick={handleOpenModal}>
                                 Записаться на сессию
                             </button>

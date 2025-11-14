@@ -34,7 +34,7 @@ const sort_persons_by_slot_having = (persons: Array<IPsychologist>): Array<IPsyc
 }
 
 function easeInOutQuint(t: number) {
-  return t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * --t * t * t * t * t;
+    return t < 0.5 ? 16 * t * t * t * t * t : 1 + 16 * --t * t * t * t * t;
 }
 
 const scrollingRef = typeof window !== 'undefined' ? { current: 0 } : { current: 0 };
@@ -153,13 +153,13 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
     }, [filtered_persons, filter.price]);
 
     const scrollToFn = React.useCallback(
-  (offset: number, options: { behavior?: 'auto' | 'smooth'; adjustments?: number }, instance: any) => {
-    // Принудительно отключаем smooth scroll для стабильности
-    const opts = { ...options, behavior: 'auto' as const };
-    elementScroll(offset, opts, instance);
-  },
-  []
-);
+        (offset: number, options: { behavior?: 'auto' | 'smooth'; adjustments?: number }, instance: any) => {
+            // Принудительно отключаем smooth scroll для стабильности
+            const opts = { ...options, behavior: 'auto' as const };
+            elementScroll(offset, opts, instance);
+        },
+        []
+    );
 
     // Виртуализатор для window
     const virtualizer = useWindowVirtualizer({
@@ -174,13 +174,13 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
     const searchParams = useSearchParams()
     // Очищаем предзаполненные блокирующие показ слотов поля из localstorage 
     useEffect(() => {
-        
-      
+
+
         if (!searchParams.get('selected_psychologist')) {
             clearStorage(false)
         }
 
-        
+
     }, [])
 
     useEffect(() => {
@@ -333,6 +333,7 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
         }
     }, [selectedIndex, fullySortedPersons.length, JSON.stringify(fullySortedPersons.map(p => p.id)), virtualizer]);
 
+
     // --- Новый код для Popup подробной карточки психолога ---
     // Получаем параметр selected_psychologist из поисковой строки
     const selectedPsychologistId = searchParams.get('selected_psychologist');
@@ -347,6 +348,23 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
         }
         return found || null;
     }, [selectedPsychologistId, filter.filtered_by_automatch_psy]);
+    // --- Конец нового кода ---
+
+
+    // --- Новый код для подробной карточки психолога ---
+    // Получаем параметр psychologist из поисковой строки
+    const cardPsychologistName = searchParams.get('psychologist');
+    // Находим психолога по id или имени (универсально)
+    const singleCardPsychologist = React.useMemo(() => {
+        if (!cardPsychologistName) return null;
+        // Сначала ищем по id
+        let found = filter.filtered_by_automatch_psy.find((p: IPsychologist) => String(p.id) === String(cardPsychologistName));
+        // Если не нашли — ищем по имени
+        if (!found) {
+            found = filter.filtered_by_automatch_psy.find((p: IPsychologist) => p.name === cardPsychologistName);
+        }
+        return found || null;
+    }, [cardPsychologistName, filter.filtered_by_automatch_psy]);
     // --- Конец нового кода ---
 
 
@@ -425,10 +443,11 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
         );
     };
 
+
     return (
         <>
             {/* Popup для подробной карточки психолога */}
-            {selectedPsychologistId && popupPsychologist && (
+            {selectedPsychologistId && popupPsychologist && !cardPsychologistName && (
                 <FullWidthPopup
                     open={true}
                     hideClose={true}
@@ -438,13 +457,13 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
                         url.searchParams.delete('selected_psychologist');
                         window.history.replaceState({}, '', url.toString());
                     }}
-                    
+
                     padding="32px"
                     maxWidth="900px"
                     className="flex flex-col h-full p-0"
                 >
                     <div className="flex-1 overflow-y-auto h-full p-0">
-                        <Card psychologist={popupPsychologist} isSelected={true} hideClose = {true} inPopup={true} onClose={() => {
+                        <Card psychologist={popupPsychologist} isSelected={true} hideClose={true} inPopup={true} onClose={() => {
                             const url = new URL(window.location.href);
                             url.searchParams.delete('selected_psychologist');
                             window.history.replaceState({}, '', url.toString());
@@ -452,69 +471,83 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
                     </div>
                 </FullWidthPopup>
             )}
-            
+
             {/* Основной контент */}
-            <div className="mt-[50px] max-lg:mt-[20px] mb-[50px] max-lg:w-[100%] max-lg:px-[20px] w-full flex max-w-[1204px] max-lg:flex-col justify-center max-lg:gap-[20px] gap-[31px]">
-                <aside className="w-full min-lg:max-w-[383px]">
-                    <Filter />
-                </aside>
-                <main className="min-lg:max-w-[790px] w-full">
-                    <h1 className="text-2xl font-bold text-white pb-[20px] hidden">Подбор психолога и запись на консультацию онлайн</h1>
-                    <div style={{ width: '100%' }}>
-                        {fullySortedPersons && fullySortedPersons.length > 0 ? (
-                            <div
-                                style={{
-                                    height: virtualizer.getTotalSize(),
-                                    position: 'relative',
-                                    width: '100%',
-                                }}
-                            >
-                                {virtualizer.getVirtualItems().map((virtualRow) => {
-                                    const index = virtualRow.index;
-                                    const item = fullySortedPersons[index];
-                                    if (!item) return null;
-                                    if (!item.id && item.name) {
-                                        item.id = `id_${item.name.replace(/\s+/g, '_')}`;
-                                    }
-                                    // создаём ref для каждой карточки
-                                    const cardRef = (el: HTMLDivElement | null) => {
-                                        virtualizer.measureElement(el);
-                                    };
-                                    // функция для обновления высоты карточки
-                                    const handleCardExpand = () => {
-                                        const el = document.querySelector(`[data-index='${index}']`);
-                                        if (el) virtualizer.measureElement(el as HTMLElement);
-                                    };
-                                    return (
-                                        <div
-                                            key={virtualRow.key}
-                                            data-index={index}
-                                            ref={cardRef}
-                                            style={{
-                                                position: 'absolute',
-                                                top: 0,
-                                                left: 0,
-                                                width: '100%',
-                                                transform: `translateY(${virtualRow.start}px)`
-                                            }}
-                                            id={`psychologist-card-${item.id}`}
-                                        >
-                                            <Card
-                                                psychologist={item}
-                                                isSelected={filter.selected_psychologist?.id === item.id}
-                                                showBestMatch={hasActiveFilters && index < 3}
-                                                onExpand={handleCardExpand}
-                                            />
-                                        </div>
-                                    );
-                                })}
-                            </div>
-                        ) : (
-                            <EmptyState />
-                        )}
+            {!cardPsychologistName &&
+                <div className="mt-[50px] max-lg:mt-[20px] mb-[50px] max-lg:w-[100%] max-lg:px-[20px] w-full flex max-w-[1204px] max-lg:flex-col justify-center max-lg:gap-[20px] gap-[31px]">
+                    <aside className="w-full min-lg:max-w-[383px]">
+                        <Filter />
+                    </aside>
+                    <main className="min-lg:max-w-[790px] w-full">
+                        <h1 className="text-2xl font-bold text-white pb-[20px] hidden">Подбор психолога и запись на консультацию онлайн</h1>
+                        <div style={{ width: '100%' }}>
+                            {fullySortedPersons && fullySortedPersons.length > 0 ? (
+                                <div
+                                    style={{
+                                        height: virtualizer.getTotalSize(),
+                                        position: 'relative',
+                                        width: '100%',
+                                    }}
+                                >
+                                    {virtualizer.getVirtualItems().map((virtualRow) => {
+                                        const index = virtualRow.index;
+                                        const item = fullySortedPersons[index];
+                                        if (!item) return null;
+                                        if (!item.id && item.name) {
+                                            item.id = `id_${item.name.replace(/\s+/g, '_')}`;
+                                        }
+                                        // создаём ref для каждой карточки
+                                        const cardRef = (el: HTMLDivElement | null) => {
+                                            virtualizer.measureElement(el);
+                                        };
+                                        // функция для обновления высоты карточки
+                                        const handleCardExpand = () => {
+                                            const el = document.querySelector(`[data-index='${index}']`);
+                                            if (el) virtualizer.measureElement(el as HTMLElement);
+                                        };
+                                        return (
+                                            <div
+                                                key={virtualRow.key}
+                                                data-index={index}
+                                                ref={cardRef}
+                                                style={{
+                                                    position: 'absolute',
+                                                    top: 0,
+                                                    left: 0,
+                                                    width: '100%',
+                                                    transform: `translateY(${virtualRow.start}px)`
+                                                }}
+                                                id={`psychologist-card-${item.id}`}
+                                            >
+                                                <Card
+                                                    psychologist={item}
+                                                    isSelected={filter.selected_psychologist?.id === item.id}
+                                                    showBestMatch={hasActiveFilters && index < 3}
+                                                    onExpand={handleCardExpand}
+                                                />
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            ) : (
+                                <EmptyState />
+                            )}
+                        </div>
+                    </main>
+                </div>
+            }
+
+            {cardPsychologistName &&
+                <div className="min-h-screen w-full flex items-center justify-center p-4">
+                    <div className="w-full h-full">
+                        <Card psychologist={singleCardPsychologist} isSelected={true} hideClose={true} onClose={() => {
+                            const url = new URL(window.location.href);
+                            url.searchParams.delete('psychologist');
+                            window.history.replaceState({}, '', url.toString());
+                        }} />
                     </div>
-                </main>
-            </div>
+                </div>
+            }
         </>
     );
 };
