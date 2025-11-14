@@ -268,6 +268,16 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
 
         return (
             <div ref={ref} id={id} className={`${styles.card} ${isSelected ? 'animate-pulse-highlight bg-[#F5F5F5]' : ''} ${isScrolledPsychologist ? styles.expanded : ''} ${isFullCardMode ? 'grow h-full' : ''}`}>
+                {/* Кнопка возврата к списку психологов */}
+                {isFullCardMode && (
+                    <Link href="/" className={styles.backToList}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="m15 18-6-6 6-6" />
+                        </svg>
+                        Вернуться к списку психологов
+                    </Link>
+                )}
+
                 {/* Верхняя часть с фото и основной инфой */}
                 <div className={styles.header}>
                     <div className={styles.avatarSection}>

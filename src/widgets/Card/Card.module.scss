@@ -536,6 +536,35 @@
   }
 }
 
+.backToList {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  text-decoration: none;
+  font-size: 16px;
+  margin-bottom: 20px;
+  cursor: pointer;
+  transition: color 0.2s ease;
+
+  @include tablet {
+    font-size: 14px;
+    margin-bottom: 16px;
+  }
+
+  @include mobile {
+    margin-bottom: 12px;
+  }
+
+  &:hover {
+    color: #116466;
+  }
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
 .detailsButton {
   flex: 1;
   padding: 12px 24px;
