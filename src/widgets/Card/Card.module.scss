@@ -33,12 +33,12 @@
   // Полноэкранный режим когда карточка занимает всю высоту
   &.grow {
     min-height: 100vh;
-    
+
     .expandedContent {
       max-height: none;
       opacity: 1;
     }
-    
+
     .header {
       margin-bottom: 32px;
     }
@@ -94,24 +94,25 @@
   border-radius: 20px;
   overflow: hidden;
   cursor: pointer;
-  
+
   @include mobile {
     width: 100%;
     height: 0;
     padding-bottom: 164%; // Сохраняем пропорции
   }
-  
+
   &:hover {
     .playButton {
       opacity: 1;
     }
   }
-  
-  .image, .video {
+
+  .image,
+  .video {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    
+
     @include mobile {
       position: absolute;
       top: 0;
@@ -143,7 +144,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    
+
     @include mobile {
       position: absolute;
       top: 0;
@@ -154,7 +155,8 @@
   }
 }
 
-.playButton, .playPauseButton {
+.playButton,
+.playPauseButton {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -208,15 +210,15 @@
   font-weight: 600;
   color: #151515;
   margin: 0;
-  
+
   @include tablet {
     font-size: 18px;
   }
-  
+
   @include mobile {
     font-size: 18px;
   }
-  
+
   &:hover {
     color: #116466;
   }
@@ -227,7 +229,7 @@
   border: none;
   padding: 8px;
   cursor: pointer;
-  
+
   &:hover {
     opacity: 0.8;
   }
@@ -360,7 +362,7 @@
 
 .nextSession {
   overflow: hidden;
-  
+
   .dates {
     display: flex;
     gap: 8px;
@@ -390,13 +392,13 @@
     padding: 8px 16px;
     font-size: 16px;
     border: 1px solid #D4D4D4;
-    
+
     @include tablet {
       font-size: 14px;
       padding: 6px 12px;
       white-space: nowrap;
     }
-    
+
     @include mobile {
       padding: 6px 12px;
       font-size: 14px;
@@ -423,7 +425,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(227px, 1fr));
   gap: 10px;
-  
+
   @include tablet {
     display: flex;
     flex-wrap: nowrap;
@@ -438,7 +440,17 @@
   }
 
   @include mobile {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
     gap: 8px;
+    padding-bottom: 5px;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 
@@ -464,11 +476,19 @@
 
   @include tablet {
     min-width: 227px;
+    width: 227px;
+    flex-shrink: 0;
     font-size: 14px;
     white-space: nowrap;
     padding: 0 14px;
     transition: all 0.2s ease-in-out;
     height: 40px;
+  }
+
+  @include mobile {
+    min-width: 227px;
+    width: 227px;
+    flex-shrink: 0;
   }
 }
 
@@ -561,210 +581,211 @@
 }
 
 .expandedContent {
-    overflow: hidden;
-    max-height: 0;
-    opacity: 0;
-    flex: 1;
-    // transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  flex: 1;
+  // transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
 
-    &.expanded {
-        max-height: 2000px;
-        opacity: 1;
-    }
+  &.expanded {
+    max-height: 2000px;
+    opacity: 1;
+  }
 }
 
 .section {
-    margin-bottom: 24px;
+  margin-bottom: 24px;
 }
 
 .description {
-    position: relative;
+  position: relative;
+  max-height: none;
+  overflow: visible;
+  font-size: 18px;
+  line-height: 22px;
+  color: #333;
+  margin: 0;
+
+  &.expanded {
     max-height: none;
-    overflow: visible;
-    font-size: 18px;
-    line-height: 22px;
-    color: #333;
-    margin: 0;
+  }
 
-    &.expanded {
-        max-height: none;
+  &:not(.expanded) {
+    &[style*="height"] {
+      max-height: 44px;
+      overflow: hidden;
+
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        height: 22px;
+        background: linear-gradient(180deg, transparent, #fff);
+        pointer-events: none;
+      }
     }
-
-    &:not(.expanded) {
-        &[style*="height"] {
-            max-height: 44px;
-            overflow: hidden;
-
-            &::after {
-                content: '';
-                position: absolute;
-                bottom: 0;
-                right: 0;
-                width: 100%;
-                height: 22px;
-                background: linear-gradient(180deg, transparent, #fff);
-                pointer-events: none;
-            }
-        }
-    }
+  }
 }
 
 .education {
-    background: #FAFAFA;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 24px;
-    position: relative;
-    min-height: 80px;
-    padding-bottom: 32px;
+  background: #FAFAFA;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 24px;
+  position: relative;
+  min-height: 80px;
+  padding-bottom: 32px;
 }
 
 .educationItem {
-    margin-bottom: 15px;
-    &:last-child {
-        margin-bottom: 0;
-    }
+  margin-bottom: 15px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
 }
 
 .educationGradient {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 40px;
-    background: linear-gradient(180deg, rgba(250,250,250,0), #FAFAFA 90%);
-    pointer-events: none;
-    border-radius: 0 0 10px 10px;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 40px;
+  background: linear-gradient(180deg, rgba(250, 250, 250, 0), #FAFAFA 90%);
+  pointer-events: none;
+  border-radius: 0 0 10px 10px;
 }
 
 .educationText {
-    position: relative;
-    // max-height: 44px; // Высота двух строк
-    // overflow: hidden;
+  position: relative;
+  // max-height: 44px; // Высота двух строк
+  // overflow: hidden;
 
-    p {
-        font-size: 14px;
-        line-height: 22px;
-        color: #151515;
-        margin: 0;
-    }
+  p {
+    font-size: 14px;
+    line-height: 22px;
+    color: #151515;
+    margin: 0;
+  }
 
-    &.expanded {
-        max-height: 1000px; // Достаточно большое значение
-    }
+  &.expanded {
+    max-height: 1000px; // Достаточно большое значение
+  }
 }
 
 .educationText.withGradient::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 22px; // Высота одной строки
-    background: linear-gradient(180deg, transparent, #FAFAFA);
-    pointer-events: none;
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 22px; // Высота одной строки
+  background: linear-gradient(180deg, transparent, #FAFAFA);
+  pointer-events: none;
 }
 
 .readMoreButton {
-    margin-top: 10px;
-    font-size: 14px;
-    line-height: 19px;
-    color: #116466;
-    background: none;
-    border: none;
-    padding: 0;
-    cursor: pointer;
-    transition: opacity 0.2s;
-    outline: none;
-    user-select: none;
-    display: block;
-    width: 100%;
-    text-align: left;
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 19px;
+  color: #116466;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  outline: none;
+  user-select: none;
+  display: block;
+  width: 100%;
+  text-align: left;
 
-    &:hover {
-        opacity: 0.8;
-    }
+  &:hover {
+    opacity: 0.8;
+  }
 }
 
 .links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 16px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
 
-    @include mobile {
-        gap: 12px;
-    }
+  @include mobile {
+    gap: 12px;
+  }
 }
 
 .socialLink {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 16px;
-    border: 1px solid #D4D4D4;
-    border-radius: 20px;
-    color: #333;
-    text-decoration: none;
-    font-family: 'Open Sans', sans-serif;
-    font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border: 1px solid #D4D4D4;
+  border-radius: 20px;
+  color: #333;
+  text-decoration: none;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
 
-    @include tablet {
-        padding: 6px 12px;
-    }
+  @include tablet {
+    padding: 6px 12px;
+  }
 
-    @include mobile {
-        width: 100%;
-        justify-content: center;
-        padding: 12px;
-    }
+  @include mobile {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+  }
 
-    &:hover {
-        background: #F5F5F5;
-    }
+  &:hover {
+    background: #F5F5F5;
+  }
 }
 
 .personalInfo {
+  display: flex;
+  flex-direction: row;
+  gap: 32px;
+  flex-wrap: wrap;
+
+  @include mobile {
+    gap: 16px;
+  }
+
+  .infoRow {
     display: flex;
-    flex-direction: row;
-    gap: 32px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 8px;
 
     @include mobile {
-        gap: 16px;
+      width: 100%;
     }
+  }
 
-    .infoRow {
-        display: flex;
-        flex-direction: column;
-        gap: 8px;
+  .infoLabel {
+    color: #9A9A9A;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
 
-        @include mobile {
-            width: 100%;
-        }
+    @include tablet {
+      font-size: 14px;
     }
+  }
 
-    .infoLabel {
-        color: #9A9A9A;
-        font-family: 'Open Sans', sans-serif;
-        font-size: 16px;
+  .infoValue {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: #151515;
+    position: relative;
 
-        @include tablet {
-            font-size: 14px;
-        }
+    @include tablet {
+      font-size: 14px;
     }
-
-    .infoValue {
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        font-family: 'Open Sans', sans-serif;
-        font-size: 16px;
-        font-weight: 500;
-        color: #151515;
-        position: relative;
-
-        @include tablet {
-            font-size: 14px;
-        }
-    }
+  }
 }
