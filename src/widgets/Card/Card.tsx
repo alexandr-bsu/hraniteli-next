@@ -648,12 +648,14 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                     {!inPopup && (
                         <>
                             {!isFullCardMode && (
-                                <button
-                                    className={styles.detailsButton}
-                                    onClick={() => setIsExpanded(!isExpanded)}
+                                <Link
+                                    href={`/?psychologist=${psychologist.name}`}
+                                    
+                                    className={styles.detailsButton + ' text-center'}
+                                    // onClick={() => setIsExpanded(!isExpanded)}
                                 >
                                     {isExpanded ? 'Свернуть' : 'Подробнее о Хранителе'}
-                                </button>
+                                </Link>
                             )}
                             <button className={styles.appointmentButton} onClick={handleOpenModal}>
                                 Записаться на сессию
