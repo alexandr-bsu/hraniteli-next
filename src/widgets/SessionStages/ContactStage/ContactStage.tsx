@@ -236,7 +236,7 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
 
     const handleBack = () => {
         dispatch(closeModal());
-        dispatch(openModal('Time'));
+        dispatch(openModal('CardsForm'));
     };
 
     const getInitialFormData = (ticketId: string, timeDifference: number): FormData => ({

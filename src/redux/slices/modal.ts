@@ -9,6 +9,7 @@ export type ModalType =
   | 'Time'
   | 'Contact'
   | 'ContactForm'
+  | 'CardsForm'
   | null;
 
 interface Slot {

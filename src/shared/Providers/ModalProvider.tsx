@@ -4,6 +4,7 @@ import { useDispatch } from "react-redux";
 import { closeModal } from "@/redux/slices/modal";
 import { TimeStage } from "@/widgets/SessionStages/TimeStage/TimeStage";
 import { ContactStage } from "@/widgets/SessionStages/ContactStage/ContactStage";
+import { CardsFormStage } from "@/widgets/SessionStages/CardsFormStage/CardsFormStage";
 
 export function ModalProvider() {
     const dispatch = useDispatch();
@@ -16,6 +17,7 @@ export function ModalProvider() {
         <>
             <TimeStage />
             <ContactStage callback={handleClose} />
+            <CardsFormStage />
         </>
     );
 } 

@@ -147,7 +147,7 @@ function Form() {
 
     return (
         // <div className="w-full overflow-hidden h-full m-[20px] rounded-[30px] bg-[white] flex flex-col relative">
-        <div className="w-full overflow-hidden h-full bg-[white] flex flex-col relative">
+        <div className="w-full overflow-hidden h-full flex flex-col relative">
 
             {isLoading && (
                 <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
@@ -241,12 +241,12 @@ export default function CardsForm() {
 
     return (
         // <div className="w-full min-h-[100svh] max-lg:flex-col  max-lg:justify-start  min-lg:flex justify-center items-center">
-        <div className="w-full h-full flex justify-center items-center bg-[#000000] ">
-            <div className="flex justify-center items-center max-w-[960px] max-h-[650px]">
+        <div className="w-full h-full flex justify-center items-center">
+            {/* <div className="flex justify-center items-center max-w-[960px] max-h-[650px]"> */}
                 <Suspense>
                     <Form />
                 </Suspense>
-            </div>
+            {/* </div> */}
         </div>
     )
 }

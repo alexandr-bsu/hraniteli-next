@@ -206,7 +206,7 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
         const handleOpenModal = () => {
             dispatch(setModalSelectedPsychologist(psychologist.name));
             dispatch(setSelectedPsychologist(psychologist));
-            dispatch(openModal('Time'));
+            dispatch(openModal('CardsForm'));
         };
 
         const handleTimeStageComplete = () => {
@@ -250,7 +250,7 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
             dispatch(setSelectedPsychologist(psychologist));
             dispatch(setSelectedDate(localSlot.date));
             dispatch(setSelectedSlot(localSlot));
-            dispatch(openModal('Time'));
+            dispatch(openModal('CardsForm'));
         };
 
         const scrolledPsychologist = searchParams.get('selected_psychologist');
