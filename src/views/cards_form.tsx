@@ -57,7 +57,11 @@ const STAGES_WITH_PROGRESS = [
     'phone'
 ] as const satisfies readonly ApplicationStage[];
 
-function Form() {
+interface FormProps {
+    psychologistId?: string;
+}
+
+function Form({ psychologistId }: FormProps) {
     const router = useRouter();
     const dispatch = useDispatch();
 
@@ -65,6 +69,8 @@ function Form() {
     // Проверяем, перешли ли мы из иммледовательской формы
     const isResearchRedirect = searchParams.get('research') == 'true'
 
+    // Создаем уникальный ключ для localStorage для каждого психолога
+    const storageKey = psychologistId ? `matching_attempts_${psychologistId}` : 'matching_attempts';
 
     const prevStage = useRef<ApplicationStage | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -88,11 +94,12 @@ function Form() {
     }, [])
 
     useEffect(() => {
-        if (!ticketID) {
-            dispatch(generateTicketId('cd_'));
-            localStorage.setItem('matching_attempts', '0');
+        const formKey = psychologistId ? `cd_` : 'cd_';
+        if (!ticketID || !ticketID.includes(formKey)) {
+            dispatch(generateTicketId(formKey));
+            localStorage.setItem(storageKey, '0');
         }
-    }, [dispatch, ticketID]);
+    }, [dispatch, ticketID, psychologistId, storageKey]);
 
 
     const handleClose = () => {
@@ -211,9 +218,16 @@ function Form() {
     );
 }
 
-export default function CardsForm() {
+interface CardsFormProps {
+    psychologistId?: string;
+}
+
+export default function CardsForm({ psychologistId }: CardsFormProps) {
     const dispatch = useDispatch()
 
+    // Создаем уникальный ключ для каждого психолога
+    const formKey = psychologistId ? `cd_` : 'cd_';
+    
     const ticketID = useSelector<RootState, string>(
         state => state.applicationFormData.ticketID
     );
@@ -221,14 +235,14 @@ export default function CardsForm() {
     const is_tracker_launched = useSelector((state: RootState) => state.applicationForm.is_tracker_launched)
 
     useEffect(() => {
-        if (!ticketID) {
-            dispatch(generateTicketId('cd_'));
+        if (!ticketID || !ticketID.includes(formKey)) {
+            dispatch(generateTicketId(formKey));
         }
-    }, [ticketID, dispatch]);
+    }, [ticketID, dispatch, formKey]);
 
     // Инициализируем трекер формы
     useEffect(() => {
-        if (ticketID != "" && !is_tracker_launched) {
+        if (ticketID != "" && !is_tracker_launched && ticketID.includes(formKey)) {
             axios({
                 method: "POST",
                 url: "https://n8n-v2.hrani.live/webhook/init-form-tracking",
@@ -237,14 +251,14 @@ export default function CardsForm() {
                 dispatch(setInitTrackerStatusLaunched())
             });
         }
-    }, [ticketID])
+    }, [ticketID, formKey])
 
     return (
         // <div className="w-full min-h-[100svh] max-lg:flex-col  max-lg:justify-start  min-lg:flex justify-center items-center">
         <div className="w-full h-full flex justify-center items-center">
             {/* <div className="flex justify-center items-center max-w-[960px] max-h-[650px]"> */}
                 <Suspense>
-                    <Form />
+                    <Form psychologistId={psychologistId} />
                 </Suspense>
             {/* </div> */}
         </div>

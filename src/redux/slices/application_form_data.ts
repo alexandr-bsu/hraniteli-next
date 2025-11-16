@@ -6,11 +6,11 @@ const initialState: IApplicationFormData = {
   ticketID: '',
   username: '',
   age: '',
-  city:'',
+  city: '',
   cancel_reason: 'solved' as CancelReason,
   session_duration: '<1 month' as SessionDuration,
   choose_preferences: 'friends' as ChoosePreferences,
-  meeting_type:'online' as MeetingType,
+  meeting_type: 'online' as MeetingType,
   psychologist_education: 'no' as PsychologistEducation,
   price_session: 'free' as Price,
   last_session_price: 'free' as LastSessionPriceResearch,
@@ -40,7 +40,7 @@ export const applicationFormDataSlice = createSlice({
   initialState,
   reducers: {
     generateTicketId: (state, prefix) => {
-      state.ticketID = (prefix.payload ? prefix.payload : '')+Math.random().toString(36).substring(7);
+      state.ticketID = (prefix.payload ? prefix.payload : '') + Math.random().toString(36).substring(7);
     },
     setUsername: (state, action: PayloadAction<string>) => {
       state.username = action.payload;
@@ -61,7 +61,7 @@ export const applicationFormDataSlice = createSlice({
       state.price_session = action.payload;
     },
 
-    setLastSessionPrice: (state, action: PayloadAction<LastSessionPriceResearch>) =>{
+    setLastSessionPrice: (state, action: PayloadAction<LastSessionPriceResearch>) => {
       state.last_session_price = action.payload
     },
 
@@ -131,6 +131,13 @@ export const applicationFormDataSlice = createSlice({
     },
     setIndexPhyc: (state, action: PayloadAction<number>) => {
       state.index_phyc = action.payload;
+    },
+    resetApplicationFormData: (state, action: PayloadAction<string>) => {
+      const newTicketId = action.payload;
+      return {
+        ...initialState,
+        ticketID: newTicketId,
+      };
     }
   },
 });
@@ -164,7 +171,8 @@ export const {
   setHasMatchingError,
   setSessionDuration,
   setCity,
-  setIndexPhyc
+  setIndexPhyc,
+  resetApplicationFormData
 } = applicationFormDataSlice.actions;
 
 export const applicationFormDataReducer = applicationFormDataSlice.reducer;

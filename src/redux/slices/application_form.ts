@@ -66,11 +66,16 @@ export const applicationFormSlice = createSlice({
         },
         setIsRequestSend: (state, action: PayloadAction<boolean>) => {
             state.is_request_send = action.payload;
+        },
+        resetApplicationForm: (state) => {
+            state.application_stage = 'name';
+            state.is_tracker_launched = false;
+            state.is_request_send = false;
         }
     }
 });
 
-export const { setApplicationStage, setRid, setBid, setInitTrackerStatusLaunched, setIsRequestSend } = applicationFormSlice.actions;
+export const { setApplicationStage, setRid, setBid, setInitTrackerStatusLaunched, setIsRequestSend, resetApplicationForm } = applicationFormSlice.actions;
 export const applicationFormReducer = applicationFormSlice.reducer;
 
 // Селектор для получения текущего этапа
