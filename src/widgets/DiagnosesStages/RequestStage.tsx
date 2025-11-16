@@ -87,7 +87,7 @@ const RequestStage = () => {
                         name="request"
                         render={({ field }) => (
                             <div className='grow'>
-                                <FormItem className='grow p-[30px] max-lg:p-[15px] border-[1px] rounded-[25px] min-lg:h-[360px] overflow-y-auto'>
+                                <FormItem className='grow p-[30px] max-lg:p-[15px] border-[1px] rounded-[25px] min-lg:h-[300px] overflow-y-auto'>
                                     <FormLabel className='max-lg:text-[14px] font-semibold text-[20px] leading-[27px]'>Опишите свой запрос к психологу</FormLabel>
                                     <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
                                         Не знаете ответов — это нормально, напишите, как чувствуете. Можете пропустить если не готовы

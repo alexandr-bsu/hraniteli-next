@@ -143,7 +143,7 @@ export const ConditionStage = () => {
                         name="condition"
                         render={() => (
                             <div className='grow'>
-                                <FormItem className='grow p-[30px] max-lg:p-[15px] border-[1px] rounded-[25px] min-lg:h-[360px] overflow-y-auto'>
+                                <FormItem className='grow p-[30px] max-lg:p-[15px] border-[1px] rounded-[25px] min-lg:h-[300px] overflow-y-auto'>
                                     <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                                         Что из описанного ниже вы наблюдаете в своём состоянии в последнее время?
                                     </FormLabel>

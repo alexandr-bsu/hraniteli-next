@@ -69,7 +69,7 @@ const ChoosePreferencesStage = () => {
                         name="choose_preferences"
                         render={({ field }) => (
                             <div className='grow'>
-                                <FormItem className='grid gap-2 grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px] min-lg:h-[360px] overflow-y-auto'>
+                                <FormItem className='grid gap-2 grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px] min-lg:h-[300px] overflow-y-auto'>
                                     <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
                                         {localStorage.getItem('app_experience') == 'earlier' ? 'Как вы выбрали себе психолога, психотерапевта? Выберите именно тот путь, который в итоге оказался эффективным' : 'Как вы подбирали специалиста?'}
                                     </FormLabel>

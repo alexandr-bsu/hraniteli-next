@@ -1,6 +1,5 @@
 'use client'
 import { Form, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { setApplicationStage } from '@/redux/slices/application_form';
 import { setRequests } from '@/redux/slices/application_form_data';
@@ -18,12 +17,12 @@ import { RootState } from "@/redux/store";
 
 const FormSchema = z.object({
     request: z.string(),
-  })
+})
 
 const RequestStage = () => {
-   const dispatch = useDispatch()
+    const dispatch = useDispatch()
 
-   const ticketID = useSelector<RootState, string>(
+    const ticketID = useSelector<RootState, string>(
         state => state.applicationFormData.ticketID
     );
 
@@ -31,51 +30,51 @@ const RequestStage = () => {
         axios({
             method: "PUT",
             url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
-            data: { step: "Запрос клиента", ticket_id:ticketID },
+            data: { step: "Запрос клиента", ticket_id: ticketID },
         });
     }, [])
-   
-     // 1. Загружаем сохраненные данные из localStorage
-     const loadSavedData = () => {
-       if (typeof window !== 'undefined') {
-         const saved = localStorage.getItem('app_request')
-         try {
-           return saved ? JSON.parse(saved) : { request: '' }
-         } catch {
-           // Если старый формат (просто строка)
-           return { request: saved || '' }
-         }
-       }
-       return { request: '' }
-     }
-   
-     // 2. Настраиваем форму с начальными значениями
-     const form = useForm<z.infer<typeof FormSchema>>({
-       resolver: zodResolver(FormSchema),
-       defaultValues: loadSavedData()
-     })
-   
-     // 3. Сохраняем данные при изменении
-     const saveData = (data: z.infer<typeof FormSchema>) => {
-       localStorage.setItem('app_request', JSON.stringify(data))
-     }
-   
-     // Подписываемся на изменения формы
-     useEffect(() => {
-       const subscription = form.watch((value) => {
-         saveData(value as z.infer<typeof FormSchema>)
-       })
-       return () => subscription.unsubscribe()
-     }, [form.watch])
-   
-     // 4. Отправка формы
-     const handleSubmit = (data: z.infer<typeof FormSchema>) => {
+
+    // 1. Загружаем сохраненные данные из localStorage
+    const loadSavedData = () => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('app_request')
+            try {
+                return saved ? JSON.parse(saved) : { request: '' }
+            } catch {
+                // Если старый формат (просто строка)
+                return { request: saved || '' }
+            }
+        }
+        return { request: '' }
+    }
+
+    // 2. Настраиваем форму с начальными значениями
+    const form = useForm<z.infer<typeof FormSchema>>({
+        resolver: zodResolver(FormSchema),
+        defaultValues: loadSavedData()
+    })
+
+    // 3. Сохраняем данные при изменении
+    const saveData = (data: z.infer<typeof FormSchema>) => {
+        localStorage.setItem('app_request', JSON.stringify(data))
+    }
+
+    // Подписываемся на изменения формы
+    useEffect(() => {
+        const subscription = form.watch((value) => {
+            saveData(value as z.infer<typeof FormSchema>)
+        })
+        return () => subscription.unsubscribe()
+    }, [form.watch])
+
+    // 4. Отправка формы
+    const handleSubmit = (data: z.infer<typeof FormSchema>) => {
         axios({
             url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
             method: 'PUT',
             data: { ticketID, field: 'psy_queries', value: data.request }
-            }
-          )
+        }
+        )
         dispatch(setRequests([data.request]))
         dispatch(setApplicationStage('condition'))
     }
@@ -89,7 +88,7 @@ const RequestStage = () => {
                         name="request"
                         render={({ field }) => (
                             <div className='grow'>
-                                <FormItem className='grow p-[30px] max-lg:p-[15px] border-[1px] rounded-[25px] min-lg:h-[360px] overflow-y-auto'>
+                                <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
                                     <FormLabel className='max-lg:text-[14px] font-semibold text-[20px] leading-[27px]'>Опишите свой запрос к психологу</FormLabel>
                                     <FormDescription className='max-lg:text-[14px] font-normal text-[18px] leading-[25px]'>
                                         Не знаете ответов — это нормально, напишите, как чувствуете. Можете пропустить если не готовы
@@ -121,17 +120,17 @@ const RequestStage = () => {
                             </div>
                         )}
                     />
-                    <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px] mt-[30px] max-lg:mt-[10px]">
-                        <button 
+                    <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
+                        <button
                             type='button'
-                            onClick={() => dispatch(setApplicationStage('gender_psychologist'))} 
+                            onClick={() => dispatch(setApplicationStage('gender_psychologist'))}
                             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Назад
                         </button>
 
-                        <button 
-                            type='submit' 
+                        <button
+                            type='submit'
                             className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Продолжить
