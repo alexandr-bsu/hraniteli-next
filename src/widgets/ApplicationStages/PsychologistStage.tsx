@@ -305,21 +305,29 @@ export const PsychologistStage = () => {
     const loadSlots = async () => {
       try {
         const currentPsychologist = filtered_by_automatch_psy[currentIndex];
+        console.log('ApplicationStages - currentPsychologist:', currentPsychologist);
+        console.log('ApplicationStages - schedule:', currentPsychologist?.schedule);
+
         if (!currentPsychologist?.schedule) {
+          console.log('ApplicationStages - No schedule found');
           setAvailableSlots([]);
           return;
         }
 
         const slots: SimpleSlot[] = [];
         const schedule = currentPsychologist.schedule as Schedule;
+        console.log('ApplicationStages - schedule entries:', Object.entries(schedule));
 
         // Обрабатываем расписание как объект с датами
         Object.entries(schedule).forEach(([date, timeSlots]) => {
+          console.log('ApplicationStages - Processing date:', date, 'timeSlots:', timeSlots);
 
           // Проверяем что есть слоты на эту дату
           if (Object.keys(timeSlots).length > 0) {
             Object.entries(timeSlots).forEach(([time, slot]) => {
+              console.log('ApplicationStages - Processing slot:', time, slot);
               if (slot.state === 'Свободен') {
+                console.log('ApplicationStages - Found free slot:', date, time);
 
                 const moscow_datetime = new Date(`${slot.date}T${slot.time}`)
                 // Время уже в нужном часовом поясе, не конвертируем
@@ -341,6 +349,7 @@ export const PsychologistStage = () => {
           return dateA.getTime() - dateB.getTime();
         });
 
+        console.log('ApplicationStages - Final sorted slots:', sortedSlots);
         setAvailableSlots(sortedSlots);
 
       } catch (error) {
@@ -638,8 +647,8 @@ export const PsychologistStage = () => {
               <div className="flex flex-col w-fit">
                 <span className="text-[#9A9A9A] text-[14px]">Стоимость:</span>
                 <div className="flex items-center gap-[10px]">
-                <p className="font-semibold text-[18px]">От 0 ₽</p>
-                <Tooltip text={`<b>Первая сессия - бесплатно. Последующие сессии по цене психолога - ${currentPsychologist.min_session_price || 0} ₽.</b>
+                  <p className="font-semibold text-[18px]">От 0 ₽</p>
+                  <Tooltip text={`<b>Первая сессия - бесплатно. Последующие сессии по цене психолога - ${currentPsychologist.min_session_price || 0} ₽.</b>
 
 Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности.
 `} />

@@ -53,6 +53,17 @@ interface Schedule {
   [date: string]: DaySchedule;
 }
 
+interface NewScheduleFormat {
+  days: Array<{
+    date: string;
+    slots: {
+      [time: string]: Slot[];
+    };
+    day_name: string;
+    pretty_date: string;
+  }>;
+}
+
 interface ScheduleDay {
   date: string;
   slots: {
@@ -305,34 +316,79 @@ export const PsychologistStage = () => {
     const loadSlots = async () => {
       try {
         const currentPsychologist = filtered_by_automatch_psy[currentIndex];
+        console.log('CardStages - currentPsychologist:', currentPsychologist);
+        console.log('CardStages - schedule:', currentPsychologist?.schedule);
+        
         if (!currentPsychologist?.schedule) {
+          console.log('CardStages - No schedule found');
           setAvailableSlots([]);
           return;
         }
 
         const slots: SimpleSlot[] = [];
-        const schedule = currentPsychologist.schedule as Schedule;
+        const schedule = currentPsychologist.schedule;
+        console.log('CardStages - schedule entries:', Object.entries(schedule));
 
-        // Обрабатываем расписание как объект с датами
-        Object.entries(schedule).forEach(([date, timeSlots]) => {
+        // Проверяем структуру данных - в CardStages может быть другой формат
+        if (schedule.days && Array.isArray(schedule.days)) {
+          // Новый формат с массивом days
+          console.log('CardStages - Processing new format with days array');
+          schedule.days.forEach((dayData: any) => {
+            const date = dayData.date;
+            const daySlots = dayData.slots;
+            
+            console.log('CardStages - Processing day:', date, 'slots:', daySlots);
+            
+            if (daySlots && Object.keys(daySlots).length > 0) {
+              Object.entries(daySlots).forEach(([time, slotArray]: [string, any]) => {
+                // В новом формате слоты хранятся в массиве
+                if (Array.isArray(slotArray) && slotArray.length > 0) {
+                  const slot = slotArray[0]; // Берем первый слот из массива
+                  console.log('CardStages - Processing slot:', time, slot);
+                  
+                  if (slot.state === 'Свободен') {
+                    console.log('CardStages - Found free slot:', date, time);
 
-          // Проверяем что есть слоты на эту дату
-          if (Object.keys(timeSlots).length > 0) {
-            Object.entries(timeSlots).forEach(([time, slot]) => {
-              if (slot.state === 'Свободен') {
+                    const moscow_datetime = new Date(`${slot.date}T${slot.time}`);
+                    // Форматируем дату для отображения
+                    const displayDate = new Date(date).toLocaleDateString('ru-RU', {
+                      day: '2-digit',
+                      month: '2-digit'
+                    });
+                    
+                    slots.push({
+                      date: displayDate,
+                      time: time,
+                      moscow_datetime_formatted: format(moscow_datetime, 'dd.M HH:00'),
+                    });
+                  }
+                }
+              });
+            }
+          });
+        } else {
+          // Старый формат как в ApplicationStages
+          console.log('CardStages - Processing old format');
+          Object.entries(schedule).forEach(([date, timeSlots]: [string, any]) => {
+            console.log('CardStages - Processing date:', date, 'timeSlots:', timeSlots);
 
-                const moscow_datetime = new Date(`${slot.date}T${slot.time}`)
-                // Время уже в нужном часовом поясе, не конвертируем
-                slots.push({
-                  date: date,
-                  time: time,
-                  moscow_datetime_formatted: format(moscow_datetime, 'dd.M HH:00'),
-                });
+            if (timeSlots && Object.keys(timeSlots).length > 0) {
+              Object.entries(timeSlots).forEach(([time, slot]: [string, any]) => {
+                console.log('CardStages - Processing slot:', time, slot);
+                if (slot.state === 'Свободен') {
+                  console.log('CardStages - Found free slot:', date, time);
 
-              }
-            });
-          }
-        });
+                  const moscow_datetime = new Date(`${slot.date}T${slot.time}`);
+                  slots.push({
+                    date: date,
+                    time: time,
+                    moscow_datetime_formatted: format(moscow_datetime, 'dd.M HH:00'),
+                  });
+                }
+              });
+            }
+          });
+        }
 
         // Сортируем слоты по дате и времени
         const sortedSlots = slots.sort((a, b) => {
@@ -341,6 +397,7 @@ export const PsychologistStage = () => {
           return dateA.getTime() - dateB.getTime();
         });
 
+        console.log('CardStages - Final sorted slots:', sortedSlots);
         setAvailableSlots(sortedSlots);
 
       } catch (error) {
