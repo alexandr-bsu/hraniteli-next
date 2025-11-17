@@ -257,7 +257,7 @@ export const DiseasesPsychologistStage = () => {
 
 
     return (
-        <div className='px-[50px] max-lg:px-[20px] flex w-full grow max-lg:overflow-y-auto'>
+        <div className='px-[50px] max-lg:px-[20px] flex w-full grow  overflow-y-auto'>
 
             {isLoading && (
                 <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
