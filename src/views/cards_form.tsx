@@ -89,6 +89,10 @@ function Form({ psychologistId }: FormProps) {
     );
     const formData = useSelector((state: RootState) => state.applicationFormData);
 
+    const currentPsychologist = useSelector<RootState, any>(
+        state => state.filter
+    ).selected_psychologist;
+
     useEffect(() => {
         clearStorage(isResearchRedirect)
     }, [])
@@ -172,12 +176,12 @@ function Form({ psychologistId }: FormProps) {
                 psychologistsWithSlots.sort((a: any, b: any) => {
                     const aIndex = nameOrder.indexOf(a.name);
                     const bIndex = nameOrder.indexOf(b.name);
-                    
+
                     // Если психолог не найден в name_order, помещаем его в конец
                     if (aIndex === -1 && bIndex === -1) return 0;
                     if (aIndex === -1) return 1;
                     if (bIndex === -1) return -1;
-                    
+
                     return aIndex - bIndex;
                 });
             }
@@ -192,6 +196,124 @@ function Form({ psychologistId }: FormProps) {
         } finally {
             setIsLoading(false);
         }
+    };
+
+    // Функция для продолжения с выбранным психологом через get-aggregated-all API
+    const handleContinueAnyway = async () => {
+        if (!currentPsychologist?.name) {
+            console.error('Нет выбранного психолога');
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const requestBody = {
+                startDate: "2025-11-17",
+                endDate: "2025-12-18",
+                ageFilter: "",
+                formPsyClientInfo: {
+                    age: "",
+                    city: "",
+                    sex: "Мужской",
+                    psychoEducated: "",
+                    anxieties: [],
+                    customAnexiety: "",
+                    hasPsychoExperience: "",
+                    meetType: "",
+                    selectionСriteria: "",
+                    custmCreteria: "",
+                    importancePsycho: [],
+                    customImportance: "",
+                    agePsycho: "",
+                    sexPsycho: "Не имеет значения",
+                    priceLastSession: "",
+                    durationSession: "",
+                    reasonCancel: "",
+                    pricePsycho: "",
+                    reasonNonApplication: "",
+                    contactType: "",
+                    contact: "",
+                    name: "",
+                    is_adult: false,
+                    is_last_page: false,
+                    occupation: ""
+                },
+                form: {
+                    anxieties: [],
+                    questions: [],
+                    customQuestion: [],
+                    diagnoses: [],
+                    diagnoseInfo: "",
+                    diagnoseMedicaments: "",
+                    traumaticEvents: [],
+                    clientStates: [],
+                    selectedPsychologistsNames: [],
+                    shownPsychologists: "",
+                    psychos: [],
+                    lastExperience: "",
+                    amountExpectations: "",
+                    age: "",
+                    slots: [],
+                    contactType: "",
+                    contact: "",
+                    name: "",
+                    promocode: "",
+                    ticket_id: "",
+                    emptySlots: false,
+                    userTimeZone: "МСК",
+                    bid: 0,
+                    rid: 0,
+                    categoryType: "",
+                    customCategory: "",
+                    question_to_psychologist: "",
+                    filtered_by_automatch_psy_names: [],
+                    _queries: "",
+                    customTraumaticEvent: "",
+                    customState: ""
+                },
+                ticket_id: "",
+                userTimeOffsetMsk: 0,
+                show_only_psy: currentPsychologist.name
+            };
+
+            // Вызываем API get-aggregated-all с полной структурой запроса
+            const response = await fetch('https://n8n-v2.hrani.live/webhook/get-aggregated-all', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка при получении данных психолога');
+            }
+
+            const data = await response.json();
+
+            // Обрабатываем ответ и переходим к следующему этапу
+            if (data && data.length > 0) {
+                // Предполагаем, что API возвращает данные психолога с расписанием
+                dispatch(fill_filtered_by_automatch_psy([{
+                    ...currentPsychologist,
+                    schedule: data[0] // или как структурированы данные в ответе
+                }]));
+                dispatch(setHasMatchingError(false));
+                dispatch(setApplicationStage('psychologist'));
+            } else {
+                console.error('Нет данных от API get-aggregated-all');
+            }
+        } catch (error) {
+            console.error('Ошибка при вызове get-aggregated-all:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Функция для экстренной помощи
+    const handleEmergencyHelp = () => {
+        // Переходим к этапу экстренной помощи
+        dispatch(setApplicationStage('emergency'));
     };
 
     useEffect(() => {
@@ -239,7 +361,7 @@ function Form({ psychologistId }: FormProps) {
             case 'gratitude':
                 return <FinalStage />;
             case 'error':
-                return <NoMatchError onClose={handleClose} onRetryWithoutSpecificPsychologist={handleRetryWithoutSpecificPsychologist} />;
+                return <NoMatchError onClose={handleClose} onRetryWithoutSpecificPsychologist={handleRetryWithoutSpecificPsychologist} onContinueAnyway={handleContinueAnyway} onEmergencyHelp={handleEmergencyHelp} />;
             case 'emergency':
                 return <EmergencyContacts onClose={handleClose} />;
             case 'psychologist':
@@ -328,7 +450,7 @@ export default function CardsForm({ psychologistId }: CardsFormProps) {
 
     // Создаем уникальный ключ для каждого психолога
     const formKey = psychologistId ? `cd_` : 'cd_';
-    
+
     const ticketID = useSelector<RootState, string>(
         state => state.applicationFormData.ticketID
     );
@@ -358,9 +480,9 @@ export default function CardsForm({ psychologistId }: CardsFormProps) {
         // <div className="w-full min-h-[100svh] max-lg:flex-col  max-lg:justify-start  min-lg:flex justify-center items-center">
         <div className="w-full h-full flex justify-center items-center">
             {/* <div className="flex justify-center items-center max-w-[960px] max-h-[650px]"> */}
-                <Suspense>
-                    <Form psychologistId={psychologistId} />
-                </Suspense>
+            <Suspense>
+                <Form psychologistId={psychologistId} />
+            </Suspense>
             {/* </div> */}
         </div>
     )

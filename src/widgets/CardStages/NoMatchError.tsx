@@ -10,13 +10,15 @@ import axios from 'axios';
 interface NoMatchErrorProps {
     onClose?: () => void;
     onRetryWithoutSpecificPsychologist?: () => void;
+    onContinueAnyway?: () => void;
+    onEmergencyHelp?: () => void;
 }
 
-export const NoMatchError = ({ onClose, onRetryWithoutSpecificPsychologist }: NoMatchErrorProps) => {
+export const NoMatchError = ({ onClose, onRetryWithoutSpecificPsychologist, onContinueAnyway, onEmergencyHelp }: NoMatchErrorProps) => {
     const dispatch = useDispatch();
     const [showEmergency, setShowEmergency] = useState(false);
     const [matchingAttempts, setMatchingAttempts] = useState(0);
-    
+
     const ticketID = useSelector<RootState, string>(
         state => state.applicationFormData.ticketID
     );
@@ -71,7 +73,7 @@ export const NoMatchError = ({ onClose, onRetryWithoutSpecificPsychologist }: No
             <h2 className="text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold mb-[20px]">
                 К сожалению, мы не смогли подобрать психолога по вашим критериям
             </h2>
-            
+
             <p className="text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] text-[#737373] mb-[30px]">
                 Рекомендуем изменить ответы в следующих разделах:
             </p>
@@ -83,28 +85,48 @@ export const NoMatchError = ({ onClose, onRetryWithoutSpecificPsychologist }: No
                 >
                     Изменить предпочтения по полу психолога
                 </button>
-                
+
                 <button
                     onClick={handleChangeConditions}
                     className={`w-full text-left p-[20px] border rounded-[15px] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] hover:border-[${COLORS.primary}] transition-colors`}
                 >
                     Изменить описание состояний
                 </button>
-                
+
                 <button
                     onClick={handleChangeTraumatic}
                     className={`w-full text-left p-[20px] border rounded-[15px] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] hover:border-[${COLORS.primary}] transition-colors`}
                 >
                     Изменить описание травмирующих событий
                 </button>
-                
+
                 {onRetryWithoutSpecificPsychologist && (
-                    <button
-                        onClick={onRetryWithoutSpecificPsychologist}
-                        className={`w-full text-center p-[20px] bg-[${COLORS.primary}] text-white rounded-[15px] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] hover:opacity-90 transition-opacity mt-[10px]`}
-                    >
-                        Подобрать других психологов
-                    </button>
+                    <>
+                        <button
+                            onClick={onRetryWithoutSpecificPsychologist}
+                            className={`w-full text-center p-[20px] bg-[${COLORS.primary}] text-white rounded-[15px] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] hover:opacity-90 transition-opacity mt-[10px]`}
+                        >
+                            Подобрать других психологов
+                        </button>
+
+                        {onContinueAnyway && (
+                            <button
+                                onClick={onContinueAnyway}
+                                className={`w-full text-center p-[20px] border border-[${COLORS.primary}] text-[${COLORS.primary}] rounded-[15px] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] hover:bg-[${COLORS.primary}] hover:text-white transition-colors mt-[10px]`}
+                            >
+                                Всё равно продолжить
+                            </button>
+                        )}
+                        {/*                         
+                        {onEmergencyHelp && (
+                            <button
+                                onClick={onEmergencyHelp}
+                                className={`w-full text-center p-[20px] bg-red-600 text-white rounded-[15px] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] hover:bg-red-700 transition-colors mt-[10px]`}
+                            >
+                                Экстренная помощь
+                            </button>
+                        )} */}
+                    </>
                 )}
             </div>
         </div>
