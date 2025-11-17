@@ -578,7 +578,7 @@ export const PsychologistStage = () => {
   }
 
   return (
-    <div className="px-[50px] max-lg:px-[20px] flex w-full grow relative max-lg:overflow-y-auto">
+    <div className="px-[50px] max-lg:px-[20px] flex w-full grow relative overflow-y-auto">
       {isSubmitting && (
         <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-50">
           <div className="flex flex-col items-center gap-[10px]">
@@ -613,7 +613,7 @@ export const PsychologistStage = () => {
           </>
 
         </div>}
-        <div className="flex flex-col p-[25px] max-lg:p-[15px] mb-[43px] max-lg:mb-[20px] border-[1px] rounded-[25px] scrollContainer h-[500px] overflow-y-auto mt-[20px]">
+        <div className="flex flex-col p-[25px] max-lg:p-[15px] mb-[43px] max-lg:mb-[20px] border-[1px] rounded-[25px] mt-[20px]">
           <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-[650px]:flex-col max-[650px]:gap-[15px]">
             <div className="flex gap-[20px] max-lg:gap-[15px]">
               <div className="w-[80px] h-[80px] max-lg:w-[60px] max-lg:h-[60px] rounded-full overflow-hidden">
