@@ -101,22 +101,23 @@ export const NoMatchError = ({ onClose, onRetryWithoutSpecificPsychologist, onCo
                 </button>
 
                 {onRetryWithoutSpecificPsychologist && (
-                    <>
-                        <button
-                            onClick={onRetryWithoutSpecificPsychologist}
-                            className={`w-full text-center p-[20px] bg-[${COLORS.primary}] text-white rounded-[15px] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] hover:opacity-90 transition-opacity mt-[10px]`}
-                        >
-                            Подобрать других психологов
-                        </button>
-
+                    <div className='flex-wrap flex gap-2'>
                         {onContinueAnyway && (
                             <button
                                 onClick={onContinueAnyway}
-                                className={`w-full text-center p-[20px] border border-[${COLORS.primary}] text-[${COLORS.primary}] rounded-[15px] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] hover:bg-[${COLORS.primary}] hover:text-white transition-colors mt-[10px]`}
+                                className="text-center px-[24px] py-[12px] border grow border-[#116466] bg-white text-[#116466] rounded-[30px] text-[16px] font-medium hover:bg-[#F5F5F5] transition-all md:text-[16px] md:py-[13px] md:px-[20px]"
                             >
                                 Всё равно продолжить
                             </button>
                         )}
+                        <button
+                            onClick={onRetryWithoutSpecificPsychologist}
+                            className="text-center px-[24px] py-[12px] bg-[#116466] grow text-white rounded-[30px] text-[16px] font-medium hover:brightness-90 transition-all md:text-[16px] md:py-[13px] md:px-[20px]"
+                        >
+                            Подобрать других психологов
+                        </button>
+
+                        
                         {/*                         
                         {onEmergencyHelp && (
                             <button
@@ -126,7 +127,7 @@ export const NoMatchError = ({ onClose, onRetryWithoutSpecificPsychologist, onCo
                                 Экстренная помощь
                             </button>
                         )} */}
-                    </>
+                    </div>
                 )}
             </div>
         </div>
