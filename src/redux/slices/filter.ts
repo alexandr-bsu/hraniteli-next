@@ -18,6 +18,7 @@ interface ScheduleDay {
 
 interface FilterState {
   filtered_by_automatch_psy: IPsychologist[];
+  card_stages_psychologists: IPsychologist[]; // Отдельное состояние для CardStages
   filtered_by_slots_psy: IPsychologist[];
   filtered_by_gender: IPsychologist[];
   filtered_by_requests: IPsychologist[];
@@ -53,6 +54,7 @@ interface FilterState {
 
 const initialState: FilterState = {
   filtered_by_automatch_psy: [],
+  card_stages_psychologists: [], // Отдельное состояние для CardStages
   filtered_by_slots_psy: [],
   filtered_by_gender: [],
   filtered_by_requests: [],
@@ -326,11 +328,18 @@ const filterSlice = createSlice({
         traumatic: false
       };
     },
+    fill_card_stages_psychologists: (state, action: PayloadAction<IPsychologist[]>) => {
+      state.card_stages_psychologists = action.payload.map(psy => ({
+        ...psy,
+        id: psy.id || psy.name,
+      }));
+    },
   },
 });
 
 export const {
   fill_filtered_by_automatch_psy,
+  fill_card_stages_psychologists,
   fill_filtered_by_slots_psy,
   findByGender,
   findByRequests,

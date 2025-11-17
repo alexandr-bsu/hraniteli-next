@@ -268,7 +268,7 @@ export const PsychologistStage = () => {
         // Получаем полные данные психологов
         const { items: fullPsychologists } = await getFilteredPsychologists();
         // console.log('fullPsychologists', fullPsychologists)
-        // Мерджим с текущими психологами из стора, приоритет отдаем слотам из стора
+        // Мерджим с текущими психологами из стора CardStages, приоритет отдаем слотам из стора
         const mergedPsychologists = fullPsychologists.map((fullPsy: IPsychologist) => {
           const existingPsy = filtered_by_automatch_psy.find(p => p.name === fullPsy.name);
           if (existingPsy) {
@@ -318,7 +318,7 @@ export const PsychologistStage = () => {
         const currentPsychologist = filtered_by_automatch_psy[currentIndex];
         console.log('CardStages - currentPsychologist:', currentPsychologist);
         console.log('CardStages - schedule:', currentPsychologist?.schedule);
-        
+
         if (!currentPsychologist?.schedule) {
           console.log('CardStages - No schedule found');
           setAvailableSlots([]);
@@ -336,16 +336,16 @@ export const PsychologistStage = () => {
           schedule.days.forEach((dayData: any) => {
             const date = dayData.date;
             const daySlots = dayData.slots;
-            
+
             console.log('CardStages - Processing day:', date, 'slots:', daySlots);
-            
+
             if (daySlots && Object.keys(daySlots).length > 0) {
               Object.entries(daySlots).forEach(([time, slotArray]: [string, any]) => {
                 // В новом формате слоты хранятся в массиве
                 if (Array.isArray(slotArray) && slotArray.length > 0) {
                   const slot = slotArray[0]; // Берем первый слот из массива
                   console.log('CardStages - Processing slot:', time, slot);
-                  
+
                   if (slot.state === 'Свободен') {
                     console.log('CardStages - Found free slot:', date, time);
 
@@ -355,7 +355,7 @@ export const PsychologistStage = () => {
                       day: '2-digit',
                       month: '2-digit'
                     });
-                    
+
                     slots.push({
                       date: displayDate,
                       time: time,
@@ -695,8 +695,8 @@ export const PsychologistStage = () => {
               <div className="flex flex-col w-fit">
                 <span className="text-[#9A9A9A] text-[14px]">Стоимость:</span>
                 <div className="flex items-center gap-[10px]">
-                <p className="font-semibold text-[18px]">От 0 ₽</p>
-                <Tooltip text={`<b>Первая сессия - бесплатно. Последующие сессии по цене психолога - ${currentPsychologist.min_session_price || 0} ₽.</b>
+                  <p className="font-semibold text-[18px]">От 0 ₽</p>
+                  <Tooltip text={`<b>Первая сессия - бесплатно. Последующие сессии по цене психолога - ${currentPsychologist.min_session_price || 0} ₽.</b>
 
 Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности.
 `} />

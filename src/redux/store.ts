@@ -20,6 +20,7 @@ export interface RootState {
   applicationFormData: IApplicationFormData;
   filter: {
     filtered_by_automatch_psy: IPsychologist[];
+    card_stages_psychologists: IPsychologist[]; // Добавляем новое поле
     gender: string;
     requests: IPsychologist[];
     basic_approach: string;

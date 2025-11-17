@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import axios from 'axios';
 import Error from "next/error";
 import { IPsychologist } from "@/shared/types/psychologist.types";
-import { setDataNamePsychologist, fill_filtered_by_automatch_psy, setAvailableRequests } from "@/redux/slices/filter";
+import { setDataNamePsychologist, fill_card_stages_psychologists, setAvailableRequests } from "@/redux/slices/filter";
 import Image from "next/image";
 import { getPsychologistAll } from '@/features/actions/getPsychologistAll';
 import { getAvailableRequests } from '@/shared/api/requests';
@@ -53,7 +53,7 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
 
     // Определяем отображаемый список карточек с учётом всех фильтров
     const filtered_persons = useMemo(() => {
-        let result = [...filter.filtered_by_automatch_psy];
+        let result = [...filter.card_stages_psychologists];
 
         // Применяем фильтр по полу
         if (filter.gender !== 'other' && filter.filtered_by_gender?.length > 0) {
@@ -115,7 +115,7 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
 
         return result;
     }, [
-        filter.filtered_by_automatch_psy,
+        filter.card_stages_psychologists,
         filter.filtered_by_favorites,
         filter.filtered_by_gender,
         filter.filtered_by_requests,
@@ -216,7 +216,7 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
                     return;
                 }
 
-                dispatch(fill_filtered_by_automatch_psy(psychologists));
+                dispatch(fill_card_stages_psychologists(psychologists));
                 dispatch(setAvailableRequests(availableRequests));
             } catch (err) {
                 setError('Произошла ошибка при загрузке данных');
@@ -256,7 +256,7 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
     // Загрузка расписания
     useEffect(() => {
         const loadSchedules = async () => {
-            if (!filter.filtered_by_automatch_psy.length) return;
+            if (!filter.card_stages_psychologists.length) return;
 
             try {
                 const schedule = await submitQuestionnaire(formData, true);
@@ -299,7 +299,7 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
                     });
 
                     // Обновляем психологов с их расписаниями и образованием
-                    const updatedPsychologists = filter.filtered_by_automatch_psy.map((psy: any) => {
+                    const updatedPsychologists = filter.card_stages_psychologists.map((psy: any) => {
                         const educationKey = psy.name?.replace(/\s+/g, '_');
                         return {
                             ...psy,
@@ -309,7 +309,7 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
                     });
 
                     setScheduleLoaded(true)
-                    dispatch(fill_filtered_by_automatch_psy(updatedPsychologists));
+                    dispatch(fill_card_stages_psychologists(updatedPsychologists));
                 }
             } catch (error) {
                 console.error('Error loading schedules:', error);
@@ -317,7 +317,7 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
         };
 
         loadSchedules();
-    }, [filter.filtered_by_automatch_psy.length, dispatch, formData, educationMap]);
+    }, [filter.card_stages_psychologists.length, dispatch, formData, educationMap]);
 
     // Вычисляем id и индекс выбранного психолога
     const selectedId = filter.selected_psychologist?.id || (filter.selected_psychologist?.name ? `id_${filter.selected_psychologist.name.replace(/\s+/g, '_')}` : undefined);
@@ -341,13 +341,13 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
     const popupPsychologist = React.useMemo(() => {
         if (!selectedPsychologistId) return null;
         // Сначала ищем по id
-        let found = filter.filtered_by_automatch_psy.find((p: IPsychologist) => String(p.id) === String(selectedPsychologistId));
+        let found = filter.card_stages_psychologists.find((p: IPsychologist) => String(p.id) === String(selectedPsychologistId));
         // Если не нашли — ищем по имени
         if (!found) {
-            found = filter.filtered_by_automatch_psy.find((p: IPsychologist) => p.name === selectedPsychologistId);
+            found = filter.card_stages_psychologists.find((p: IPsychologist) => p.name === selectedPsychologistId);
         }
         return found || null;
-    }, [selectedPsychologistId, filter.filtered_by_automatch_psy]);
+    }, [selectedPsychologistId, filter.card_stages_psychologists]);
     // --- Конец нового кода ---
 
 
@@ -358,13 +358,13 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
     const singleCardPsychologist = React.useMemo(() => {
         if (!cardPsychologistName) return null;
         // Сначала ищем по id
-        let found = filter.filtered_by_automatch_psy.find((p: IPsychologist) => String(p.id) === String(cardPsychologistName));
+        let found = filter.card_stages_psychologists.find((p: IPsychologist) => String(p.id) === String(cardPsychologistName));
         // Если не нашли — ищем по имени
         if (!found) {
-            found = filter.filtered_by_automatch_psy.find((p: IPsychologist) => p.name === cardPsychologistName);
+            found = filter.card_stages_psychologists.find((p: IPsychologist) => p.name === cardPsychologistName);
         }
         return found || null;
-    }, [cardPsychologistName, filter.filtered_by_automatch_psy]);
+    }, [cardPsychologistName, filter.card_stages_psychologists]);
     // --- Конец нового кода ---
 
 
