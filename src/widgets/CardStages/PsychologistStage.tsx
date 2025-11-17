@@ -366,6 +366,36 @@ export const PsychologistStage = () => {
               });
             }
           });
+        } else if (schedule.items && Array.isArray(schedule.items)) {
+          // Формат от get-aggregated-all API
+          console.log('CardStages - Processing get-aggregated-all format');
+          schedule.items.forEach((dayData: any) => {
+            const date = dayData.date;
+            const daySlots = dayData.slots;
+            const prettyDate = dayData.pretty_date;
+
+            console.log('CardStages - Processing day:', date, 'prettyDate:', prettyDate, 'slots:', daySlots);
+
+            if (daySlots && Object.keys(daySlots).length > 0) {
+              Object.entries(daySlots).forEach(([time, slotArray]: [string, any]) => {
+                if (Array.isArray(slotArray) && slotArray.length > 0) {
+                  slotArray.forEach((slot: any) => {
+                    console.log('CardStages - Processing slot:', time, slot);
+                    if (slot.state === 'Свободен') {
+                      console.log('CardStages - Found free slot:', date, time);
+
+                      const moscow_datetime = new Date(`${slot.date}T${slot.time}`);
+                      slots.push({
+                        date: prettyDate, // Используем pretty_date для отображения
+                        time: time,
+                        moscow_datetime_formatted: format(moscow_datetime, 'dd.M HH:00'),
+                      });
+                    }
+                  });
+                }
+              });
+            }
+          });
         } else {
           // Старый формат как в ApplicationStages
           console.log('CardStages - Processing old format');

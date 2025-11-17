@@ -200,11 +200,16 @@ function Form({ psychologistId }: FormProps) {
 
     // Функция для продолжения с выбранным психологом через get-aggregated-all API
     const handleContinueAnyway = async () => {
+        console.log('=== НАЧАЛО handleContinueAnyway ===');
+        console.log('Текущий психолог:', currentPsychologist);
+        console.log('Имя психолога:', currentPsychologist?.name);
+
         if (!currentPsychologist?.name) {
             console.error('Нет выбранного психолога');
             return;
         }
 
+        console.log('Устанавливаем isLoading = true');
         setIsLoading(true);
         try {
             const requestBody = {
@@ -291,20 +296,92 @@ function Form({ psychologistId }: FormProps) {
 
             const data = await response.json();
 
-            // Обрабатываем ответ и переходим к следующему этапу
-            if (data && data.length > 0) {
-                // Предполагаем, что API возвращает данные психолога с расписанием
+            console.log('=== ОТЛАДКА КНОПКИ "ВСЁРАВНО ПРОДОЛЖИТЬ" ===');
+            console.log('1. Ответ от API get-aggregated-all:', data);
+            console.log('2. Имя текущего психолога:', currentPsychologist?.name);
+            console.log('3. Есть ли data?', !!data);
+            console.log('4. Является ли data массивом?', Array.isArray(data));
+            console.log('5. Есть ли data[0]?', !!data?.[0]);
+            console.log('6. Есть ли data[0].items?', !!data?.[0]?.items);
+            console.log('7. Является ли data[0].items массивом?', Array.isArray(data?.[0]?.items));
+
+            const scheduleData = Array.isArray(data) && data.length > 0 ? data[0] : null;
+
+            if (scheduleData?.items) {
+                console.log('8. Количество дней в расписании:', scheduleData.items.length);
+
+                // Подробно анализируем каждый день
+                scheduleData.items.forEach((day: any, dayIndex: number) => {
+                    console.log(`День ${dayIndex + 1} (${day.pretty_date}):`);
+                    console.log('  - Есть ли slots?', !!day.slots);
+
+                    if (day.slots) {
+                        const slotsCount = Object.keys(day.slots).length;
+                        console.log(`  - Количество временных слотов: ${slotsCount}`);
+
+                        let dayFreeSlots = 0;
+                        Object.entries(day.slots).forEach(([time, slots]) => {
+                            if (Array.isArray(slots) && slots.length > 0) {
+                                const freeSlots = slots.filter(slot => slot.state === 'Свободен');
+                                if (freeSlots.length > 0) {
+                                    dayFreeSlots += freeSlots.length;
+                                    console.log(`    ${time}: ${freeSlots.length} свободных слотов`);
+                                    freeSlots.forEach(slot => {
+                                        console.log(`      - Психолог: ${slot.psychologist}, Статус: ${slot.state}`);
+                                    });
+                                }
+                            }
+                        });
+                        console.log(`  - Всего свободных слотов в этот день: ${dayFreeSlots}`);
+                    }
+                });
+            }
+
+            // Проверяем наличие свободных слотов
+            let hasAvailableSlots = false;
+            if (scheduleData && scheduleData.items && Array.isArray(scheduleData.items)) {
+                // Проверяем есть ли вообще слоты со статусом "Свободен"
+                hasAvailableSlots = scheduleData.items.some((day: any) => {
+                    if (!day.slots) return false;
+
+                    return Object.entries(day.slots).some(([time, slots]) => {
+                        if (!Array.isArray(slots)) return false;
+
+                        return slots.some(slot => slot.state === 'Свободен');
+                    });
+                });
+            }
+
+            console.log('9. Найдены ли свободные слоты?', hasAvailableSlots);
+            console.log('10. Текущий этап приложения:', currentStage);
+            console.log('11. Есть ли ошибка подбора?', hasError);
+
+            // Всегда переходим к выбору времени, если получили данные
+            if (scheduleData && scheduleData.items) {
+                console.log('12. ПЕРЕХОДИМ К ВЫБОРУ ВРЕМЕНИ');
+                console.log('13. Данные для сохранения в Redux:', {
+                    psychologist: currentPsychologist,
+                    schedule: scheduleData
+                });
+
                 dispatch(fill_filtered_by_automatch_psy([{
                     ...currentPsychologist,
-                    schedule: data[0] // или как структурированы данные в ответе
+                    schedule: scheduleData
                 }]));
                 dispatch(setHasMatchingError(false));
                 dispatch(setApplicationStage('psychologist'));
+
+                console.log('14. Redux actions выполнены');
             } else {
-                console.error('Нет данных от API get-aggregated-all');
+                console.log('12. НЕ ПЕРЕХОДИМ К ВЫБОРУ ВРЕМЕНИ - нет данных');
             }
+
+            console.log('=== КОНЕЦ ОТЛАДКИ ===');
         } catch (error) {
+            console.error('=== ОШИБКА В handleContinueAnyway ===');
             console.error('Ошибка при вызове get-aggregated-all:', error);
+            console.error('Имя психолога:', currentPsychologist?.name);
+            console.error('=== КОНЕЦ ОШИБКИ ===');
         } finally {
             setIsLoading(false);
         }
