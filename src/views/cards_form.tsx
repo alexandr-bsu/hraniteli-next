@@ -95,6 +95,7 @@ function Form({ psychologistId }: FormProps) {
 
     // Функция для повторного подбора без конкретного психолога
     const handleRetryWithoutSpecificPsychologist = async () => {
+        setIsLoading(true);
         try {
             // Отправляем анкету без указания конкретного психолога
             const schedule = await submitQuestionnaire(formData, false, false); // Не передаем имя психолога
@@ -188,6 +189,8 @@ function Form({ psychologistId }: FormProps) {
             }
         } catch (error) {
             console.error('Ошибка при подборе других психологов:', error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
