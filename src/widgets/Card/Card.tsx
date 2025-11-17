@@ -650,14 +650,18 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                             {!isFullCardMode && (
                                 <Link
                                     href={`/?psychologist=${psychologist.name}`}
-                                    
+
                                     className={styles.detailsButton + ' text-center'}
-                                    // onClick={() => setIsExpanded(!isExpanded)}
+                                // onClick={() => setIsExpanded(!isExpanded)}
                                 >
                                     {isExpanded ? 'Свернуть' : 'Подробнее о Хранителе'}
                                 </Link>
                             )}
-                            <button className={styles.appointmentButton} onClick={handleOpenModal}>
+                            <button
+                                className={`${styles.appointmentButton} ${!availableSlots?.length ? styles.appointmentButtonDisabled : ''}`}
+                                onClick={availableSlots?.length ? handleOpenModal : undefined}
+                                disabled={!availableSlots?.length}
+                            >
                                 Записаться на сессию
                             </button>
                         </>

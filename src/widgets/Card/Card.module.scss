@@ -607,6 +607,16 @@
   @include mobile {
     padding: 13px 20px;
   }
+
+  &.appointmentButtonDisabled {
+    background: #9A9A9A;
+    // color: #9A9A9A;
+    cursor: not-allowed;
+
+    &:hover {
+      filter: none;
+    }
+  }
 }
 
 .expandedContent {
