@@ -470,7 +470,7 @@ function Form({ psychologistId }: FormProps) {
                     <div className="w-full flex justify-between min-lg:px-[50px] max-lg:px-[20px]">
                         <div className="flex flex-col md:gap-[10px] justify-center">
                             <h2 className="font-semibold text-[20px] max-lg:text-[14px] max-lg:leading-[22px] leading-[27px]">
-                                Подбор психолога
+                                Запись на сессию {currentPsychologist?.name ? ` - ${currentPsychologist.name}` : ''}
                             </h2>
                             <span className="font-normal text-[18px] hidden md:block max-lg:text-[14px] leading-[25px] max-[360px]:w-[192px]">
                                 Среднее время заполнения заявки - 5 минут
