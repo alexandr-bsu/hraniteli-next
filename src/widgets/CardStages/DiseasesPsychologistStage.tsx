@@ -51,6 +51,10 @@ export const DiseasesPsychologistStage = () => {
         state => state.applicationFormData.ticketID
     );
 
+    const currentPsychologist = useSelector<RootState, any>(
+        state => state.filter
+    ).selected_psychologist;
+
     useEffect(() => {
         axios({
             method: "PUT",
@@ -131,7 +135,7 @@ export const DiseasesPsychologistStage = () => {
             // Отправляем анкету и получаем расписание
             const schedule = await submitQuestionnaire({
                 ...formData
-            });
+            }, false, false, currentPsychologist?.name);
 
             // Проверяем наличие слотов
             let hasSlots = false;

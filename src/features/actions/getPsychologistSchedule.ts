@@ -6,6 +6,7 @@ interface PsychologistScheduleRequest {
     startDate: string;
     endDate: string;
     ageFilter: string;
+    show_only_psy?: string;
     formPsyClientInfo: {
         age: string;
         city: string;
@@ -71,7 +72,7 @@ interface PsychologistScheduleRequest {
 }
 
 // Отправка анкеты
-export const submitQuestionnaire = async (formData: IApplicationFormData, from_cards: boolean = false, from_diagnostic_form: boolean = false) => {
+export const submitQuestionnaire = async (formData: IApplicationFormData, from_cards: boolean = false, from_diagnostic_form: boolean = false, psychologist_name?: string) => {
     try {
         const startDate = new Date();
         const endDate = new Date();
@@ -81,6 +82,7 @@ export const submitQuestionnaire = async (formData: IApplicationFormData, from_c
             startDate: startDate.toISOString().split('T')[0],
             endDate: endDate.toISOString().split('T')[0],
             ageFilter: formData.age,
+            ...(psychologist_name ? { show_only_psy: psychologist_name } : {}),
             formPsyClientInfo: {
                 age: formData.age,
                 city: '',
@@ -186,7 +188,7 @@ export const submitQuestionnaire = async (formData: IApplicationFormData, from_c
         // Сортируем психологов по name_order если он есть в ответе
         if (data[0]?.name_order && Array.isArray(data[0].name_order)) {
             const nameOrder = data[0].name_order;
-            
+
             // Сортируем слоты по порядку психологов в name_order
             data[0].items.forEach((day: any) => {
                 if (day.slots) {
@@ -195,12 +197,12 @@ export const submitQuestionnaire = async (formData: IApplicationFormData, from_c
                             day.slots[time].sort((a: any, b: any) => {
                                 const aIndex = nameOrder.indexOf(a.psychologist);
                                 const bIndex = nameOrder.indexOf(b.psychologist);
-                                
+
                                 // Если психолог не найден в name_order, помещаем его в конец
                                 if (aIndex === -1 && bIndex === -1) return 0;
                                 if (aIndex === -1) return 1;
                                 if (bIndex === -1) return -1;
-                                
+
                                 return aIndex - bIndex;
                             });
                         }
