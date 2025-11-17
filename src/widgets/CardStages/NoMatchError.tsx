@@ -9,9 +9,10 @@ import axios from 'axios';
 
 interface NoMatchErrorProps {
     onClose?: () => void;
+    onRetryWithoutSpecificPsychologist?: () => void;
 }
 
-export const NoMatchError = ({ onClose }: NoMatchErrorProps) => {
+export const NoMatchError = ({ onClose, onRetryWithoutSpecificPsychologist }: NoMatchErrorProps) => {
     const dispatch = useDispatch();
     const [showEmergency, setShowEmergency] = useState(false);
     const [matchingAttempts, setMatchingAttempts] = useState(0);
@@ -96,6 +97,15 @@ export const NoMatchError = ({ onClose }: NoMatchErrorProps) => {
                 >
                     Изменить описание травмирующих событий
                 </button>
+                
+                {onRetryWithoutSpecificPsychologist && (
+                    <button
+                        onClick={onRetryWithoutSpecificPsychologist}
+                        className={`w-full text-center p-[20px] bg-[${COLORS.primary}] text-white rounded-[15px] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] hover:opacity-90 transition-opacity mt-[10px]`}
+                    >
+                        Подобрать других психологов
+                    </button>
+                )}
             </div>
         </div>
     );

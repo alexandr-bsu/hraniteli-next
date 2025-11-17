@@ -122,8 +122,8 @@ export const DiseasesPsychologistStage = () => {
             url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
             method: 'PUT',
             data: { ticketID, field: 'diagnose', value: result }
-            }
-          )
+        }
+        )
 
         dispatch(setDiseases(result))
         dispatch(setHasMatchingError(false))
@@ -157,12 +157,12 @@ export const DiseasesPsychologistStage = () => {
                 localStorage.setItem('matching_attempts', (currentAttempts + 1).toString());
                 dispatch(setHasMatchingError(true));
                 setShowNoMatch(true);
-                if(Number(localStorage.getItem('matching_attempts') || '0') < 3){
+                if (Number(localStorage.getItem('matching_attempts') || '0') < 3) {
                     dispatch(setApplicationStage('error'))
                 } else {
                     dispatch(setApplicationStage('emergency'))
                 }
-                
+
                 return;
             }
 
@@ -218,12 +218,12 @@ export const DiseasesPsychologistStage = () => {
                 psychologistsWithSlots.sort((a: any, b: any) => {
                     const aIndex = nameOrder.indexOf(a.name);
                     const bIndex = nameOrder.indexOf(b.name);
-                    
+
                     // Если психолог не найден в name_order, помещаем его в конец
                     if (aIndex === -1 && bIndex === -1) return 0;
                     if (aIndex === -1) return 1;
                     if (bIndex === -1) return -1;
-                    
+
                     return aIndex - bIndex;
                 });
             }
@@ -232,7 +232,7 @@ export const DiseasesPsychologistStage = () => {
                 localStorage.setItem('matching_attempts', (currentAttempts + 1).toString());
                 dispatch(setHasMatchingError(true));
                 setShowNoMatch(true);
-                if(Number(localStorage.getItem('matching_attempts') || '0') < 3){
+                if (Number(localStorage.getItem('matching_attempts') || '0') < 3) {
                     dispatch(setApplicationStage('error'))
                 } else {
                     dispatch(setApplicationStage('emergency'))
@@ -258,7 +258,7 @@ export const DiseasesPsychologistStage = () => {
 
     return (
         <div className='px-[50px] max-lg:px-[20px] flex w-full grow max-lg:overflow-y-auto'>
-            
+
             {isLoading && (
                 <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-50 flex items-center justify-center">
                     <div className="flex flex-col items-center gap-4">

@@ -93,6 +93,104 @@ function Form({ psychologistId }: FormProps) {
         clearStorage(isResearchRedirect)
     }, [])
 
+    // Функция для повторного подбора без конкретного психолога
+    const handleRetryWithoutSpecificPsychologist = async () => {
+        try {
+            // Отправляем анкету без указания конкретного психолога
+            const schedule = await submitQuestionnaire(formData, false, false); // Не передаем имя психолога
+
+            // Проверяем наличие слотов
+            let hasSlots = false;
+            if (schedule[0]?.items) {
+                hasSlots = schedule[0].items.some((day: any) => {
+                    if (!day.slots) return false;
+                    return Object.entries(day.slots).some(([time, slots]) => {
+                        if (!Array.isArray(slots)) return false;
+                        return slots.some(slot => slot.state === 'Свободен');
+                    });
+                });
+            }
+
+            // Получаем список психологов
+            const result = await getFilteredPsychologists();
+
+            // Если нет слотов вообще - показываем ошибку
+            if (!hasSlots || result.items.length === 0) {
+                return; // Остаемся на экране ошибки
+            }
+
+            // Собираем все id психологов из слотов и их расписания
+            const psychologistSchedules = new Map<string, any>();
+            schedule[0].items.forEach((day: any) => {
+                if (!day.slots) return;
+                Object.entries(day.slots).forEach(([time, slots]) => {
+                    if (!Array.isArray(slots)) return;
+                    slots.forEach((slot: any) => {
+                        if (slot.psychologist) {
+                            if (!psychologistSchedules.has(slot.psychologist)) {
+                                const psychologistSchedule: { [date: string]: { [time: string]: any } } = {};
+                                schedule[0].items.forEach((d: any) => {
+                                    if (d.slots) {
+                                        psychologistSchedule[d.pretty_date] = {};
+                                        Object.entries(d.slots).forEach(([t, s]) => {
+                                            if (Array.isArray(s)) {
+                                                const psychologistSlots = s.filter(sl => sl.psychologist === slot.psychologist && sl.state === 'Свободен');
+                                                if (psychologistSlots.length > 0) {
+                                                    psychologistSchedule[d.pretty_date][t] = psychologistSlots[0];
+                                                }
+                                            }
+                                        });
+                                    }
+                                });
+                                psychologistSchedules.set(slot.psychologist, psychologistSchedule);
+                            }
+                        }
+                    });
+                });
+            });
+
+            // Фильтруем психологов у которых есть слоты
+            const psychologistsWithSlots = result.items.map((psy: any) => {
+                const schedule = psychologistSchedules.get(psy.name);
+                return {
+                    ...psy,
+                    schedule: schedule
+                };
+            }).filter((psy: any) => {
+                const schedule = psychologistSchedules.get(psy.name);
+                if (!schedule) return false;
+                return Object.values(schedule).some((daySlots: any) =>
+                    // @ts-expect-error: We expecting error because of error type
+                    Object.values(daySlots).some(slot => slot && slot.state === 'Свободен')
+                );
+            });
+
+            // Сортируем психологов по name_order если он есть в ответе
+            if (schedule[0]?.name_order && Array.isArray(schedule[0].name_order)) {
+                const nameOrder = schedule[0].name_order;
+                psychologistsWithSlots.sort((a: any, b: any) => {
+                    const aIndex = nameOrder.indexOf(a.name);
+                    const bIndex = nameOrder.indexOf(b.name);
+                    
+                    // Если психолог не найден в name_order, помещаем его в конец
+                    if (aIndex === -1 && bIndex === -1) return 0;
+                    if (aIndex === -1) return 1;
+                    if (bIndex === -1) return -1;
+                    
+                    return aIndex - bIndex;
+                });
+            }
+
+            if (psychologistsWithSlots.length > 0) {
+                dispatch(fill_filtered_by_automatch_psy(psychologistsWithSlots));
+                dispatch(setHasMatchingError(false));
+                dispatch(setApplicationStage('psychologist'));
+            }
+        } catch (error) {
+            console.error('Ошибка при подборе других психологов:', error);
+        }
+    };
+
     useEffect(() => {
         const formKey = psychologistId ? `cd_` : 'cd_';
         if (!ticketID || !ticketID.includes(formKey)) {
@@ -138,7 +236,7 @@ function Form({ psychologistId }: FormProps) {
             case 'gratitude':
                 return <FinalStage />;
             case 'error':
-                return <NoMatchError onClose={handleClose} />;
+                return <NoMatchError onClose={handleClose} onRetryWithoutSpecificPsychologist={handleRetryWithoutSpecificPsychologist} />;
             case 'emergency':
                 return <EmergencyContacts onClose={handleClose} />;
             case 'psychologist':
