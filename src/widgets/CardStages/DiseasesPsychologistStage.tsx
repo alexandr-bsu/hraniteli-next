@@ -160,7 +160,7 @@ export const DiseasesPsychologistStage = () => {
                 if (Number(localStorage.getItem('matching_attempts') || '0') < 3) {
                     dispatch(setApplicationStage('error'))
                 } else {
-                    dispatch(setApplicationStage('emergency'))
+                    dispatch(setApplicationStage('error'))
                 }
 
                 return;
@@ -232,10 +232,10 @@ export const DiseasesPsychologistStage = () => {
                 localStorage.setItem('matching_attempts', (currentAttempts + 1).toString());
                 dispatch(setHasMatchingError(true));
                 setShowNoMatch(true);
-                if (Number(localStorage.getItem('matching_attempts') || '0') < 3) {
+                if (Number(localStorage.getItem('matching_attempts') || '0') < 1000) {
                     dispatch(setApplicationStage('error'))
                 } else {
-                    dispatch(setApplicationStage('emergency'))
+                    dispatch(setApplicationStage('error'))
                 }
                 return;
             }

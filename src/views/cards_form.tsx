@@ -30,7 +30,7 @@ import { submitQuestionnaire, getFilteredPsychologists } from "@/features/action
 import { setHasMatchingError } from "@/redux/slices/application_form_data";
 import { setApplicationStage } from "@/redux/slices/application_form";
 import { NoMatchError } from "@/widgets/CardStages/NoMatchError";
-import { EmergencyContacts } from "@/widgets/CardStages/EmergencyContacts";
+
 
 import { useSearchParams } from "next/navigation";
 import { clearStorage } from "@/features/utils";
@@ -387,11 +387,7 @@ function Form({ psychologistId }: FormProps) {
         }
     };
 
-    // Функция для экстренной помощи
-    const handleEmergencyHelp = () => {
-        // Переходим к этапу экстренной помощи
-        dispatch(setApplicationStage('emergency'));
-    };
+
 
     useEffect(() => {
         const formKey = psychologistId ? `cd_` : 'cd_';
@@ -438,9 +434,9 @@ function Form({ psychologistId }: FormProps) {
             case 'gratitude':
                 return <FinalStage />;
             case 'error':
-                return <NoMatchError onClose={handleClose} onRetryWithoutSpecificPsychologist={handleRetryWithoutSpecificPsychologist} onContinueAnyway={handleContinueAnyway} onEmergencyHelp={handleEmergencyHelp} />;
+                return <NoMatchError onClose={handleClose} onRetryWithoutSpecificPsychologist={handleRetryWithoutSpecificPsychologist} onContinueAnyway={handleContinueAnyway} />;
             case 'emergency':
-                return <EmergencyContacts onClose={handleClose} />;
+                return <NoMatchError onClose={handleClose} onRetryWithoutSpecificPsychologist={handleRetryWithoutSpecificPsychologist} onContinueAnyway={handleContinueAnyway} />;
             case 'psychologist':
                 return <PsychologistStage />;
             case 'diseases_psychologist':
@@ -465,7 +461,7 @@ function Form({ psychologistId }: FormProps) {
                 </div>
             )}
 
-            {currentStage !== 'gratitude' && currentStage !== 'error' && (
+            {currentStage !== 'gratitude' && currentStage !== 'error' && currentStage !== 'emergency' && (
                 <div className="w-full min-lg:rounded-[30px] pt-[30px] shrink-0">
                     <div className="w-full flex justify-between min-lg:px-[50px] max-lg:px-[20px]">
                         <div className="flex flex-col md:gap-[10px] justify-center">
