@@ -539,7 +539,7 @@ export const Psychologist_cards = ({ data, isLoaded }: Props) => {
 
             {cardPsychologistName &&
                 <div className="min-h-screen w-full flex items-center justify-center p-4">
-                    <div className="w-full h-full">
+                    <div className="max-w-[1200px] max-lg:w-full h-full">
                         <Card psychologist={singleCardPsychologist} isSelected={true} hideClose={true} onClose={() => {
                             const url = new URL(window.location.href);
                             url.searchParams.delete('psychologist');
