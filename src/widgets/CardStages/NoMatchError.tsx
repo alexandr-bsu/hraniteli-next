@@ -60,12 +60,12 @@ export const NoMatchError = ({ onClose, onRetryWithoutSpecificPsychologist, onCo
             </p>
 
             <div className="flex flex-col gap-[15px]">
-                <button
+                {/* <button
                     onClick={handleChangeGender}
                     className={`w-full text-left p-[20px] border rounded-[15px] text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] hover:border-[${COLORS.primary}] transition-colors`}
                 >
                     Изменить предпочтения по полу психолога
-                </button>
+                </button> */}
 
                 <button
                     onClick={handleChangeConditions}
