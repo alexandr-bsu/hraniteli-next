@@ -14,14 +14,15 @@ import {
 } from "@/components/ui/form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { setApplicationStage } from "@/redux/slices/application_form"
-import { setExperienceUser, setPriceSession } from "@/redux/slices/application_form_data"
+import { setPriceSession } from "@/redux/slices/application_form_data"
 import { Price } from "@/shared/types/application.types"
 import { COLORS } from '@/shared/constants/colors';
 
 import axios from 'axios';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { RootState } from "@/redux/store";
 import { useDispatch, useSelector } from 'react-redux';
+import { shouldShowKeeperLabels } from '@/shared/utils/utm';
 
 const FormSchema = z.object({
     price_session: z.enum(['free', '300', '500', '1000', '1500', '2000', '3000'], {
@@ -30,6 +31,7 @@ const FormSchema = z.object({
 })
 
 export const PriceSessionStage = () => {
+    const [showKeeperLabels, setShowKeeperLabels] = useState(false);
     const dispatch = useDispatch();
     const ticketID = useSelector<RootState, string>(
         state => state.applicationFormData.ticketID
@@ -41,6 +43,9 @@ export const PriceSessionStage = () => {
             url: "https://n8n-v2.hrani.live/webhook/update-tracking-step",
             data: { step: "Сумма за сессию", ticket_id: ticketID },
         });
+
+        // Проверяем UTM параметр для отображения подписей "Хранители"
+        setShowKeeperLabels(shouldShowKeeperLabels());
     }, [])
 
     const savedPriceSession = typeof window !== 'undefined'
@@ -93,8 +98,8 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="free" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    Бесплатно 
-                                                    <span className="text-neutral-500">- начинающие психологи </span>
+                                                    Бесплатно
+                                                    { showKeeperLabels && <span className="text-neutral-500">- начинающие психологи </span>}
                                                 </FormLabel>
                                             </FormItem>
 
@@ -103,8 +108,8 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="500" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    500 руб 
-                                                    <span className="text-neutral-500">- участники супервизионной группы</span>
+                                                    500 руб
+                                                    {showKeeperLabels && <span className="text-neutral-500">- участники супервизионной группы</span>}
                                                 </FormLabel>
                                             </FormItem>
 
@@ -113,8 +118,8 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="1000" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    1000 руб 
-                                                    <span className="text-neutral-500">- опытные психологи - Хранители</span>
+                                                    1000 руб
+                                                    {showKeeperLabels && <span className="text-neutral-500">- опытные психологи - Хранители</span>}
                                                 </FormLabel>
                                             </FormItem>
 
@@ -123,8 +128,8 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="1500" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    1500 руб 
-                                                    <span className="text-neutral-500">- опытные психологи - Хранители</span>
+                                                    1500 руб
+                                                    {showKeeperLabels && <span className="text-neutral-500">- опытные психологи - Хранители</span>}
                                                 </FormLabel>
                                             </FormItem>
 
@@ -134,7 +139,7 @@ export const PriceSessionStage = () => {
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
                                                     2000 руб
-                                                    <span className="text-neutral-500">- опытные психологи - Хранители</span>
+                                                    {showKeeperLabels && <span className="text-neutral-500">- опытные психологи - Хранители</span>}
                                                 </FormLabel>
                                             </FormItem>
 
@@ -143,8 +148,8 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="3000" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    3000 руб 
-                                                    <span className="text-neutral-500">- опытные психологи - Хранители</span>
+                                                    3000 руб
+                                                    {showKeeperLabels && <span className="text-neutral-500">- опытные психологи - Хранители</span>}
                                                 </FormLabel>
                                             </FormItem>
 
