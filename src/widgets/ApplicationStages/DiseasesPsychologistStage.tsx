@@ -162,34 +162,45 @@ export const DiseasesPsychologistStage = () => {
                 return;
             }
 
-            // Собираем все id психологов из слотов и их расписания
-            const psychologistSchedules = new Map<string, any>();
+            // Собираем всех уникальных психологов из слотов
+            const uniquePsychologists = new Set<string>();
             schedule[0].items.forEach((day: any) => {
                 if (!day.slots) return;
                 Object.entries(day.slots).forEach(([time, slots]) => {
                     if (!Array.isArray(slots)) return;
                     slots.forEach((slot: any) => {
-                        if (slot.psychologist) {
-                            if (!psychologistSchedules.has(slot.psychologist)) {
-                                const psychologistSchedule: { [date: string]: { [time: string]: any } } = {};
-                                schedule[0].items.forEach((d: any) => {
-                                    if (d.slots) {
-                                        psychologistSchedule[d.pretty_date] = {};
-                                        Object.entries(d.slots).forEach(([t, s]) => {
-                                            if (Array.isArray(s)) {
-                                                const psychologistSlots = s.filter(sl => sl.psychologist === slot.psychologist && sl.state === 'Свободен');
-                                                if (psychologistSlots.length > 0) {
-                                                    psychologistSchedule[d.pretty_date][t] = psychologistSlots[0];
-                                                }
-                                            }
-                                        });
-                                    }
-                                });
-                                psychologistSchedules.set(slot.psychologist, psychologistSchedule);
+                        if (slot.psychologist && slot.state === 'Свободен') {
+                            uniquePsychologists.add(slot.psychologist);
+                        }
+                    });
+                });
+            });
+
+            // Создаем расписание для каждого психолога
+            const psychologistSchedules = new Map<string, any>();
+            uniquePsychologists.forEach((psychologistName) => {
+                const psychologistSchedule: { [date: string]: { [time: string]: any } } = {};
+                schedule[0].items.forEach((d: any) => {
+                    if (!d.slots) return;
+                    Object.entries(d.slots).forEach(([t, s]) => {
+                        if (Array.isArray(s)) {
+                            const psychologistSlots = s.filter((sl: any) => 
+                                sl.psychologist === psychologistName && sl.state === 'Свободен'
+                            );
+                            if (psychologistSlots.length > 0) {
+                                if (!psychologistSchedule[d.pretty_date]) {
+                                    psychologistSchedule[d.pretty_date] = {};
+                                }
+                                psychologistSchedule[d.pretty_date][t] = psychologistSlots[0];
                             }
                         }
                     });
                 });
+                
+                // Добавляем только если есть слоты
+                if (Object.keys(psychologistSchedule).length > 0) {
+                    psychologistSchedules.set(psychologistName, psychologistSchedule);
+                }
             });
 
             // Фильтруем психологов у которых есть слоты

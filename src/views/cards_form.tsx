@@ -25,7 +25,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { ApplicationStage } from '@/redux/slices/application_form';
 import { PhoneStage } from "@/widgets/CardStages/PhoneStage";
 import { getPsychologistAll } from "@/features/actions/getPsychologistAll";
-import { fill_filtered_by_automatch_psy } from "@/redux/slices/filter";
+import { fill_matched_psychologists_in_modal } from "@/redux/slices/filter";
 import { submitQuestionnaire, getFilteredPsychologists } from "@/features/actions/getPsychologistSchedule";
 import { setHasMatchingError } from "@/redux/slices/application_form_data";
 import { setApplicationStage } from "@/redux/slices/application_form";
@@ -187,7 +187,7 @@ function Form({ psychologistId }: FormProps) {
             }
 
             if (psychologistsWithSlots.length > 0) {
-                dispatch(fill_filtered_by_automatch_psy(psychologistsWithSlots));
+                dispatch(fill_matched_psychologists_in_modal(psychologistsWithSlots));
                 dispatch(setHasMatchingError(false));
                 dispatch(setApplicationStage('psychologist'));
             }
@@ -364,7 +364,7 @@ function Form({ psychologistId }: FormProps) {
                     schedule: scheduleData
                 });
 
-                dispatch(fill_filtered_by_automatch_psy([{
+                dispatch(fill_matched_psychologists_in_modal([{
                     ...currentPsychologist,
                     schedule: scheduleData
                 }]));

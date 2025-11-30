@@ -14,7 +14,6 @@ import { IMaskInput } from 'react-imask';
 import { RootState } from '@/redux/store';
 import { NoMatchError } from './NoMatchError';
 import { submitQuestionnaire, getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
-import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
 import { useSearchParams } from 'next/navigation'
 import axios from 'axios';
 import { toast } from 'sonner';
@@ -45,9 +44,9 @@ export const PhoneStage = () => {
         state => state.filter
     ).selected_psychologist;
 
-    // Add selector for all matched psychologists
-    const filtered_by_automatch_psy = useSelector<RootState, any[]>(
-        state => state.filter.filtered_by_automatch_psy
+    // Add selector for all matched psychologists in modal
+    const matched_psychologists_in_modal = useSelector<RootState, any[]>(
+        state => state.filter.matched_psychologists_in_modal
     );
 
 
@@ -145,7 +144,7 @@ export const PhoneStage = () => {
                     JSON.parse(localStorage.getItem('app_conditions') || '[]') : [],
                 selectedPsychologistsNames: [currentPsychologist?.name],
                 shownPsychologists: currentPsychologist?.name || "",
-                top_3_psychologists: Array.from(new Set((filtered_by_automatch_psy || []).map((psy: any) => psy.name).filter(Boolean))),
+                top_3_psychologists: Array.from(new Set((matched_psychologists_in_modal || []).map((psy: any) => psy.name).filter(Boolean))),
                 lastExperience: localStorage.getItem('app_experience') === 'earlier' ? 'Да, я работал(а) с психологом/психотерапевтом.' + (localStorage.getItem('app_experience') == 'earlier' ?
                     localStorage.getItem('app_session_duration') === '<1 month' ? 'До месяца' :
                         localStorage.getItem('app_session_duration') === '2-3 months' ? '2-3 месяца' :

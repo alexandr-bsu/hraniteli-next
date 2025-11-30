@@ -9,7 +9,7 @@ import Image from 'next/image';
 import { COLORS } from '@/shared/constants/colors';
 import Link from 'next/link';
 import { RootState } from '@/redux/store';
-import { fill_filtered_by_automatch_psy, setSelectedPsychologist } from '@/redux/slices/filter';
+import { fill_matched_psychologists_in_modal, setSelectedPsychologist } from '@/redux/slices/filter';
 import { Tooltip } from '@/shared/ui/Tooltip';
 import { NoMatchError } from './NoMatchError';
 import { EmergencyContacts } from './EmergencyContacts';
@@ -152,7 +152,7 @@ export const PsychologistStage = () => {
       return users.map(user => user.name);
     };
 
-    const psy_names: string[] = getNames(filtered_by_automatch_psy)
+    const psy_names: string[] = getNames(matched_psychologists_in_modal)
 
     const requestData = {
       form: {
@@ -251,14 +251,15 @@ export const PsychologistStage = () => {
 
 
 
-  const filtered_by_automatch_psy = useSelector<RootState, any[]>(
-    state => state.filter.filtered_by_automatch_psy
+  const matched_psychologists_in_modal = useSelector<RootState, any[]>(
+    state => state.filter.matched_psychologists_in_modal
   );
   const currentIndex = useSelector((state: RootState) => state.applicationFormData.index_phyc);
 
   useEffect(() => {
     const fetchPsychologists = async () => {
-      if (filtered_by_automatch_psy.length > 0) {
+      // Если психологи уже загружены из DiseasesPsychologistStage, не перезаписываем их
+      if (matched_psychologists_in_modal.length > 0) {
         setIsLoading(false);
         return;
       }
@@ -270,7 +271,7 @@ export const PsychologistStage = () => {
         // console.log('fullPsychologists', fullPsychologists)
         // Мерджим с текущими психологами из стора CardStages, приоритет отдаем слотам из стора
         const mergedPsychologists = fullPsychologists.map((fullPsy: IPsychologist) => {
-          const existingPsy = filtered_by_automatch_psy.find(p => p.name === fullPsy.name);
+          const existingPsy = matched_psychologists_in_modal.find(p => p.name === fullPsy.name);
           if (existingPsy) {
             return {
               ...fullPsy,
@@ -282,7 +283,7 @@ export const PsychologistStage = () => {
         });
 
         if (mergedPsychologists?.length) {
-          dispatch(fill_filtered_by_automatch_psy(mergedPsychologists));
+          dispatch(fill_matched_psychologists_in_modal(mergedPsychologists));
           dispatch(setHasMatchingError(false));
         } else {
           dispatch(setHasMatchingError(true));
@@ -298,24 +299,25 @@ export const PsychologistStage = () => {
     };
 
     fetchPsychologists();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (!isLoading && filtered_by_automatch_psy.length === 0) {
+    if (!isLoading && matched_psychologists_in_modal.length === 0) {
       setShowNoMatch(true);
     }
-  }, [filtered_by_automatch_psy.length, isLoading]);
+  }, [matched_psychologists_in_modal.length, isLoading]);
 
   useEffect(() => {
-    if (!isLoading && filtered_by_automatch_psy.length === 0 && retryCount > 0) {
+    if (!isLoading && matched_psychologists_in_modal.length === 0 && retryCount > 0) {
       setShowEmergency(true);
     }
-  }, [filtered_by_automatch_psy.length, retryCount, isLoading]);
+  }, [matched_psychologists_in_modal.length, retryCount, isLoading]);
 
   useEffect(() => {
     const loadSlots = async () => {
       try {
-        const currentPsychologist = filtered_by_automatch_psy[currentIndex];
+        const currentPsychologist = matched_psychologists_in_modal[currentIndex];
         console.log('CardStages - currentPsychologist:', currentPsychologist);
         console.log('CardStages - schedule:', currentPsychologist?.schedule);
 
@@ -437,9 +439,9 @@ export const PsychologistStage = () => {
     };
 
     loadSlots();
-  }, [currentIndex, filtered_by_automatch_psy]);
+  }, [currentIndex, matched_psychologists_in_modal]);
 
-  const currentPsychologist = filtered_by_automatch_psy[currentIndex];
+  const currentPsychologist = matched_psychologists_in_modal[currentIndex];
 
   const getFilterQueryParams = () => {
     const params = new URLSearchParams();
@@ -492,7 +494,7 @@ export const PsychologistStage = () => {
   };
 
   const handleNext = () => {
-    if (currentIndex < filtered_by_automatch_psy.length - 1) {
+    if (currentIndex < matched_psychologists_in_modal.length - 1) {
       setSelectedSlot(null);
       setAvailableSlots([]);
       dispatch(setIndexPhyc(currentIndex + 1));
@@ -534,7 +536,7 @@ export const PsychologistStage = () => {
     return <NoMatchError onClose={handleCloseNoMatch} />;
   }
 
-  if (!filtered_by_automatch_psy.length) {
+  if (!matched_psychologists_in_modal.length) {
     return (
       <div className="flex flex-col items-center justify-center h-full">
         <div className="w-12 h-12 border-4 border-[#116466] border-t-transparent rounded-full animate-spin"></div>
@@ -543,7 +545,7 @@ export const PsychologistStage = () => {
     );
   }
 
-  const remainingPsychologists = filtered_by_automatch_psy.length - (currentIndex + 1);
+  const remainingPsychologists = matched_psychologists_in_modal.length - (currentIndex + 1);
 
   const method_description = {
     "Аналитическая психология": "Подход помогает глубоко исследовать причины вашего текущего состояния — включая травмы, подавленные чувства и сценарии, повторяющиеся в жизни. Работа строится не только через разговор, но и через образы: сны, символы, метафоры, МАК-карты, сказки. Здесь важна не только логика, но и воображение — как инструмент самопонимания. Вместе с психологом вы будете размышлять, исследовать свои чувства и искать смысл в личной истории",
@@ -589,10 +591,9 @@ export const PsychologistStage = () => {
       )}
 
       <div className="flex flex-col h-full w-full pb-[120px] max-lg:pb-[0px]">
-        {filtered_by_automatch_psy.length > 1 && <div className="flex justify-between items-center mt-[20px] max-lg:gap-[15px] min-h-[50px]">
-
-          <>
-            {currentIndex > 0 && (
+        {matched_psychologists_in_modal.length > 1 && (
+          <div className="flex justify-between items-center mt-[20px] max-lg:gap-[15px] min-h-[50px] z-10 relative">
+            {currentIndex > 0 ? (
               <button
                 onClick={handlePrevious}
                 className="flex items-center gap-[10px] cursor-pointer text-[#116466] text-[14px] lg:text-[14px] md:text-[12px] max-lg:text-[12px] text-right"
@@ -600,8 +601,10 @@ export const PsychologistStage = () => {
                 <Image src="/card/arrow_left.svg" alt="Previous" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
                 <span>Предыдущий психолог</span>
               </button>
+            ) : (
+              <div></div>
             )}
-            {currentIndex < filtered_by_automatch_psy.length - 1 && remainingPsychologists > 0 && (
+            {currentIndex < matched_psychologists_in_modal.length - 1 ? (
               <button
                 onClick={handleNext}
                 className="flex items-center gap-[10px] cursor-pointer text-left text-[#116466] text-[14px] lg:text-[14px] md:text-[12px] max-lg:text-[12px] ml-auto"
@@ -609,10 +612,11 @@ export const PsychologistStage = () => {
                 <span>Показать еще {remainingPsychologists} {getPsychologistDeclension(remainingPsychologists)}</span>
                 <Image src="/card/arrow_right.svg" alt="Next" width={50} height={50} className="max-lg:w-[30px] max-lg:h-[30px]" />
               </button>
+            ) : (
+              <div></div>
             )}
-          </>
-
-        </div>}
+          </div>
+        )}
         <div className="flex flex-col p-[25px] max-lg:p-[15px] mb-[43px] max-lg:mb-[20px] border-[1px] rounded-[25px] mt-[20px]">
           <div className="flex justify-between items-start mb-[30px] max-lg:mb-[20px] max-[650px]:flex-col max-[650px]:gap-[15px]">
             <div className="flex gap-[20px] max-lg:gap-[15px]">

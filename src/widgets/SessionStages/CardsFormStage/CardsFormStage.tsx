@@ -7,6 +7,7 @@ import { RootState } from '@/redux/store';
 import { useEffect } from 'react';
 import { resetApplicationForm } from '@/redux/slices/application_form';
 import { resetApplicationFormData } from '@/redux/slices/application_form_data';
+import { clear_matched_psychologists_in_modal } from '@/redux/slices/filter';
 
 export const CardsFormStage = () => {
     const dispatch = useDispatch();
@@ -18,6 +19,21 @@ export const CardsFormStage = () => {
             const newTicketId = `cd_${Math.random().toString(36).substring(7)}`;
             dispatch(resetApplicationForm());
             dispatch(resetApplicationFormData(newTicketId));
+        }
+    }, [selectedPsychologist, dispatch]);
+    
+    // Очищаем состояние подобранных психологов при закрытии модального окна
+    useEffect(() => {
+        return () => {
+            // Очищаем при размонтировании компонента (закрытие модального окна)
+            dispatch(clear_matched_psychologists_in_modal());
+        };
+    }, [dispatch]);
+    
+    // Также очищаем когда selectedPsychologist становится null
+    useEffect(() => {
+        if (!selectedPsychologist) {
+            dispatch(clear_matched_psychologists_in_modal());
         }
     }, [selectedPsychologist, dispatch]);
     

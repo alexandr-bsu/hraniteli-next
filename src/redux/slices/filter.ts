@@ -19,6 +19,7 @@ interface ScheduleDay {
 interface FilterState {
   filtered_by_automatch_psy: IPsychologist[];
   card_stages_psychologists: IPsychologist[]; // Отдельное состояние для CardStages
+  matched_psychologists_in_modal: IPsychologist[]; // Подобранные психологи только для модального окна
   filtered_by_slots_psy: IPsychologist[];
   filtered_by_gender: IPsychologist[];
   filtered_by_requests: IPsychologist[];
@@ -55,6 +56,7 @@ interface FilterState {
 const initialState: FilterState = {
   filtered_by_automatch_psy: [],
   card_stages_psychologists: [], // Отдельное состояние для CardStages
+  matched_psychologists_in_modal: [], // Подобранные психологи только для модального окна
   filtered_by_slots_psy: [],
   filtered_by_gender: [],
   filtered_by_requests: [],
@@ -334,12 +336,53 @@ const filterSlice = createSlice({
         id: psy.id || psy.name,
       }));
     },
+    fill_matched_psychologists_in_modal: (state, action: PayloadAction<IPsychologist[]>) => {
+      state.matched_psychologists_in_modal = action.payload.map(psy => {
+        // Находим существующего психолога в стейте
+        const existingPsy = state.matched_psychologists_in_modal.find(p => p.name === psy.name);
+        
+        return {
+          ...existingPsy, // Сохраняем все существующие поля
+          ...psy, // Накладываем новые данные
+          id: psy.id || existingPsy?.id || psy.name,
+          name: psy.name,
+          age: psy.age || existingPsy?.age,
+          sex: psy.sex || existingPsy?.sex,
+          experience: psy.experience || existingPsy?.experience,
+          max_session_price: psy.max_session_price || existingPsy?.max_session_price,
+          min_session_price: psy.min_session_price || existingPsy?.min_session_price,
+          avatar: psy.avatar || psy.link_photo || existingPsy?.avatar || existingPsy?.link_photo,
+          specialization: psy.specialization || existingPsy?.specialization || [],
+          works_with: psy.works_with || existingPsy?.works_with,
+          mental_illness: psy.mental_illness || existingPsy?.mental_illness || [],
+          mental_illness2: psy.mental_illness2 || existingPsy?.mental_illness2 || [],
+          video: psy.video || existingPsy?.video || false,
+          requests: psy.requests || existingPsy?.requests || [],
+          queries: psy.queries || existingPsy?.queries || '',
+          short_description: psy.short_description || existingPsy?.short_description || '',
+          link_video: psy.link_video || existingPsy?.link_video || null,
+          verified: psy.verified || existingPsy?.verified || false,
+          schedule: psy.schedule || existingPsy?.schedule || { days: [] },
+          main_modal: psy.main_modal || existingPsy?.main_modal,
+          in_community: psy.in_community || existingPsy?.in_community,
+          personal_therapy_duration: psy.personal_therapy_duration || existingPsy?.personal_therapy_duration,
+          personal_therapy_type: psy.personal_therapy_type || existingPsy?.personal_therapy_type,
+          is_onboarding_finished: psy.is_onboarding_finished || existingPsy?.is_onboarding_finished,
+          group: psy.group || existingPsy?.group
+        };
+      });
+    },
+    clear_matched_psychologists_in_modal: (state) => {
+      state.matched_psychologists_in_modal = [];
+    },
   },
 });
 
 export const {
   fill_filtered_by_automatch_psy,
   fill_card_stages_psychologists,
+  fill_matched_psychologists_in_modal,
+  clear_matched_psychologists_in_modal,
   fill_filtered_by_slots_psy,
   findByGender,
   findByRequests,

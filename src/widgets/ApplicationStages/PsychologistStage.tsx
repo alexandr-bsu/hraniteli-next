@@ -323,10 +323,11 @@ export const PsychologistStage = () => {
           console.log('ApplicationStages - Processing date:', date, 'timeSlots:', timeSlots);
 
           // Проверяем что есть слоты на эту дату
-          if (Object.keys(timeSlots).length > 0) {
+          if (timeSlots && typeof timeSlots === 'object' && Object.keys(timeSlots).length > 0) {
             Object.entries(timeSlots).forEach(([time, slot]) => {
               console.log('ApplicationStages - Processing slot:', time, slot);
-              if (slot.state === 'Свободен') {
+              // Проверяем, что slot - это объект, а не массив
+              if (slot && typeof slot === 'object' && !Array.isArray(slot) && slot.state === 'Свободен') {
                 console.log('ApplicationStages - Found free slot:', date, time);
 
                 const moscow_datetime = new Date(`${slot.date}T${slot.time}`)

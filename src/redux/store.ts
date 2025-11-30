@@ -21,6 +21,7 @@ export interface RootState {
   filter: {
     filtered_by_automatch_psy: IPsychologist[];
     card_stages_psychologists: IPsychologist[]; // Добавляем новое поле
+    matched_psychologists_in_modal: IPsychologist[]; // Подобранные психологи только для модального окна
     gender: string;
     requests: IPsychologist[];
     basic_approach: string;
