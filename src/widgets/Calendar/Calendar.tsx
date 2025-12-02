@@ -11,13 +11,13 @@ export const Calendar: React.FC = () => {
         <>
 
 
-            <div data-name="data-groups" className="slot-grid-container px-5 pt-5 pb-10 min-h-screen gap-10 ">
+            <div data-name="data-groups" className="slot-grid-container px-5 pt-5 pb-10 min-h-screen gap-10 absolute top-0 left-0 z-1000">
                 <div style={{ position: 'fixed', zIndex: 9999, inset: '16px', pointerEvents: 'none' }}></div>
-                <div className="fixed top-0 left-0 h-screen w-full flex justify-center items-center p-5 z-20 bg-[#000000] bg-opacity-20">
+                <div className="fixed top-0 left-0 h-screen w-full flex justify-center items-center p-5 z-20" style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
                     <div className="bg-white rounded-[30px] w-full max-w-[660px] mx-5 max-h-[650px] overflow-y-auto">
                         <div className="bg-white sticky top-0 p-5 border-b border-b-dark-green w-full flex justify-between items-center">
                             <div className="flex items-center gap-3 flex-wrap">
-                                <h2 className="text-green font-bold text-2xl">Супервизия КПТ</h2>
+                                <h2 className="text-[#155d5e] font-bold text-2xl">Супервизия КПТ</h2>
                                 <span className="px-3 py-1 rounded-full text-white font-medium text-sm" style={{ backgroundColor: 'rgb(252, 211, 77)' }}>кпт</span>
                             </div>
                             <img src="static/close.png" className="cursor-pointer w-5 h-5" alt="Закрыть" />
@@ -25,12 +25,12 @@ export const Calendar: React.FC = () => {
                         <div data-name="event-data" className="p-5 flex flex-col gap-4">
                             <div data-group="section">
                                 <div className="flex flex-col gap-1">
-                                    <h3 className="text-green font-bold text-[19px]">2 декабря 2025 в 19:00</h3>
+                                    <h3 className="text-[#155d5e] font-bold text-[19px]">3 декабря 2025 в 18:00</h3>
                                 </div>
                             </div>
                             <div data-group="section">
                                 <div className="flex flex-col gap-1">
-                                    <p className="text-green text-base font-normal">На супервизии можно выносить:
+                                    <p className="text-[#155d5e] text-base font-normal">На супервизии можно выносить:
                                         1) кейсы по клиентам, в том числе по 1 сессии
                                         2) список вопросов по практике, который волнует сейчас
                                         3) любой другой материал и вопросы супервизору
@@ -39,9 +39,9 @@ export const Calendar: React.FC = () => {
                             </div>
                             <div data-group="section">
                                 <div className="flex flex-wrap">
-                                    <p className="text-green text-base flex items-center flex-wrap">
+                                    <p className="text-[#155d5e] text-base flex items-center flex-wrap">
                                         <span className="font-normal mr-1">Супервизор: </span>
-                                        <a href="https://https://t.me/c/2404791398/937/965" target="_blank" rel="noopener noreferrer" className="text-green hover:text-green transition-colors inline-flex items-center" title="Перейти на страницу психолога">
+                                        <a href="https://https://t.me/c/2404791398/937/965" target="_blank" rel="noopener noreferrer" className="text-[#155d5e] hover:text-[#155d5e] transition-colors inline-flex items-center" title="Перейти на страницу психолога">
                                             <span className="font-bold">Елена Греченко</span>
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-send-icon lucide-send">
                                                 <path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path>
@@ -51,23 +51,23 @@ export const Calendar: React.FC = () => {
                                     </p>
                                 </div>
                                 <div className="flex flex-col flex-wrap">
-                                    <p className="text-green text-base"><span className="font-normal">Участников: </span> <span className="font-bold">1/10</span></p>
+                                    <p className="text-[#155d5e] text-base"><span className="font-normal">Участников: </span> <span className="font-bold">1/10</span></p>
                                 </div>
                                 <div className="flex flex-col flex-wrap">
-                                    <p className="text-green text-base"><span className="font-normal">Ссылка на мероприятие: </span> <a href="https://telemost.360.yandex.ru/j/9882565885" target="_blank" rel="noopener noreferrer" className="text-green font-bold">ссылка</a></p>
+                                    <p className="text-[#155d5e] text-base"><span className="font-normal">Ссылка на мероприятие: </span> <a href="https://telemost.360.yandex.ru/j/9882565885" target="_blank" rel="noopener noreferrer" className="text-[#155d5e] font-bold">ссылка</a></p>
                                 </div>
                             </div>
                             <div className="flex flex-col gap-2">
-                                <div className="p-3 rounded-[30px] border border-2 border-green text-green">
+                                <div className="p-3 rounded-[30px] border border-2 border-green text-[#155d5e]">
                                     <div className="space-y-2">
                                         <p className="font-semibold">Вы успешно записались на супервизию.</p>
                                         <p>Ссылка будет доступна в этой карточке. В чат-бот вам придет напоминание о событии за 24 часа и за 1 час 🙏</p>
                                         <p>Если вы хотите вынести кейс, то пожалуйста запишитесь в этой таблице (максимум 2 кейса на одной супервизии): <a href="https://docs.google.com/spreadsheets/d/1Brg-cz6OAp7Li3X3IrrwYPbNPGvckXRMk5fYUSbSH-E/" target="_blank" rel="noopener noreferrer" className="underline">Расписание мероприятий Сообщества Хранители</a>.</p>
                                     </div>
                                 </div>
-                                <button className="font-normal transition-colors bg-green text-white hover:bg-dark-green px-[20px] py-[12px] text-[16px] rounded-full">Отменить запись</button><button className="font-normal transition-colors border border-gray text-green hover:bg-gray px-[20px] py-[12px] text-[16px] rounded-full">Закрыть</button>
+                                <button className="font-normal transition-colors bg-[#155d5e] text-white hover:bg-dark-green px-[20px] py-[12px] text-[16px] rounded-full">Отменить запись</button><button className="font-normal transition-colors border border-gray text-[#155d5e] hover:bg-gray px-[20px] py-[12px] text-[16px] rounded-full">Закрыть</button>
                                 <div className="flex w-full items-center p-2 justify-center">
-                                    <p className="text-green underline cursor-pointer">Открыть слот для записи клиентов</p>
+                                    <p className="text-[#155d5e] underline cursor-pointer">Открыть слот для записи клиентов</p>
                                 </div>
                             </div>
                         </div>
