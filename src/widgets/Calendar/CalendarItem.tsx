@@ -2,7 +2,7 @@ type Modality = 'Юнгианство' | 'КПТ' | 'Гештальт' | 'Пси
 
 interface CardItemProps {
     title: string;
-    description?: string;
+    counter: string;
     author: string;
     modality?: Modality;
     is_registered?: boolean;
@@ -10,7 +10,7 @@ interface CardItemProps {
 
 const CardItem: React.FC<CardItemProps> = ({
     title,
-    description,
+    counter,
     author,
     modality,
     is_registered = false,
@@ -47,12 +47,12 @@ const CardItem: React.FC<CardItemProps> = ({
         return <div className='whitespace-nowrap'>{author}</div>;
     }
     return (
-        <div className={`min-h-[100px] rounded-md p-3 flex flex-col justify-between gap-4 ${getTextColor(modality)} relative cursor-pointer hover:opacity-90 transition-opacity`}
+        <div className={`min-h-[100px] rounded-[30px] p-3 flex flex-col justify-between gap-4 ${getTextColor(modality)} relative cursor-pointer hover:opacity-90 transition-opacity`}
             style={{ backgroundColor: getBackgroundColor(modality) }}>
 
             <div>
                 <div className='flex justify-between items-start mb-1'>
-                    <div className='font-bold text-sm'>{title}</div>
+                    <div className='font-bold text-base'>{title}</div>
                     {is_registered && (
                         <svg
                             width="20"
@@ -70,14 +70,14 @@ const CardItem: React.FC<CardItemProps> = ({
                         </svg>
                     )}
                 </div>
-                {/* <div className='text-xs opacity-90'>{description}</div> */}
+                <div className='text-base opacity-90'>{counter}</div>
             </div>
             <div className='flex justify-between items-center'>
-                <div className='text-xs opacity-80'>
+                <div className='text-base opacity-80'>
                     {formatAuthor(author)}
                 </div>
                 {modality && (
-                    <div className={`${getBadgeOpacity(modality)} rounded-full px-2 py-1 text-xs flex items-center justify-center`}>
+                    <div className={`${getBadgeOpacity(modality)} rounded-full px-2 py-1 text-base flex items-center justify-center`}>
                         {modality}
                     </div>
                 )}

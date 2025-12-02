@@ -11,7 +11,7 @@ export const Calendar: React.FC = () => {
         <>
 
 
-            <div data-name="data-groups" className="slot-grid-container px-5 pt-5 pb-10 min-h-screen gap-10 absolute top-0 left-0 z-1000">
+            {/* <div data-name="data-groups" className="slot-grid-container px-5 pt-5 pb-10 min-h-screen gap-10 absolute top-0 left-0 z-1000">
                 <div style={{ position: 'fixed', zIndex: 9999, inset: '16px', pointerEvents: 'none' }}></div>
                 <div className="fixed top-0 left-0 h-screen w-full flex justify-center items-center p-5 z-20" style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
                     <div className="bg-white rounded-[30px] w-full max-w-[660px] mx-5 max-h-[650px] overflow-y-auto">
@@ -20,12 +20,15 @@ export const Calendar: React.FC = () => {
                                 <h2 className="text-[#155d5e] font-bold text-2xl">Супервизия КПТ</h2>
                                 <span className="px-3 py-1 rounded-full text-white font-medium text-sm" style={{ backgroundColor: 'rgb(252, 211, 77)' }}>кпт</span>
                             </div>
-                            <img src="static/close.png" className="cursor-pointer w-5 h-5" alt="Закрыть" />
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="cursor-pointer w-5 h-5">
+                                <path d="m18 6-12 12"></path>
+                                <path d="m6 6 12 12"></path>
+                            </svg>
                         </div>
                         <div data-name="event-data" className="p-5 flex flex-col gap-4">
                             <div data-group="section">
                                 <div className="flex flex-col gap-1">
-                                    <h3 className="text-[#155d5e] font-bold text-[19px]">3 декабря 2025 в 18:00</h3>
+                                    <h3 className="text-[#155d5e] font-bold text-[21px]">3 декабря 2025 в 18:00</h3>
                                 </div>
                             </div>
                             <div data-group="section">
@@ -66,25 +69,23 @@ export const Calendar: React.FC = () => {
                                     </div>
                                 </div>
                                 <button className="font-normal transition-colors bg-[#155d5e] text-white hover:bg-dark-green px-[20px] py-[12px] text-[16px] rounded-full">Отменить запись</button><button className="font-normal transition-colors border border-gray text-[#155d5e] hover:bg-gray px-[20px] py-[12px] text-[16px] rounded-full">Закрыть</button>
-                                <div className="flex w-full items-center p-2 justify-center">
-                                    <p className="text-[#155d5e] underline cursor-pointer">Открыть слот для записи клиентов</p>
-                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+             */}
             <div data-name="container">
                 <div className='sticky top-0 z-20'>
                     <div data-name="header" className='w-full h-6 bg-[#fbfbfb] flex items-center border-b border-[#333] ' >
                         <span className='h-full min-w-[150px] flex items-center justify-center text-xs font-bold border-r border-[#333]'></span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[19px]'>ПН</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[19px]'>ВТ</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[19px]'>СР</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[19px]'>ЧТ</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[19px]'>ПТ</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[19px]'>СБ</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold text-[#155d5e] text-[19px]'>ВС</span>
+                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ПН</span>
+                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ВТ</span>
+                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>СР</span>
+                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ЧТ</span>
+                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ПТ</span>
+                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>СБ</span>
+                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold text-[#155d5e] text-[21px]'>ВС</span>
                     </div>
                 </div>
 
@@ -92,7 +93,7 @@ export const Calendar: React.FC = () => {
                     {/* Строка с датами */}
                     <div className='w-full flex sticky top-6 z-10'>
                         <div className='min-w-[150px] border-r border-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>1 декабря</div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white rounded-full'>1 декабря</div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>2 декабря</div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>3 декабря</div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>4 декабря</div>
@@ -104,7 +105,7 @@ export const Calendar: React.FC = () => {
                     {/* Первая строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[19px]' >13:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]' >13:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
 
@@ -119,7 +120,7 @@ export const Calendar: React.FC = () => {
 
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <CardItem title={'"Кто я?" - теплица проф.идентичности'} description={'Группа исследования проф.идентичности для практикующих психологов'} author={'Алёна Перова'} modality='Общие' />
+                            <CardItem title={'"Кто я?" - теплица проф.идентичности'} counter={'Участников: 0/10'} author={'Алёна Перова'} modality='Общие' />
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
 
@@ -132,14 +133,14 @@ export const Calendar: React.FC = () => {
                     {/* Вторая строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >14:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]' >14:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
 
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <CardItem title={'Супервизия Юнг.'} description={'Разбор 2-х кейсов'} author={'Анна Бородкина'} modality='Юнгианство' is_registered />
+                            <CardItem title={'Супервизия Юнг.'} counter={'Участников: 2/10'} author={'Анна Бородкина'} modality='Юнгианство' is_registered />
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
 
@@ -151,13 +152,13 @@ export const Calendar: React.FC = () => {
                     {/* Третья строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >18:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]' >18:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
                             <div onClick={openModal}>
-                                <CardItem title={'Супервизия КПТ'} description={'Разбор 2-х кейсов'} author={'Елена Греченко'} modality='КПТ' />
+                                <CardItem title={'Супервизия КПТ'} counter={'Участников: 1/10'} author={'Елена Греченко'} modality='КПТ' />
                             </div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
@@ -169,7 +170,7 @@ export const Calendar: React.FC = () => {
                     {/* Четвёртая строка времени */}
                     <div className='w-full flex'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >20:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]' >20:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
@@ -179,7 +180,7 @@ export const Calendar: React.FC = () => {
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <CardItem title={'Исследование личного мифа'} description={'Разбор истории клиента'} author={'Валентина Ким, Нина Дятловская'} modality='Юнгианство' />
+                            <CardItem title={'Исследование личного мифа'} counter={'Участников: 0/10'} author={'Валентина Ким, Нина Дятловская'} modality='Юнгианство' />
                         </div>
                         <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     </div>
@@ -202,7 +203,7 @@ export const Calendar: React.FC = () => {
                     {/* Первая строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[19px]' >09:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]' >09:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
 
@@ -213,7 +214,7 @@ export const Calendar: React.FC = () => {
 
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <CardItem title={'Киноклуб'} description={'Киноклуб - это возможность разделить с другими свои переживаниями'} author={'Майя Филиппова'} modality='Общие' />
+                            <CardItem title={'Киноклуб'} counter={'Участников: 1/10'} author={'Майя Филиппова'} modality='Общие' />
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
@@ -221,9 +222,9 @@ export const Calendar: React.FC = () => {
 
                     {/* Вторая строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4  font-bold text-[#155d5e] text-[19px]' >14:00</div></div>
+                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4  font-bold text-[#155d5e] text-[21px]' >14:00</div></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <CardItem title={'Рефлексивная группа КПТ'} description={'Разделить чувства с коллегами'} author={'Юлия Ким'} modality='КПТ' is_registered />
+                            <CardItem title={'Рефлексивная группа КПТ'} counter={'Участников: 1/10'} author={'Юлия Ким'} modality='КПТ' is_registered />
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
 
@@ -237,12 +238,12 @@ export const Calendar: React.FC = () => {
 
                     {/* Третья строка времени */}
                     <div className='w-full flex'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >19:00</div></div>
+                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]' >19:00</div></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <CardItem title={'Книжный Клуб'} description={'Роберт Лихи "Победи депрессию"'} author={'Юлия Ким'} modality='КПТ' />
+                            <CardItem title={'Книжный Клуб'} counter={'Участников: 1/10'} author={'Юлия Ким'} modality='КПТ' />
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
@@ -266,7 +267,7 @@ export const Calendar: React.FC = () => {
                     {/* Первая строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[19px]' >13:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]' >13:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
 
@@ -274,7 +275,7 @@ export const Calendar: React.FC = () => {
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <CardItem title={'"Кто я?" - теплица проф.идентичности'} description={'Группа исследования проф.идентичности для практикующих психологов'} author={'Алёна Перова'} modality='Общие' is_registered={true} />
+                            <CardItem title={'"Кто я?" - теплица проф.идентичности'} counter={'Участников: 3/10'} author={'Алёна Перова'} modality='Общие' is_registered={true} />
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
@@ -284,7 +285,7 @@ export const Calendar: React.FC = () => {
                     {/* Вторая строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >12:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]' >12:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
@@ -321,7 +322,7 @@ export const Calendar: React.FC = () => {
                     {/* Третья строка времени */}
                     <div className='w-full flex'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >13:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]' >13:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
@@ -357,7 +358,7 @@ export const Calendar: React.FC = () => {
                     {/* Первая строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[19px]' >10:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]' >10:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
                             <div className='h-[100px] bg-[#8B5CF6] rounded-md p-3 flex flex-col justify-between text-white'>
@@ -386,7 +387,7 @@ export const Calendar: React.FC = () => {
 
                     {/* Вторая строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4  font-bold text-[#155d5e] text-[19px]' >12:00</div></div>
+                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4  font-bold text-[#155d5e] text-[21px]' >12:00</div></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
                             <div className='h-[100px] bg-[#1c9140] rounded-md p-3 flex flex-col justify-between text-white'>
@@ -406,7 +407,7 @@ export const Calendar: React.FC = () => {
 
                     {/* Третья строка времени */}
                     <div className='w-full flex'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >13:00</div></div>
+                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]' >13:00</div></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
@@ -418,7 +419,7 @@ export const Calendar: React.FC = () => {
                 </div>
 
                 {/* Плавающий элемент в правом нижнем углу */}
-                <div className="fixed top-16 right-4 bg-[#fbfbfb] rounded-md p-6 flex flex-col gap-4 shadow-lg z-50 border border-[#333333]">
+                <div className="fixed top-16 right-4 bg-[#fbfbfb] rounded-[30px] p-6 flex flex-col gap-4 shadow-lg z-50 border border-[#333333]">
                     {/* Содержимое плавающего элемента */}
                     <ul className='flex flex-col gap-2'>
                         <li className="flex gap-4 items-center">
