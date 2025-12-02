@@ -1,4 +1,5 @@
 import React from 'react';
+import CardItem from './CalendarItem';
 
 export const Calendar: React.FC = () => {
     return (
@@ -33,88 +34,82 @@ export const Calendar: React.FC = () => {
                 {/* Первая строка времени */}
                 <div className='w-full flex border-b border-dashed border-[#ddd]'>
                     <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                        <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[19px]' >10:00</div>
+                        <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[19px]' >13:00</div>
                     </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                        <div className='h-[100px] bg-[#8B5CF6] rounded-md p-3 flex flex-col justify-between text-white'>
-                            <div>
-                                <div className='font-bold text-sm mb-1'>Юнгианство</div>
-                                <div className='text-xs opacity-90'>Знакомство с коллегами, обсуждение планов</div>
-                            </div>
-                            <div className='text-xs opacity-80'>Алена Петрова</div>
-                        </div>
+
                     </div>
-                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                        <div className='h-[100px] bg-[#FCD34D] rounded-md p-3 flex flex-col justify-between text-gray-800'>
-                            <div>
-                                <div className='font-bold text-sm mb-1'>Рефлексивная группа</div>
-                                <div className='text-xs opacity-90'>Родители-психологи с коллегами</div>
-                            </div>
-                            <div className='text-xs opacity-80'>Зоя Карелидзе</div>
-                        </div>
+
                     </div>
-                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                    <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
+
+                    </div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
+
+                    </div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
+                        <CardItem title={'"Кто я?" - теплица проф.идентичности'} description={'Группа исследования проф.идентичности для практикующих психологов'} author={'Алёна Перова'} modality='Общие' />
+                    </div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
+
+                    </div>
+                    <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
+
+                    </div>
                 </div>
 
                 {/* Вторая строка времени */}
                 <div className='w-full flex border-b border-dashed border-[#ddd]'>
                     <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                    <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >12:00</div>
-                    </div>
-                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                        <div className='h-[100px] bg-[#FCD34D] rounded-md p-3 flex flex-col justify-between text-gray-800'>
-                            <div>
-                                <div className='font-bold text-sm mb-1'>Супервизия КПТ</div>
-                                <div className='text-xs opacity-90'>Разбор 2-х случаев</div>
-                            </div>
-                            <div className='text-xs opacity-80'>Елена Гриценко</div>
-                        </div>
-                        <div className='h-[100px] bg-[#FCD34D] rounded-md p-3 flex flex-col justify-between text-gray-800'>
-                            <div>
-                                <div className='font-bold text-sm mb-1'>Интервизия КПТ</div>
-                                <div className='text-xs opacity-90'>Разбор 2-х случаев</div>
-                            </div>
-                            <div className='text-xs opacity-80'>Юлия Ким</div>
-                        </div>
+                        <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >14:00</div>
                     </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                        <div className='h-[100px] bg-[#FCD34D] rounded-md p-3 flex flex-col justify-between text-gray-800'>
-                            <div>
-                                <div className='font-bold text-sm mb-1'>Рефлексивная группа КПТ</div>
-                                <div className='text-xs opacity-90'>Родители-психологи с коллегами</div>
-                            </div>
-                            <div className='text-xs opacity-80'>Юлия Ким</div>
-                        </div>
+                        <CardItem title={'Супервизия Юнг.'} description={'Разбор 2-х кейсов'} author={'Анна Бородкина'} modality='Юнгианство' is_registered/>
+                    </div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
+
                     </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                 </div>
 
                 {/* Третья строка времени */}
-                <div className='w-full flex'>
+                <div className='w-full flex border-b border-dashed border-[#ddd]'>
                     <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                    <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >13:00</div>
+                        <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >18:00</div>
                     </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                        <div className='h-[100px] bg-[#3B82F6] rounded-md p-3 flex flex-col justify-between text-white'>
-                            <div>
-                                <div className='font-bold text-sm mb-1'>Группа самоуправления</div>
-                                <div className='text-xs opacity-90'>Лидия Казанцева</div>
-                            </div>
-                        </div>
+                        <CardItem title={'Супервизия КПТ'} description={'Разбор 2-х кейсов'} author={'Елена Греченко'} modality='КПТ' />
+
                     </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                    <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                </div>
+
+                {/* Четвёртая строка времени */}
+                <div className='w-full flex'>
+                    <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
+                        <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >20:00</div>
+                    </div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
+
+                    </div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
+                        <CardItem title={'Исследование личного мифа'} description={'Разбор истории клиента'} author={'Валентина Ким, Нина Дятловская'} modality='Юнгианство' />
+                    </div>
                     <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                 </div>
             </div>
@@ -136,45 +131,31 @@ export const Calendar: React.FC = () => {
                 {/* Первая строка времени */}
                 <div className='w-full flex border-b border-dashed border-[#ddd]'>
                     <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                    <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[19px]' >10:00</div>
+                        <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[19px]' >09:00</div>
                     </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                        <div className='h-[100px] bg-[#8B5CF6] rounded-md p-3 flex flex-col justify-between text-white'>
-                            <div>
-                                <div className='font-bold text-sm mb-1'>Книжная встреча</div>
-                                <div className='text-xs opacity-90'>«П. Экзюпери "Маленький принц"»</div>
-                            </div>
-                            <div className='text-xs opacity-80'>Татьяна Кудашова</div>
-                        </div>
+
                     </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                        <div className='h-[100px] bg-[#1c9140] rounded-md p-3 flex flex-col justify-between text-white'>
-                            <div>
-                                <div className='font-bold text-sm mb-1'>Юнгианская встреча</div>
-                                <div className='text-xs opacity-90'>«П. Экзюпери "Маленький принц"»</div>
-                            </div>
-                            <div className='text-xs opacity-80'>Татьяна Кудашова</div>
-                        </div>
+
                     </div>
-                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
+                        <CardItem title={'Киноклуб'} description={'Киноклуб - это возможность разделить с другими свои переживаниями'} author={'Майя Филиппова'} modality='Общие' />
+                    </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                 </div>
 
                 {/* Вторая строка времени */}
                 <div className='w-full flex border-b border-dashed border-[#ddd]'>
-                    <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4  font-bold text-[#155d5e] text-[19px]' >12:00</div></div>
-                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                    <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4  font-bold text-[#155d5e] text-[19px]' >14:00</div></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                        <div className='h-[100px] bg-[#1c9140] rounded-md p-3 flex flex-col justify-between text-white'>
-                            <div>
-                                <div className='font-bold text-sm mb-1'>Тренинг первой сессии</div>
-                                <div className='text-xs opacity-90'>3 активных участника</div>
-                            </div>
-                            <div className='text-xs opacity-80'>Юлия Ким</div>
-                        </div>
+                        <CardItem title={'Рефлексивная группа КПТ'} description={'Разделить чувства с коллегами'} author={'Юлия Ким'} modality='КПТ' is_registered/>
+                    </div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
+
                     </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
@@ -185,54 +166,44 @@ export const Calendar: React.FC = () => {
 
                 {/* Третья строка времени */}
                 <div className='w-full flex'>
-                    <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >13:00</div></div>
+                    <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >19:00</div></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
+                        <CardItem title={'Книжный Клуб'} description={'Роберт Лихи "Победи депрессию"'} author={'Юлия Ким'} modality='КПТ' />
+                    </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                 </div>
             </div>
 
-             <div data-name="week" className='w-full bg-[#fbfbfb] flex flex-col border-[#ddd]  border-dashed border-b'>
+            <div data-name="week" className='w-full bg-[#fbfbfb] flex flex-col border-[#ddd]  border-dashed border-b'>
                 {/* Строка с датами */}
                 <div className='w-full flex sticky top-6 z-10'>
                     <div className='min-w-[150px] border-r border-[#333]'></div>
-                    <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>1 декабря</div>
-                    <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>2 декабря</div>
-                    <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>3 декабря</div>
-                    <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>4 декабря</div>
-                    <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>5 декабря</div>
-                    <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>6 декабря</div>
-                    <div className='flex-1 min-w-[300px] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>7 декабря</div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>15 декабря</div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>16 декабря</div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>17 декабря</div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>18 декабря</div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>19 декабря</div>
+                    <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>20 декабря</div>
+                    <div className='flex-1 min-w-[300px] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>21 декабря</div>
                 </div>
 
                 {/* Первая строка времени */}
                 <div className='w-full flex border-b border-dashed border-[#ddd]'>
                     <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                        <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[19px]' >10:00</div>
+                        <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[19px]' >13:00</div>
                     </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                        <div className='h-[100px] bg-[#8B5CF6] rounded-md p-3 flex flex-col justify-between text-white'>
-                            <div>
-                                <div className='font-bold text-sm mb-1'>Юнгианство</div>
-                                <div className='text-xs opacity-90'>Знакомство с коллегами, обсуждение планов</div>
-                            </div>
-                            <div className='text-xs opacity-80'>Алена Петрова</div>
-                        </div>
+
                     </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                        <div className='h-[100px] bg-[#FCD34D] rounded-md p-3 flex flex-col justify-between text-gray-800'>
-                            <div>
-                                <div className='font-bold text-sm mb-1'>Рефлексивная группа</div>
-                                <div className='text-xs opacity-90'>Родители-психологи с коллегами</div>
-                            </div>
-                            <div className='text-xs opacity-80'>Зоя Карелидзе</div>
-                        </div>
+                        <CardItem title={'"Кто я?" - теплица проф.идентичности'} description={'Группа исследования проф.идентичности для практикующих психологов'} author={'Алёна Перова'} modality='Общие' is_registered={true}/>
                     </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
@@ -242,7 +213,7 @@ export const Calendar: React.FC = () => {
                 {/* Вторая строка времени */}
                 <div className='w-full flex border-b border-dashed border-[#ddd]'>
                     <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                    <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >12:00</div>
+                        <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >12:00</div>
                     </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
@@ -276,10 +247,10 @@ export const Calendar: React.FC = () => {
                     <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                 </div>
 
-                {/* Третья строка времени */} 
+                {/* Третья строка времени */}
                 <div className='w-full flex'>
                     <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                    <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >13:00</div>
+                        <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[19px]' >13:00</div>
                     </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
@@ -315,7 +286,7 @@ export const Calendar: React.FC = () => {
                 {/* Первая строка времени */}
                 <div className='w-full flex border-b border-dashed border-[#ddd]'>
                     <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                    <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[19px]' >10:00</div>
+                        <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[19px]' >10:00</div>
                     </div>
                     <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
                         <div className='h-[100px] bg-[#8B5CF6] rounded-md p-3 flex flex-col justify-between text-white'>
@@ -375,9 +346,9 @@ export const Calendar: React.FC = () => {
                 </div>
             </div>
 
-        
 
-            
+
+
 
             {/* Плавающий элемент в правом нижнем углу */}
             <div className="fixed top-16 right-4 bg-[#fbfbfb] rounded-md p-6 flex flex-col gap-4 shadow-lg z-50 border border-[#333333]">
