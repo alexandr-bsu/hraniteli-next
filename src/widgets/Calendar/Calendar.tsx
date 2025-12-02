@@ -93,7 +93,9 @@ export const Calendar: React.FC = () => {
                     {/* Строка с датами */}
                     <div className='w-full flex sticky top-6 z-10'>
                         <div className='min-w-[150px] border-r border-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white rounded-full'>1 декабря</div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'>
+                            <div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>1 декабря</div>
+                        </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>2 декабря</div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>3 декабря</div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>4 декабря</div>
