@@ -2,7 +2,7 @@ type Modality = 'Юнгианство' | 'КПТ' | 'Гештальт' | 'Пси
 
 interface CardItemProps {
     title: string;
-    description: string;
+    description?: string;
     author: string;
     modality?: Modality;
     is_registered?: boolean;
@@ -47,7 +47,7 @@ const CardItem: React.FC<CardItemProps> = ({
         return <div className='whitespace-nowrap'>{author}</div>;
     }
     return (
-        <div className={`min-h-[100px] rounded-md p-3 flex flex-col justify-between gap-4 ${getTextColor(modality)} relative`}
+        <div className={`min-h-[100px] rounded-md p-3 flex flex-col justify-between gap-4 ${getTextColor(modality)} relative cursor-pointer hover:opacity-90 transition-opacity`}
             style={{ backgroundColor: getBackgroundColor(modality) }}>
 
             <div>
@@ -70,7 +70,7 @@ const CardItem: React.FC<CardItemProps> = ({
                         </svg>
                     )}
                 </div>
-                <div className='text-xs opacity-90'>{description}</div>
+                {/* <div className='text-xs opacity-90'>{description}</div> */}
             </div>
             <div className='flex justify-between items-center'>
                 <div className='text-xs opacity-80'>
