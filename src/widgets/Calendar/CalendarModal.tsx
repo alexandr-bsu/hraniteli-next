@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { Button } from '@/shared/ui/Button';
 import { toast, Toaster } from 'sonner';
 
@@ -38,6 +39,9 @@ interface CalendarModalProps {
 }
 
 export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, event, onEventUpdate, allEvents = [], onEventSwitch }) => {
+    const searchParams = useSearchParams();
+    const secret = searchParams.get('secret') || ''; // fallback к дефолтному значению
+
     const [isLoading, setIsLoading] = useState(false);
 
     if (!isOpen || !event) return null;
@@ -67,7 +71,7 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    secret: '6a656816-9ac1-4d98-8613-ca2edb067ca4',
+                    secret: secret,
                     date: event.date,
                     time: event.time,
                     event: event.title
@@ -111,7 +115,7 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
 
         setIsLoading(true);
         try {
-            const response = await fetch(`https://n8n-v2.hrani.live/webhook/cancel-slot?slot=${event.slot_id}&secret=6a656816-9ac1-4d98-8613-ca2edb067ca4`, {
+            const response = await fetch(`https://n8n-v2.hrani.live/webhook/cancel-slot?slot=${event.slot_id}&secret=${secret}`, {
                 method: 'GET',
             });
 

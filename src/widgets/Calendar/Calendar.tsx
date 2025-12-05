@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import CardItem from './CalendarItem';
 import { CalendarModal } from './CalendarModal';
 import { Check } from 'lucide-react';
@@ -239,6 +240,9 @@ const WeekComponent: React.FC<{
 };
 
 export const Calendar: React.FC = () => {
+    const searchParams = useSearchParams();
+    const secret = searchParams.get('secret') || ''; // fallback к дефолтному значению
+
     const [events, setEvents] = useState<Event[]>([]);
     const [slots, setSlots] = useState<SlotsResponse | null>(null);
     const [loading, setLoading] = useState(true);
@@ -333,8 +337,8 @@ export const Calendar: React.FC = () => {
 
                 // Загружаем события и слоты параллельно
                 const [eventsResponse, slotsResponse] = await Promise.all([
-                    fetch('https://n8n-v2.hrani.live/webhook/get-all-events?secret=6a656816-9ac1-4d98-8613-ca2edb067ca4'),
-                    fetch(`https://n8n-v2.hrani.live/webhook/get-slot?startDate=${startDateStr}&endDate=${endDateStr}&secret=6a656816-9ac1-4d98-8613-ca2edb067ca4`)
+                    fetch(`https://n8n-v2.hrani.live/webhook/get-all-events?secret=${secret}`),
+                    fetch(`https://n8n-v2.hrani.live/webhook/get-slot?startDate=${startDateStr}&endDate=${endDateStr}&secret=${secret}`)
                 ]);
 
                 console.log('Ответы получены:', eventsResponse.status, slotsResponse.status);
@@ -377,7 +381,7 @@ export const Calendar: React.FC = () => {
         };
 
         fetchData();
-    }, []);
+    }, [secret]);
 
     // Фильтруем события по выбранным модальностям
     const filteredEvents = useMemo(() => {
