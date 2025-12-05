@@ -2,6 +2,8 @@ import React, { useState, useMemo, useEffect } from 'react';
 import CardItem from './CalendarItem';
 import { CalendarModal } from './CalendarModal';
 import { Check } from 'lucide-react';
+import { useDragToScroll } from '../../hooks/useDragToScroll';
+import styles from './Calendar.module.css';
 
 // Типы для API данных
 interface Event {
@@ -243,6 +245,12 @@ export const Calendar: React.FC = () => {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
+    // Хук для drag-to-scroll функциональности
+    const scrollRef = useDragToScroll({
+        direction: 'horizontal',
+        sensitivity: 1
+    });
+
     const handleEventClick = (event: Event) => {
         setSelectedEvent(event);
         setIsModalOpen(true);
@@ -392,29 +400,37 @@ export const Calendar: React.FC = () => {
             />
 
             <div data-name="container">
-                <div className='sticky top-0 z-20'>
-                    <div data-name="header" className='w-full h-6 bg-[#fbfbfb] flex items-center border-b border-[#333]'>
-                        <span className='h-full min-w-[150px] flex items-center justify-center text-xs font-bold border-r border-[#333]'></span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ПН</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ВТ</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>СР</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ЧТ</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ПТ</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>СБ</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold text-[#155d5e] text-[21px]'>ВС</span>
+                {/* Контейнер с горизонтальным скроллом */}
+                <div 
+                    ref={scrollRef}
+                    className={`overflow-x-auto overflow-y-visible ${styles.scrollContainer}`}
+                >
+                    <div className="min-w-[2250px]"> {/* Минимальная ширина для 7 колонок по 300px + 150px для времени */}
+                        <div className='sticky top-0 z-20'>
+                            <div data-name="header" className='w-full h-6 bg-[#fbfbfb] flex items-center border-b border-[#333]'>
+                                <span className='h-full min-w-[150px] flex items-center justify-center text-xs font-bold border-r border-[#333]'></span>
+                                <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ПН</span>
+                                <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ВТ</span>
+                                <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>СР</span>
+                                <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ЧТ</span>
+                                <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ПТ</span>
+                                <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>СБ</span>
+                                <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold text-[#155d5e] text-[21px]'>ВС</span>
+                            </div>
+                        </div>
+
+                        {/* Отображаем все четыре недели */}
+                        {allWeeks.map((weekDates, index) => (
+                            <WeekComponent
+                                key={index}
+                                weekDates={weekDates}
+                                weekNumber={index + 1}
+                                events={events}
+                                onEventClick={handleEventClick}
+                            />
+                        ))}
                     </div>
                 </div>
-
-                {/* Отображаем все четыре недели */}
-                {allWeeks.map((weekDates, index) => (
-                    <WeekComponent
-                        key={index}
-                        weekDates={weekDates}
-                        weekNumber={index + 1}
-                        events={events}
-                        onEventClick={handleEventClick}
-                    />
-                ))}
 
                 {/* Плавающий элемент в правом верхнем углу */}
                 <div className="fixed top-20 right-4 bg-[#fbfbfb] rounded-[30px] p-6 flex flex-col gap-4 shadow-lg z-50 border border-[#333333]">

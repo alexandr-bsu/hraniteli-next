@@ -1,0 +1,39 @@
+/* Стили для кастомного скроллбара */
+.scrollContainer {
+  scrollbar-width: thin;
+  scrollbar-color: #4a9b8e #f1f1f1;
+}
+
+/* Webkit браузеры (Chrome, Safari, Edge) */
+.scrollContainer::-webkit-scrollbar {
+  height: 8px;
+}
+
+.scrollContainer::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb {
+  background: #4a9b8e;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.scrollContainer::-webkit-scrollbar-thumb:hover {
+  background: #3a8b7e;
+}
+
+/* Убираем плавную анимацию для drag-to-scroll */
+.scrollContainer {
+  scroll-behavior: auto;
+}
+
+/* Курсор при наведении на скроллируемую область */
+.scrollContainer:hover {
+  cursor: grab;
+}
+
+.scrollContainer:active {
+  cursor: grabbing;
+}
