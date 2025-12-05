@@ -84,6 +84,12 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
 
             const data = await response.json();
 
+            // Проверяем на ошибку тарифа супервизий
+            if (data.error === "max_supervision_tarif_reached") {
+                showToast('К сожалению ваш тариф не включает в себя посещение супервизий', 'error');
+                return;
+            }
+
             // Показываем уведомление об успешной записи
             showToast('Вы записались на мероприятие', 'success');
 
