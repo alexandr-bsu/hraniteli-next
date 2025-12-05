@@ -79,11 +79,28 @@ const WeekComponent: React.FC<{ weekDates: Date[]; weekNumber: number; events: E
 
         const filtered = events.filter(event => {
             const eventDate = new Date(event.date);
-            return eventDate >= weekStart && eventDate <= weekEnd;
+            const weekStartDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
+            const weekEndDate = new Date(weekEnd.getFullYear(), weekEnd.getMonth(), weekEnd.getDate());
+            const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+
+            return eventDateOnly >= weekStartDate && eventDateOnly <= weekEndDate;
         });
 
         console.log(`Неделя ${weekNumber}: ${weekStart.toDateString()} - ${weekEnd.toDateString()}`);
         console.log(`Найдено событий для недели ${weekNumber}:`, filtered.length);
+
+        // Логируем все события для отладки
+        events.forEach(event => {
+            const eventDate = new Date(event.date);
+            const weekStartDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
+            const weekEndDate = new Date(weekEnd.getFullYear(), weekEnd.getMonth(), weekEnd.getDate());
+            const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+
+            const isInWeek = eventDateOnly >= weekStartDate && eventDateOnly <= weekEndDate;
+            if (weekNumber === 1) { // Логируем только для первой недели
+                console.log(`Событие "${event.title}" на ${event.date} (${eventDateOnly.toDateString()}) - в неделе: ${isInWeek}`);
+            }
+        });
 
         return filtered;
     }, [weekDates, events, weekNumber]);
@@ -181,7 +198,7 @@ const WeekComponent: React.FC<{ weekDates: Date[]; weekNumber: number; events: E
                                                                         event.event_modal_type === 'психоанализ' ? 'Психоанализ' :
                                                                             'Общие'
                                                     }
-                                                    
+
                                                 />
                                             </div>
                                         );
