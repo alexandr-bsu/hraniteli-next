@@ -253,6 +253,15 @@ export const Calendar: React.FC = () => {
         setSelectedEvent(null);
     };
 
+    const handleEventUpdate = (updatedEvent: Event) => {
+        setEvents(prevEvents => 
+            prevEvents.map(event => 
+                event.id === updatedEvent.id ? updatedEvent : event
+            )
+        );
+        setSelectedEvent(updatedEvent);
+    };
+
     // Функция для сопоставления событий со слотами
     const matchEventsWithSlots = (events: Event[], slotsData: SlotsResponse): Event[] => {
         return events.map(event => {
@@ -373,6 +382,7 @@ export const Calendar: React.FC = () => {
                 isOpen={isModalOpen}
                 onClose={handleCloseModal}
                 event={selectedEvent}
+                onEventUpdate={handleEventUpdate}
             />
 
             <div data-name="container">

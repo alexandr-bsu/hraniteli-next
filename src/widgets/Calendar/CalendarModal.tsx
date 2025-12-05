@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { Button } from '@/shared/ui/Button';
 
 interface Event {
     id: string;
@@ -30,10 +31,72 @@ interface CalendarModalProps {
     isOpen: boolean;
     onClose: () => void;
     event?: Event | null;
+    onEventUpdate?: (updatedEvent: Event) => void;
 }
 
-export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, event }) => {
+export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, event, onEventUpdate }) => {
+    const [isLoading, setIsLoading] = useState(false);
+
     if (!isOpen || !event) return null;
+
+    const showToast = (message: string, type: 'success' | 'error') => {
+        // Попробуем использовать глобальную функцию toast, если она есть
+        if (typeof window !== 'undefined' && (window as any).toast) {
+            if (type === 'success') {
+                (window as any).toast.success(message);
+            } else {
+                (window as any).toast.error(message);
+            }
+        } else {
+            // Fallback на alert
+            alert(message);
+        }
+    };
+
+    const handleRegister = async () => {
+        setIsLoading(true);
+        try {
+            const response = await fetch('https://n8n-v2.hrani.live/webhook/join-to-event', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    secret: '6a656816-9ac1-4d98-8613-ca2edb067ca4',
+                    date: event.date,
+                    time: event.time,
+                    event: event.title
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Ошибка при записи на мероприятие');
+            }
+
+            const data = await response.json();
+
+            // Показываем уведомление об успешной записи
+            showToast('Вы записались на мероприятие', 'success');
+
+            // Обновляем событие
+            const updatedEvent = {
+                ...event,
+                is_registered: true,
+                slot_id: data.id,
+                current_participants: event.current_participants + 1
+            };
+
+            if (onEventUpdate) {
+                onEventUpdate(updatedEvent);
+            }
+
+        } catch (error) {
+            console.error('Ошибка при записи на мероприятие:', error);
+            showToast('Ошибка при записи на мероприятие', 'error');
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const formatDate = (dateStr: string, timeStr: string) => {
         const date = new Date(dateStr);
@@ -63,23 +126,23 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
                     <div className="bg-white sticky top-0 p-5 border-b border-b-dark-green w-full flex justify-between items-center">
                         <div className="flex items-center gap-3 flex-wrap">
                             <h2 className="text-[#155d5e] font-bold text-2xl">{event.title}</h2>
-                            <span 
-                                className="px-3 py-1 rounded-full text-white font-medium text-sm" 
+                            <span
+                                className="px-3 py-1 rounded-full text-white font-medium text-sm"
                                 style={{ backgroundColor: getModalityColor(event.event_modal_type) }}
                             >
                                 {event.event_modal_type}
                             </span>
                         </div>
-                        <svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            width="20" 
-                            height="20" 
-                            viewBox="0 0 24 24" 
-                            fill="none" 
-                            stroke="currentColor" 
-                            strokeWidth="2" 
-                            strokeLinecap="round" 
-                            strokeLinejoin="round" 
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
                             className="cursor-pointer w-5 h-5"
                             onClick={onClose}
                         >
@@ -106,11 +169,11 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
                             <div className="flex flex-wrap">
                                 <p className="text-[#155d5e] text-base flex items-center flex-wrap">
                                     <span className="font-normal mr-1">Супервизор: </span>
-                                    <a 
-                                        href={event.organizator_link} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer" 
-                                        className="text-[#155d5e] hover:text-[#155d5e] transition-colors inline-flex items-center" 
+                                    <a
+                                        href={event.organizator_link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-[#155d5e] hover:text-[#155d5e] transition-colors inline-flex items-center"
                                         title="Перейти на страницу психолога"
                                     >
                                         <span className="font-bold">{event.organizator_name}</span>
@@ -123,17 +186,17 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
                             </div>
                             <div className="flex flex-col flex-wrap">
                                 <p className="text-[#155d5e] text-base">
-                                    <span className="font-normal">Участников: </span> 
+                                    <span className="font-normal">Участников: </span>
                                     <span className="font-bold">{event.current_participants}/{event.max_participants}</span>
                                 </p>
                             </div>
                             <div className="flex flex-col flex-wrap">
                                 <p className="text-[#155d5e] text-base">
-                                    <span className="font-normal">Ссылка на мероприятие: </span> 
-                                    <a 
-                                        href={event.event_link} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer" 
+                                    <span className="font-normal">Ссылка на мероприятие: </span>
+                                    <a
+                                        href={event.event_link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className="text-[#155d5e] font-bold"
                                     >
                                         ссылка
@@ -142,32 +205,101 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
                             </div>
                         </div>
                         <div className="flex flex-col gap-2">
-                            {event.is_registered ? (
-                                <div className="p-3 rounded-[30px] border border-2 border-green text-[#155d5e]">
+                            {(() => {
+                                console.log('EventViewPopup - button condition:', {
+                                    isRegistered: event.is_registered,
+                                    'event.registered': event.is_registered,
+                                    'event.is_canceled': event.is_canceled,
+                                    shouldShowButton: !event.is_registered && !event.is_canceled
+                                });
+                                return null;
+                            })()}
+                            {!event.is_registered && !event.is_canceled && !(event.current_participants >= event.max_participants) ? (
+                                <Button
+                                    variant={'primary'}
+                                    className="rounded-full"
+                                    onClick={handleRegister}
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? 'Записываемся...' : 'Записаться'}
+                                </Button>
+                            ) : event.is_canceled ? (
+                                <div className="p-3 rounded-lg bg-red text-white">
+                                    Мероприятие отменено
+                                </div>
+                            ) : event.current_participants >= event.max_participants && !event.is_registered ? (
+                                <div className="p-3 rounded-[30px] border-2 border-green text-[#155d5e]">
                                     <div className="space-y-2">
-                                        <p className="font-semibold">Вы успешно записались на супервизию.</p>
-                                        <p>Ссылка будет доступна в этой карточке. В чат-бот вам придет напоминание о событии за 24 часа и за 1 час 🙏</p>
-                                        <p>Если вы хотите вынести кейс, то пожалуйста запишитесь в этой таблице (максимум 2 кейса на одной супервизии): <a href="https://docs.google.com/spreadsheets/d/1Brg-cz6OAp7Li3X3IrrwYPbNPGvckXRMk5fYUSbSH-E/" target="_blank" rel="noopener noreferrer" className="underline">Расписание мероприятий Сообщества Хранители</a>.</p>
+                                        <p>К сожалению вы не можете записаться на это мероприятие, поскольку число желающих его посетить уже достигло максимального количества.</p>
+                                        {event.next_event && (
+                                            <p>Вы можете записаться на аналогичное мероприятие по ссылке выше 🙏</p>
+                                        )}
                                     </div>
                                 </div>
-                            ) : null}
-                            <div className="flex gap-2">
-                                {event.is_registered ? (
-                                    <button className="font-normal transition-colors bg-[#155d5e] text-white hover:bg-dark-green px-[20px] py-[12px] text-[16px] rounded-full">
-                                        Отменить запись
-                                    </button>
-                                ) : (
-                                    <button className="font-normal transition-colors bg-[#155d5e] text-white hover:bg-dark-green px-[20px] py-[12px] text-[16px] rounded-full">
-                                        Записаться
-                                    </button>
-                                )}
-                                <button 
-                                    onClick={onClose}
-                                    className="font-normal transition-colors border border-gray text-[#155d5e] hover:bg-gray px-[20px] py-[12px] text-[16px] rounded-full"
+                            ) : (
+                                <div className="p-3 rounded-[30px] border border-2 border-green text-[#155d5e]">
+                                    {(() => {
+                                        const eventType = (event.event_type || "").toLowerCase();
+                                        const organizatorName = event.organizator_name || "супервизора";
+                                        const eventFolder = event.event_folder;
+
+                                        if (eventType.includes("супервизи")) {
+                                            return (
+                                                <div className="space-y-2">
+                                                    <p className="font-semibold">Вы успешно записались на супервизию.</p>
+                                                    <p>Ссылка будет доступна в этой карточке. В чат-бот вам придет напоминание о событии за 24 часа и за 1 час 🙏</p>
+                                                    <p>Если вы хотите вынести кейс, то пожалуйста запишитесь в этой таблице (максимум 2 кейса на одной супервизии): <a href="https://docs.google.com/spreadsheets/d/1Brg-cz6OAp7Li3X3IrrwYPbNPGvckXRMk5fYUSbSH-E/" target="_blank" rel="noopener noreferrer" className="underline">Расписание мероприятий Сообщества Хранители</a>.</p>
+                                                    {eventFolder && (
+                                                        <p>Кейсы можете загрузить в папку по ссылке выше</p>
+                                                    )}
+                                                </div>
+                                            );
+                                        } else if (eventType.includes("интервизи")) {
+                                            return (
+                                                <div className="space-y-2">
+                                                    <p className="font-semibold">Вы успешно записались на интервизию.</p>
+                                                    <p>Ссылка будет доступна в этой карточке. В чат-бот вам придет напоминание о событии за 24 часа и за 1 час 🙏</p>
+                                                    <p>Если вы хотите вынести кейс, то пожалуйста запишитесь в этой таблице (максимум 2 кейса на одной супервизии): <a href="https://docs.google.com/spreadsheets/d/1Brg-cz6OAp7Li3X3IrrwYPbNPGvckXRMk5fYUSbSH-E/" target="_blank" rel="noopener noreferrer" className="underline">Расписание мероприятий Сообщества Хранители</a>.</p>
+                                                    {eventFolder && (
+                                                        <p>Кейсы можете загрузить в папку по ссылке выше</p>
+                                                    )}
+                                                </div>
+                                            );
+                                        } else {
+                                            return (
+                                                <div className="space-y-2">
+                                                    <p className="font-semibold">Вы успешно записались на мероприятие: {event.title}, которое состоится {formatDate(event.date, event.time)}.</p>
+                                                    <p>Ссылка на мероприятие доступна в этой карточке. В чат-бот вам придет напоминание о событии за 24 часа и за 1 час 🙏</p>
+                                                </div>
+                                            );
+                                        }
+                                    })()}
+                                </div>
+                            )}
+
+                            {/* Кнопка отмены записи - показывается только если пользователь записан */}
+                            {(() => {
+                                console.log('Условия для кнопки отмены:', {
+                                    isRegistered: event.is_registered,
+                                    'event.registered': event.is_registered,
+                                    'event.is_canceled': event.is_canceled,
+                                    shouldShowCancelButton: event.is_registered && !event.is_canceled
+                                });
+                                return null;
+                            })()}
+                            {event.is_registered && !event.is_canceled && (
+                                <Button
+                                    variant={'primary'}
+                                    className="rounded-full"
+                                    onClick={() => {/* handleCancelRegistration */ }}
                                 >
-                                    Закрыть
-                                </button>
-                            </div>
+                                    Отменить запись
+                                </Button>
+                            )}
+
+                            <Button variant="outline" className="rounded-full" onClick={onClose}>
+                                Закрыть
+                            </Button>
                         </div>
                     </div>
                 </div>
