@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import CardItem from './CalendarItem';
+import { CalendarModal } from './CalendarModal';
 import { Check } from 'lucide-react';
 
 // Типы для API данных
@@ -77,22 +78,15 @@ const formatDate = (date: Date): string => {
     return `${date.getDate()} ${months[date.getMonth()]}`;
 };
 
-// Функция для получения цвета модальности
-const getModalityColor = (modality: string): string => {
-    switch (modality.toLowerCase()) {
-        case 'кпт': return '#FCD34D';
-        case 'юнгианство': return '#8B5CF6';
-        case 'общие': return '#10B981';
-        case 'гештальт': return '#1c9140';
-        case 'психоанализ': return '#3B82F6';
-        default: return '#4a9b8e';
-    }
-};
+
 
 // Компонент для отображения одной недели
-const WeekComponent: React.FC<{ weekDates: Date[]; weekNumber: number; events: Event[] }> = ({ weekDates, weekNumber, events }) => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const openModal = () => setIsModalOpen(true);
+const WeekComponent: React.FC<{
+    weekDates: Date[];
+    weekNumber: number;
+    events: Event[];
+    onEventClick: (event: Event) => void;
+}> = ({ weekDates, weekNumber, events, onEventClick }) => {
 
     // Фильтруем события для текущей недели
     const weekEvents = useMemo(() => {
@@ -213,7 +207,7 @@ const WeekComponent: React.FC<{ weekDates: Date[]; weekNumber: number; events: E
                                     {dayEvents.map((event) => {
                                         console.log('Рендерим событие:', event.title, 'в ячейке');
                                         return (
-                                            <div key={event.id} onClick={openModal}>
+                                            <div key={event.id} onClick={() => onEventClick(event)}>
                                                 <CardItem
                                                     title={event.title}
                                                     counter={`Участников: ${event.current_participants}/${event.max_participants}`}
@@ -246,6 +240,18 @@ export const Calendar: React.FC = () => {
     const [events, setEvents] = useState<Event[]>([]);
     const [slots, setSlots] = useState<SlotsResponse | null>(null);
     const [loading, setLoading] = useState(true);
+    const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const handleEventClick = (event: Event) => {
+        setSelectedEvent(event);
+        setIsModalOpen(true);
+    };
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedEvent(null);
+    };
 
     // Функция для сопоставления событий со слотами
     const matchEventsWithSlots = (events: Event[], slotsData: SlotsResponse): Event[] => {
@@ -363,6 +369,12 @@ export const Calendar: React.FC = () => {
 
     return (
         <>
+            <CalendarModal
+                isOpen={isModalOpen}
+                onClose={handleCloseModal}
+                event={selectedEvent}
+            />
+
             <div data-name="container">
                 <div className='sticky top-0 z-20'>
                     <div data-name="header" className='w-full h-6 bg-[#fbfbfb] flex items-center border-b border-[#333]'>
@@ -379,7 +391,13 @@ export const Calendar: React.FC = () => {
 
                 {/* Отображаем все четыре недели */}
                 {allWeeks.map((weekDates, index) => (
-                    <WeekComponent key={index} weekDates={weekDates} weekNumber={index + 1} events={events} />
+                    <WeekComponent
+                        key={index}
+                        weekDates={weekDates}
+                        weekNumber={index + 1}
+                        events={events}
+                        onEventClick={handleEventClick}
+                    />
                 ))}
 
                 {/* Плавающий элемент в правом верхнем углу */}
