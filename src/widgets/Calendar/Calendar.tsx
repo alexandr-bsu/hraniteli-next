@@ -244,6 +244,7 @@ export const Calendar: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedFilters, setSelectedFilters] = useState<string[]>(['юнгианство', 'кпт', 'гештальт', 'психоанализ', 'общие']);
 
     // Хук для drag-to-scroll функциональности
     const scrollRef = useDragToScroll({
@@ -272,6 +273,14 @@ export const Calendar: React.FC = () => {
 
     const handleEventSwitch = (newEvent: Event) => {
         setSelectedEvent(newEvent);
+    };
+
+    const handleFilterToggle = (filterType: string) => {
+        setSelectedFilters(prev =>
+            prev.includes(filterType)
+                ? prev.filter(f => f !== filterType)
+                : [...prev, filterType]
+        );
     };
 
     // Функция для сопоставления событий со слотами
@@ -369,6 +378,14 @@ export const Calendar: React.FC = () => {
         fetchData();
     }, []);
 
+    // Фильтруем события по выбранным модальностям
+    const filteredEvents = useMemo(() => {
+        return events.filter(event => {
+            const modalType = event.event_modal_type.toLowerCase();
+            return selectedFilters.includes(modalType);
+        });
+    }, [events, selectedFilters]);
+
     // Вычисляем даты для всех четырех недель
     const allWeeks = useMemo(() => {
         const today = new Date();
@@ -395,13 +412,13 @@ export const Calendar: React.FC = () => {
                 onClose={handleCloseModal}
                 event={selectedEvent}
                 onEventUpdate={handleEventUpdate}
-                allEvents={events}
+                allEvents={filteredEvents}
                 onEventSwitch={handleEventSwitch}
             />
 
             <div data-name="container">
                 {/* Контейнер с горизонтальным скроллом */}
-                <div 
+                <div
                     ref={scrollRef}
                     className={`overflow-x-auto overflow-y-visible ${styles.scrollContainer}`}
                 >
@@ -425,7 +442,7 @@ export const Calendar: React.FC = () => {
                                 key={index}
                                 weekDates={weekDates}
                                 weekNumber={index + 1}
-                                events={events}
+                                events={filteredEvents}
                                 onEventClick={handleEventClick}
                             />
                         ))}
@@ -435,33 +452,58 @@ export const Calendar: React.FC = () => {
                 {/* Плавающий элемент в правом верхнем углу */}
                 <div className="fixed top-20 right-4 bg-[#fbfbfb] rounded-[30px] p-6 flex flex-col gap-4 shadow-lg z-50 border border-[#333333]">
                     <ul className='flex flex-col gap-2'>
-                        <li className="flex gap-4 items-center">
-                            <span className='rounded-md bg-[#8B5CF6] h-6 w-6 flex items-center justify-center'>
-                                <Check width={16} height={16} color='#fff' />
+                        <li className="flex gap-4 items-center cursor-pointer" onClick={() => handleFilterToggle('юнгианство')}>
+                            <span className={`rounded-md h-6 w-6 flex items-center justify-center transition-all duration-200 ${selectedFilters.includes('юнгианство')
+                                ? 'bg-[#8B5CF6]'
+                                : 'bg-gray-300'
+                                }`}>
+                                {selectedFilters.includes('юнгианство') && (
+                                    <Check width={16} height={16} color='#fff' />
+                                )}
                             </span>
                             Юнгианство
                         </li>
-                        <li className="flex gap-4 items-center">
-                            <span className='rounded-md bg-[#FCD34D] h-6 w-6 flex items-center justify-center'>
-                                <Check width={16} height={16} color='#fff' />
+                        <li className="flex gap-4 items-center cursor-pointer" onClick={() => handleFilterToggle('кпт')}>
+                            <span className={`rounded-md h-6 w-6 flex items-center justify-center transition-all duration-200 ${selectedFilters.includes('кпт')
+                                ? 'bg-[#FCD34D]'
+                                : 'bg-gray-300'
+                                }`}>
+                                {selectedFilters.includes('кпт') && (
+                                    <Check width={16} height={16} color='#fff' />
+                                )}
                             </span>
                             КПТ
                         </li>
-                        <li className="flex gap-4 items-center">
-                            <span className='rounded-md bg-[#1c9140] h-6 w-6 flex items-center justify-center'>
-                                <Check width={16} height={16} color='#fff' />
+                        <li className="flex gap-4 items-center cursor-pointer" onClick={() => handleFilterToggle('гештальт')}>
+                            <span className={`rounded-md h-6 w-6 flex items-center justify-center transition-all duration-200 ${selectedFilters.includes('гештальт')
+                                ? 'bg-[#1c9140]'
+                                : 'bg-gray-300'
+                                }`}>
+                                {selectedFilters.includes('гештальт') && (
+                                    <Check width={16} height={16} color='#fff' />
+                                )}
                             </span>
                             Гештальт
                         </li>
-                        <li className="flex gap-4 items-center">
-                            <span className='rounded-md bg-[#3B82F6] h-6 w-6 flex items-center justify-center'>
-                                <Check width={16} height={16} color='#fff' />
+                        <li className="flex gap-4 items-center cursor-pointer" onClick={() => handleFilterToggle('психоанализ')}>
+                            <span className={`rounded-md h-6 w-6 flex items-center justify-center transition-all duration-200 ${selectedFilters.includes('психоанализ')
+                                ? 'bg-[#3B82F6]'
+                                : 'bg-gray-300'
+                                }`}>
+                                {selectedFilters.includes('психоанализ') && (
+                                    <Check width={16} height={16} color='#fff' />
+                                )}
                             </span>
                             Психоанализ
                         </li>
-                        <li className="flex gap-4 items-center">
-                            <span className='rounded-md bg-[#10B981] h-6 w-6 flex items-center justify-center'>
-                                <Check width={16} height={16} color='#fff' />
+                        <li className="flex gap-4 items-center cursor-pointer" onClick={() => handleFilterToggle('общие')}>
+                            <span className={`rounded-md h-6 w-6 flex items-center justify-center transition-all duration-200 ${selectedFilters.includes('общие')
+                                ? 'bg-[#10B981]'
+                                : 'bg-gray-300'
+                                }`}>
+                                {selectedFilters.includes('общие') && (
+                                    <Check width={16} height={16} color='#fff' />
+                                )}
                             </span>
                             Общие
                         </li>
