@@ -32,9 +32,11 @@ interface CalendarModalProps {
     onClose: () => void;
     event?: Event | null;
     onEventUpdate?: (updatedEvent: Event) => void;
+    allEvents?: Event[];
+    onEventSwitch?: (event: Event) => void;
 }
 
-export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, event, onEventUpdate }) => {
+export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, event, onEventUpdate, allEvents = [], onEventSwitch }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     if (!isOpen || !event) return null;
@@ -156,6 +158,20 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
             default: return 'rgb(74, 155, 142)';
         }
     };
+
+    const handleNextEventClick = () => {
+        if (!event?.next_event || !allEvents.length) return;
+
+        // Ищем событие с названием, соответствующим next_event
+        const nextEvent = allEvents.find(e => e.title === event.next_event);
+
+        if (nextEvent && onEventSwitch) {
+            onEventSwitch(nextEvent);
+        }
+    };
+
+    // Проверяем, существует ли следующее событие в allEvents
+    const hasNextEvent = event?.next_event && allEvents.some(e => e.title === event.next_event);
 
     return (
         <div className="slot-grid-container px-5 pt-5 pb-10 min-h-screen gap-10 absolute top-0 left-0 z-1000">
@@ -285,13 +301,17 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
                                 )}
                         </div>
 
-                        {/* Следующее мероприятие */}
-                        {event.next_event && (
+                        {/* Следующее мероприятие - показываем только если событие существует в allEvents */}
+                        {hasNextEvent && (
                             <div data-group="section">
                                 <div className="flex flex-col gap-1">
                                     <p className="text-[#155d5e] text-base">
                                         <span className="font-normal">Следующее мероприятие:</span>{' '}
-                                        <span className="font-bold text-[#155d5e] cursor-pointer hover:underline">
+                                        <span
+                                            className="font-bold text-[#155d5e] cursor-pointer hover:underline transition-colors"
+                                            onClick={handleNextEventClick}
+                                            title="Перейти к следующему мероприятию"
+                                        >
                                             {event.next_event}
                                         </span>
                                     </p>
@@ -326,7 +346,7 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
                                 <div className="p-3 rounded-[30px] border-2 border-[#155d5e] text-[#155d5e]">
                                     <div className="space-y-2">
                                         <p>К сожалению вы не можете записаться на это мероприятие, поскольку число желающих его посетить уже достигло максимального количества.</p>
-                                        {event.next_event && (
+                                        {hasNextEvent && (
                                             <p>Вы можете записаться на аналогичное мероприятие "{event.next_event}" по ссылке выше 🙏</p>
                                         )}
                                     </div>

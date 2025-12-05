@@ -254,12 +254,16 @@ export const Calendar: React.FC = () => {
     };
 
     const handleEventUpdate = (updatedEvent: Event) => {
-        setEvents(prevEvents => 
-            prevEvents.map(event => 
+        setEvents(prevEvents =>
+            prevEvents.map(event =>
                 event.id === updatedEvent.id ? updatedEvent : event
             )
         );
         setSelectedEvent(updatedEvent);
+    };
+
+    const handleEventSwitch = (newEvent: Event) => {
+        setSelectedEvent(newEvent);
     };
 
     // Функция для сопоставления событий со слотами
@@ -383,6 +387,8 @@ export const Calendar: React.FC = () => {
                 onClose={handleCloseModal}
                 event={selectedEvent}
                 onEventUpdate={handleEventUpdate}
+                allEvents={events}
+                onEventSwitch={handleEventSwitch}
             />
 
             <div data-name="container">
