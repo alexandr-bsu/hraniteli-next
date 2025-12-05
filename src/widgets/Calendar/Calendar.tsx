@@ -177,7 +177,7 @@ const WeekComponent: React.FC<{
                 </div>
                 {weekDates.map((date, index) => (
                     <div key={index} className={`flex-1 min-w-[300px] ${index < 6 ? 'border-r border-[#333]' : ''} flex items-center justify-center p-2`}>
-                        <div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>
+                        <div className='text-xs font-bold py-2 bg-[#155d5e] text-white flex w-full justify-center items-center rounded-full'>
                             {formatDate(date)}
                         </div>
                     </div>
