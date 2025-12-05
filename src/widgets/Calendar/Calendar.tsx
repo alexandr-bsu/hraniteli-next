@@ -172,7 +172,7 @@ const WeekComponent: React.FC<{
             {/* Строка с датами */}
             <div className='w-full flex sticky top-6 z-10'>
                 <div className='min-w-[150px] border-r border-[#333] flex items-center justify-center'>
-                    <span className='text-xs font-bold text-[#155d5e]'>Неделя {weekNumber}</span>
+                    {/* <span className='text-xs font-bold text-[#155d5e]'>Неделя {weekNumber}</span> */}
                 </div>
                 {weekDates.map((date, index) => (
                     <div key={index} className={`flex-1 min-w-[300px] ${index < 6 ? 'border-r border-[#333]' : ''} flex items-center justify-center p-2`}>
@@ -249,7 +249,8 @@ export const Calendar: React.FC = () => {
     // Хук для drag-to-scroll функциональности
     const scrollRef = useDragToScroll({
         direction: 'horizontal',
-        sensitivity: 1
+        sensitivity: 1,
+        disabled: loading // Отключаем хук пока идет загрузка
     });
 
     const handleEventClick = (event: Event) => {
