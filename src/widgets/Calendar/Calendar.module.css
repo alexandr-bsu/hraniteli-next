@@ -37,3 +37,25 @@
 .scrollContainer:active {
   cursor: grabbing;
 }
+
+/* Мобильная адаптивность */
+@media (max-width: 768px) {
+  .scrollContainer {
+    /* Улучшаем touch-скролл на мобильных */
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Исправление проблемы с фоном в последней колонке */
+.scrollContainer > div {
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollContainer > div > div[data-name="week"] {
+  flex: 1;
+}
+
+.scrollContainer > div > div[data-name="week"] > div:last-child {
+  flex: 1;
+}

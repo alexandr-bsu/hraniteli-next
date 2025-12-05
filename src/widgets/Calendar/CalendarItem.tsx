@@ -47,12 +47,12 @@ const CardItem: React.FC<CardItemProps> = ({
         return <div className='whitespace-nowrap'>{author}</div>;
     }
     return (
-        <div className={`min-h-[100px] rounded-[30px] p-3 flex flex-col justify-between gap-4 ${getTextColor(modality)} relative cursor-pointer hover:opacity-90 transition-opacity`}
+        <div className={`min-h-[100px] max-md:min-h-[80px] rounded-[30px] max-md:rounded-[20px] p-3 max-md:p-2 flex flex-col justify-between gap-4 max-md:gap-2 ${getTextColor(modality)} relative cursor-pointer hover:opacity-90 transition-opacity`}
             style={{ backgroundColor: getBackgroundColor(modality) }}>
 
             <div>
-                <div className='flex justify-between items-start mb-1'>
-                    <div className='font-bold text-base'>{title}</div>
+                <div className='flex justify-between items-start mb-1 max-md:mb-0.5'>
+                    <div className='font-bold text-base max-md:text-sm'>{title}</div>
                     {is_registered && (
                         <svg
                             width="20"
@@ -63,21 +63,21 @@ const CardItem: React.FC<CardItemProps> = ({
                             strokeWidth="2"
                             strokeLinecap="round"
                             strokeLinejoin="round"
-                            className='opacity-80 flex-shrink-0'
+                            className='opacity-80 flex-shrink-0 max-md:w-4 max-md:h-4'
                         >
                             <path d="m18 2 4 4-14 14H4v-4L18 2z" />
                             <path d="m14.5 5.5 4 4" />
                         </svg>
                     )}
                 </div>
-                <div className='text-base opacity-90'>{counter}</div>
+                <div className='text-base max-md:text-xs opacity-90'>{counter}</div>
             </div>
             <div className='flex justify-between items-center'>
-                <div className='text-sm opacity-80'>
+                <div className='text-sm max-md:text-[10px] opacity-80'>
                     {formatAuthor(author)}
                 </div>
                 {modality && (
-                    <div className={`${getBadgeOpacity(modality)} rounded-full px-2 py-1 text-sm flex items-center justify-center`}>
+                    <div className={`${getBadgeOpacity(modality)} rounded-full px-2 max-md:px-1.5 py-1 max-md:py-0.5 text-sm max-md:text-[10px] flex items-center justify-center`}>
                         {modality}
                     </div>
                 )}
