@@ -73,11 +73,11 @@ const CardItem: React.FC<CardItemProps> = ({
                 <div className='text-base opacity-90'>{counter}</div>
             </div>
             <div className='flex justify-between items-center'>
-                <div className='text-base opacity-80'>
+                <div className='text-sm opacity-80'>
                     {formatAuthor(author)}
                 </div>
                 {modality && (
-                    <div className={`${getBadgeOpacity(modality)} rounded-full px-2 py-1 text-base flex items-center justify-center`}>
+                    <div className={`${getBadgeOpacity(modality)} rounded-full px-2 py-1 text-sm flex items-center justify-center`}>
                         {modality}
                     </div>
                 )}

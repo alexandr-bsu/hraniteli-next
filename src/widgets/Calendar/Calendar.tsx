@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import CardItem from './CalendarItem';
-
+import {Check} from 'lucide-react'
 export const Calendar: React.FC = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -96,12 +96,12 @@ export const Calendar: React.FC = () => {
                         <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'>
                             <div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>1 декабря</div>
                         </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>2 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>3 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>4 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>5 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>6 декабря</div>
-                        <div className='flex-1 min-w-[300px] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>7 декабря</div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>2 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>3 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>4 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>5 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>6 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>7 декабря</div></div>
                     </div>
 
                     {/* Первая строка времени */}
@@ -193,13 +193,13 @@ export const Calendar: React.FC = () => {
                     <div className='w-full flex sticky top-6 z-10'>
                         <div className='min-w-[150px] border-r border-[#333]'>
                         </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>8 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>9 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>10 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>11 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>12 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>13 декабря</div>
-                        <div className='flex-1 min-w-[300px] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>14 декабря</div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>8 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>9 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>10 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>11 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>12 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>13 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>14 декабря</div></div>
                     </div>
 
                     {/* Первая строка времени */}
@@ -257,13 +257,13 @@ export const Calendar: React.FC = () => {
                     {/* Строка с датами */}
                     <div className='w-full flex sticky top-6 z-10'>
                         <div className='min-w-[150px] border-r border-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>15 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>16 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>17 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>18 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>19 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>20 декабря</div>
-                        <div className='flex-1 min-w-[300px] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>21 декабря</div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>15 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>16 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>17 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>18 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>19 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>20 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>21 декабря</div></div>
                     </div>
 
                     {/* Первая строка времени */}
@@ -348,13 +348,13 @@ export const Calendar: React.FC = () => {
                     <div className='w-full flex sticky top-6 z-10'>
                         <div className='min-w-[150px] border-r border-[#333]'>
                         </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>8 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>9 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>10 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>11 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>12 декабря</div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>13 декабря</div>
-                        <div className='flex-1 min-w-[300px] flex items-center justify-center text-xs font-bold py-1 bg-[#4a9b8e] text-white'>14 декабря</div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>8 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>9 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>10 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>11 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>12 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>13 декабря</div></div>
+                        <div className='flex-1 min-w-[300px] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>14 декабря</div></div>
                     </div>
 
                     {/* Первая строка времени */}
@@ -420,35 +420,44 @@ export const Calendar: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Плавающий элемент в правом нижнем углу */}
-                <div className="fixed top-16 right-4 bg-[#fbfbfb] rounded-[30px] p-6 flex flex-col gap-4 shadow-lg z-50 border border-[#333333]">
+                {/* Плавающий элемент в правом верхнем углу */}
+                <div className="fixed top-20 right-4 bg-[#fbfbfb] rounded-[30px] p-6 flex flex-col gap-4 shadow-lg z-50 border border-[#333333]">
                     {/* Содержимое плавающего элемента */}
                     <ul className='flex flex-col gap-2'>
                         <li className="flex gap-4 items-center">
-                            <span className='rounded-md p-2 bg-[#8B5CF6] h-6 w-6 flex items-center justify-center'>
-
+                            <span className='rounded-md bg-[#8B5CF6] h-6 w-6 flex items-center justify-center'>
+                                <Check width={16} height={16} color='#fff'/>
                             </span>
-
+     
+                        
                             Юнгианство
                         </li>
 
                         <li className="flex gap-4 items-center">
-                            <span className='rounded-md p-2 bg-[#FCD34D] h-6 w-6'></span>
-                            Кпт
+                            <span className='rounded-md bg-[#FCD34D] h-6 w-6 flex items-center justify-center'>
+                            <Check width={16} height={16} color='#fff'/>
+                            </span>
+                            КПТ
                         </li>
 
                         <li className="flex gap-4 items-center">
-                            <span className='rounded-md p-2 bg-[#1c9140] h-6 w-6'></span>
+                            <span className='rounded-md bg-[#1c9140] h-6 w-6 flex items-center justify-center'>
+                            <Check width={16} height={16} color='#fff'/>
+                            </span>
                             Гештальт
                         </li>
 
                         <li className="flex gap-4 items-center">
-                            <span className='rounded-md p-2 bg-[#3B82F6] h-6 w-6'></span>
+                            <span className='rounded-md bg-[#3B82F6] h-6 w-6 flex items-center justify-center'>
+                            <Check width={16} height={16} color='#fff'/>
+                            </span>
                             Психоанализ
                         </li>
 
                         <li className="flex gap-4 items-center">
-                            <span className='rounded-md p-2 bg-[#10B981] h-6 w-6'></span>
+                            <span className='rounded-md bg-[#10B981] h-6 w-6 flex items-center justify-center'>
+                                <Check width={16} height={16} color='#fff'/>
+                            </span>
                             Общие
                         </li>
 
