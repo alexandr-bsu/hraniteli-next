@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '@/shared/ui/Button';
+import { toast, Toaster } from 'sonner';
 
 interface Event {
     id: string;
@@ -42,16 +43,18 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
     if (!isOpen || !event) return null;
 
     const showToast = (message: string, type: 'success' | 'error') => {
-        // Попробуем использовать глобальную функцию toast, если она есть
-        if (typeof window !== 'undefined' && (window as any).toast) {
-            if (type === 'success') {
-                (window as any).toast.success(message);
-            } else {
-                (window as any).toast.error(message);
-            }
+        console.log('Показываем toast:', message, type);
+
+        if (type === 'success') {
+            toast.success(message, {
+                position: 'top-left',
+                duration: 3000,
+            });
         } else {
-            // Fallback на alert
-            alert(message);
+            toast.error(message, {
+                position: 'top-left',
+                duration: 3000,
+            });
         }
     };
 
@@ -175,6 +178,21 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
 
     return (
         <div className="slot-grid-container px-5 pt-5 pb-10 min-h-screen gap-10 absolute top-0 left-0 z-1000">
+            {/* <Toaster
+                position="top-center"
+                duration={3000}
+                richColors
+                closeButton
+                toastOptions={{
+                    style: {
+                        background: '#FFFFFF',
+                        color: '#333333',
+                        border: '1px solid #E2E8F0',
+                        borderRadius: '10px',
+                        minWidth: '300px',
+                    },
+                }}
+            /> */}
             <div style={{ position: 'fixed', zIndex: 9999, inset: '16px', pointerEvents: 'none' }}></div>
             <div className="fixed top-0 left-0 h-screen w-full flex justify-center items-center p-5 z-20" style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
                 <div className="bg-white rounded-[30px] w-full max-w-[660px] mx-5 max-h-[650px] overflow-y-auto">
