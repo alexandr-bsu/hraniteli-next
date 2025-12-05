@@ -1,152 +1,87 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import CardItem from './CalendarItem';
-import {Check} from 'lucide-react'
-export const Calendar: React.FC = () => {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+import { Check } from 'lucide-react';
 
+// Функция для получения понедельника текущей недели
+const getMonday = (date: Date): Date => {
+    const d = new Date(date);
+    const day = d.getDay();
+    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+    return new Date(d.setDate(diff));
+};
+
+// Функция для получения дат недели начиная с понедельника
+const getWeekDates = (startDate: Date): Date[] => {
+    const dates = [];
+    for (let i = 0; i < 7; i++) {
+        const date = new Date(startDate);
+        date.setDate(startDate.getDate() + i);
+        dates.push(date);
+    }
+    return dates;
+};
+
+// Функция для форматирования даты
+const formatDate = (date: Date): string => {
+    const months = [
+        'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
+        'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
+    ];
+    return `${date.getDate()} ${months[date.getMonth()]}`;
+};
+
+// Компонент для отображения одной недели
+const WeekComponent: React.FC<{ weekDates: Date[]; weekNumber: number }> = ({ weekDates, weekNumber }) => {
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);
-    const closeModal = () => setIsModalOpen(false);
 
     return (
-        <>
-
-
-            {/* <div data-name="data-groups" className="slot-grid-container px-5 pt-5 pb-10 min-h-screen gap-10 absolute top-0 left-0 z-1000">
-                <div style={{ position: 'fixed', zIndex: 9999, inset: '16px', pointerEvents: 'none' }}></div>
-                <div className="fixed top-0 left-0 h-screen w-full flex justify-center items-center p-5 z-20" style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
-                    <div className="bg-white rounded-[30px] w-full max-w-[660px] mx-5 max-h-[650px] overflow-y-auto">
-                        <div className="bg-white sticky top-0 p-5 border-b border-b-dark-green w-full flex justify-between items-center">
-                            <div className="flex items-center gap-3 flex-wrap">
-                                <h2 className="text-[#155d5e] font-bold text-2xl">Супервизия КПТ</h2>
-                                <span className="px-3 py-1 rounded-full text-white font-medium text-sm" style={{ backgroundColor: 'rgb(252, 211, 77)' }}>кпт</span>
-                            </div>
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="cursor-pointer w-5 h-5">
-                                <path d="m18 6-12 12"></path>
-                                <path d="m6 6 12 12"></path>
-                            </svg>
-                        </div>
-                        <div data-name="event-data" className="p-5 flex flex-col gap-4">
-                            <div data-group="section">
-                                <div className="flex flex-col gap-1">
-                                    <h3 className="text-[#155d5e] font-bold text-[21px]">3 декабря 2025 в 18:00</h3>
-                                </div>
-                            </div>
-                            <div data-group="section">
-                                <div className="flex flex-col gap-1">
-                                    <p className="text-[#155d5e] text-base font-normal">На супервизии можно выносить:
-                                        1) кейсы по клиентам, в том числе по 1 сессии
-                                        2) список вопросов по практике, который волнует сейчас
-                                        3) любой другой материал и вопросы супервизору
-                                    </p>
-                                </div>
-                            </div>
-                            <div data-group="section">
-                                <div className="flex flex-wrap">
-                                    <p className="text-[#155d5e] text-base flex items-center flex-wrap">
-                                        <span className="font-normal mr-1">Супервизор: </span>
-                                        <a href="https://https://t.me/c/2404791398/937/965" target="_blank" rel="noopener noreferrer" className="text-[#155d5e] hover:text-[#155d5e] transition-colors inline-flex items-center" title="Перейти на страницу психолога">
-                                            <span className="font-bold">Елена Греченко</span>
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-send-icon lucide-send">
-                                                <path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path>
-                                                <path d="m21.854 2.147-10.94 10.939"></path>
-                                            </svg>
-                                        </a>
-                                    </p>
-                                </div>
-                                <div className="flex flex-col flex-wrap">
-                                    <p className="text-[#155d5e] text-base"><span className="font-normal">Участников: </span> <span className="font-bold">1/10</span></p>
-                                </div>
-                                <div className="flex flex-col flex-wrap">
-                                    <p className="text-[#155d5e] text-base"><span className="font-normal">Ссылка на мероприятие: </span> <a href="https://telemost.360.yandex.ru/j/9882565885" target="_blank" rel="noopener noreferrer" className="text-[#155d5e] font-bold">ссылка</a></p>
-                                </div>
-                            </div>
-                            <div className="flex flex-col gap-2">
-                                <div className="p-3 rounded-[30px] border border-2 border-green text-[#155d5e]">
-                                    <div className="space-y-2">
-                                        <p className="font-semibold">Вы успешно записались на супервизию.</p>
-                                        <p>Ссылка будет доступна в этой карточке. В чат-бот вам придет напоминание о событии за 24 часа и за 1 час 🙏</p>
-                                        <p>Если вы хотите вынести кейс, то пожалуйста запишитесь в этой таблице (максимум 2 кейса на одной супервизии): <a href="https://docs.google.com/spreadsheets/d/1Brg-cz6OAp7Li3X3IrrwYPbNPGvckXRMk5fYUSbSH-E/" target="_blank" rel="noopener noreferrer" className="underline">Расписание мероприятий Сообщества Хранители</a>.</p>
-                                    </div>
-                                </div>
-                                <button className="font-normal transition-colors bg-[#155d5e] text-white hover:bg-dark-green px-[20px] py-[12px] text-[16px] rounded-full">Отменить запись</button><button className="font-normal transition-colors border border-gray text-[#155d5e] hover:bg-gray px-[20px] py-[12px] text-[16px] rounded-full">Закрыть</button>
-                            </div>
+        <div data-name="week" className='w-full bg-[#fbfbfb] flex flex-col border-[#ddd] border-dashed border-b'>
+            {/* Строка с датами */}
+            <div className='w-full flex sticky top-6 z-10'>
+                <div className='min-w-[150px] border-r border-[#333] flex items-center justify-center'>
+                    <span className='text-xs font-bold text-[#155d5e]'>Неделя {weekNumber}</span>
+                </div>
+                {weekDates.map((date, index) => (
+                    <div key={index} className={`flex-1 min-w-[300px] ${index < 6 ? 'border-r border-[#333]' : ''} flex items-center justify-center p-2`}>
+                        <div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>
+                            {formatDate(date)}
                         </div>
                     </div>
-                </div>
+                ))}
             </div>
-             */}
-            <div data-name="container">
-                <div className='sticky top-0 z-20'>
-                    <div data-name="header" className='w-full h-6 bg-[#fbfbfb] flex items-center border-b border-[#333] ' >
-                        <span className='h-full min-w-[150px] flex items-center justify-center text-xs font-bold border-r border-[#333]'></span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ПН</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ВТ</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>СР</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ЧТ</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ПТ</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>СБ</span>
-                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold text-[#155d5e] text-[21px]'>ВС</span>
-                    </div>
-                </div>
 
-                <div data-name="week" className='w-full bg-[#fbfbfb] flex flex-col border-[#ddd] border-dashed  border-b'>
-                    {/* Строка с датами */}
-                    <div className='w-full flex sticky top-6 z-10'>
-                        <div className='min-w-[150px] border-r border-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'>
-                            <div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>1 декабря</div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>2 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>3 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>4 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>5 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>6 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>7 декабря</div></div>
-                    </div>
-
+            {/* Временные слоты */}
+            {weekNumber === 1 && (
+                <>
                     {/* Первая строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]' >13:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]'>13:00</div>
                         </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-
-                        </div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
                             <CardItem title={'"Кто я?" - теплица проф.идентичности'} counter={'Участников: 0/10'} author={'Алёна Перова'} modality='Общие' />
                         </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-
-                        </div>
-                        <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-
-                        </div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                        <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     </div>
 
                     {/* Вторая строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]' >14:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>14:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
                             <CardItem title={'Супервизия Юнг.'} counter={'Участников: 2/10'} author={'Анна Бородкина'} modality='Юнгианство' is_registered />
                         </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-
-                        </div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     </div>
@@ -154,7 +89,7 @@ export const Calendar: React.FC = () => {
                     {/* Третья строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]' >18:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>18:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
@@ -172,13 +107,11 @@ export const Calendar: React.FC = () => {
                     {/* Четвёртая строка времени */}
                     <div className='w-full flex'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]' >20:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>20:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-
-                        </div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
@@ -186,35 +119,20 @@ export const Calendar: React.FC = () => {
                         </div>
                         <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     </div>
-                </div>
+                </>
+            )}
 
-                <div data-name="week" className='w-full bg-[#fbfbfb] flex flex-col border-[#ddd]  border-dashed border-b'>
-                    {/* Строка с датами */}
-                    <div className='w-full flex sticky top-6 z-10'>
-                        <div className='min-w-[150px] border-r border-[#333]'>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>8 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>9 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>10 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>11 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>12 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>13 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>14 декабря</div></div>
-                    </div>
-
+            {weekNumber === 2 && (
+                <>
                     {/* Первая строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]' >09:00</div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-
+                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]'>09:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-
-                        </div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
                             <CardItem title={'Киноклуб'} counter={'Участников: 1/10'} author={'Майя Филиппова'} modality='Общие' />
                         </div>
@@ -224,13 +142,13 @@ export const Calendar: React.FC = () => {
 
                     {/* Вторая строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4  font-bold text-[#155d5e] text-[21px]' >14:00</div></div>
+                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
+                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>14:00</div>
+                        </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
                             <CardItem title={'Рефлексивная группа КПТ'} counter={'Участников: 1/10'} author={'Юлия Ким'} modality='КПТ' is_registered />
                         </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-
-                        </div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
@@ -240,7 +158,9 @@ export const Calendar: React.FC = () => {
 
                     {/* Третья строка времени */}
                     <div className='w-full flex'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]' >19:00</div></div>
+                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
+                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>19:00</div>
+                        </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
@@ -251,29 +171,17 @@ export const Calendar: React.FC = () => {
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     </div>
-                </div>
+                </>
+            )}
 
-                <div data-name="week" className='w-full bg-[#fbfbfb] flex flex-col border-[#ddd]  border-dashed border-b'>
-                    {/* Строка с датами */}
-                    <div className='w-full flex sticky top-6 z-10'>
-                        <div className='min-w-[150px] border-r border-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>15 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>16 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>17 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>18 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>19 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>20 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>21 декабря</div></div>
-                    </div>
-
+            {weekNumber === 3 && (
+                <>
                     {/* Первая строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]' >13:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]'>13:00</div>
                         </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-
-                        </div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
@@ -287,7 +195,7 @@ export const Calendar: React.FC = () => {
                     {/* Вторая строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]' >12:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>12:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
@@ -324,7 +232,7 @@ export const Calendar: React.FC = () => {
                     {/* Третья строка времени */}
                     <div className='w-full flex'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]' >13:00</div>
+                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>13:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
@@ -341,134 +249,117 @@ export const Calendar: React.FC = () => {
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     </div>
-                </div>
+                </>
+            )}
 
-                <div data-name="week" className='w-full bg-[#fbfbfb] flex flex-col border-[#ddd]  border-dashed border-b'>
-                    {/* Строка с датами */}
-                    <div className='w-full flex sticky top-6 z-10'>
-                        <div className='min-w-[150px] border-r border-[#333]'>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>8 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>9 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>10 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>11 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>12 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>13 декабря</div></div>
-                        <div className='flex-1 min-w-[300px] flex items-center justify-center p-2'><div className='text-xs font-bold py-2 bg-[#4a9b8e] text-white flex w-full justify-center items-center rounded-full'>14 декабря</div></div>
-                    </div>
-
+            {weekNumber === 4 && (
+                <>
                     {/* Первая строка времени */}
                     <div className='w-full flex border-b border-dashed border-[#ddd]'>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]' >10:00</div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <div className='h-[100px] bg-[#8B5CF6] rounded-md p-3 flex flex-col justify-between text-white'>
-                                <div>
-                                    <div className='font-bold text-sm mb-1'>Книжная встреча</div>
-                                    <div className='text-xs opacity-90'>«П. Экзюпери "Маленький принц"»</div>
-                                </div>
-                                <div className='text-xs opacity-80'>Татьяна Кудашова</div>
-                            </div>
+                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]'>10:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <div className='h-[100px] bg-[#1c9140] rounded-md p-3 flex flex-col justify-between text-white'>
-                                <div>
-                                    <div className='font-bold text-sm mb-1'>Юнгианская встреча</div>
-                                    <div className='text-xs opacity-90'>«П. Экзюпери "Маленький принц"»</div>
-                                </div>
-                                <div className='text-xs opacity-80'>Татьяна Кудашова</div>
-                            </div>
-                        </div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     </div>
 
                     {/* Вторая строка времени */}
-                    <div className='w-full flex border-b border-dashed border-[#ddd]'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4  font-bold text-[#155d5e] text-[21px]' >12:00</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <div className='h-[100px] bg-[#1c9140] rounded-md p-3 flex flex-col justify-between text-white'>
-                                <div>
-                                    <div className='font-bold text-sm mb-1'>Тренинг первой сессии</div>
-                                    <div className='text-xs opacity-90'>3 активных участника</div>
-                                </div>
-                                <div className='text-xs opacity-80'>Юлия Ким</div>
-                            </div>
+                    <div className='w-full flex'>
+                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
+                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>15:00</div>
                         </div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                         <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
                     </div>
+                </>
+            )}
+        </div>
+    );
+};
 
-                    {/* Третья строка времени */}
-                    <div className='w-full flex'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'><div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]' >13:00</div></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+export const Calendar: React.FC = () => {
+    // Вычисляем даты для всех четырех недель
+    const allWeeks = useMemo(() => {
+        const today = new Date();
+        const monday = getMonday(today);
+        const weeks = [];
+        
+        for (let weekOffset = 0; weekOffset < 4; weekOffset++) {
+            const weekStart = new Date(monday);
+            weekStart.setDate(monday.getDate() + (weekOffset * 7));
+            weeks.push(getWeekDates(weekStart));
+        }
+        
+        return weeks;
+    }, []);
+
+    return (
+        <>
+            <div data-name="container">
+                <div className='sticky top-0 z-20'>
+                    <div data-name="header" className='w-full h-6 bg-[#fbfbfb] flex items-center border-b border-[#333]'>
+                        <span className='h-full min-w-[150px] flex items-center justify-center text-xs font-bold border-r border-[#333]'></span>
+                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ПН</span>
+                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ВТ</span>
+                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>СР</span>
+                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ЧТ</span>
+                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>ПТ</span>
+                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px]'>СБ</span>
+                        <span className='flex-1 h-full min-w-[300px] flex items-center justify-center text-xs font-bold text-[#155d5e] text-[21px]'>ВС</span>
                     </div>
                 </div>
 
+                {/* Отображаем все четыре недели */}
+                {allWeeks.map((weekDates, index) => (
+                    <WeekComponent key={index} weekDates={weekDates} weekNumber={index + 1} />
+                ))}
+
                 {/* Плавающий элемент в правом верхнем углу */}
                 <div className="fixed top-20 right-4 bg-[#fbfbfb] rounded-[30px] p-6 flex flex-col gap-4 shadow-lg z-50 border border-[#333333]">
-                    {/* Содержимое плавающего элемента */}
                     <ul className='flex flex-col gap-2'>
                         <li className="flex gap-4 items-center">
                             <span className='rounded-md bg-[#8B5CF6] h-6 w-6 flex items-center justify-center'>
                                 <Check width={16} height={16} color='#fff'/>
                             </span>
-     
-                        
                             Юнгианство
                         </li>
-
                         <li className="flex gap-4 items-center">
                             <span className='rounded-md bg-[#FCD34D] h-6 w-6 flex items-center justify-center'>
-                            <Check width={16} height={16} color='#fff'/>
+                                <Check width={16} height={16} color='#fff'/>
                             </span>
                             КПТ
                         </li>
-
                         <li className="flex gap-4 items-center">
                             <span className='rounded-md bg-[#1c9140] h-6 w-6 flex items-center justify-center'>
-                            <Check width={16} height={16} color='#fff'/>
+                                <Check width={16} height={16} color='#fff'/>
                             </span>
                             Гештальт
                         </li>
-
                         <li className="flex gap-4 items-center">
                             <span className='rounded-md bg-[#3B82F6] h-6 w-6 flex items-center justify-center'>
-                            <Check width={16} height={16} color='#fff'/>
+                                <Check width={16} height={16} color='#fff'/>
                             </span>
                             Психоанализ
                         </li>
-
                         <li className="flex gap-4 items-center">
                             <span className='rounded-md bg-[#10B981] h-6 w-6 flex items-center justify-center'>
                                 <Check width={16} height={16} color='#fff'/>
                             </span>
                             Общие
                         </li>
-
                     </ul>
                 </div>
             </div>
-
-
-
-
         </>
-
     );
 };
