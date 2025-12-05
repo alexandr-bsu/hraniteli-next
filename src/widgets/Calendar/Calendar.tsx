@@ -1,6 +1,31 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import CardItem from './CalendarItem';
 import { Check } from 'lucide-react';
+
+// Типы для API данных
+interface Event {
+    id: string;
+    title: string;
+    event_modal_type: string;
+    event_type: string;
+    description: string;
+    organizator_type: string;
+    organizator_name: string;
+    organizator_link: string;
+    max_participants: number;
+    date: string;
+    next_event: string | null;
+    is_canceled: boolean;
+    event_link: string;
+    is_published: boolean;
+    time: string;
+    repeat_period: string | null;
+    last_planed_date: string | null;
+    event_folder: string | null;
+    root_event: string | null;
+    current_participants: number;
+    allow_connect: boolean;
+}
 
 // Функция для получения понедельника текущей недели
 const getMonday = (date: Date): Date => {
@@ -30,10 +55,76 @@ const formatDate = (date: Date): string => {
     return `${date.getDate()} ${months[date.getMonth()]}`;
 };
 
+// Функция для получения цвета модальности
+const getModalityColor = (modality: string): string => {
+    switch (modality.toLowerCase()) {
+        case 'кпт': return '#FCD34D';
+        case 'юнгианство': return '#8B5CF6';
+        case 'общие': return '#10B981';
+        case 'гештальт': return '#1c9140';
+        case 'психоанализ': return '#3B82F6';
+        default: return '#4a9b8e';
+    }
+};
+
 // Компонент для отображения одной недели
-const WeekComponent: React.FC<{ weekDates: Date[]; weekNumber: number }> = ({ weekDates, weekNumber }) => {
+const WeekComponent: React.FC<{ weekDates: Date[]; weekNumber: number; events: Event[] }> = ({ weekDates, weekNumber, events }) => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const openModal = () => setIsModalOpen(true);
+
+    // Фильтруем события для текущей недели
+    const weekEvents = useMemo(() => {
+        const weekStart = weekDates[0];
+        const weekEnd = weekDates[6];
+
+        const filtered = events.filter(event => {
+            const eventDate = new Date(event.date);
+            return eventDate >= weekStart && eventDate <= weekEnd;
+        });
+
+        console.log(`Неделя ${weekNumber}: ${weekStart.toDateString()} - ${weekEnd.toDateString()}`);
+        console.log(`Найдено событий для недели ${weekNumber}:`, filtered.length);
+
+        return filtered;
+    }, [weekDates, events, weekNumber]);
+
+    // Получаем уникальные времена для этой недели и сортируем их
+    const weekTimes = useMemo(() => {
+        const times = Array.from(new Set(weekEvents.map(event => event.time)));
+        return times.sort((a, b) => {
+            const timeA = parseInt(a.split(':')[0]) * 60 + parseInt(a.split(':')[1]);
+            const timeB = parseInt(b.split(':')[0]) * 60 + parseInt(b.split(':')[1]);
+            return timeA - timeB;
+        });
+    }, [weekEvents]);
+
+    // Группируем события по дате и времени
+    const eventsByDateTime = useMemo(() => {
+        const grouped: { [key: string]: Event[] } = {};
+        weekEvents.forEach(event => {
+            const key = `${event.date}-${event.time}`;
+            if (!grouped[key]) {
+                grouped[key] = [];
+            }
+            grouped[key].push(event);
+        });
+
+        console.log(`Неделя ${weekNumber} - сгруппированные события:`, grouped);
+        return grouped;
+    }, [weekEvents, weekNumber]);
+
+    // Функция для получения событий для конкретной даты и времени
+    const getEventsForDateTime = (date: Date, time: string): Event[] => {
+        const dateStr = date.toISOString().split('T')[0];
+        const key = `${dateStr}-${time}`;
+        const events = eventsByDateTime[key] || [];
+
+        if (events.length > 0) {
+            console.log(`Найдены события для ${dateStr} в ${time}:`, events.length);
+        }
+
+        return events;
+    };
 
     return (
         <div data-name="week" className='w-full bg-[#fbfbfb] flex flex-col border-[#ddd] border-dashed border-b'>
@@ -51,257 +142,108 @@ const WeekComponent: React.FC<{ weekDates: Date[]; weekNumber: number }> = ({ we
                 ))}
             </div>
 
-            {/* Временные слоты */}
-            {weekNumber === 1 && (
-                <>
-                    {/* Первая строка времени */}
-                    <div className='w-full flex border-b border-dashed border-[#ddd]'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]'>13:00</div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <CardItem title={'"Кто я?" - теплица проф.идентичности'} counter={'Участников: 0/10'} author={'Алёна Перова'} modality='Общие' />
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+            {/* Динамические временные слоты */}
+            {weekTimes.length === 0 ? (
+                <div className='w-full flex'>
+                    <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-8'>
+                        <div className='text-gray-400'>Нет событий</div>
                     </div>
-
-                    {/* Вторая строка времени */}
-                    <div className='w-full flex border-b border-dashed border-[#ddd]'>
+                    {weekDates.map((_, dayIndex) => (
+                        <div key={dayIndex} className={`flex-1 min-w-[300px] ${dayIndex < 6 ? 'border-r border-[#333]' : ''} p-4 flex flex-col gap-2 text-xs font-medium text-[#333]`}>
+                        </div>
+                    ))}
+                </div>
+            ) : (
+                weekTimes.map((time, timeIndex) => (
+                    <div key={time} className={`w-full flex ${timeIndex < weekTimes.length - 1 ? 'border-b border-dashed border-[#ddd]' : ''}`}>
                         <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>14:00</div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <CardItem title={'Супервизия Юнг.'} counter={'Участников: 2/10'} author={'Анна Бородкина'} modality='Юнгианство' is_registered />
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                    </div>
-
-                    {/* Третья строка времени */}
-                    <div className='w-full flex border-b border-dashed border-[#ddd]'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>18:00</div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <div onClick={openModal}>
-                                <CardItem title={'Супервизия КПТ'} counter={'Участников: 1/10'} author={'Елена Греченко'} modality='КПТ' />
+                            <div className={`rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px] ${timeIndex === 0 ? '-mt-6' : ''}`}>
+                                {time}
                             </div>
                         </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                    </div>
+                        {weekDates.map((date, dayIndex) => {
+                            const dayEvents = getEventsForDateTime(date, time);
+                            return (
+                                <div key={dayIndex} className={`flex-1 min-w-[300px] ${dayIndex < 6 ? 'border-r border-[#333]' : ''} p-4 flex flex-col gap-2 text-xs font-medium text-[#333]`}>
+                                    {dayEvents.map((event) => {
+                                        console.log('Рендерим событие:', event.title, 'в ячейке');
+                                        return (
+                                            <div key={event.id} onClick={openModal}>
+                                                <CardItem
+                                                    title={event.title}
+                                                    counter={`Участников: ${event.current_participants}/${event.max_participants}`}
+                                                    author={event.organizator_name}
+                                                    modality={
+                                                        event.event_modal_type === 'кпт' ? 'КПТ' :
+                                                            event.event_modal_type === 'юнгианство' ? 'Юнгианство' :
+                                                                event.event_modal_type === 'общие' ? 'Общие' :
+                                                                    event.event_modal_type === 'гештальт' ? 'Гештальт' :
+                                                                        event.event_modal_type === 'психоанализ' ? 'Психоанализ' :
+                                                                            'Общие'
+                                                    }
+                                                    
+                                                />
+                                            </div>
+                                        );
+                                    })}
 
-                    {/* Четвёртая строка времени */}
-                    <div className='w-full flex'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>20:00</div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <CardItem title={'Исследование личного мифа'} counter={'Участников: 0/10'} author={'Валентина Ким, Нина Дятловская'} modality='Юнгианство' />
-                        </div>
-                        <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                    </div>
-                </>
-            )}
-
-            {weekNumber === 2 && (
-                <>
-                    {/* Первая строка времени */}
-                    <div className='w-full flex border-b border-dashed border-[#ddd]'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]'>09:00</div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <CardItem title={'Киноклуб'} counter={'Участников: 1/10'} author={'Майя Филиппова'} modality='Общие' />
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                    </div>
-
-                    {/* Вторая строка времени */}
-                    <div className='w-full flex border-b border-dashed border-[#ddd]'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>14:00</div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <CardItem title={'Рефлексивная группа КПТ'} counter={'Участников: 1/10'} author={'Юлия Ким'} modality='КПТ' is_registered />
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                    </div>
-
-                    {/* Третья строка времени */}
-                    <div className='w-full flex'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>19:00</div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <CardItem title={'Книжный Клуб'} counter={'Участников: 1/10'} author={'Юлия Ким'} modality='КПТ' />
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                    </div>
-                </>
-            )}
-
-            {weekNumber === 3 && (
-                <>
-                    {/* Первая строка времени */}
-                    <div className='w-full flex border-b border-dashed border-[#ddd]'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]'>13:00</div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <CardItem title={'"Кто я?" - теплица проф.идентичности'} counter={'Участников: 3/10'} author={'Алёна Перова'} modality='Общие' is_registered={true} />
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                    </div>
-
-                    {/* Вторая строка времени */}
-                    <div className='w-full flex border-b border-dashed border-[#ddd]'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>12:00</div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <div className='h-[100px] bg-[#FCD34D] rounded-md p-3 flex flex-col justify-between text-gray-800'>
-                                <div>
-                                    <div className='font-bold text-sm mb-1'>Супервизия КПТ</div>
-                                    <div className='text-xs opacity-90'>Разбор 2-х случаев</div>
                                 </div>
-                                <div className='text-xs opacity-80'>Елена Гриценко</div>
-                            </div>
-                            <div className='h-[100px] bg-[#FCD34D] rounded-md p-3 flex flex-col justify-between text-gray-800'>
-                                <div>
-                                    <div className='font-bold text-sm mb-1'>Интервизия КПТ</div>
-                                    <div className='text-xs opacity-90'>Разбор 2-х случаев</div>
-                                </div>
-                                <div className='text-xs opacity-80'>Юлия Ким</div>
-                            </div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <div className='h-[100px] bg-[#FCD34D] rounded-md p-3 flex flex-col justify-between text-gray-800'>
-                                <div>
-                                    <div className='font-bold text-sm mb-1'>Рефлексивная группа КПТ</div>
-                                    <div className='text-xs opacity-90'>Родители-психологи с коллегами</div>
-                                </div>
-                                <div className='text-xs opacity-80'>Юлия Ким</div>
-                            </div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
+                            );
+                        })}
                     </div>
-
-                    {/* Третья строка времени */}
-                    <div className='w-full flex'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>13:00</div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'>
-                            <div className='h-[100px] bg-[#3B82F6] rounded-md p-3 flex flex-col justify-between text-white'>
-                                <div>
-                                    <div className='font-bold text-sm mb-1'>Группа самоуправления</div>
-                                    <div className='text-xs opacity-90'>Лидия Казанцева</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                    </div>
-                </>
-            )}
-
-            {weekNumber === 4 && (
-                <>
-                    {/* Первая строка времени */}
-                    <div className='w-full flex border-b border-dashed border-[#ddd]'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold -mt-6 text-[#155d5e] text-[21px]'>10:00</div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                    </div>
-
-                    {/* Вторая строка времени */}
-                    <div className='w-full flex'>
-                        <div data-name='slot-time' className='min-w-[150px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4'>
-                            <div className='rounded-full px-8 py-4 font-bold text-[#155d5e] text-[21px]'>15:00</div>
-                        </div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] border-r border-[#333] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                        <div className='flex-1 min-w-[300px] p-4 flex flex-col gap-2 text-xs font-medium text-[#333]'></div>
-                    </div>
-                </>
+                ))
             )}
         </div>
     );
 };
 
 export const Calendar: React.FC = () => {
+    const [events, setEvents] = useState<Event[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    // Загружаем события из API
+    useEffect(() => {
+        const fetchEvents = async () => {
+            console.log('Начинаем загрузку событий...');
+            try {
+                const response = await fetch('https://n8n-v2.hrani.live/webhook/get-all-events?secret=6a656816-9ac1-4d98-8613-ca2edb067ca4');
+                console.log('Ответ получен:', response.status);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('Данные получены:', data.length, 'событий');
+                setEvents(data);
+            } catch (error) {
+                console.error('Ошибка загрузки событий:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchEvents();
+    }, []);
+
     // Вычисляем даты для всех четырех недель
     const allWeeks = useMemo(() => {
         const today = new Date();
         const monday = getMonday(today);
         const weeks = [];
-        
+
         for (let weekOffset = 0; weekOffset < 4; weekOffset++) {
             const weekStart = new Date(monday);
             weekStart.setDate(monday.getDate() + (weekOffset * 7));
             weeks.push(getWeekDates(weekStart));
         }
-        
+
         return weeks;
     }, []);
+
+    if (loading) {
+        return <div className="flex justify-center items-center h-64">Загрузка событий...</div>;
+    }
 
     return (
         <>
@@ -321,7 +263,7 @@ export const Calendar: React.FC = () => {
 
                 {/* Отображаем все четыре недели */}
                 {allWeeks.map((weekDates, index) => (
-                    <WeekComponent key={index} weekDates={weekDates} weekNumber={index + 1} />
+                    <WeekComponent key={index} weekDates={weekDates} weekNumber={index + 1} events={events} />
                 ))}
 
                 {/* Плавающий элемент в правом верхнем углу */}
@@ -329,31 +271,31 @@ export const Calendar: React.FC = () => {
                     <ul className='flex flex-col gap-2'>
                         <li className="flex gap-4 items-center">
                             <span className='rounded-md bg-[#8B5CF6] h-6 w-6 flex items-center justify-center'>
-                                <Check width={16} height={16} color='#fff'/>
+                                <Check width={16} height={16} color='#fff' />
                             </span>
                             Юнгианство
                         </li>
                         <li className="flex gap-4 items-center">
                             <span className='rounded-md bg-[#FCD34D] h-6 w-6 flex items-center justify-center'>
-                                <Check width={16} height={16} color='#fff'/>
+                                <Check width={16} height={16} color='#fff' />
                             </span>
                             КПТ
                         </li>
                         <li className="flex gap-4 items-center">
                             <span className='rounded-md bg-[#1c9140] h-6 w-6 flex items-center justify-center'>
-                                <Check width={16} height={16} color='#fff'/>
+                                <Check width={16} height={16} color='#fff' />
                             </span>
                             Гештальт
                         </li>
                         <li className="flex gap-4 items-center">
                             <span className='rounded-md bg-[#3B82F6] h-6 w-6 flex items-center justify-center'>
-                                <Check width={16} height={16} color='#fff'/>
+                                <Check width={16} height={16} color='#fff' />
                             </span>
                             Психоанализ
                         </li>
                         <li className="flex gap-4 items-center">
                             <span className='rounded-md bg-[#10B981] h-6 w-6 flex items-center justify-center'>
-                                <Check width={16} height={16} color='#fff'/>
+                                <Check width={16} height={16} color='#fff' />
                             </span>
                             Общие
                         </li>
