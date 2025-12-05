@@ -25,6 +25,28 @@ interface Event {
     root_event: string | null;
     current_participants: number;
     allow_connect: boolean;
+    is_registered?: boolean;
+    slot_id?: string;
+}
+
+interface Slot {
+    id: string;
+    status: string;
+    event: string | null;
+    event_modal_type: string | null;
+    slot_over_event: boolean;
+}
+
+interface DaySlots {
+    date: string;
+    slots: { [time: string]: Slot[] };
+    day_name: string;
+    pretty_date: string;
+}
+
+interface SlotsResponse {
+    items: DaySlots[];
+    date: string;
 }
 
 // Функция для получения понедельника текущей недели
@@ -90,17 +112,23 @@ const WeekComponent: React.FC<{ weekDates: Date[]; weekNumber: number; events: E
         console.log(`Найдено событий для недели ${weekNumber}:`, filtered.length);
 
         // Логируем все события для отладки
-        events.forEach(event => {
-            const eventDate = new Date(event.date);
-            const weekStartDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
-            const weekEndDate = new Date(weekEnd.getFullYear(), weekEnd.getMonth(), weekEnd.getDate());
-            const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
+        if (weekNumber === 1) {
+            console.log('Всего событий для проверки:', events.length);
+            events.forEach(event => {
+                const eventDate = new Date(event.date);
+                const weekStartDate = new Date(weekStart.getFullYear(), weekStart.getMonth(), weekStart.getDate());
+                const weekEndDate = new Date(weekEnd.getFullYear(), weekEnd.getMonth(), weekEnd.getDate());
+                const eventDateOnly = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
 
-            const isInWeek = eventDateOnly >= weekStartDate && eventDateOnly <= weekEndDate;
-            if (weekNumber === 1) { // Логируем только для первой недели
-                console.log(`Событие "${event.title}" на ${event.date} (${eventDateOnly.toDateString()}) - в неделе: ${isInWeek}`);
-            }
-        });
+                const isInWeek = eventDateOnly >= weekStartDate && eventDateOnly <= weekEndDate;
+                console.log(`Событие "${event.title}" на ${event.date}`);
+                console.log(`  Дата события: ${eventDateOnly.toDateString()}`);
+                console.log(`  Начало недели: ${weekStartDate.toDateString()}`);
+                console.log(`  Конец недели: ${weekEndDate.toDateString()}`);
+                console.log(`  В неделе: ${isInWeek}`);
+                console.log('---');
+            });
+        }
 
         return filtered;
     }, [weekDates, events, weekNumber]);
@@ -198,7 +226,7 @@ const WeekComponent: React.FC<{ weekDates: Date[]; weekNumber: number; events: E
                                                                         event.event_modal_type === 'психоанализ' ? 'Психоанализ' :
                                                                             'Общие'
                                                     }
-
+                                                    is_registered={event.is_registered || false}
                                                 />
                                             </div>
                                         );
@@ -216,31 +244,102 @@ const WeekComponent: React.FC<{ weekDates: Date[]; weekNumber: number; events: E
 
 export const Calendar: React.FC = () => {
     const [events, setEvents] = useState<Event[]>([]);
+    const [slots, setSlots] = useState<SlotsResponse | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // Загружаем события из API
-    useEffect(() => {
-        const fetchEvents = async () => {
-            console.log('Начинаем загрузку событий...');
-            try {
-                const response = await fetch('https://n8n-v2.hrani.live/webhook/get-all-events?secret=6a656816-9ac1-4d98-8613-ca2edb067ca4');
-                console.log('Ответ получен:', response.status);
+    // Функция для сопоставления событий со слотами
+    const matchEventsWithSlots = (events: Event[], slotsData: SlotsResponse): Event[] => {
+        return events.map(event => {
+            // Ищем слот для этого события
+            const daySlots = slotsData.items.find(day => day.date === event.date);
+            if (!daySlots) {
+                return { ...event, is_registered: false };
+            }
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+            const timeSlots = daySlots.slots[event.time];
+            if (!timeSlots || timeSlots.length === 0) {
+                return { ...event, is_registered: false };
+            }
+
+            // Ищем слот с таким же названием события
+            const matchingSlot = timeSlots.find(slot =>
+                slot.event === event.title &&
+                slot.status === 'Забронирован'
+            );
+
+            if (matchingSlot) {
+                console.log(`Найдено соответствие: событие "${event.title}" забронировано в слоте ${matchingSlot.id}`);
+                return {
+                    ...event,
+                    is_registered: true,
+                    slot_id: matchingSlot.id
+                };
+            }
+
+            return { ...event, is_registered: false };
+        });
+    };
+
+    // Загружаем события и слоты из API
+    useEffect(() => {
+        const fetchData = async () => {
+            console.log('Начинаем загрузку данных...');
+            try {
+                // Вычисляем диапазон дат для 4 недель
+                const today = new Date();
+                const monday = getMonday(today);
+                const endDate = new Date(monday);
+                endDate.setDate(monday.getDate() + 27); // 4 недели = 28 дней
+
+                const startDateStr = monday.toISOString().split('T')[0];
+                const endDateStr = endDate.toISOString().split('T')[0];
+
+                // Загружаем события и слоты параллельно
+                const [eventsResponse, slotsResponse] = await Promise.all([
+                    fetch('https://n8n-v2.hrani.live/webhook/get-all-events?secret=6a656816-9ac1-4d98-8613-ca2edb067ca4'),
+                    fetch(`https://n8n-v2.hrani.live/webhook/get-slot?startDate=${startDateStr}&endDate=${endDateStr}&secret=6a656816-9ac1-4d98-8613-ca2edb067ca4`)
+                ]);
+
+                console.log('Ответы получены:', eventsResponse.status, slotsResponse.status);
+
+                if (!eventsResponse.ok || !slotsResponse.ok) {
+                    throw new Error(`HTTP error! events: ${eventsResponse.status}, slots: ${slotsResponse.status}`);
                 }
 
-                const data = await response.json();
-                console.log('Данные получены:', data.length, 'событий');
-                setEvents(data);
+                const eventsData = await eventsResponse.json();
+                const slotsData = await slotsResponse.json();
+
+                console.log('Сырые данные событий:', eventsData);
+                console.log('Сырые данные слотов:', slotsData);
+
+                // Проверяем структуру данных
+                if (!Array.isArray(eventsData)) {
+                    console.error('eventsData не является массивом:', eventsData);
+                    throw new Error('Неверный формат данных событий');
+                }
+
+                if (!Array.isArray(slotsData) || !slotsData[0] || !slotsData[0].items || !Array.isArray(slotsData[0].items)) {
+                    console.error('slotsData имеет неверную структуру:', slotsData);
+                    throw new Error('Неверный формат данных слотов');
+                }
+
+                const slotsItems = slotsData[0];
+                console.log('Данные получены:', eventsData.length, 'событий,', slotsItems.items.length, 'дней со слотами');
+                console.log('Все события:', eventsData.map(e => ({ title: e.title, date: e.date, time: e.time })));
+
+                // Сопоставляем события со слотами
+                const eventsWithSlots = matchEventsWithSlots(eventsData, slotsItems);
+
+                setEvents(eventsWithSlots);
+                setSlots(slotsItems);
             } catch (error) {
-                console.error('Ошибка загрузки событий:', error);
+                console.error('Ошибка загрузки данных:', error);
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchEvents();
+        fetchData();
     }, []);
 
     // Вычисляем даты для всех четырех недель
