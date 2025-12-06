@@ -184,7 +184,7 @@ export const FinalStage = () => {
               <div className="border-[#D4D4D4] border-[2px] p-[20px] text-center rounded-[30px] max-lg:text-[14px] mt-[30px] flex flex-col justify-center items-center text-[18px] leading-[25px] font-normal w-full">
                 <span>Сейчас мы не можем подобрать подходящего для вас психолога 🙏 Вы можете подать заявку в Руку Помощи
                   <TextTooltip text="В рамках проекта вы можете найти психолога для длительной терапии со стоимостью 8 сессий (2 месяца терапии) бесплатно или по своей цене">
-                    <span className="inline-flex align-middle ml-1"><img src='card/hint.svg' width={20} height={20} /></span>
+                    <span className="inline-flex align-middle ml-1"><Image src='/card/hint.svg' width={20} height={20} alt="Подсказка" /></span>
                   </TextTooltip>
                   , и мы сообщим вам, когда психолог освободится
                 </span>

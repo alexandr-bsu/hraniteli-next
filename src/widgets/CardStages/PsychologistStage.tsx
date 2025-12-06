@@ -299,7 +299,6 @@ export const PsychologistStage = () => {
     };
 
     fetchPsychologists();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

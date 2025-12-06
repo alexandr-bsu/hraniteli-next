@@ -1,4 +1,4 @@
-import Metadata from "next";
+import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "../shared/styles/globals.css";
 import '../shared/styles/main.scss';

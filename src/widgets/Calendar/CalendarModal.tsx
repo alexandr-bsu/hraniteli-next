@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/shared/ui/Button';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
+import Image from 'next/image';
 
 interface Event {
     id: string;
@@ -375,7 +376,7 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
                                     <div className="space-y-2">
                                         <p>К сожалению вы не можете записаться на это мероприятие, поскольку число желающих его посетить уже достигло максимального количества.</p>
                                         {hasNextEvent && (
-                                            <p>Вы можете записаться на аналогичное мероприятие "{event.next_event}" по ссылке выше 🙏</p>
+                                            <p>Вы можете записаться на аналогичное мероприятие &quot;{event.next_event}&quot; по ссылке выше 🙏</p>
                                         )}
                                     </div>
                                 </div>
@@ -391,7 +392,7 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
                                                 <div className="space-y-2">
                                                     <p className="font-semibold">Вы успешно записались на супервизию.</p>
                                                     <p>Ссылка будет доступна в этой карточке. В чат-бот вам придет напоминание о событии за 24 часа и за 1 час 🙏</p>
-                                                    <p>Если вы хотите вынести кейс, то пожалуйста запишитесь в этой таблице (максимум 2 кейса на одной супервизии): <a href="https://docs.google.com/spreadsheets/d/1Brg-cz6OAp7Li3X3IrrwYPbNPGvckXRMk5fYUSbSH-E/" target="_blank" rel="noopener noreferrer" className="underline">Расписание мероприятий Сообщества Хранители</a>.</p>
+                                                    <p>Если вы хотите вынести кейс, то пожалуйста запишитесь в этой таблице (максимум 2 кейса на одной супервизии): <a href="https://docs.google.com/spreadsheets/d/1Brg-cz6OAp7Li3X3IrrwYPbNPGvckXRMk5fYUSbSH-E/" target="_blank" rel="noopener noreferrer" className="underline">Расписание мероприятий Сообщества &quot;Хранители&quot;</a>.</p>
                                                     {eventFolder && (
                                                         <p>Кейсы можете загрузить в папку по ссылке выше</p>
                                                     )}
@@ -402,7 +403,7 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
                                                 <div className="space-y-2">
                                                     <p className="font-semibold">Вы успешно записались на интервизию.</p>
                                                     <p>Ссылка будет доступна в этой карточке. В чат-бот вам придет напоминание о событии за 24 часа и за 1 час 🙏</p>
-                                                    <p>Если вы хотите вынести кейс, то пожалуйста запишитесь в этой таблице (максимум 2 кейса на одной интервизии): <a href="https://docs.google.com/spreadsheets/d/1Brg-cz6OAp7Li3X3IrrwYPbNPGvckXRMk5fYUSbSH-E/" target="_blank" rel="noopener noreferrer" className="underline">Расписание мероприятий Сообщества Хранители</a>.</p>
+                                                    <p>Если вы хотите вынести кейс, то пожалуйста запишитесь в этой таблице (максимум 2 кейса на одной интервизии): <a href="https://docs.google.com/spreadsheets/d/1Brg-cz6OAp7Li3X3IrrwYPbNPGvckXRMk5fYUSbSH-E/" target="_blank" rel="noopener noreferrer" className="underline">Расписание мероприятий Сообщества &quot;Хранители&quot;</a>.</p>
                                                     {eventFolder && (
                                                         <p>Кейсы можете загрузить в папку по ссылке выше</p>
                                                     )}
