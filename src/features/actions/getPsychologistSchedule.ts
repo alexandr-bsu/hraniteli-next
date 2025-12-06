@@ -72,7 +72,7 @@ interface PsychologistScheduleRequest {
 }
 
 // Отправка анкеты
-export const submitQuestionnaire = async (formData: IApplicationFormData, from_cards: boolean = false, from_diagnostic_form: boolean = false, psychologist_name?: string) => {
+export const submitQuestionnaire = async (formData: IApplicationFormData, from_cards: boolean = false, from_diagnostic_form: boolean = false, from_card_stages: boolean = false, psychologist_name?: string) => {
     try {
         const startDate = new Date();
         const endDate = new Date();
@@ -158,7 +158,8 @@ export const submitQuestionnaire = async (formData: IApplicationFormData, from_c
         const response = await fetch(
             from_cards ? `https://cache-api.hrani.live/convert-schedule-timezone/${offset}`
                 : from_diagnostic_form ? 'https://n8n-v2.hrani.live/webhook/schedule-diagnosis-v2'
-                    : 'https://n8n-v2.hrani.live/webhook/get-agregated-schedule-v2', {
+                    : from_card_stages ? 'https://n8n-v2.hrani.live/webhook/get-agregated-schedule-cards'
+                        : 'https://n8n-v2.hrani.live/webhook/get-agregated-schedule-v2', {
 
             method: 'POST',
             headers: {

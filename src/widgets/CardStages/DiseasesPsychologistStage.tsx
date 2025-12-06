@@ -136,7 +136,7 @@ export const DiseasesPsychologistStage = () => {
             // Не передаем currentPsychologist?.name, чтобы получить всех подходящих психологов, а не только выбранного
             const schedule = await submitQuestionnaire({
                 ...formData
-            }, false, false);
+            }, false, false, true, currentPsychologist?.name);
 
             // Проверяем наличие слотов
             let hasSlots = false;
@@ -190,10 +190,10 @@ export const DiseasesPsychologistStage = () => {
                     if (!d.slots) return;
                     const daySlots: { [time: string]: any[] } = {};
                     let hasFreeSlots = false;
-                    
+
                     Object.entries(d.slots).forEach(([time, slots]) => {
                         if (!Array.isArray(slots)) return;
-                        const psychologistSlots = slots.filter((sl: any) => 
+                        const psychologistSlots = slots.filter((sl: any) =>
                             sl.psychologist === psychologistName && sl.state === 'Свободен'
                         );
                         if (psychologistSlots.length > 0) {
@@ -201,7 +201,7 @@ export const DiseasesPsychologistStage = () => {
                             hasFreeSlots = true;
                         }
                     });
-                    
+
                     if (hasFreeSlots) {
                         daysArray.push({
                             date: d.date,
@@ -211,7 +211,7 @@ export const DiseasesPsychologistStage = () => {
                         });
                     }
                 });
-                
+
                 psychologistSchedules.set(psychologistName, { days: daysArray });
             });
 

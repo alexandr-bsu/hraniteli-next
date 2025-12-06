@@ -102,7 +102,7 @@ function Form({ psychologistId }: FormProps) {
         setIsLoading(true);
         try {
             // Отправляем анкету без указания конкретного психолога
-            const schedule = await submitQuestionnaire(formData, false, false); // Не передаем имя психолога
+            const schedule = await submitQuestionnaire(formData, false, false, true); // Не передаем имя психолога, используем cards API
 
             // Проверяем наличие слотов
             let hasSlots = false;
