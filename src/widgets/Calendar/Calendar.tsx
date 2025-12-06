@@ -322,6 +322,17 @@ export const Calendar: React.FC = () => {
         });
     };
 
+    // Изменяем title страницы при открытии календаря
+    useEffect(() => {
+        const originalTitle = document.title;
+        document.title = 'Календарь мероприятий';
+
+        // Возвращаем оригинальный title при размонтировании компонента
+        return () => {
+            document.title = originalTitle;
+        };
+    }, []);
+
     // Загружаем события и слоты из API
     useEffect(() => {
         const fetchData = async () => {
