@@ -78,7 +78,8 @@ const formatDate = (date: Date): string => {
         'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
         'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'
     ];
-    return `${date.getDate()} ${months[date.getMonth()]}`;
+    const weekdays = ['Вс', 'Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб'];
+    return `${weekdays[date.getDay()]}, ${date.getDate()} ${months[date.getMonth()]}`;
 };
 
 
