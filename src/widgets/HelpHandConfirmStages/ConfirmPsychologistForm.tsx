@@ -16,7 +16,7 @@ import { Tooltip } from '@/shared/ui/Tooltip';
 import { NoMatchError } from '../HelpHandStages/NoMatchError';
 import { EmergencyContactsClone } from '../HelpHandStages/EmergencyContactsClone';
 import axios from 'axios';
-import styles from '../HelpHandStages/PsychologistStage.module.scss';
+import styles from '@/shared/styles/PsychologistStage.module.css';
 import styles_cards from '../Card/Card.module.scss';
 import { format, startOfWeek, addMonths } from 'date-fns';
 import { getAgeWord } from '@/features/utils';

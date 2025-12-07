@@ -15,7 +15,7 @@ import { NoMatchError } from './NoMatchError';
 import { EmergencyContacts } from './EmergencyContacts';
 import axios from 'axios';
 
-import styles from './PsychologistStage.module.scss';
+import styles from '@/shared/styles/PsychologistStage.module.css';
 import styles_cards from '../Card/Card.module.scss';
 import { format } from 'date-fns';
 import { getAgeWord } from '@/features/utils';
