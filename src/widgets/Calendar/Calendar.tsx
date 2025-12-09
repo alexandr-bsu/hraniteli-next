@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import CardItem from './CalendarItem';
 import { CalendarModal } from './CalendarModal';
-import { Check } from 'lucide-react';
+import { Check, ChevronRight, X } from 'lucide-react';
 import { useDragToScroll } from '../../hooks/useDragToScroll';
 import styles from './Calendar.module.css';
 
@@ -173,11 +173,11 @@ const WeekComponent: React.FC<{
         <div data-name="week" className='w-full bg-[#fbfbfb] flex flex-col border-[#ddd] border-dashed border-b min-h-full'>
             {/* Строка с датами */}
             <div className='w-full flex sticky top-[24px] z-20 bg-[#fbfbfb]'>
-                <div className='min-w-[150px] max-md:min-w-[100px] border-r border-[#333] flex items-center justify-center sticky top-[24px] left-0 bg-[#fbfbfb] z-30'>
+                <div className='min-w-[150px] max-md:min-w-[60px] border-r border-[#333] flex items-center justify-center sticky top-[24px] left-0 bg-[#fbfbfb] z-30'>
                     {/* <span className='text-xs font-bold text-[#155d5e]'>Неделя {weekNumber}</span> */}
                 </div>
                 {weekDates.map((date, index) => (
-                    <div key={index} className={`flex-1 min-w-[300px] max-md:min-w-[250px] ${index < 6 ? 'border-r border-[#333]' : ''} flex items-center justify-center p-2 max-md:p-1 bg-[#fbfbfb] min-h-full`}>
+                    <div key={index} className={`flex-1 min-w-[300px] max-md:min-w-[180px] ${index < 6 ? 'border-r border-[#333]' : ''} flex items-center justify-center p-2 max-md:p-1 bg-[#fbfbfb] min-h-full`}>
                         <div className='text-xs font-bold py-2 max-md:py-1 max-md:text-[10px] bg-[#155d5e] text-white flex w-full justify-center items-center rounded-full'>
                             {formatDate(date)}
                         </div>
@@ -188,26 +188,26 @@ const WeekComponent: React.FC<{
             {/* Динамические временные слоты */}
             {weekTimes.length === 0 ? (
                 <div className='w-full flex items-stretch flex-1'>
-                    <div data-name='slot-time' className='min-w-[150px] max-md:min-w-[100px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-8 max-md:py-4 sticky left-0 bg-[#fbfbfb] z-10'>
+                    <div data-name='slot-time' className='min-w-[150px] max-md:min-w-[60px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-8 max-md:py-4 sticky left-0 bg-[#fbfbfb] z-10'>
                         <div className='text-gray-400 max-md:text-[10px]'>Нет событий</div>
                     </div>
                     {weekDates.map((_, dayIndex) => (
-                        <div key={dayIndex} className={`flex-1 min-w-[300px] max-md:min-w-[250px] ${dayIndex < 6 ? 'border-r border-[#333]' : ''} p-4 max-md:p-2 flex flex-col gap-2 text-xs font-medium text-[#333] bg-[#fbfbfb]`}>
+                        <div key={dayIndex} className={`flex-1 min-w-[300px] max-md:min-w-[180px] ${dayIndex < 6 ? 'border-r border-[#333]' : ''} p-4 max-md:p-2 flex flex-col gap-2 text-xs font-medium text-[#333] bg-[#fbfbfb]`}>
                         </div>
                     ))}
                 </div>
             ) : (
                 weekTimes.map((time, timeIndex) => (
                     <div key={time} className={`w-full flex items-stretch ${timeIndex < weekTimes.length - 1 ? 'border-b border-dashed border-[#ddd]' : ''}`}>
-                        <div data-name='slot-time' className='min-w-[150px] max-md:min-w-[100px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4 max-md:py-2 sticky left-0 bg-[#fbfbfb] z-10'>
-                            <div className={`rounded-full px-8 max-md:px-4 py-4 max-md:py-2 font-bold text-[#155d5e] text-[21px] max-md:text-sm ${timeIndex === 0 ? '-mt-6 max-md:-mt-3' : ''}`}>
+                        <div data-name='slot-time' className='min-w-[150px] max-md:min-w-[60px] border-r border-[#333] flex items-center justify-center text-xs font-medium text-[#333] py-4 max-md:py-2 sticky left-0 bg-[#fbfbfb] z-10'>
+                            <div className={`rounded-full px-8 max-md:px-2 py-4 max-md:py-1 font-bold text-[#155d5e] text-[21px] max-md:text-xs ${timeIndex === 0 ? '-mt-6 max-md:-mt-3' : ''}`}>
                                 {time}
                             </div>
                         </div>
                         {weekDates.map((date, dayIndex) => {
                             const dayEvents = getEventsForDateTime(date, time);
                             return (
-                                <div key={dayIndex} className={`flex-1 min-w-[300px] max-md:min-w-[250px] ${dayIndex < 6 ? 'border-r border-[#333]' : ''} p-4 max-md:p-2 flex flex-col gap-2 text-xs font-medium text-[#333] bg-[#fbfbfb]`}>
+                                <div key={dayIndex} className={`flex-1 min-w-[300px] max-md:min-w-[180px] ${dayIndex < 6 ? 'border-r border-[#333]' : ''} p-4 max-md:p-2 flex flex-col gap-2 text-xs font-medium text-[#333] bg-[#fbfbfb]`}>
                                     {dayEvents.map((event) => {
                                         console.log('Рендерим событие:', event.title, 'в ячейке');
                                         return (
@@ -250,6 +250,7 @@ export const Calendar: React.FC = () => {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedFilters, setSelectedFilters] = useState<string[]>(['юнгианство', 'кпт', 'гештальт', 'психоанализ', 'общие']);
+    const [isMobileFiltersOpen, setIsMobileFiltersOpen] = useState(false);
 
     // Хук для drag-to-scroll функциональности
     const scrollRef = useDragToScroll({
@@ -440,16 +441,16 @@ export const Calendar: React.FC = () => {
                     className={`overflow-x-auto overflow-y-auto ${styles.scrollContainer}`}
                     style={{ touchAction: 'pan-y pan-x' }}
                 >
-                    <div className="min-w-[2250px] max-md:min-w-[1750px] bg-[#fbfbfb] min-h-full"> {/* Минимальная ширина для 7 колонок по 300px + 150px для времени, на мобильных: 7*250px + 100px */}
+                    <div className="min-w-[2250px] max-md:min-w-[1320px] bg-[#fbfbfb] min-h-full"> {/* Минимальная ширина для 7 колонок по 300px + 150px для времени, на мобильных: 7*180px + 60px */}
                         <div data-name="header" className='w-full h-6 bg-[#fbfbfb] flex items-center border-b border-[#333] sticky top-0 z-[100]' style={{ position: 'sticky', top: 0 }}>
-                            <span className='h-full min-w-[150px] max-md:min-w-[100px] flex items-center justify-center text-xs font-bold border-r border-[#333] sticky left-0 bg-[#fbfbfb] z-[110]' style={{ position: 'sticky', top: 0, left: 0 }}></span>
-                            <span className='flex-1 h-full min-w-[300px] max-md:min-w-[250px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px] max-md:text-base'>ПН</span>
-                            <span className='flex-1 h-full min-w-[300px] max-md:min-w-[250px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px] max-md:text-base'>ВТ</span>
-                            <span className='flex-1 h-full min-w-[300px] max-md:min-w-[250px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px] max-md:text-base'>СР</span>
-                            <span className='flex-1 h-full min-w-[300px] max-md:min-w-[250px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px] max-md:text-base'>ЧТ</span>
-                            <span className='flex-1 h-full min-w-[300px] max-md:min-w-[250px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px] max-md:text-base'>ПТ</span>
-                            <span className='flex-1 h-full min-w-[300px] max-md:min-w-[250px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px] max-md:text-base'>СБ</span>
-                            <span className='flex-1 h-full min-w-[300px] max-md:min-w-[250px] flex items-center justify-center text-xs font-bold text-[#155d5e] text-[21px] max-md:text-base bg-[#fbfbfb]'>ВС</span>
+                            <span className='h-full min-w-[150px] max-md:min-w-[60px] flex items-center justify-center text-xs font-bold border-r border-[#333] sticky left-0 bg-[#fbfbfb] z-[110]' style={{ position: 'sticky', top: 0, left: 0 }}></span>
+                            <span className='flex-1 h-full min-w-[300px] max-md:min-w-[180px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px] max-md:text-sm'>ПН</span>
+                            <span className='flex-1 h-full min-w-[300px] max-md:min-w-[180px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px] max-md:text-sm'>ВТ</span>
+                            <span className='flex-1 h-full min-w-[300px] max-md:min-w-[180px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px] max-md:text-sm'>СР</span>
+                            <span className='flex-1 h-full min-w-[300px] max-md:min-w-[180px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px] max-md:text-sm'>ЧТ</span>
+                            <span className='flex-1 h-full min-w-[300px] max-md:min-w-[180px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px] max-md:text-sm'>ПТ</span>
+                            <span className='flex-1 h-full min-w-[300px] max-md:min-w-[180px] flex items-center justify-center text-xs font-bold border-r border-[#333] text-[#155d5e] text-[21px] max-md:text-sm'>СБ</span>
+                            <span className='flex-1 h-full min-w-[300px] max-md:min-w-[180px] flex items-center justify-center text-xs font-bold text-[#155d5e] text-[21px] max-md:text-sm bg-[#fbfbfb]'>ВС</span>
                         </div>
 
                         {/* Отображаем все четыре недели */}
@@ -465,65 +466,164 @@ export const Calendar: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Плавающий элемент в правом верхнем углу */}
-                <div className="fixed top-20 right-4 max-md:top-auto max-md:bottom-4 max-md:right-4 bg-[#fbfbfb] rounded-[30px] max-md:rounded-[20px] p-6 max-md:p-4 flex flex-col gap-4 max-md:gap-2 shadow-lg z-50 border border-[#333333]">
-                    <ul className='flex flex-col gap-2 max-md:gap-1.5'>
-                        <li className="flex gap-4 max-md:gap-2 items-center cursor-pointer" onClick={() => handleFilterToggle('юнгианство')}>
-                            <span className={`rounded-md h-6 w-6 max-md:h-5 max-md:w-5 flex items-center justify-center transition-all duration-200 ${selectedFilters.includes('юнгианство')
+                {/* Плавающий элемент в правом верхнем углу (десктоп) */}
+                <div className="fixed top-20 right-4 max-md:hidden bg-[#fbfbfb] rounded-[30px] p-6 flex flex-col gap-4 shadow-lg z-50 border border-[#333333]">
+                    <ul className='flex flex-col gap-2'>
+                        <li className="flex gap-4 items-center cursor-pointer" onClick={() => handleFilterToggle('юнгианство')}>
+                            <span className={`rounded-md h-6 w-6 flex items-center justify-center transition-all duration-200 ${selectedFilters.includes('юнгианство')
                                 ? 'bg-[#8B5CF6]'
                                 : 'bg-gray-300'
                                 }`}>
                                 {selectedFilters.includes('юнгианство') && (
-                                    <Check width={16} height={16} className="max-md:w-3 max-md:h-3" color='#fff' />
+                                    <Check width={16} height={16} color='#fff' />
                                 )}
                             </span>
-                            <span className="max-md:text-sm">Юнгианство</span>
+                            <span>Юнгианство</span>
                         </li>
-                        <li className="flex gap-4 max-md:gap-2 items-center cursor-pointer" onClick={() => handleFilterToggle('кпт')}>
-                            <span className={`rounded-md h-6 w-6 max-md:h-5 max-md:w-5 flex items-center justify-center transition-all duration-200 ${selectedFilters.includes('кпт')
+                        <li className="flex gap-4 items-center cursor-pointer" onClick={() => handleFilterToggle('кпт')}>
+                            <span className={`rounded-md h-6 w-6 flex items-center justify-center transition-all duration-200 ${selectedFilters.includes('кпт')
                                 ? 'bg-[#FCD34D]'
                                 : 'bg-gray-300'
                                 }`}>
                                 {selectedFilters.includes('кпт') && (
-                                    <Check width={16} height={16} className="max-md:w-3 max-md:h-3" color='#fff' />
+                                    <Check width={16} height={16} color='#fff' />
                                 )}
                             </span>
-                            <span className="max-md:text-sm">КПТ</span>
+                            <span>КПТ</span>
                         </li>
-                        <li className="flex gap-4 max-md:gap-2 items-center cursor-pointer" onClick={() => handleFilterToggle('гештальт')}>
-                            <span className={`rounded-md h-6 w-6 max-md:h-5 max-md:w-5 flex items-center justify-center transition-all duration-200 ${selectedFilters.includes('гештальт')
+                        <li className="flex gap-4 items-center cursor-pointer" onClick={() => handleFilterToggle('гештальт')}>
+                            <span className={`rounded-md h-6 w-6 flex items-center justify-center transition-all duration-200 ${selectedFilters.includes('гештальт')
                                 ? 'bg-[#1c9140]'
                                 : 'bg-gray-300'
                                 }`}>
                                 {selectedFilters.includes('гештальт') && (
-                                    <Check width={16} height={16} className="max-md:w-3 max-md:h-3" color='#fff' />
+                                    <Check width={16} height={16} color='#fff' />
                                 )}
                             </span>
-                            <span className="max-md:text-sm">Гештальт</span>
+                            <span>Гештальт</span>
                         </li>
-                        <li className="flex gap-4 max-md:gap-2 items-center cursor-pointer" onClick={() => handleFilterToggle('психоанализ')}>
-                            <span className={`rounded-md h-6 w-6 max-md:h-5 max-md:w-5 flex items-center justify-center transition-all duration-200 ${selectedFilters.includes('психоанализ')
+                        <li className="flex gap-4 items-center cursor-pointer" onClick={() => handleFilterToggle('психоанализ')}>
+                            <span className={`rounded-md h-6 w-6 flex items-center justify-center transition-all duration-200 ${selectedFilters.includes('психоанализ')
                                 ? 'bg-[#3B82F6]'
                                 : 'bg-gray-300'
                                 }`}>
                                 {selectedFilters.includes('психоанализ') && (
-                                    <Check width={16} height={16} className="max-md:w-3 max-md:h-3" color='#fff' />
+                                    <Check width={16} height={16} color='#fff' />
                                 )}
                             </span>
-                            <span className="max-md:text-sm">Психоанализ</span>
+                            <span>Психоанализ</span>
                         </li>
-                        <li className="flex gap-4 max-md:gap-2 items-center cursor-pointer" onClick={() => handleFilterToggle('общие')}>
-                            <span className={`rounded-md h-6 w-6 max-md:h-5 max-md:w-5 flex items-center justify-center transition-all duration-200 ${selectedFilters.includes('общие')
+                        <li className="flex gap-4 items-center cursor-pointer" onClick={() => handleFilterToggle('общие')}>
+                            <span className={`rounded-md h-6 w-6 flex items-center justify-center transition-all duration-200 ${selectedFilters.includes('общие')
                                 ? 'bg-[#10B981]'
                                 : 'bg-gray-300'
                                 }`}>
                                 {selectedFilters.includes('общие') && (
-                                    <Check width={16} height={16} className="max-md:w-3 max-md:h-3" color='#fff' />
+                                    <Check width={16} height={16} color='#fff' />
                                 )}
                             </span>
-                            <span className="max-md:text-sm">Общие</span>
+                            <span>Общие</span>
                         </li>
                     </ul>
+                </div>
+
+                {/* Затемнение фона при открытой панели фильтров */}
+                {isMobileFiltersOpen && (
+                    <div
+                        className="fixed inset-0 bg-black/10 z-30 md:hidden transition-opacity duration-300"
+                        onClick={() => setIsMobileFiltersOpen(false)}
+                    />
+                )}
+
+                {/* Контейнер для кнопки и попапа в левом нижнем углу, выровненный по центру колонки времени */}
+                <div className="fixed bottom-4 md:hidden z-50" style={{ left: '30px', transform: 'translateX(-50%)' }}>
+                    {/* Кнопка для мобильных устройств */}
+                    <button
+                        onClick={() => setIsMobileFiltersOpen(!isMobileFiltersOpen)}
+                        className="bg-[#fbfbfb] rounded-full p-3 shadow-lg border border-[#333333] transition-all duration-300 hover:scale-110 active:scale-95"
+                        aria-label="Показать фильтры"
+                    >
+                        {isMobileFiltersOpen ? (
+                            <X className="w-5 h-5 text-[#155d5e]" />
+                        ) : (
+                            <ChevronRight className="w-5 h-5 text-[#155d5e]" />
+                        )}
+                    </button>
+
+                    {/* Компактный попап с фильтрами */}
+                    <div
+                        className={`absolute bottom-full left-0 mb-2 bg-[#fbfbfb] rounded-[20px] shadow-2xl border border-[#333333] transition-all duration-300 ease-out ${
+                            isMobileFiltersOpen
+                                ? 'opacity-100 translate-y-0 pointer-events-auto'
+                                : 'opacity-0 translate-y-2 pointer-events-none'
+                        }`}
+                        style={{
+                            minWidth: '200px',
+                            maxWidth: '280px',
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="p-4">
+                            <h3 className="text-base font-semibold text-[#155d5e] mb-3">Фильтры</h3>
+                            <ul className='flex flex-col gap-2.5'>
+                                <li className="flex gap-2.5 items-center cursor-pointer" onClick={() => handleFilterToggle('юнгианство')}>
+                                    <span className={`rounded-md h-5 w-5 flex items-center justify-center transition-all duration-200 flex-shrink-0 ${selectedFilters.includes('юнгианство')
+                                        ? 'bg-[#8B5CF6]'
+                                        : 'bg-gray-300'
+                                        }`}>
+                                        {selectedFilters.includes('юнгианство') && (
+                                            <Check width={14} height={14} color='#fff' />
+                                        )}
+                                    </span>
+                                    <span className="text-sm">Юнгианство</span>
+                                </li>
+                                <li className="flex gap-2.5 items-center cursor-pointer" onClick={() => handleFilterToggle('кпт')}>
+                                    <span className={`rounded-md h-5 w-5 flex items-center justify-center transition-all duration-200 flex-shrink-0 ${selectedFilters.includes('кпт')
+                                        ? 'bg-[#FCD34D]'
+                                        : 'bg-gray-300'
+                                        }`}>
+                                        {selectedFilters.includes('кпт') && (
+                                            <Check width={14} height={14} color='#fff' />
+                                        )}
+                                    </span>
+                                    <span className="text-sm">КПТ</span>
+                                </li>
+                                <li className="flex gap-2.5 items-center cursor-pointer" onClick={() => handleFilterToggle('гештальт')}>
+                                    <span className={`rounded-md h-5 w-5 flex items-center justify-center transition-all duration-200 flex-shrink-0 ${selectedFilters.includes('гештальт')
+                                        ? 'bg-[#1c9140]'
+                                        : 'bg-gray-300'
+                                        }`}>
+                                        {selectedFilters.includes('гештальт') && (
+                                            <Check width={14} height={14} color='#fff' />
+                                        )}
+                                    </span>
+                                    <span className="text-sm">Гештальт</span>
+                                </li>
+                                <li className="flex gap-2.5 items-center cursor-pointer" onClick={() => handleFilterToggle('психоанализ')}>
+                                    <span className={`rounded-md h-5 w-5 flex items-center justify-center transition-all duration-200 flex-shrink-0 ${selectedFilters.includes('психоанализ')
+                                        ? 'bg-[#3B82F6]'
+                                        : 'bg-gray-300'
+                                        }`}>
+                                        {selectedFilters.includes('психоанализ') && (
+                                            <Check width={14} height={14} color='#fff' />
+                                        )}
+                                    </span>
+                                    <span className="text-sm">Психоанализ</span>
+                                </li>
+                                <li className="flex gap-2.5 items-center cursor-pointer" onClick={() => handleFilterToggle('общие')}>
+                                    <span className={`rounded-md h-5 w-5 flex items-center justify-center transition-all duration-200 flex-shrink-0 ${selectedFilters.includes('общие')
+                                        ? 'bg-[#10B981]'
+                                        : 'bg-gray-300'
+                                        }`}>
+                                        {selectedFilters.includes('общие') && (
+                                            <Check width={14} height={14} color='#fff' />
+                                        )}
+                                    </span>
+                                    <span className="text-sm">Общие</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
         </>

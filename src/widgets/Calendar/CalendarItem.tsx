@@ -39,15 +39,15 @@ const CardItem: React.FC<CardItemProps> = ({
     const formatAuthor = (author: string) => {
         if (author.includes(',')) {
             return author.split(',').map((part, index) => (
-                <div key={index} className='whitespace-nowrap'>
+                <div key={index} className='truncate' title={part.trim()}>
                     {part.trim()}
                 </div>
             ));
         }
-        return <div className='whitespace-nowrap'>{author}</div>;
+        return <div className='truncate' title={author}>{author}</div>;
     }
     return (
-        <div className={`min-h-[100px] max-md:min-h-[80px] rounded-[30px] max-md:rounded-[20px] p-3 max-md:p-2 flex flex-col justify-between gap-4 max-md:gap-2 ${getTextColor(modality)} relative cursor-pointer hover:opacity-90 transition-opacity`}
+        <div className={`min-h-[100px] max-md:min-h-[80px] rounded-[30px] max-md:rounded-[20px] p-3 max-md:p-2 flex flex-col justify-between gap-4 max-md:gap-2 max-md:max-w-[200px] ${getTextColor(modality)} relative cursor-pointer hover:opacity-90 transition-opacity`}
             style={{ backgroundColor: getBackgroundColor(modality) }}>
 
             <div>
@@ -72,12 +72,12 @@ const CardItem: React.FC<CardItemProps> = ({
                 </div>
                 <div className='text-base max-md:text-xs opacity-90'>{counter}</div>
             </div>
-            <div className='flex justify-between items-center'>
-                <div className='text-sm max-md:text-[10px] opacity-80'>
+            <div className='flex justify-between items-center gap-2 min-w-0'>
+                <div className='text-sm max-md:text-[10px] opacity-80 flex-1 min-w-0 overflow-hidden'>
                     {formatAuthor(author)}
                 </div>
                 {modality && (
-                    <div className={`${getBadgeOpacity(modality)} rounded-full px-2 max-md:px-1.5 py-1 max-md:py-0.5 text-sm max-md:text-[10px] flex items-center justify-center`}>
+                    <div className={`${getBadgeOpacity(modality)} rounded-full px-2 max-md:px-1.5 py-1 max-md:py-0.5 text-sm max-md:text-[10px] flex items-center justify-center flex-shrink-0`}>
                         {modality}
                     </div>
                 )}
