@@ -244,9 +244,10 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
                         </div>
                         <div data-group="section">
                             <div className="flex flex-col gap-1">
-                                <p className="text-[#155d5e] text-base font-normal whitespace-pre-wrap">
-                                    {event.description}
-                                </p>
+                                <div 
+                                    className="text-[#155d5e] text-base font-normal whitespace-pre-wrap [&_a]:text-[#155d5e] [&_a]:underline [&_a]:hover:text-[#0f4a4b] [&_a]:cursor-pointer"
+                                    dangerouslySetInnerHTML={{ __html: event.description }}
+                                />
                             </div>
                         </div>
                         <div data-group="section">
