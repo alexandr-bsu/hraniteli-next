@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Button } from '@/shared/ui/Button';
 import { toast } from 'sonner';
@@ -37,19 +37,97 @@ interface CalendarModalProps {
     onEventUpdate?: (updatedEvent: Event) => void;
     allEvents?: Event[];
     onEventSwitch?: (event: Event) => void;
+    psychologistName?: string | null; // Опциональное имя психолога, которое может быть передано из родительского компонента
 }
 
-export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, event, onEventUpdate, allEvents = [], onEventSwitch }) => {
+// Функция для нормализации имени (приведение к нижнему регистру и удаление лишних пробелов)
+const normalizeName = (name: string): string => {
+    return name.trim().toLowerCase().replace(/\s+/g, ' ');
+};
+
+// Функция для сравнения имен с учетом перестановки имени и фамилии
+const compareNames = (name1: string, name2: string): boolean => {
+    const normalized1 = normalizeName(name1);
+    const normalized2 = normalizeName(name2);
+    
+    // Прямое сравнение
+    if (normalized1 === normalized2) {
+        return true;
+    }
+    
+    // Разбиваем имена на части
+    const parts1 = normalized1.split(' ').filter(p => p.length > 0);
+    const parts2 = normalized2.split(' ').filter(p => p.length > 0);
+    
+    // Если количество частей не совпадает, это разные люди
+    if (parts1.length !== parts2.length) {
+        return false;
+    }
+    
+    // Проверяем, являются ли части одинаковыми (с учетом перестановки)
+    const sorted1 = [...parts1].sort().join(' ');
+    const sorted2 = [...parts2].sort().join(' ');
+    
+    return sorted1 === sorted2;
+};
+
+// Функция для проверки, является ли психолог организатором мероприятия
+const isOrganizer = (psychologistName: string, organizatorNames: string): boolean => {
+    if (!psychologistName || !organizatorNames) {
+        return false;
+    }
+    
+    // Разбиваем список организаторов по запятой
+    const organizers = organizatorNames.split(',').map(name => name.trim()).filter(name => name.length > 0);
+    
+    // Проверяем каждое имя организатора
+    return organizers.some(organizerName => compareNames(psychologistName, organizerName));
+};
+
+export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, event, onEventUpdate, allEvents = [], onEventSwitch, psychologistName }) => {
     const searchParams = useSearchParams();
     const secret = searchParams.get('secret') || ''; // fallback к дефолтному значению
 
     const [isLoading, setIsLoading] = useState(false);
+    const [currentPsychologistName, setCurrentPsychologistName] = useState<string | null>(psychologistName || null);
+
+    // Получаем имя текущего психолога по secret
+    useEffect(() => {
+        const fetchPsychologistName = async () => {
+            if (!secret) {
+                return;
+            }
+            
+            try {
+                // Используем эндпоинт /get-psycho для получения имени психолога
+                const response = await fetch(`https://n8n-v2.hrani.live/webhook/get-psycho?secret=${secret}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (Array.isArray(data) && data.length > 0 && data[0].psychologist) {
+                        setCurrentPsychologistName(data[0].psychologist);
+                        return;
+                    } else if (data.psychologist) {
+                        setCurrentPsychologistName(data.psychologist);
+                        return;
+                    }
+                }
+            } catch (error) {
+                console.error('Ошибка при получении имени психолога:', error);
+            }
+        };
+
+        if (isOpen && secret && !psychologistName) {
+            fetchPsychologistName();
+        } else if (psychologistName) {
+            setCurrentPsychologistName(psychologistName);
+        }
+    }, [secret, isOpen, psychologistName]);
 
     if (!isOpen || !event) return null;
 
     const showToast = (message: string, type: 'success' | 'error') => {
-        console.log('Показываем toast:', message, type);
-
         if (type === 'success') {
             toast.success(message, {
                 position: 'top-left',
@@ -177,7 +255,7 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
         if (!event?.next_event || !allEvents.length) return;
 
         // Ищем событие с названием, соответствующим next_event
-        const nextEvent = allEvents.find(e => e.title === event.next_event);
+        const nextEvent: Event | undefined = allEvents.find((e: Event) => e.title === event.next_event);
 
         if (nextEvent && onEventSwitch) {
             onEventSwitch(nextEvent);
@@ -185,7 +263,7 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
     };
 
     // Проверяем, существует ли следующее событие в allEvents
-    const hasNextEvent = event?.next_event && allEvents.some(e => e.title === event.next_event);
+    const hasNextEvent = event?.next_event && allEvents.some((e: Event) => e.title === event.next_event);
 
     return (
         <div className="slot-grid-container px-5 pt-5 pb-10 min-h-screen gap-10 absolute top-0 left-0 z-1000">
@@ -206,7 +284,8 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
             /> */}
             <div style={{ position: 'fixed', zIndex: 9999, inset: '16px', pointerEvents: 'none' }}></div>
             <div className="fixed top-0 left-0 h-screen w-full flex justify-center items-center p-5 z-20" style={{ backgroundColor: 'rgba(0, 0, 0, 0.2)' }}>
-                <div className="bg-white rounded-[30px] w-full max-w-[660px] mx-5 max-h-[650px] overflow-y-auto">
+                <div className="bg-white rounded-[30px] w-full max-w-[660px] mx-5 max-h-[650px] overflow-hidden flex flex-col">
+                    <div className="overflow-y-auto flex-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-[#D4D4D4] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:hover:bg-[#9A9A9A] [scrollbar-width:thin] [scrollbar-color:#D4D4D4_transparent] pr-2">
                     <div className="bg-white sticky top-0 p-5 border-b border-b-dark-green w-full flex justify-between items-center">
                         <div className="flex items-center gap-3 flex-wrap">
                             <h2 className="text-[#155d5e] font-bold text-2xl">{event.title}</h2>
@@ -350,15 +429,6 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
                         )}
 
                         <div className="flex flex-col gap-2">
-                            {(() => {
-                                console.log('EventViewPopup - button condition:', {
-                                    isRegistered: event.is_registered,
-                                    'event.registered': event.is_registered,
-                                    'event.is_canceled': event.is_canceled,
-                                    shouldShowButton: !event.is_registered && !event.is_canceled
-                                });
-                                return null;
-                            })()}
                             {!event.is_registered && !event.is_canceled && !(event.current_participants >= event.max_participants) ? (
                                 <Button
                                     variant={'primary'}
@@ -446,16 +516,21 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
                                 </div>
                             )}
 
+                            {/* Кнопка-ссылка для организатора - показывается только если текущий психолог является организатором */}
+                            {event.is_registered && 
+                             currentPsychologistName && 
+                             isOrganizer(currentPsychologistName, event.organizator_name) &&
+                             event.event_link ? (
+                                <Button
+                                    variant={'outline'}
+                                    className="rounded-full"
+                                    onClick={() => window.open(event.event_link || '', '_blank')}
+                                >
+                                    Ссылка для организатора
+                                </Button>
+                            ) : null}
+
                             {/* Кнопка отмены записи - показывается только если пользователь записан */}
-                            {(() => {
-                                console.log('Условия для кнопки отмены:', {
-                                    isRegistered: event.is_registered,
-                                    'event.registered': event.is_registered,
-                                    'event.is_canceled': event.is_canceled,
-                                    shouldShowCancelButton: event.is_registered && !event.is_canceled
-                                });
-                                return null;
-                            })()}
                             {event.is_registered && !event.is_canceled && (
                                 <Button
                                     variant={'primary'}
@@ -471,6 +546,7 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
                                 Закрыть
                             </Button>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>
