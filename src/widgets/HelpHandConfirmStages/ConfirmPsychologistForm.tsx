@@ -554,6 +554,28 @@ export const ConfirmPsychologistForm = () => {
     }
     return description
   }
+
+  const getPriceFromApplication = (): string => {
+    switch (formData.price_session) {
+      case 'free':
+        return 'Бесплатно';
+      case '300':
+        return '300 ₽';
+      case '500':
+        return '500 ₽';
+      case '1000':
+        return '1000 ₽';
+      case '1500':
+        return '1500 ₽';
+      case '2000':
+        return '2000 ₽';
+      case '3000':
+        return '3000 ₽';
+      default:
+        return 'Бесплатно';
+    }
+  }
+
   return (
     <div className="px-[50px] max-lg:px-[20px] flex w-full grow relative max-lg:overflow-y-auto">
       {isSubmitting && (
@@ -684,12 +706,8 @@ export const ConfirmPsychologistForm = () => {
               <div>
                 <span className="text-[#9A9A9A] text-[16px]">Стоимость:</span>
                 <div className="flex items-center gap-[10px] mt-[5px]">
-                  {/* <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p> */}
-                  <p className="font-semibold text-[18px]">От 0 ₽</p>
-                  <Tooltip text={`<b>Первая сессия - бесплатно. Последующие сессии по цене психолога - ${currentPsychologist.min_session_price || 0} ₽.</b>
-
-Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности.
-`} />
+                  <p className="font-semibold text-[18px]">{getPriceFromApplication()}</p>
+                  <Tooltip text={`Стоимость сессии - та, которую вы указали в заявке. Она фиксируется на 8 сессий. Последующие сессии по цене психолога - ${currentPsychologist.min_session_price || 0} ₽.`} />
                 </div>
               </div>
             )}
@@ -714,8 +732,8 @@ export const ConfirmPsychologistForm = () => {
                 <div className="flex flex-col w-fit">
                   <span className="text-[#9A9A9A] text-[14px]">Стоимость:</span>
                   <div className="flex items-center gap-[10px]">
-                    <p className="font-semibold text-[14px]">От {currentPsychologist.min_session_price || 0} ₽</p>
-                    <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
+                    <p className="font-semibold text-[14px]">{getPriceFromApplication()}</p>
+                    <Tooltip text={`Стоимость сессии - та, которую вы указали в заявке. Она фиксируется на 8 сессий. Последующие сессии по цене психолога - ${currentPsychologist.min_session_price || 0} ₽.`} />
                   </div>
                 </div>
               )}

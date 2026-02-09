@@ -98,8 +98,7 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="free" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    Бесплатно
-                                                    {showKeeperLabels && <span className="text-neutral-500">- начинающие психологи </span>}
+                                                    Бесплатно - обучающиеся психологи (до 1 года практики)
                                                 </FormLabel>
                                             </FormItem>
 
@@ -108,8 +107,7 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="500" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    500 руб
-                                                    {showKeeperLabels && <span className="text-neutral-500">- участники супервизионной группы</span>}
+                                                    500 рублей - обучающиеся психологи (до 1 года практики)
                                                 </FormLabel>
                                             </FormItem>
 
@@ -118,8 +116,7 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="1000" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    1000 руб
-                                                    {showKeeperLabels && <span className="text-neutral-500">- опытные психологи - Хранители</span>}
+                                                    1000 рублей - начинающие психологи (до 5 лет практики)
                                                 </FormLabel>
                                             </FormItem>
 
@@ -128,8 +125,7 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="1500" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    1500 руб
-                                                    {showKeeperLabels && <span className="text-neutral-500">- опытные психологи - Хранители</span>}
+                                                    1500 рублей - начинающие психологи (до 5 лет практики)
                                                 </FormLabel>
                                             </FormItem>
 
@@ -138,8 +134,7 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="2000" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    2000 руб
-                                                    {showKeeperLabels && <span className="text-neutral-500">- опытные психологи - Хранители</span>}
+                                                    2000 рублей - опытные психологи (более 5 лет практики)
                                                 </FormLabel>
                                             </FormItem>
 
@@ -148,8 +143,7 @@ export const PriceSessionStage = () => {
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="3000" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    3000 руб
-                                                    {showKeeperLabels && <span className="text-neutral-500">- опытные психологи - Хранители</span>}
+                                                    3000 рублей - опытные психологи (более 5 лет практики)
                                                 </FormLabel>
                                             </FormItem>
 
