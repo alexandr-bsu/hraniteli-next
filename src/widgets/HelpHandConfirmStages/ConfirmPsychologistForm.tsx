@@ -740,7 +740,7 @@ export const ConfirmPsychologistForm = () => {
             </div>
           </div>
           <div className={styles.nextSession}>
-            <h4 className="text-[18px] font-semibold mb-[15px] max-lg:text-[14px]">Ближайшая запись:</h4>
+            <h4 className="text-[18px] font-semibold mb-[15px] max-lg:text-[14px]">Ближайшая запись (время московское):</h4>
             {availableSlots && availableSlots.length > 0 ? (
               <div className="flex gap-[10px] flex-wrap overflow-y-auto">
                 {availableSlots.map((slot, index) => (
