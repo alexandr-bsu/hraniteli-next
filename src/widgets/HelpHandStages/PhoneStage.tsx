@@ -165,7 +165,7 @@ export const PhoneStage = () => {
                             type='submit'
                             className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
-                            Продолжить
+                            Последний шаг
                         </button>
                     </div>
                 </form>
