@@ -43,6 +43,10 @@ export const FinalStage = () => {
     window.open(`https://t.me/HraniLiveBot?start=${ticketId}`, '_blank')
   }
 
+  const handleVkClick = () => {
+    window.open(`https://vk.com/write-230628314?ref=${ticketId}`, '_blank')
+  }
+
   return (
     <div className='relative min-lg:p-[50px] p-[20px] max-lg:px-[20px] flex-col min-h-full h-[100svh] justify-between  flex w-full grow'>
         <div className="w-full flex justify-end ">
@@ -62,7 +66,7 @@ export const FinalStage = () => {
                 <div className="flex flex-col items-center gap-[10px]">
                     <h2 className="font-semibold text-[26px] max-lg:text-[14px] max-lg:leading-[22px]">Спасибо!</h2>
 
-                    <span className="font-normal text-[18px] leading-[25px] text-center max-lg:text-[14px]">Мы получили ваш запрос и чтобы забронировать время запустите телеграм-бот. 
+                    <span className="font-normal text-[18px] leading-[25px] text-center max-lg:text-[14px]">Мы получили ваш запрос и чтобы забронировать время запустите бот. 
                     {/* <br />  */}
                     </span>
                 </div>
@@ -76,11 +80,11 @@ export const FinalStage = () => {
         </div>
 
         <button 
-            onClick={handleTelegramClick}
-            className="w-full text-[#FFFFFF] p-[14px] max-lg:text-[14px] shrink-0 bg-[#116466] rounded-[50px] font-normal text-[18px] leading-[25px]"
-        >
-                Перейти в телеграм бот
-        </button>
+            onClick={handleVkClick}
+            className="w-full text-[#FFFFFF] p-[14px] max-lg:text-[14px] shrink-0 bg-[#116466] rounded-[50px] font-normal text-[18px] leading-[25px] mt-8 max-w-[400px] max-w-full"
+          >
+            Перейти в VK бот
+      </button>
     </div>
   )
 }

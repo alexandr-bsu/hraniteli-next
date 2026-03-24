@@ -35,6 +35,7 @@ export const FinalStage = ({ ticket_id }: FinalStageProps) => {
   const handleTelegramClick = () => {
     window.open(`https://t.me/HraniLiveBot?start=${ticket_id}`, '_blank')
   }
+  
   const handleVkClick = () => {
     window.open(`https://vk.com/write-230628314?ref=${ticket_id}`, '_blank')
   }
@@ -47,7 +48,7 @@ export const FinalStage = ({ ticket_id }: FinalStageProps) => {
           <Image className="max-lg:w-[140px] max-lg:h-[140px]" src={'/card/thanks.svg'} alt="Спасибо" height={210} width={210} />
           <div className="flex flex-col items-center gap-[10px] max-w-[500px] w-full max-w-full">
             <h2 className="font-semibold text-[26px] max-lg:text-[14px] max-lg:leading-[22px]">Спасибо!</h2>
-            <span className="font-normal text-[18px] leading-[25px] max-lg:text-[14px]">Мы получили ваш запрос и чтобы забронировать время запустите телеграм-бот. </span>
+            <span className="font-normal text-[18px] leading-[25px] max-lg:text-[14px]">Мы получили ваш запрос и чтобы забронировать время запустите бот. </span>
           </div>
           <div className="border-[#D4D4D4] border-[2px] p-[20px] rounded-[30px] max-lg:text-[14px] mt-[30px] flex justify-center items-center text-[18px] leading-[25px] font-normal w-full max-w-[500px] max-w-full">
             В боте вы также получите подтверждение записи и ссылку на первую сессию с психологом
