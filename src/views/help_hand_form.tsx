@@ -33,8 +33,7 @@ const STAGES_WITH_PROGRESS = [
     'condition',
     'traumatic',
     'request',
-    'psychologist_price',
-    'phone'
+    'psychologist_price'
 ] as const satisfies readonly ApplicationStage[];
 
 export default function HelpHandForm() {
@@ -107,8 +106,8 @@ export default function HelpHandForm() {
                 return <RequestStage />;
            case 'psychologist_price':
                 return <PriceSessionStage />;
-            case 'phone':
-                return <PhoneStage />;
+            // case 'phone':
+            //     return <PhoneStage />;
             case 'gratitude':
                 return <FinalStage />;
             case 'error':

@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { setApplicationStage } from "@/redux/slices/application_form"
-import { setPriceSession } from "@/redux/slices/application_form_data"
+import { setPriceSession, setHasMatchingError } from "@/redux/slices/application_form_data"
 import { Price } from "@/shared/types/application.types"
 import { COLORS } from '@/shared/constants/colors';
 
@@ -23,6 +23,8 @@ import { useEffect, useState } from 'react';
 import { RootState } from "@/redux/store";
 import { useDispatch, useSelector } from 'react-redux';
 import { shouldShowKeeperLabels } from '@/shared/utils/utm';
+import useYandexMetrika from '@/components/yandex/useYandexMetrika';
+import { submitHelpHandQuestionnaire } from '@/features/actions/HelpHand';
 
 const FormSchema = z.object({
     price_session: z.enum(['free', '300', '500', '1000', '1500', '2000', '3000'], {
@@ -35,8 +37,13 @@ export const PriceSessionStage = () => {
     const ticketID = useSelector<RootState, string>(
         state => state.applicationFormData.ticketID
     );
+    // Получаем все данные анкеты из Redux
+    const formData = useSelector((state: RootState) => state.applicationFormData);
+    
     const [showKeeperLabels, setShowKeeperLabels] = useState(false);
-
+    const { reachGoal } = useYandexMetrika(102105189);
+    const [isLoading, setIsLoading] = useState(false);
+    
     useEffect(() => {
         axios({
             method: "PUT",
@@ -44,7 +51,6 @@ export const PriceSessionStage = () => {
             data: { step: "Сумма за сессию", ticket_id: ticketID },
         });
 
-        // Проверяем UTM параметр для отображения подписей "Хранители"
         setShowKeeperLabels(shouldShowKeeperLabels());
     }, [])
 
@@ -59,17 +65,52 @@ export const PriceSessionStage = () => {
         }
     })
 
-    const handleSubmit = (data: { price_session: Price }) => {
-        localStorage.setItem('app_price_session', data.price_session)
-        dispatch(setPriceSession(data.price_session))
-        axios({
-            url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
-            method: 'PUT',
-            data: { ticketID, field: 'psychologist_category', value: data.price_session }
+    // Полная отправка анкеты
+    const handleSubmit = async (data: z.infer<typeof FormSchema>) => {
+        if (isLoading) return;
+        
+        setIsLoading(true);
+        
+        try {
+            // 1. Сохраняем выбранный price_session
+            localStorage.setItem('app_price_session', data.price_session);
+            dispatch(setPriceSession(data.price_session));
+
+            // 2. Отправляем аналитику шага
+            await axios({
+                url: 'https://n8n-v2.hrani.live/webhook/step-analytics',
+                method: 'PUT',
+                data: { 
+                    ticketID, 
+                    field: 'psychologist_category', 
+                    value: data.price_session 
+                }
+            });
+
+            // 3. Формируем и отправляем ПОЛНУЮ анкету
+            const fullFormData = {
+                ...formData,
+                price_session: data.price_session
+            };
+            
+            await submitHelpHandQuestionnaire(fullFormData);
+
+            // 4. Трекаем успешную отправку
+            if (typeof reachGoal === 'function') {
+                reachGoal('submit_help_hand_form');
+            }
+
+            // 5. Сбрасываем ошибки (если были) и переходим
+            dispatch(setHasMatchingError(false));
+            dispatch(setApplicationStage('gratitude'));
+
+        } catch (error) {
+            console.error('Ошибка при отправке анкеты:', error);
+            dispatch(setHasMatchingError(true));
+        } finally {
+            setIsLoading(false);
         }
-        )
-        dispatch(setApplicationStage('phone'))
-    }
+    };
 
     return (
         <div className='px-[50px] max-lg:px-[20px] flex w-full grow max-lg:overflow-y-auto'>
@@ -164,15 +205,17 @@ export const PriceSessionStage = () => {
                             type='button'
                             onClick={() => dispatch(setApplicationStage('request'))}
                             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
+                            disabled={isLoading}
                         >
                             Назад
                         </button>
 
                         <button
                             type='submit'
-                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
+                            disabled={isLoading}
+                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px] ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                            Продолжить
+                            {isLoading ? 'Отправка...' : 'Продолжить'}
                         </button>
                     </div>
                 </form>

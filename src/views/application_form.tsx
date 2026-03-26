@@ -50,7 +50,6 @@ const STAGES_WITH_PROGRESS = [
     'traumatic',
     'diseases_psychologist',
     'promocode',
-    'phone'
 ] as const satisfies readonly ApplicationStage[];
 
 export default function ApplicationForm() {
@@ -254,8 +253,8 @@ export default function ApplicationForm() {
                 return <TraumaticStage />;
             case 'promocode':
                 return <PromocodeStage />;
-            case 'phone':
-                return <PhoneStage />;
+            // case 'phone':
+            //     return <PhoneStage />;
             case 'gratitude':
                 return <FinalStage />;
             case 'error':
