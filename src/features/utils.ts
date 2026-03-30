@@ -42,6 +42,7 @@ export const clearStorage = (is_research_redirect: boolean = false) => {
   if(!is_research_redirect){
     localStorage.removeItem('app_occupation')
   }
+  localStorage.removeItem('app_contact')
 }
 
 // Function to transform JSON data to form structure

@@ -4,7 +4,8 @@ import { IPsychologist } from './psychologist.types';
 export type Gender = 'male' | 'female' | 'other' | 'none';
 export type ClientExperience = 'earlier' | 'in_therapy' | 'supposed' | 'no' | 'none';
 export type Price = 'free' | '300' | '500' | '1000' | '1500' | '2000' | '3000';
-export type ContactType = 'Telegram' | 'WhatsApp' | 'Phone';
+/** Канал связи для заявок (PascalCase для API / n8n) */
+export type ContactType = 'Telegram' | 'VK' | 'Max' | 'WhatsApp' | 'Phone';
 export type PsychologistEducation = 'practic' | 'other_speciality' | 'student' | 'no'
 export type MeetingType = 'online' | 'offline' | 'both'
 export type ChoosePreferences = 'friends' | 'self' | 'service'
@@ -35,7 +36,10 @@ export interface IApplicationFormData {
   diseases: string[];
   requests: string[];
   promocode: string;
+  /** Username, ссылка, id и т.д. (исторически поле называется phone) */
   phone: string;
+  /** Канал для contact в webhook: Telegram | VK | Max */
+  contact_type: ContactType;
   selected_slots: string[];
   selected_slots_objects: string[];
   selected_psychologist: any[];

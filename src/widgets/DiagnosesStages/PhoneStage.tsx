@@ -1,33 +1,24 @@
 
 'use client'
-import { Form, FormDescription, FormField, FormItem, FormLabel } from '@/components/ui/form';
+import { Form } from '@/components/ui/form';
 import { setApplicationStage } from '@/redux/slices/application_form';
-import { setPhone, setHasMatchingError } from '@/redux/slices/application_form_data';
+import { setPhone, setHasMatchingError, setContactType } from '@/redux/slices/application_form_data';
 import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useSelector, useDispatch } from 'react-redux';
-import { z } from 'zod';
+import { useDispatch, useSelector } from 'react-redux';
 import { COLORS } from '@/shared/constants/colors';
-import styles from '@/styles/input.module.scss';
-import { IMaskInput } from 'react-imask';
 import { RootState } from '@/redux/store';
 import { NoMatchError } from './NoMatchError';
-import { submitQuestionnaire, getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
-import { fill_filtered_by_automatch_psy } from '@/redux/slices/filter';
 import { useSearchParams } from 'next/navigation'
 import axios from 'axios';
 import { toast } from 'sonner';
 import { getTimeDifference } from '@/features/utils';
 import useYandexMetrika from '@/components/yandex/useYandexMetrika'
 import { setIsRequestSend } from '@/redux/slices/application_form';
-
-
-const phoneRegex = /^\+7\d{10}$/;
-
-const FormSchema = z.object({
-    phone: z.string().nonempty("Вы не заполнили обязательное поле").regex(phoneRegex, 'Введите корректный номер телефона')
-});
+import { ContactMethodFormFields } from '@/widgets/shared/ContactMethodFormFields';
+import { contactMethodFormSchema, type ContactMethodFormValues } from '@/widgets/shared/contactMethodFormSchema';
+import { getAppContactFromStorage, persistAppContact } from '@/features/appContactStorage';
 
 export const PhoneStage = () => {
     const isRequestSend = useSelector<RootState, boolean>(state => state.applicationForm.is_request_send);
@@ -45,11 +36,9 @@ export const PhoneStage = () => {
         state => state.filter
     ).selected_psychologist;
 
-    // Добавляем селектор для всех подобранных психологов
     const filtered_by_automatch_psy = useSelector<RootState, any[]>(
         state => state.filter.filtered_by_automatch_psy
     );
-
 
     const timeDifference = getTimeDifference();
 
@@ -69,7 +58,6 @@ export const PhoneStage = () => {
     }, [])
 
     const searchParams = useSearchParams()
-    // Проверяем, перешли ли мы из иммледовательской формы
     const isResearchRedirect = searchParams.get('research') == 'true'
 
     const utm_client = searchParams.get('utm_client')
@@ -79,29 +67,25 @@ export const PhoneStage = () => {
     const utm_source = searchParams.get('utm_source')
     const utm_term = searchParams.get('utm_term')
 
-    const formData = useSelector((state: RootState) => state.applicationFormData);
     const [showNoMatch, setShowNoMatch] = React.useState(false);
-    const [isLoading, setIsLoading] = React.useState(false);
 
-    // 1. Загружаем сохраненные данные из localStorage
-    const savedData = typeof window !== 'undefined'
-        ? JSON.parse(localStorage.getItem('app_phone') || '{}')
-        : {}
+    const saved = typeof window !== 'undefined' ? getAppContactFromStorage() : { contact: '', contactType: 'Telegram' as const }
 
-    // 2. Настраиваем форму
-    const form = useForm<z.infer<typeof FormSchema>>({
-        resolver: zodResolver(FormSchema),
+    const form = useForm<ContactMethodFormValues>({
+        resolver: zodResolver(contactMethodFormSchema),
         defaultValues: {
-            phone: savedData.phone || '',
+            contact: saved.contact,
+            contactType: saved.contactType === 'WhatsApp' || saved.contactType === 'Phone' ? 'Telegram' : saved.contactType,
         }
     })
 
     const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-    // 3. Сохраняем данные при изменении
     useEffect(() => {
         const subscription = form.watch((value) => {
-            localStorage.setItem('app_phone', JSON.stringify(value.phone));
+            if (value.contact !== undefined && value.contactType !== undefined) {
+                persistAppContact(value.contact ?? '', value.contactType ?? 'Telegram');
+            }
         });
         return () => subscription.unsubscribe();
     }, [form.watch]);
@@ -111,16 +95,18 @@ export const PhoneStage = () => {
         dispatch(setHasMatchingError(false));
     };
 
-    // 4. Отправка формы
-    const handleSubmit = async (data: z.infer<typeof FormSchema>) => {
-        if (isRequestSend) return; // Не отправляем повторно
+    const handleSubmit = async (data: ContactMethodFormValues) => {
+        if (isRequestSend) return;
         dispatch(setIsRequestSend(true));
-        localStorage.setItem('app_phone', JSON.stringify(data.phone));
-        dispatch(setPhone(data.phone));
+        persistAppContact(data.contact, data.contactType);
+        dispatch(setPhone(data.contact));
+        dispatch(setContactType(data.contactType));
+
+        const contactStr = data.contact;
+        const contactTypeStr = data.contactType;
 
         try {
             setIsSubmitting(true)
-            // Получаем запросы из localStorage
             const storedRequests = localStorage.getItem('app_request') ?
                 [JSON.parse(localStorage.getItem('app_request') || '[]')?.request] : [];
 
@@ -157,14 +143,11 @@ export const PhoneStage = () => {
                 age: localStorage.getItem('app_age') || '',
                 slots: Array.isArray(selected_slots) ? selected_slots : [selected_slots],
                 slots_objects: [],
-                contactType: "Telegram",
-                contact: localStorage.getItem('app_phone') || '',
+                contactType: contactTypeStr,
+                contact: contactStr,
                 name: localStorage.getItem('app_username') || '',
                 promocode: isResearchRedirect ? 'Клиент перешёл из исследовательской анкеты' : localStorage.getItem('app_promocode') || '',
-                // UPDATE: устанавливаем ticket_id из redux 
                 ticket_id: ticketID || '',
-
-                // ticket_id: localStorage.getItem('app_ticket_id') || '',
                 emptySlots: false,
                 userTimeZone: "МСК" + (+timeDifference > 0 ? '+' + timeDifference : timeDifference == 0 ? '' : timeDifference),
                 userTimeOffsetMsk: timeDifference.toString(),
@@ -249,8 +232,8 @@ export const PhoneStage = () => {
                                     localStorage.getItem('app_cancel_reason') === 'other' ? 'Другая причина' : ''
                         : '',
 
-                    contactType: "Telegram",
-                    contact: localStorage.getItem('app_phone') || '',
+                    contactType: contactTypeStr,
+                    contact: contactStr,
                     name: localStorage.getItem('app_username') || '',
                     is_adult: parseInt(localStorage.getItem('app_age') || '0') >= 18,
                     is_last_page: true,
@@ -264,9 +247,111 @@ export const PhoneStage = () => {
 
             const response = await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka-diagnostic-v2', requestData);
 
+            if (ridId && bidId) {
+                await axios.put('https://n8n-v2.hrani.live/webhook/update-contacts-stb',
+                    {
+                        rid: ridId,
+                        bid: bidId,
+                        contact: contactStr,
+                        contactType: contactTypeStr,
+                        name: localStorage.getItem('app_username') || '',
+                        age: localStorage.getItem('app_age') || '',
+                        formPsyClientInfo: {
+                            age: localStorage.getItem('app_age') || '',
+                            city: "",
+                            sex: localStorage.getItem('app_gender') === 'male' ? 'Мужской' :
+                                localStorage.getItem('app_gender') === 'female' ? 'Женский' : '',
+
+                            psychoEducated: localStorage.getItem('app_psychologist_education') === 'practic' ? 'Да, я практикующий специалист' :
+                                localStorage.getItem('app_psychologist_education') === 'other_speciality' ? 'Да, но работаю в другой сфере' :
+                                    localStorage.getItem('app_psychologist_education') === 'student' ? 'В процессе получения' :
+                                        localStorage.getItem('app_psychologist_education') === 'no' ? 'Нет' : '',
+
+                            anxieties: [],
+                            customAnexiety: "",
+                            hasPsychoExperience: localStorage.getItem('app_experience') === 'earlier' ? 'Да, я работал(а) с психологом/психотерапевтом' :
+                                localStorage.getItem('app_experience') === 'supposed' ? 'Нет, но рассматривал(а) такую возможность' : '',
+
+                            meetType: localStorage.getItem('app_meeting_type') === 'online' ? 'Онлайн' :
+                                localStorage.getItem('app_meeting_type') === 'offline' ? 'Оффлайн' :
+                                    localStorage.getItem('app_meeting_type') === 'both' ? 'И так и так' : '',
+
+                            selectionСriteria: localStorage.getItem('app_choose_preferences') === 'friends' ? 'По рекомендациям знакомых' :
+                                localStorage.getItem('app_choose_preferences') === 'self' ? 'Самостоятельно просматривал(а) анкеты в интернете или читал(а) отзывы' :
+                                    localStorage.getItem('app_choose_preferences') === 'service' ? 'Через сервис, который сам подбирает подходящего специалиста' : '',
+
+                            custmCreteria: "",
+                            importancePsycho: localStorage.getItem('app_preferences') ?
+                                JSON.parse(localStorage.getItem('app_preferences') || '[]') : [],
+
+                            customImportance: localStorage.getItem('app_custom_preferences') || '',
+                            agePsycho: "",
+                            sexPsycho: localStorage.getItem('app_gender_psychologist') === 'male' ? 'Мужчина' :
+                                localStorage.getItem('app_gender_psychologist') === 'female' ? 'Женщина' : 'Не имеет значения',
+
+                            priceLastSession: localStorage.getItem('app_experience') == 'earlier' ?
+                                localStorage.getItem('app_last_session_price') === 'free' ? 'Бесплатно' :
+                                    localStorage.getItem('app_last_session_price') === '<1000' ? 'Меньше 1000 руб.' :
+                                        localStorage.getItem('app_last_session_price') === '<3000' ? 'Меньше 3000 руб.' :
+                                            localStorage.getItem('app_last_session_price') === '<5000' ? 'Меньше 5000 руб.' :
+                                                localStorage.getItem('app_last_session_price') === '5000+' ? '5000 руб. и более' : ''
+                                : '',
+
+                            durationSession: localStorage.getItem('app_experience') == 'earlier' ?
+                                localStorage.getItem('app_session_duration') === '<1 month' ? 'До месяца' :
+                                    localStorage.getItem('app_session_duration') === '2-3 months' ? '2-3 месяца' :
+                                        localStorage.getItem('app_session_duration') === '<1 year' ? 'До года' :
+                                            localStorage.getItem('app_session_duration') === '>1 year' ? 'Более года' : ''
+                                : '',
+
+                            reasonCancel: localStorage.getItem('app_experience') == 'earlier' ?
+                                localStorage.getItem('app_cancel_reason') === 'solved' ? 'Помогло, проблема была решена' :
+                                    localStorage.getItem('app_cancel_reason') === 'new_psychologist' ? 'Не помогло, выбрал(а) нового' :
+                                        localStorage.getItem('app_cancel_reason') === 'full_cancel' ? 'Не помогло, вообще прекратил(а)' :
+                                            localStorage.getItem('app_cancel_reason') === 'expensive' ? 'Дорого' :
+                                                localStorage.getItem('app_cancel_reason') === 'uncomfortable' ? 'Неудобно по времени/формату/месту' :
+                                                    localStorage.getItem('app_cancel_reason') === 'in_therapy' ? 'Я всё еще в терапии' : ''
+                                : '',
+
+                            pricePsycho: localStorage.getItem('app_experience') == 'supposed' ?
+                                localStorage.getItem('app_last_session_price') === 'free' ? 'Бесплатно' :
+                                    localStorage.getItem('app_last_session_price') === '<1000' ? 'Меньше 1000 руб.' :
+                                        localStorage.getItem('app_last_session_price') === '<3000' ? 'Меньше 3000 руб.' :
+                                            localStorage.getItem('app_last_session_price') === '<5000' ? 'Меньше 5000 руб.' :
+                                                localStorage.getItem('app_last_session_price') === '5000+' ? '5000 руб. и более' : ''
+                                : '',
+
+                            reasonNonApplication: localStorage.getItem('app_experience') == 'supposed' ?
+                                localStorage.getItem('app_cancel_reason') === 'solved' ? 'Проблемы сами разрешились' :
+                                    localStorage.getItem('app_cancel_reason') === 'no trust' ? 'Не было доверия' :
+                                        localStorage.getItem('app_cancel_reason') === 'expensive' ? 'Дорого' :
+                                            localStorage.getItem('app_cancel_reason') === 'other' ? 'Другая причина' : ''
+                                : '',
+
+                            contactType: contactTypeStr,
+                            contact: contactStr,
+                            name: localStorage.getItem('app_username') || '',
+                            is_adult: parseInt(localStorage.getItem('app_age') || '0') >= 18,
+                            is_last_page: true,
+                            occupation: localStorage.getItem('app_occupation') === 'fulltime' ? 'Постоянная работа в найме' :
+                                localStorage.getItem('app_occupation') === 'freelance' ? 'Фрилансер/самозанятый/работаю на себя' :
+                                    localStorage.getItem('app_occupation') === 'business' ? 'Предприниматель' :
+                                        localStorage.getItem('app_occupation') === 'additional income' ? 'Не работаю, есть доп. источник дохода' :
+                                            localStorage.getItem('app_occupation') === 'no income' ? 'Не работаю, нет доп. источников доходов' : ''
+                        }
+                    }
+                )
+            }
+
+
             if (response.status === 200) {
                 setIsSubmitting(false)
-                reachGoal('submit_form_diasgnostic')
+                if (!isResearchRedirect) {
+                    reachGoal('submit_form_podbor_bes_issledovanie')
+                }
+                else {
+                    reachGoal('submit_form_podbor_issledovanie')
+                }
                 dispatch(setApplicationStage('gratitude'));
 
             } else {
@@ -301,39 +386,10 @@ export const PhoneStage = () => {
                         </div>
                     )}
 
-                    <FormField
+                    <ContactMethodFormFields
                         control={form.control}
-                        name="phone"
-                        render={({ field: { onChange, value } }) => (
-                            <div className='grow'>
-                                <FormItem className='grow p-[30px] max-lg:max-h-none max-lg:p-[15px] border-[1px] rounded-[25px]'>
-                                    <FormLabel className='text-[20px] lg:text-[20px] md:text-[14px] max-lg:text-[14px] leading-[27px] max-lg:leading-[22px] font-semibold'>
-                                        Оставьте ваш контакт для связи
-                                    </FormLabel>
-                                    <FormDescription className='text-neutral-500 dark:text-neutral-400 text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal'>
-                                        Рекламу не присылаем. Психологи не видят ваши контакты. Только вы решаете кому их показать после сессии
-                                    </FormDescription>
-                                    <div className={styles.input__text_container}>
-                                        <IMaskInput
-                                            mask="+70000000000"
-                                            value={value}
-                                            unmask={false}
-                                            onAccept={(value) => onChange(value)}
-                                            placeholder=" "
-                                            className={`${styles.input__text} text-[14px] w-full h-full px-[20px] bg-[#FAFAFA] rounded-[10px] border-none`}
-                                        />
-                                        <label className={`${styles.input__text_label} text-[14px]`}>
-                                            Введите номер телефона
-                                        </label>
-                                    </div>
-                                    {form.formState.errors.phone && (
-                                        <span className="text-[#FF0000] text-[14px] mt-[5px]">
-                                            {form.formState.errors.phone.message}
-                                        </span>
-                                    )}
-                                </FormItem>
-                            </div>
-                        )}
+                        contactName="contact"
+                        contactTypeName="contactType"
                     />
 
                     <div className="shrink-0 mt-[30px] pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
@@ -349,7 +405,7 @@ export const PhoneStage = () => {
                             type='submit'
                             className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
-                            Продолжить
+                            Практически конец
                         </button>
                     </div>
                 </form>

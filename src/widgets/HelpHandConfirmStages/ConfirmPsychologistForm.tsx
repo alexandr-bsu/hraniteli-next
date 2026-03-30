@@ -451,7 +451,7 @@ export const ConfirmPsychologistForm = () => {
           age: formData.age || "",
           slots: [formattedSlot], // Формат "23.7 19:00"
           slots_objects: [selectedSlot.id], // ID выбранного слота
-          contactType: "Telegram",
+          contactType: formData.contact_type || 'Telegram',
           contact: formData.phone || "",
           name: formData.username || "",
           promocode: formData.promocode || "",

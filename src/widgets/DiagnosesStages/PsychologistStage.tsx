@@ -14,6 +14,7 @@ import { Tooltip } from '@/shared/ui/Tooltip';
 import { NoMatchError } from './NoMatchError';
 import { EmergencyContacts } from './EmergencyContacts';
 import axios from 'axios';
+import { getAppContactFromStorage } from '@/features/appContactStorage';
 
 import styles from '@/shared/styles/PsychologistStage.module.css';
 import styles_cards from '../Card/Card.module.scss';
@@ -142,6 +143,7 @@ export const PsychologistStage = () => {
     };
 
     const psy_names: string[] = getNames(matched_psychologists_in_modal)
+    const appContact = getAppContactFromStorage()
 
     const requestData = {
       form: {
@@ -164,8 +166,8 @@ export const PsychologistStage = () => {
         age: localStorage.getItem('app_age') || '',
         slots: [],
         slots_objects: [],
-        contactType: "Telegram",
-        contact: localStorage.getItem('app_phone') || '',
+        contactType: appContact.contactType,
+        contact: appContact.contact,
         name: localStorage.getItem('app_username') || '',
         promocode: localStorage.getItem('app_promocode') || '',
         // UPDATE: устанавливаем ticket_id из redux 
@@ -208,8 +210,8 @@ export const PsychologistStage = () => {
         reasonCancel: "",
         pricePsycho: "",
         reasonNonApplication: "",
-        contactType: "Telegram",
-        contact: localStorage.getItem('app_phone') || '',
+        contactType: appContact.contactType,
+        contact: appContact.contact,
         name: localStorage.getItem('app_username') || '',
         is_adult: parseInt(localStorage.getItem('app_age') || '0') >= 18,
         is_last_page: true,

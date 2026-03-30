@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { IApplicationFormData, Gender, ClientExperience, Price, PsychologistEducation, MeetingType, ChoosePreferences, LastSessionPriceResearch, SessionDuration, CancelReason, Occupation } from '@/shared/types/application.types';
+import { IApplicationFormData, Gender, ClientExperience, Price, PsychologistEducation, MeetingType, ChoosePreferences, LastSessionPriceResearch, SessionDuration, CancelReason, Occupation, ContactType } from '@/shared/types/application.types';
 import { setPsychologists } from './psychologists';
 
 const initialState: IApplicationFormData = {
@@ -27,6 +27,7 @@ const initialState: IApplicationFormData = {
   conditions: [],
   promocode: '',
   phone: '',
+  contact_type: 'Telegram' as ContactType,
   selected_slots: [],
   selected_slots_objects: [],
   selected_psychologist: [],
@@ -115,6 +116,9 @@ export const applicationFormDataSlice = createSlice({
     setPhone: (state, action: PayloadAction<string>) => {
       state.phone = action.payload;
     },
+    setContactType: (state, action: PayloadAction<ContactType>) => {
+      state.contact_type = action.payload;
+    },
     setSelectedSlots: (state, action: PayloadAction<string[]>) => {
       state.selected_slots = action.payload;
     },
@@ -165,6 +169,7 @@ export const {
   setExperienceUser,
   setPromocode,
   setPhone,
+  setContactType,
   setSelectedSlots,
   setSelectedSlotsObjects,
   setSelectedPsychologistForm,
