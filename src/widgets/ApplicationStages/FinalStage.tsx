@@ -5,7 +5,7 @@ import { useSelector } from "react-redux"
 import { RootState } from "@/redux/store"
 import axios from 'axios';
 import { useEffect } from 'react';
-
+import { FinalStageBotButtons } from '@/widgets/shared/FinalStageBotButtons';
 
 export const FinalStage = () => {
   
@@ -38,15 +38,6 @@ export const FinalStage = () => {
     router.push('/')
   }
 
-  const handleTelegramClick = () => {
-    // Открываем телеграм бота с тикетом
-    window.open(`https://t.me/HraniLiveBot?start=${ticketId}`, '_blank')
-  }
-
-  const handleVkClick = () => {
-    window.open(`https://vk.com/write-230628314?ref=${ticketId}`, '_blank')
-  }
-
   return (
     <div className='relative min-lg:p-[50px] p-[20px] max-lg:px-[20px] flex-col min-h-full h-[100svh] justify-between  flex w-full grow'>
       <div className="w-full flex justify-end ">
@@ -66,7 +57,7 @@ export const FinalStage = () => {
           <div className="flex flex-col items-center gap-[10px]">
             <h2 className="font-semibold text-[26px] max-lg:text-[14px] max-lg:leading-[22px]">Спасибо!</h2>
 
-            <span className="font-normal text-[18px] leading-[25px] text-center max-lg:text-[14px]">Мы получили ваш запрос и чтобы забронировать время запустите бот.
+            <span className="font-normal text-[18px] leading-[25px] text-center max-lg:text-[14px]">Для того, чтобы подтвердить заявку, выберите удобный чат-бот, - так психолог увидит вашу заявку. Перейдите в VK бот или ТГ бот.
               {/* <br />  */}
             </span>
           </div>
@@ -79,12 +70,11 @@ export const FinalStage = () => {
 
       </div>
 
-      <button 
-            onClick={handleVkClick}
-            className="w-full text-[#FFFFFF] p-[14px] max-lg:text-[14px] shrink-0 bg-[#116466] rounded-[50px] font-normal text-[18px] leading-[25px] mt-8 max-w-[400px] max-w-full"
-          >
-            Перейти в VK бот
-      </button>
+      <FinalStageBotButtons
+        ticketId={ticketId}
+        analyticsSource="application"
+        className="mt-8 max-w-[400px] max-w-full"
+      />
     </div>
   )
 }

@@ -1,7 +1,4 @@
-/**
- * Один источник правды для выбора мессенджера в форме контакта
- * (поле contactType в zod и в UI).
- */
+/** contactType: zod + UI (см. contactMethodFormSchema). */
 export const CONTACT_METHOD_TYPES = ['Telegram', 'VK', 'Max'] as const;
 
 export type ContactMethodOption = (typeof CONTACT_METHOD_TYPES)[number];

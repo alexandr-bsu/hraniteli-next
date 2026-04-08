@@ -8,10 +8,7 @@ type Props = {
   isActive: boolean;
 };
 
-/**
- * Внешние SVG в mask нельзя перекрасить через fill/currentColor как у inline-SVG.
- * Фон = фирменный цвет, альфа задаётся маской по силуэту файла.
- */
+/** SVG через CSS mask + COLORS.primary (внешний файл нельзя перекрасить fill’ом). */
 export function ContactBrandIcon({ src, isActive }: Props) {
   const style: CSSProperties = {
     opacity: isActive ? 1 : 0.45,

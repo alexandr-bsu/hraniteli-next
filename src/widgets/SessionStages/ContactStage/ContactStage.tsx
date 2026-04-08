@@ -14,6 +14,7 @@ import { redirect } from 'next/navigation';
 import PhoneInput from '@/components/phoneimput';
 import { getPsychologistAll } from '@/features/actions/getPsychologistAll';
 import Link from 'next/link';
+import { telegramBotDeepLink } from '@/shared/constants/hraniBot';
 
 interface ContactStageProps {
     callback: () => void;
@@ -348,7 +349,7 @@ export const ContactStage: React.FC<ContactStageProps> = ({ callback }) => {
             const initialFormData = getInitialFormData(ticketId, timeDifference);
 
             await axios.post('https://n8n-v2.hrani.live/webhook/tilda-zayavka', requestData);
-            window.location.href = `https://t.me/HraniLiveBot?start=${ticketId}`;
+            window.location.href = telegramBotDeepLink(ticketId);
         } catch (error) {
             console.error('Error submitting form:', error);
         }
