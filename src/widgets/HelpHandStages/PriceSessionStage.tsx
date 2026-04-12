@@ -93,14 +93,14 @@ export const PriceSessionStage = () => {
                                             defaultValue={field.value}
                                             className="flex flex-col gap-[20px] max-lg:gap-[16px]"
                                         >
-                                            <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
+                                            {/* <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl>
                                                     <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="free" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
                                                     Бесплатно - обучающиеся психологи (до 1 года практики)
                                                 </FormLabel>
-                                            </FormItem>
+                                            </FormItem> */}
 
                                             <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl>
