@@ -93,30 +93,13 @@ export const PriceSessionStage = () => {
                                             defaultValue={field.value}
                                             className="flex flex-col gap-[20px] max-lg:gap-[16px]"
                                         >
-                                            {/* <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
-                                                <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="free" />
-                                                </FormControl>
-                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    Бесплатно - обучающиеся психологи (до 1 года практики)
-                                                </FormLabel>
-                                            </FormItem> */}
-
+                                            
                                             <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="500" />
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="2000" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    500 рублей - обучающиеся психологи (до 1 года практики)
-                                                </FormLabel>
-                                            </FormItem>
-
-                                            <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
-                                                <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="1000" />
-                                                </FormControl>
-                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    1000 рублей - начинающие психологи (до 5 лет практики)
+                                                    2000 рублей - опытные психологи (более 5 лет практики)
                                                 </FormLabel>
                                             </FormItem>
 
@@ -131,19 +114,28 @@ export const PriceSessionStage = () => {
 
                                             <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="2000" />
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="1000" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    2000 рублей - опытные психологи (более 5 лет практики)
+                                                    1000 рублей - начинающие психологи (до 5 лет практики)
                                                 </FormLabel>
                                             </FormItem>
 
                                             <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
                                                 <FormControl>
-                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="3000" />
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="500" />
                                                 </FormControl>
                                                 <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
-                                                    3000 рублей - опытные психологи (более 5 лет практики)
+                                                    500 рублей - обучающиеся психологи (до 1 года практики)
+                                                </FormLabel>
+                                            </FormItem>
+
+                                            <FormItem className="flex items-center gap-[15px] max-lg:gap-[12px]">
+                                                <FormControl>
+                                                    <RadioGroupItem className="h-[30px] w-[30px] max-lg:h-[24px] max-lg:w-[24px]" value="free" />
+                                                </FormControl>
+                                                <FormLabel className={`text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] leading-[25px] max-lg:leading-[20px] font-normal text-[${COLORS.text.primary}] flex flex-wrap`}>
+                                                    Бесплатно - обучающиеся психологи (длительный подбор)
                                                 </FormLabel>
                                             </FormItem>
 
