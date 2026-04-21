@@ -97,6 +97,97 @@ export const ConfirmPsychologistForm = () => {
   const isResearchRedirect = searchParams.get('research') == 'true';
   const utm_psy = searchParams.get('utm_psy');
   const ticketID = searchParams.get('ticket_id');
+  const ticketPriceParam =
+    searchParams.get('psychologist_category')
+    || searchParams.get('price_session')
+    || searchParams.get('category')
+    || searchParams.get('price');
+  const [ticketData, setTicketData] = useState<Record<string, any> | null>(null);
+
+  const normalizePriceSession = (value: string | null | undefined): string | null => {
+    if (!value) return null;
+
+    const normalized = value.toString().trim().toLowerCase().replace(/\s+/g, '');
+    if (!normalized) return null;
+    if (normalized === 'free' || normalized === 'бесплатно') return 'free';
+
+    const numeric = normalized.replace(/[^\d]/g, '');
+    if (['300', '500', '1000', '1500', '2000', '3000'].includes(numeric)) {
+      return numeric;
+    }
+
+    return null;
+  }
+
+  const getPriceLabel = (priceSession: string | null): string => {
+    switch (priceSession) {
+      case 'free':
+        return 'Бесплатно';
+      case '300':
+        return '300 ₽';
+      case '500':
+        return '500 ₽';
+      case '1000':
+        return '1000 ₽';
+      case '1500':
+        return '1500 ₽';
+      case '2000':
+        return '2000 ₽';
+      case '3000':
+        return '3000 ₽';
+      default:
+        return 'Не указана';
+    }
+  }
+
+  const getTicketPriceValue = (ticketResponse: Record<string, any> | null): string | null => {
+    if (!ticketResponse) return null;
+
+    const ticketObject = Array.isArray(ticketResponse)
+      ? ticketResponse[0]
+      : ((ticketResponse.ticket && typeof ticketResponse.ticket === 'object')
+        ? ticketResponse.ticket
+        : ticketResponse);
+
+    if (!ticketObject) return null;
+
+    return ticketObject.psychologist_price
+      || ticketObject.psychologist_category
+      || ticketObject.price_session
+      || ticketObject.category
+      || ticketObject.price
+      || null;
+  };
+
+  const ticketPriceValue = getTicketPriceValue(ticketData);
+  const resolvedPriceSession =
+    normalizePriceSession(ticketPriceValue)
+    ?? normalizePriceSession(ticketPriceParam)
+    ?? normalizePriceSession(formData.price_session);
+  const getPriceFromApplication = () => getPriceLabel(resolvedPriceSession);
+  const resolvedCategoryType = getPriceLabel(resolvedPriceSession) === 'Не указана'
+    ? ''
+    : getPriceLabel(resolvedPriceSession).replace(' ₽', ' руб');
+
+  useEffect(() => {
+    if (!ticketID) {
+      setTicketData(null);
+      return;
+    }
+
+    const fetchTicketInfo = async () => {
+      try {
+        const response = await fetch(`https://n8n-v2.hrani.live/webhook/get-ticket-info?ticket_id=${encodeURIComponent(ticketID)}`);
+        if (!response.ok) throw new Error(`Ошибка получения тикета: ${response.status}`);
+        const data = await response.json();
+        setTicketData(data);
+      } catch (error) {
+        setTicketData(null);
+      }
+    };
+
+    fetchTicketInfo();
+  }, [ticketID]);
 
   // Проверяем наличие обязательных параметров
   const hasRequiredParams = utm_psy || ticketID;
@@ -250,13 +341,7 @@ export const ConfirmPsychologistForm = () => {
           userTimeZone: "МСК" + (userTimeOffsetMsk > 0 ? '+' + userTimeOffsetMsk : userTimeOffsetMsk < 0 ? userTimeOffsetMsk : ''),
           bid: 0,
           rid: 0,
-          categoryType: formData.price_session === 'free' ? 'Бесплатно' :
-            formData.price_session === '300' ? '300 руб' :
-              formData.price_session === '500' ? '500 руб' :
-                formData.price_session === '1000' ? '1000 руб' :
-                  formData.price_session === '1500' ? '1500 руб' :
-                    formData.price_session === '2000' ? '2000 руб' :
-                      formData.price_session === '3000' ? '3000 руб' : 'Бесплатно',
+          categoryType: resolvedCategoryType,
           customCategory: '',
           question_to_psychologist: formData.requests?.join('; ') || '',
           filtered_by_automatch_psy_names: [],
@@ -460,13 +545,7 @@ export const ConfirmPsychologistForm = () => {
           userTimeZone: "МСК" + (timeDifference > 0 ? '+' + timeDifference : timeDifference < 0 ? timeDifference : ''),
           bid: 0,
           rid: 0,
-          categoryType: formData.price_session === 'free' ? 'Бесплатно' :
-            formData.price_session === '300' ? '300 руб' :
-              formData.price_session === '500' ? '500 руб' :
-                formData.price_session === '1000' ? '1000 руб' :
-                  formData.price_session === '1500' ? '1500 руб' :
-                    formData.price_session === '2000' ? '2000 руб' :
-                      formData.price_session === '3000' ? '3000 руб' : 'Бесплатно',
+          categoryType: resolvedCategoryType,
           customCategory: "",
           question_to_psychologist: formData.requests?.join('; ') || "",
           filtered_by_automatch_psy_names: currentPsychologist?.name ? [currentPsychologist.name] : [],
@@ -555,26 +634,6 @@ export const ConfirmPsychologistForm = () => {
     return description
   }
 
-  const getPriceFromApplication = (): string => {
-    switch (formData.price_session) {
-      case 'free':
-        return 'Бесплатно';
-      case '300':
-        return '300 ₽';
-      case '500':
-        return '500 ₽';
-      case '1000':
-        return '1000 ₽';
-      case '1500':
-        return '1500 ₽';
-      case '2000':
-        return '2000 ₽';
-      case '3000':
-        return '3000 ₽';
-      default:
-        return 'Бесплатно';
-    }
-  }
 
   return (
     <div className="px-[50px] max-lg:px-[20px] flex w-full grow relative max-lg:overflow-y-auto">
