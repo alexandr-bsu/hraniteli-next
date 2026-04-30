@@ -76,6 +76,10 @@ export const PhoneStage = () => {
         dispatch(setContactType(data.contactType));
 
         try {
+            if (typeof window !== 'undefined') {
+                (window as any)._tmr?.push?.({ type: 'reachGoal', id: 3503497, goal: 'Lead' });
+            }
+
             await submitHelpHandQuestionnaire({
                 ...formData,
                 phone: data.contact,

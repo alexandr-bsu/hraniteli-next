@@ -7,6 +7,7 @@ import YandexMetrikaContainer from "@/components/yandex/YandexMetrikaContainer";
 import { Suspense } from "react";
 import { StagewiseToolbar } from '@stagewise/toolbar-next';
 import ReactPlugin from '@stagewise-plugins/react';
+import Script from "next/script";
 
 
 const open_sans = Open_Sans({
@@ -34,6 +35,20 @@ export default function RootLayout({
             enabled
           />
         </Suspense>
+        <Script id="mailru-counter" strategy="afterInteractive">
+          {`(function (d, w, id) {
+  w._tmr = w._tmr || [];
+  w._tmr.push({ type: 'pageView', id: 3503497, start: new Date().getTime() });
+  if (d.getElementById(id)) return;
+  var ts = d.createElement('script');
+  ts.type = 'text/javascript';
+  ts.async = true;
+  ts.id = id;
+  ts.src = 'https://top-fwz1.mail.ru/js/code.js';
+  var s = d.getElementsByTagName('script')[0];
+  if (s && s.parentNode) s.parentNode.insertBefore(ts, s);
+})(document, window, 'tmr-code');`}
+        </Script>
       </head>
       <body
         className={`${open_sans.className} antialiased`}
