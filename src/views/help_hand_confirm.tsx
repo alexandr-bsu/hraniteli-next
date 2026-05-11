@@ -2,7 +2,8 @@
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import { ConfirmPsychologistForm } from "@/widgets/HelpHandConfirmStages/ConfirmPsychologistForm";
-import React from "react";
+import React, { useEffect } from "react";
+import { captureMarketingParamsFromUrl } from "@/shared/utils/utm";
 
 const STAGES_WITH_PROGRESS = [
     'name',
@@ -22,7 +23,9 @@ export default function HelpHandConfirm() {
     const currentStage = useSelector<RootState, string>(state => state.applicationForm.application_stage);
     const hasError = useSelector<RootState, boolean>(state => state.applicationFormData.has_matching_error);
 
-
+    useEffect(() => {
+        captureMarketingParamsFromUrl();
+    }, []);
 
     return (
         <div className="w-full overflow-hidden h-full bg-[white] flex flex-col relative">

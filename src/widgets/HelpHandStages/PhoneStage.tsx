@@ -18,6 +18,7 @@ import { setIsRequestSend } from '@/redux/slices/application_form';
 import { ContactMethodFormFields } from '@/widgets/shared/ContactMethodFormFields';
 import { contactMethodFormSchema, type ContactMethodFormValues } from '@/widgets/shared/contactMethodFormSchema';
 import { getAppContactFromStorage, persistAppContact } from '@/features/appContactStorage';
+import { onHelpHandQuizCompletedSuccessfully } from '@/shared/utils/topMailHelpHandLeadwide';
 
 export const PhoneStage = () => {
     const isRequestSend = useSelector<RootState, boolean>(state => state.applicationForm.is_request_send);
@@ -89,6 +90,7 @@ export const PhoneStage = () => {
             dispatch(setHasMatchingError(false));
             reachGoal('submit_help_hand_form')
 
+            onHelpHandQuizCompletedSuccessfully(ticketID);
             dispatch(setApplicationStage('gratitude'));
 
 

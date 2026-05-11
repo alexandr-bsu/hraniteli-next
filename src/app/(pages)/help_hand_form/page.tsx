@@ -8,6 +8,7 @@ import { Suspense, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/redux/store";
 import axios from "axios";
+import { resetHelpHandLeadwideDedupe } from "@/shared/utils/topMailHelpHandLeadwide";
 
 export default function ApplicationFormLayout() {
 
@@ -21,11 +22,13 @@ export default function ApplicationFormLayout() {
 
      if (!ticketID) {
         dispatch(generateTicketId('hh_'));
+        resetHelpHandLeadwideDedupe();
     }
 
     useEffect(() => {
         if (!ticketID) {
             dispatch(generateTicketId('hh_'));
+            resetHelpHandLeadwideDedupe();
         }
     }, []);
 

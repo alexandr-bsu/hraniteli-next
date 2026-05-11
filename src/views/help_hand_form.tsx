@@ -22,6 +22,8 @@ import { NoMatchError } from "@/widgets/HelpHandStages/NoMatchError";
 
 import { useSearchParams } from "next/navigation";
 import { clearStorage } from "@/features/utils";
+import { captureMarketingParamsFromUrl } from "@/shared/utils/utm";
+import { resetHelpHandLeadwideDedupe } from "@/shared/utils/topMailHelpHandLeadwide";
 
 const STAGES_WITH_PROGRESS = [
     'name',
@@ -63,12 +65,14 @@ export default function HelpHandForm() {
     
 
     useEffect(() => {
+            captureMarketingParamsFromUrl()
             clearStorage(isResearchRedirect)
         }, [])
 
     useEffect(() => {
         if (!ticketID) {
             dispatch(generateTicketId('hh_'));
+            resetHelpHandLeadwideDedupe();
             localStorage.setItem('matching_attempts', '0');
         }
     }, [dispatch, ticketID]);  

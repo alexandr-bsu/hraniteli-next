@@ -21,6 +21,7 @@ import { format } from 'date-fns';
 import { getAgeWord } from '@/features/utils';
 import useYandexMetrika from '@/components/yandex/useYandexMetrika'
 import { getAppContactFromStorage } from '@/features/appContactStorage';
+import { getMarketingParamsForPayload } from '@/shared/utils/utm';
 
 
 
@@ -429,6 +430,7 @@ export const PsychologistStage = () => {
           [JSON.parse(localStorage.getItem('app_request') || '')?.request] : [];
 
         const requestData = {
+          ...getMarketingParamsForPayload(),
           anxieties: [],
           questions: storedRequests,
           customQuestion: [],
@@ -705,11 +707,8 @@ export const PsychologistStage = () => {
             <div>
               <span className="text-[#9A9A9A] text-[16px]">Стоимость:</span>
               <div className="flex items-center gap-[10px] mt-[5px]">
-              <p className="font-semibold text-[18px]">От 0 ₽</p>
-                <Tooltip text={`<b>Первая сессия - бесплатно. Последующие сессии по цене психолога - ${currentPsychologist.min_session_price || 0} ₽.</b>
-
-Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности.
-`} />
+                <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p>
+                <Tooltip text="Стоимость сессии длительностью 50-55 минут" />
               </div>
             </div>
           </div>
@@ -734,11 +733,8 @@ export const PsychologistStage = () => {
               <div className="flex flex-col w-fit">
                 <span className="text-[#9A9A9A] text-[14px]">Стоимость:</span>
                 <div className="flex items-center gap-[10px]">
-                <p className="font-semibold text-[18px]">От 0 ₽</p>
-                <Tooltip text={`<b>Первая сессия - бесплатно. Последующие сессии по цене психолога - ${currentPsychologist.min_session_price || 0} ₽.</b>
-
-Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности.
-`} />
+                  <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p>
+                  <Tooltip text="Стоимость сессии длительностью 50-55 минут" />
                 </div>
               </div>
             </div>

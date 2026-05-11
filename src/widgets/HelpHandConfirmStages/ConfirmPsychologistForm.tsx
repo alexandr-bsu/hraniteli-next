@@ -21,6 +21,7 @@ import styles_cards from '../Card/Card.module.scss';
 import { format, startOfWeek, addMonths } from 'date-fns';
 import { getAgeWord } from '@/features/utils';
 import { useSearchParams } from 'next/navigation';
+import { getMarketingParamsForPayload } from '@/shared/utils/utm';
 import { FinalStage } from './FinalStage';
 
 // --- Типы и утилиты ---
@@ -520,6 +521,7 @@ export const ConfirmPsychologistForm = () => {
 
         // Формируем данные для отправки на API
         const requestData = {
+          ...getMarketingParamsForPayload(),
           anxieties: [],
           questions: formData.requests || [],
           customQuestion: [],

@@ -353,7 +353,7 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                         <div className={styles.nameRow}>
                             <h2 className={styles.name}>
                                 {psychologist.name}
-                                {psychologist.age !== undefined && `, ${psychologist.age} ${getAgeWord(psychologist.age)}`}
+                                {typeof psychologist.age === 'number' && psychologist.age > 0 && `, ${psychologist.age} ${getAgeWord(psychologist.age)}`}
                             </h2>
                             {inPopup && !hideClose ? (
                                 <button
@@ -420,7 +420,7 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                             <span className={styles.label}>Стоимость:</span>
                             <div className={styles.value}>
                                 От {psychologist.min_session_price || 0} ₽
-                                <Tooltip text="Стоимость сессии длительностью 50-55 минут в формате онлайн видеозвонка. Частоту и формат последующих встреч определяете вместе с психологом" />
+                                <Tooltip text="Стоимость сессии длительностью 50-55 минут" />
                             </div>
                         </div> */}
                         </div>

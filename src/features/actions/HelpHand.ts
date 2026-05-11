@@ -1,7 +1,15 @@
 import { IApplicationFormData } from '@/shared/types/application.types';
 import { getTimeDifference } from '../utils';
+import { getMarketingParamsForPayload } from '@/shared/utils/utm';
 
 interface HelpHandRequest {
+    utm_source: string;
+    utm_medium: string;
+    utm_campaign: string;
+    utm_content: string;
+    utm_term: string;
+    utm_client: string;
+    utm_anketa: string;
 
     formPsyClientInfo: {
         age: string;
@@ -67,7 +75,10 @@ interface HelpHandRequest {
 // Отправка анкеты
 export const submitHelpHandQuestionnaire = async (formData: IApplicationFormData) => {
     try {
+        const marketing = getMarketingParamsForPayload();
+
         const request: HelpHandRequest = {
+            ...marketing,
 
             formPsyClientInfo: {
                 age: formData.age,

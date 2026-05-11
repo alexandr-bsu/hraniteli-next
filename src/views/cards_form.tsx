@@ -212,9 +212,13 @@ function Form({ psychologistId }: FormProps) {
         console.log('Устанавливаем isLoading = true');
         setIsLoading(true);
         try {
+            const startDate = new Date();
+            const endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + 31);
+
             const requestBody = {
-                startDate: "2025-11-17",
-                endDate: "2025-12-18",
+                startDate: startDate.toISOString().split('T')[0],
+                endDate: endDate.toISOString().split('T')[0],
                 ageFilter: "",
                 formPsyClientInfo: {
                     age: "",
