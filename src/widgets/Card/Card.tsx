@@ -431,7 +431,7 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                             <div className={styles.approachBlock}>
                                 <span className={styles.label}>Стоимость:</span>
                                 <div className={styles.value}>
-                                    От {psychologist.min_session_price || 0} ₽
+                                    {psychologist.min_session_price || 0} ₽
                                     <Tooltip text="Стоимость сессии длительностью 50-55 минут" />
                                 </div>
                             </div>

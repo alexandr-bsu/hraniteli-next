@@ -685,11 +685,11 @@ export const PsychologistStage = () => {
 
           {/* Desktop */}
           <div className="hidden lg:grid lg:grid-cols-3 lg:gap-[30px] lg:mb-[30px]">
-            <div>
+            <div className="min-w-0">
               <span className="text-[#9A9A9A] text-[16px]">Основной подход:</span>
-              <div className="flex items-center gap-[10px] mt-[5px]">
+              <div className="flex items-center gap-[10px] mt-[5px] min-w-0">
                 {/* UPDATE: по-умолчанию значение - Аналитическая психология */}
-                <p className="font-semibold text-[18px] leading-[25px]">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
+                <p className="font-semibold text-[18px] leading-[25px] lg:whitespace-nowrap shrink-0">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
                 <Tooltip text={getMethodDescription(currentPsychologist.main_modal) != '' ? getMethodDescription(currentPsychologist.main_modal) : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
               </div>
             </div>
@@ -700,7 +700,7 @@ export const PsychologistStage = () => {
             <div>
               <span className="text-[#9A9A9A] text-[16px]">Стоимость:</span>
               <div className="flex items-center gap-[10px] mt-[5px]">
-                <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p>
+                <p className="font-semibold text-[18px]">{currentPsychologist.min_session_price || 0} ₽</p>
                 <Tooltip text="Стоимость сессии длительностью 50-55 минут" />
               </div>
             </div>
@@ -726,7 +726,7 @@ export const PsychologistStage = () => {
               <div className="flex flex-col w-fit">
                 <span className="text-[#9A9A9A] text-[14px]">Стоимость:</span>
                 <div className="flex items-center gap-[10px]">
-                  <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p>
+                  <p className="font-semibold text-[18px]">{currentPsychologist.min_session_price || 0} ₽</p>
                   <Tooltip text="Стоимость сессии длительностью 50-55 минут" />
                 </div>
               </div>
@@ -750,7 +750,7 @@ export const PsychologistStage = () => {
               <div className="flex-1">
                 <span className="text-[#9A9A9A] text-[14px]">Стоимость:</span>
                 <div className="flex items-center gap-[10px]">
-                  <p className="font-semibold text-[14px]">От {currentPsychologist.min_session_price || 0} ₽</p>
+                  <p className="font-semibold text-[14px]">{currentPsychologist.min_session_price || 0} ₽</p>
                   <Tooltip text="Стоимость сессии длительностью 50-60 минут. Может меняться в зависимости от формата работы и длительности." />
                 </div>
               </div>

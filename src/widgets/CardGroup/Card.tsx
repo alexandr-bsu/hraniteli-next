@@ -416,13 +416,13 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                                     {/* <Tooltip text={getMethodDescription(psychologist.main_modal) != '' ? getMethodDescription(psychologist.main_modal) : 'Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов.'} /> */}
                                 </div>
                             </div>
-                            {/* <div className={styles.approachBlock}>
-                            <span className={styles.label}>Стоимость:</span>
-                            <div className={styles.value}>
-                                От {psychologist.min_session_price || 0} ₽
-                                <Tooltip text="Стоимость сессии длительностью 50-55 минут" />
+                            <div className={styles.approachBlock}>
+                                <span className={styles.label}>Стоимость:</span>
+                                <div className={styles.value}>
+                                    {psychologist.min_session_price || 0} ₽
+                                    <Tooltip text="Стоимость сессии длительностью 50-55 минут" />
+                                </div>
                             </div>
-                        </div> */}
                         </div>
 
                         <div className={styles.additionalApproaches}>
