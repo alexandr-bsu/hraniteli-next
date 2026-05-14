@@ -125,7 +125,7 @@ export default function HelpHandForm() {
     const showProgress = (STAGES_WITH_PROGRESS as readonly string[]).includes(currentStage) && !hasError;
 
     return (
-        <div className="w-full overflow-hidden h-full bg-[white] flex flex-col relative">
+        <div className="w-full h-full min-h-0 bg-[white] flex flex-col relative overflow-x-hidden">
             {currentStage !== 'gratitude' && currentStage !== 'error' && (
                 <div className="w-full min-lg:rounded-[30px] pt-[30px] shrink-0">
                     <div className="w-full flex justify-between min-lg:px-[50px] max-lg:px-[20px]">
@@ -159,7 +159,9 @@ export default function HelpHandForm() {
                 </div>
             )}
 
-            {renderStage(currentStage)}
+            <div className="flex-1 min-h-0 overflow-y-auto overscroll-y-contain">
+                {renderStage(currentStage)}
+            </div>
         </div>
     );
 }
