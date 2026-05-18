@@ -28,7 +28,7 @@ export function ContactBrandIcon({ src, isActive }: Props) {
   return (
     <span
       aria-hidden
-      className="block h-7 w-7 shrink-0 self-center"
+      className="block h-7 w-7 max-lg:h-5 max-lg:w-5 shrink-0 self-center"
       style={style}
     />
   );

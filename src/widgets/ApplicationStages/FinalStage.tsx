@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useSelector } from "react-redux"
 import { RootState } from "@/redux/store"
 import axios from 'axios';
@@ -22,6 +22,8 @@ export const FinalStage = () => {
   }, [])
 
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const isResearchRedirect = searchParams.get('research') === 'true'
   const ticketId = useSelector((state: RootState) => state.applicationFormData.ticketID)
 
   const handleClose = () => {
@@ -57,8 +59,10 @@ export const FinalStage = () => {
           <div className="flex flex-col items-center gap-[10px]">
             <h2 className="font-semibold text-[26px] max-lg:text-[14px] max-lg:leading-[22px]">Спасибо!</h2>
 
-            <span className="font-normal text-[18px] leading-[25px] text-center max-lg:text-[14px]">Для того, чтобы подтвердить заявку, выберите удобный чат-бот, - так психолог увидит вашу заявку. Перейдите в VK бот или ТГ бот.
-              {/* <br />  */}
+            <span className="font-normal text-[18px] leading-[25px] text-center max-lg:text-[14px]">
+              {isResearchRedirect
+                ? 'Для того, чтобы подтвердить заявку, выберите удобный чат-бот, - так психолог увидит вашу заявку. Перейдите в Telegram бот.'
+                : 'Для того, чтобы подтвердить заявку, выберите удобный чат-бот, - так психолог увидит вашу заявку. Перейдите в VK бот или ТГ бот.'}
             </span>
           </div>
 
@@ -73,6 +77,7 @@ export const FinalStage = () => {
       <FinalStageBotButtons
         ticketId={ticketId}
         analyticsSource="application"
+        showVkButton={!isResearchRedirect}
         className="mt-8 max-w-[400px] max-w-full"
       />
     </div>

@@ -35,7 +35,7 @@ export function ContactMethodFormFields<T extends FieldValues>({
         name={contactTypeName}
         render={({ field }) => (
           <FormItem className="mb-[20px]">
-            <div className="flex flex-wrap gap-[10px] justify-start">
+            <div className="flex flex-wrap gap-[10px] max-lg:gap-[8px] justify-start">
               {CONTACT_METHOD_OPTIONS.map((opt) => {
                 const isActive = field.value === opt.value;
                 return (
@@ -43,7 +43,7 @@ export function ContactMethodFormFields<T extends FieldValues>({
                     key={opt.value}
                     type="button"
                     onClick={() => field.onChange(opt.value)}
-                    className={`flex items-center gap-[8px] overflow-visible px-[16px] py-3 rounded-[50px] border text-[16px] leading-none max-lg:text-[14px] transition-colors ${
+                    className={`flex items-center gap-[8px] max-lg:gap-[6px] overflow-visible px-[16px] py-3 max-lg:px-[12px] max-lg:py-[8px] rounded-[50px] border text-[16px] leading-none max-lg:text-[12px] transition-colors ${
                       isActive
                         ? `border-[${COLORS.primary}] bg-[#F0FAFA] text-[${COLORS.primary}]`
                         : 'border-[#D4D4D4] text-[#333] hover:border-[#999]'

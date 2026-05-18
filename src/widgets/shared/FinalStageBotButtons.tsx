@@ -14,12 +14,13 @@ type Props = {
   ticketId: string;
   analyticsSource: FinalStageAnalyticsSource;
   className?: string;
+  showVkButton?: boolean;
 };
 
 const BTN =
   'w-full text-[#FFFFFF] p-[14px] max-lg:text-[14px] shrink-0 rounded-[50px] font-normal text-[18px] leading-[25px] bg-[#116466]';
 
-export function FinalStageBotButtons({ ticketId, analyticsSource, className }: Props) {
+export function FinalStageBotButtons({ ticketId, analyticsSource, className, showVkButton = true }: Props) {
   const { reachGoal, hit } = useYandexMetrika(102105189);
 
   const virtualPath = (messenger: 'telegram' | 'vk') =>
@@ -42,9 +43,11 @@ export function FinalStageBotButtons({ ticketId, analyticsSource, className }: P
       <button type="button" onClick={openTg} className={BTN}>
         Перейти в Telegram бот
       </button>
-      <button type="button" onClick={openVk} className={BTN}>
-        Перейти в VK бот
-      </button>
+      {showVkButton && (
+        <button type="button" onClick={openVk} className={BTN}>
+          Перейти в VK бот
+        </button>
+      )}
     </div>
   );
 }

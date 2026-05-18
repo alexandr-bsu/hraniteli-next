@@ -469,6 +469,8 @@ export const PsychologistStage = () => {
   }
 
   const remainingPsychologists = filtered_by_automatch_psy.length - (currentIndex + 1);
+  const sessionPrice = isResearchRedirect ? 0 : (currentPsychologist.min_session_price || 0);
+  const sessionPriceLabel = isResearchRedirect ? `${sessionPrice} ₽` : `От ${sessionPrice} ₽`;
 
   const method_description = {
     "Аналитическая психология": "Подход помогает глубоко исследовать причины вашего текущего состояния — включая травмы, подавленные чувства и сценарии, повторяющиеся в жизни. Работа строится не только через разговор, но и через образы: сны, символы, метафоры, МАК-карты, сказки. Здесь важна не только логика, но и воображение — как инструмент самопонимания. Вместе с психологом вы будете размышлять, исследовать свои чувства и искать смысл в личной истории",
@@ -620,7 +622,7 @@ export const PsychologistStage = () => {
             <div>
               <span className="text-[#9A9A9A] text-[16px]">Стоимость:</span>
               <div className="flex items-center gap-[10px] mt-[5px]">
-                <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p>
+                <p className="font-semibold text-[18px]">{sessionPriceLabel}</p>
                 <Tooltip text="Стоимость сессии длительностью 50-55 минут" />
               </div>
             </div>
@@ -646,7 +648,7 @@ export const PsychologistStage = () => {
               <div className="flex flex-col w-fit">
                 <span className="text-[#9A9A9A] text-[14px]">Стоимость:</span>
                 <div className="flex items-center gap-[10px]">
-                  <p className="font-semibold text-[18px]">От {currentPsychologist.min_session_price || 0} ₽</p>
+                  <p className="font-semibold text-[18px]">{sessionPriceLabel}</p>
                   <Tooltip text="Стоимость сессии длительностью 50-55 минут" />
                 </div>
               </div>
