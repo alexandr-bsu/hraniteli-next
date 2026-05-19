@@ -147,7 +147,7 @@ export const PhoneStage = () => {
                 contactType: contactTypeStr,
                 contact: contactStr,
                 name: localStorage.getItem('app_username') || '',
-                promocode: getApplicationDonationPromocodeNote(searchParams) ?? localStorage.getItem('app_promocode') || '',
+                promocode: (getApplicationDonationPromocodeNote(searchParams) ?? localStorage.getItem('app_promocode')) || '',
                 ticket_id: ticketID || '',
                 emptySlots: false,
                 userTimeZone: "МСК" + (+timeDifference > 0 ? '+' + timeDifference : timeDifference == 0 ? '' : timeDifference),
