@@ -30,6 +30,7 @@ import { EmergencyContacts } from "@/widgets/ApplicationStages/EmergencyContacts
 
 import { useSearchParams } from "next/navigation";
 import { clearStorage } from "@/features/utils";
+import { isApplicationDonationEntry } from "@/shared/utils/applicationFormEntryMode";
 
 // Только три ключевых экрана, которые влияют на подбор психологов
 const KEY_STAGES = [
@@ -58,9 +59,7 @@ export default function ApplicationForm() {
     const dispatch = useDispatch();
 
     const searchParams = useSearchParams()
-    // Проверяем, перешли ли мы из иммледовательской формы
-    const isResearchRedirect = searchParams.get('research') == 'true'
-
+    const isDonationEntry = isApplicationDonationEntry(searchParams)
 
     const prevStage = useRef<ApplicationStage | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -80,7 +79,7 @@ export default function ApplicationForm() {
     const formData = useSelector((state: RootState) => state.applicationFormData);
 
     useEffect(() => {
-        clearStorage(isResearchRedirect)
+        clearStorage(isDonationEntry)
     }, [])
 
     useEffect(() => {

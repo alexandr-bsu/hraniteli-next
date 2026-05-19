@@ -6,6 +6,7 @@ import { RootState } from "@/redux/store"
 import axios from 'axios';
 import { useEffect } from 'react';
 import { FinalStageBotButtons } from '@/widgets/shared/FinalStageBotButtons';
+import { isApplicationDonationEntry } from '@/shared/utils/applicationFormEntryMode';
 
 export const FinalStage = () => {
   
@@ -23,7 +24,8 @@ export const FinalStage = () => {
 
   const router = useRouter()
   const searchParams = useSearchParams()
-  const isResearchRedirect = searchParams.get('research') === 'true'
+  const isDonationEntry = isApplicationDonationEntry(searchParams)
+  const showVkButton = !isDonationEntry
   const ticketId = useSelector((state: RootState) => state.applicationFormData.ticketID)
 
   const handleClose = () => {
@@ -60,9 +62,9 @@ export const FinalStage = () => {
             <h2 className="font-semibold text-[26px] max-lg:text-[14px] max-lg:leading-[22px]">Спасибо!</h2>
 
             <span className="font-normal text-[18px] leading-[25px] text-center max-lg:text-[14px]">
-              {isResearchRedirect
-                ? 'Для того, чтобы подтвердить заявку, выберите удобный чат-бот, - так психолог увидит вашу заявку. Перейдите в Telegram бот.'
-                : 'Для того, чтобы подтвердить заявку, выберите удобный чат-бот, - так психолог увидит вашу заявку. Перейдите в VK бот или ТГ бот.'}
+              {showVkButton
+                ? 'Для того, чтобы подтвердить заявку, выберите удобный чат-бот, — так психолог увидит вашу заявку. Перейдите в VK бот или ТГ бот.'
+                : 'Для того, чтобы подтвердить заявку, перейдите в чат-бот ниже — так психолог увидит вашу заявку.'}
             </span>
           </div>
 
@@ -77,7 +79,7 @@ export const FinalStage = () => {
       <FinalStageBotButtons
         ticketId={ticketId}
         analyticsSource="application"
-        showVkButton={!isResearchRedirect}
+        showVkButton={showVkButton}
         className="mt-8 max-w-[400px] max-w-full"
       />
     </div>

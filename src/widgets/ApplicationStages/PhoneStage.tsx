@@ -19,6 +19,7 @@ import { setIsRequestSend } from '@/redux/slices/application_form';
 import { ContactMethodFormFields } from '@/widgets/shared/ContactMethodFormFields';
 import { contactMethodFormSchema, type ContactMethodFormValues } from '@/widgets/shared/contactMethodFormSchema';
 import { getAppContactFromStorage, persistAppContact } from '@/features/appContactStorage';
+import { isApplicationDonationEntry, getApplicationDonationPromocodeNote } from '@/shared/utils/applicationFormEntryMode';
 
 export const PhoneStage = () => {
     const isRequestSend = useSelector<RootState, boolean>(state => state.applicationForm.is_request_send);
@@ -58,7 +59,7 @@ export const PhoneStage = () => {
     }, [])
 
     const searchParams = useSearchParams()
-    const isResearchRedirect = searchParams.get('research') == 'true'
+    const isDonationEntry = isApplicationDonationEntry(searchParams)
 
     const utm_client = searchParams.get('utm_client')
     const utm_campaign = searchParams.get('utm_campaign')
@@ -146,7 +147,7 @@ export const PhoneStage = () => {
                 contactType: contactTypeStr,
                 contact: contactStr,
                 name: localStorage.getItem('app_username') || '',
-                promocode: isResearchRedirect ? 'Клиент перешёл из исследовательской анкеты' : localStorage.getItem('app_promocode') || '',
+                promocode: getApplicationDonationPromocodeNote(searchParams) ?? localStorage.getItem('app_promocode') || '',
                 ticket_id: ticketID || '',
                 emptySlots: false,
                 userTimeZone: "МСК" + (+timeDifference > 0 ? '+' + timeDifference : timeDifference == 0 ? '' : timeDifference),
@@ -346,7 +347,7 @@ export const PhoneStage = () => {
 
             if (response.status === 200) {
                 setIsSubmitting(false)
-                if (!isResearchRedirect) {
+                if (!isDonationEntry) {
                     reachGoal('submit_form_podbor_bes_issledovanie')
                 }
                 else {
@@ -395,7 +396,7 @@ export const PhoneStage = () => {
                     <div className="shrink-0 mt-[30px] pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
                         <button
                             type='button'
-                            onClick={() => isResearchRedirect ? dispatch(setApplicationStage('psychologist')) : dispatch(setApplicationStage('promocode'))}
+                            onClick={() => isDonationEntry ? dispatch(setApplicationStage('psychologist')) : dispatch(setApplicationStage('promocode'))}
                             className={`cursor-pointer shrink-0 w-[81px] border-[1px] border-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.primary}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]`}
                         >
                             Назад

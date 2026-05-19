@@ -21,7 +21,6 @@ import { COLORS } from '@/shared/constants/colors'
 import { RootState } from '@/redux/store'
 import { useState, useEffect } from "react"
 import { NoMatchError } from './NoMatchError'
-import { useSearchParams } from 'next/navigation'
 import axios from "axios"
 
 import { submitQuestionnaire, getFilteredPsychologists } from '@/features/actions/getPsychologistSchedule';
@@ -58,10 +57,6 @@ export const DiseasesPsychologistStage = () => {
             data: { step: "Психические заболевания", ticket_id: ticketID },
         });
     }, [])
-
-    const searchParams = useSearchParams()
-    // Проверяем, перешли ли мы из иммледовательской формы
-    const isResearchRedirect = searchParams.get('research') == 'true'
 
     const hasError = useSelector((state: RootState) => state.applicationFormData.has_matching_error)
     const [showNoMatch, setShowNoMatch] = useState(hasError)
