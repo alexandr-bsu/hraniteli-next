@@ -88,7 +88,7 @@ export default function NameStageApplication() {
               </div>
             )}
           />
-          <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
+          <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px] mt-[30px]">
             <button
               type="submit"
               className="cursor-pointer grow border-[1px] bg-[#116466] min-lg:p-[12px] text-[white] font-normal text-[18px] lg:text-[18px] md:text-[14px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px]"

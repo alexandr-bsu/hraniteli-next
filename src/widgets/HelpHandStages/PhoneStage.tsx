@@ -127,7 +127,7 @@ export const PhoneStage = () => {
                         contactTypeName="contactType"
                     />
 
-                    <div className="shrink-0 mt-[30px] pb-[50px] max-lg:pb-[20px] flex gap-[10px]">
+                    <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px] mt-[30px]">
                         <button
                             type='button'
                             onClick={() => dispatch(setApplicationStage('psychologist_price'))}
