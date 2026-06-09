@@ -206,7 +206,7 @@ export const DiseasesPsychologistStage = () => {
                         )}
                     />
 
-                    <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px] mt-[30px] max-lg:mt-[10px]">
+                    <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px] mt-[30px] max-lg:mt-[30px]">
                         <button
                             type='button'
                             onClick={() => dispatch(setApplicationStage('preferences'))}
