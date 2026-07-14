@@ -1,7 +1,7 @@
 'use client';
 
 import useYandexMetrika from '@/components/yandex/useYandexMetrika';
-import { telegramBotDeepLink, vkBotWriteUrl } from '@/shared/constants/hraniBot';
+import { vkBotWriteUrl } from '@/shared/constants/hraniBot';
 
 export type FinalStageAnalyticsSource =
   | 'application'
@@ -23,26 +23,14 @@ const BTN =
 export function FinalStageBotButtons({ ticketId, analyticsSource, className, showVkButton = true }: Props) {
   const { reachGoal, hit } = useYandexMetrika(102105189);
 
-  const virtualPath = (messenger: 'telegram' | 'vk') =>
-    `/virtual/final-bot/${messenger}?source=${encodeURIComponent(analyticsSource)}`;
-
-  const openTg = () => {
-    hit(virtualPath('telegram'));
-    reachGoal('final_stage_telegram', { source: analyticsSource });
-    window.open(telegramBotDeepLink(ticketId), '_blank', 'noopener,noreferrer');
-  };
-
   const openVk = () => {
-    hit(virtualPath('vk'));
+    hit(`/virtual/final-bot/vk?source=${encodeURIComponent(analyticsSource)}`);
     reachGoal('final_stage_vk', { source: analyticsSource });
     window.open(vkBotWriteUrl(ticketId), '_blank', 'noopener,noreferrer');
   };
 
   return (
     <div className={`flex w-full flex-col gap-[10px] ${className ?? ''}`}>
-      <button type="button" onClick={openTg} className={BTN}>
-        Перейти в Telegram бот
-      </button>
       {showVkButton && (
         <button type="button" onClick={openVk} className={BTN}>
           Перейти в VK бот

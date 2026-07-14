@@ -38,13 +38,13 @@ export const FinalStage = ({ ticket_id }: FinalStageProps) => {
       <div className="w-full flex justify-end "></div>
       <div className="flex h-full w-full justify-center items-center flex-col p-[30px] gap-[30px] overflow-x-hidden">
         <div className="grow w-full flex flex-col items-center justify-center text-center max-w-[800px] mx-auto">
-          <Image className="max-lg:w-[140px] max-lg:h-[140px]" src={'/card/thanks.svg'} alt="Спасибо" height={210} width={210} />
+          <Image className="max-lg:w-[140px] max-lg:h-[140px]" src={'/card/thanks.svg'} alt="Время забронировано" height={210} width={210} />
           <div className="flex flex-col items-center gap-[10px] max-w-[500px] w-full max-w-full">
-            <h2 className="font-semibold text-[26px] max-lg:text-[14px] max-lg:leading-[22px]">Спасибо!</h2>
-            <span className="font-normal text-[18px] leading-[25px] max-lg:text-[14px]">Мы получили ваш запрос и чтобы забронировать время перейдите в VK бот или ТГ бот, выберите удобный чат-бот</span>
+            <h2 className="font-semibold text-[26px] max-lg:text-[14px] max-lg:leading-[22px]">Время забронировано!</h2>
+            <span className="font-normal text-[18px] leading-[25px] max-lg:text-[14px]">Пожалуйста вернитесь в выбранный ранее бот - там вас будет ждать ссылка на первую сессию с психологом</span>
           </div>
           <div className="border-[#D4D4D4] border-[2px] p-[20px] rounded-[30px] max-lg:text-[14px] mt-[30px] flex justify-center items-center text-[18px] leading-[25px] font-normal w-full max-w-[500px] max-w-full">
-            В боте вы также получите подтверждение записи и ссылку на первую сессию с психологом
+            После сессии в боте вы также сможете оставить отзыв и получите контакт психолога
           </div>
           
           <FinalStageBotButtons
