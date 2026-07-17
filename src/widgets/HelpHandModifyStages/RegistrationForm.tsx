@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -187,8 +187,10 @@ interface RegistrationFormProps {
 export const RegistrationForm = ({ linkId }: RegistrationFormProps) => {
     const [isLoading, setIsLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const isSubmittingRef = useRef(false);
     const [loadError, setLoadError] = useState<string | null>(null);
     const [submitSuccess, setSubmitSuccess] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
 
     const form = useForm<FormData>({
         resolver: zodResolver(FormSchema),
@@ -272,8 +274,11 @@ export const RegistrationForm = ({ linkId }: RegistrationFormProps) => {
     }, [linkId]);
 
     const handleSubmit = async (data: FormData) => {
+        if (isSubmittingRef.current) return;
+        isSubmittingRef.current = true;
         setIsSubmitting(true);
         setSubmitSuccess(false);
+        setSubmitError(null);
         try {
             // Маппим обратно в формат API
             const payload = {
@@ -324,8 +329,9 @@ export const RegistrationForm = ({ linkId }: RegistrationFormProps) => {
             setSubmitSuccess(true);
         } catch (error) {
             console.error('Ошибка при сохранении:', error);
-            alert('Не удалось сохранить изменения. Попробуйте позже.');
+            setSubmitError('Не удалось сохранить изменения. Попробуйте позже.');
         } finally {
+            isSubmittingRef.current = false;
             setIsSubmitting(false);
         }
     };
@@ -361,11 +367,7 @@ export const RegistrationForm = ({ linkId }: RegistrationFormProps) => {
                         </div>
                     )}
 
-                    {submitSuccess && (
-                        <div className="bg-[#E8F5E9] border border-[#4CAF50] p-[15px] rounded-[15px] text-[16px] max-lg:text-[14px] text-[#2E7D32]">
-                            Изменения успешно сохранены
-                        </div>
-                    )}
+
 
                     {/* === Имя === */}
                     <FormField
@@ -823,7 +825,7 @@ export const RegistrationForm = ({ linkId }: RegistrationFormProps) => {
                     </FormItem>
 
                     {/* === Кнопка === */}
-                    <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex gap-[10px] mt-[10px]">
+                    <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex flex-col gap-[15px] mt-[10px]">
                         <button
                             type="submit"
                             disabled={isSubmitting}
@@ -831,6 +833,18 @@ export const RegistrationForm = ({ linkId }: RegistrationFormProps) => {
                         >
                             Сохранить изменения
                         </button>
+
+                        {submitSuccess && (
+                            <div className="bg-[#E8F5E9] border border-[#4CAF50] p-[15px] rounded-[15px] text-[16px] max-lg:text-[14px] text-[#2E7D32] text-center font-medium">
+                                Изменения успешно сохранены. Пожалуйста подтвердите заявку в боте
+                            </div>
+                        )}
+
+                        {submitError && (
+                            <div className="bg-[#FFEBEE] border border-[#FF8A80] p-[15px] rounded-[15px] text-[16px] max-lg:text-[14px] text-[#C62828] text-center font-medium">
+                                {submitError}
+                            </div>
+                        )}
                     </div>
                 </form>
             </Form>
