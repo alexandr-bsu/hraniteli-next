@@ -273,8 +273,17 @@ export const RegistrationForm = ({ linkId }: RegistrationFormProps) => {
         fetchData();
     }, [linkId]);
 
+    // При изменении полей формы сбрасываем статус успешного сохранения/ошибки
+    useEffect(() => {
+        const subscription = form.watch(() => {
+            if (submitSuccess) setSubmitSuccess(false);
+            if (submitError) setSubmitError(null);
+        });
+        return () => subscription.unsubscribe();
+    }, [form, submitSuccess, submitError]);
+
     const handleSubmit = async (data: FormData) => {
-        if (isSubmittingRef.current) return;
+        if (isSubmittingRef.current || isSubmitting || submitSuccess) return;
         isSubmittingRef.current = true;
         setIsSubmitting(true);
         setSubmitSuccess(false);
@@ -828,10 +837,10 @@ export const RegistrationForm = ({ linkId }: RegistrationFormProps) => {
                     <div className="shrink-0 pb-[50px] max-lg:pb-[20px] flex flex-col gap-[15px] mt-[10px]">
                         <button
                             type="submit"
-                            disabled={isSubmitting}
-                            className={`cursor-pointer grow border-[1px] bg-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px] ${isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            disabled={isSubmitting || submitSuccess}
+                            className={`grow border-[1px] bg-[${COLORS.primary}] min-lg:p-[12px] text-[${COLORS.white}] font-normal text-[18px] max-lg:text-[14px] rounded-[50px] max-lg:h-[47px] ${isSubmitting || submitSuccess ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                         >
-                            Сохранить изменения
+                            {isSubmitting ? 'Сохранение...' : submitSuccess ? 'Сохранено' : 'Сохранить изменения'}
                         </button>
 
                         {submitSuccess && (
