@@ -11,7 +11,7 @@ import { GenderStageApplication } from "@/widgets/HelpHandStages/GenderStage";
 import { PriceSessionStage } from "@/widgets/HelpHandStages/PriceSessionStage";
 import NameStageApplication from "@/widgets/HelpHandStages/NameStage";
 import { PreferencesStage } from "@/widgets/HelpHandStages/PreferencesStage";
-import {ExperienceStage} from "@/widgets/HelpHandStages/ExperienceStage";
+import { ExperienceStage } from "@/widgets/HelpHandStages/ExperienceStage";
 import RequestStage from "@/widgets/HelpHandStages/RequestStage";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -44,7 +44,7 @@ export default function HelpHandForm() {
     const dispatch = useDispatch();
     const prevStage = useRef<ApplicationStage | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    
+
     const currentStage = useSelector<RootState, ApplicationStage>(
         state => state.applicationForm.application_stage
     );
@@ -60,14 +60,14 @@ export default function HelpHandForm() {
     const formData = useSelector((state: RootState) => state.applicationFormData);
 
     const searchParams = useSearchParams()
-        // Проверяем, перешли ли мы из иммледовательской формы
-        const isResearchRedirect = searchParams.get('research') == 'true'
-    
+    // Проверяем, перешли ли мы из иммледовательской формы
+    const isResearchRedirect = searchParams.get('research') == 'true'
+
 
     useEffect(() => {
-            captureMarketingParamsFromUrl()
-            clearStorage(isResearchRedirect)
-        }, [])
+        captureMarketingParamsFromUrl()
+        clearStorage(isResearchRedirect)
+    }, [])
 
     useEffect(() => {
         if (!ticketID) {
@@ -75,7 +75,7 @@ export default function HelpHandForm() {
             resetHelpHandLeadwideDedupe();
             localStorage.setItem('matching_attempts', '0');
         }
-    }, [dispatch, ticketID]);  
+    }, [dispatch, ticketID]);
 
 
     const handleClose = () => {
@@ -109,7 +109,7 @@ export default function HelpHandForm() {
                 return <TraumaticStage />;
             case 'request':
                 return <RequestStage />;
-           case 'psychologist_price':
+            case 'psychologist_price':
                 return <PriceSessionStage />;
             case 'phone':
                 return <PhoneStage />;
@@ -134,7 +134,7 @@ export default function HelpHandForm() {
                                 Заявка на подбор психолога в проекте «Рука помощи от Хранителей»
                             </h2>
                             <span className="font-normal text-[18px] max-lg:text-[14px] leading-[25px]">
-                                Среднее время заполнения заявки - 5 минут. (Если заполняете заявку второй раз напишите в боте слово «Начать».)
+                                Среднее время заполнения заявки - 5 минут.
                             </span>
                         </div>
                     </div>
@@ -150,7 +150,7 @@ export default function HelpHandForm() {
                                         {getProgressPercentage()}%
                                     </div>
                                 </li>
-                                
+
                             </ul>
                         </>
                     )}
