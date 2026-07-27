@@ -7,5 +7,5 @@ export function telegramBotDeepLink(linkId: string): string {
 }
 
 export function vkBotWriteUrl(refId: string): string {
-  return `https://vk.com/write-${HRANI_VK_WRITE_PEER_ID}?ref=${refId}`;
+  return `https://vk.me/club${HRANI_VK_WRITE_PEER_ID}?ref=${refId}`;
 }

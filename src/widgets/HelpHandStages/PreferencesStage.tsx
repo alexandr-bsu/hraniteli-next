@@ -45,8 +45,8 @@ const preferences = [
 
 
 const FormSchema = z.object({
-  preferences: z.array(z.string()).nonempty({message: 'Вы не заполнили обязательное поле'}),
-  customPreferences: z.string(),
+  preferences: z.array(z.string()).optional().default([]),
+  customPreferences: z.string().optional().default(''),
 })
 
 
@@ -176,11 +176,6 @@ export const PreferencesStage = () => {
                         )} />
                     </div>
                   </div>
-                  {!form.formState.errors.preferences &&
-                    <span className='mt-[10px] max-lg:text-[14px] font-normal text-[14px] leading-[100%] text-[#9A9A9A]'>
-                      Поле обязательное для заполнения
-                    </span>
-                  }
                   <FormMessage className="mt-[10px] max-lg:text-[14px]" />
                 </FormItem>
               </div>

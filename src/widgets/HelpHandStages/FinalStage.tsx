@@ -58,8 +58,10 @@ export const FinalStage = () => {
                 <div className="flex flex-col items-center gap-[10px]">
                     <h2 className="font-semibold text-[26px] max-lg:text-[14px] max-lg:leading-[22px]">Перейдите в VK бот по кнопке ниже</h2>
 
-                    <span className="font-normal text-[18px] leading-[25px] text-center max-lg:text-[14px]">Для того, чтобы подтвердить заявку, перейдите в VK бот — так психолог увидит вашу заявку.
-                    {/* <br />  */}
+                    <span className="font-normal text-[18px] leading-[25px] text-center max-lg:text-[14px]">
+                        Для того, чтобы подтвердить заявку, перейдите в VK бот — так психолог увидит вашу заявку.
+                        <br />
+                        Если заполняете заявку второй раз напишите в боте слово «Начать»
                     </span>
                 </div>
 

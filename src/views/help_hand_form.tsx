@@ -133,8 +133,8 @@ export default function HelpHandForm() {
                             <h2 className="font-semibold text-[20px] max-lg:text-[14px] max-lg:leading-[22px] leading-[27px]">
                                 Заявка на подбор психолога в проекте «Рука помощи от Хранителей»
                             </h2>
-                            <span className="font-normal text-[18px] hidden md:block max-lg:text-[14px] leading-[25px] max-[360px]:w-[192px]">
-                                Среднее время заполнения заявки - 5 минут
+                            <span className="font-normal text-[18px] max-lg:text-[14px] leading-[25px]">
+                                Среднее время заполнения заявки - 5 минут. (Если заполняете заявку второй раз напишите в боте слово «Начать».)
                             </span>
                         </div>
                     </div>
