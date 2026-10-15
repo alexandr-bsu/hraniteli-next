@@ -396,14 +396,22 @@ const CardInner = forwardRef<HTMLDivElement, CardProps>(
                             )}
                         </div>
                         <Tooltip
-                            text={`${psychologist.name.split(" ")[1]} как Хранитель придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`}
+                            text={psychologist.group === 'Старт практики'
+                                ? `${psychologist.name.split(" ")[1] || psychologist.name} как участник проекта «Старт практики» придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`
+                                : `${psychologist.name.split(" ")[1]} как Хранитель придерживается этических правил и принципов сообщества, посещает супервизора, углубляет знания в психологии на наших мероприятиях`}
                             customMargin="35%"
                         >
                             <div className={`${styles.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
-                                {psychologist.experience && (
+                                {psychologist.group === 'Старт практики' ? (
                                     <span className={styles.experience}>
-                                        {psychologist.experience} в сообществе
+                                        Старт практики
                                     </span>
+                                ) : (
+                                    psychologist.experience && (
+                                        <span className={styles.experience}>
+                                            {psychologist.experience} в сообществе
+                                        </span>
+                                    )
                                 )}
 
                                 {psychologist.verified && (
