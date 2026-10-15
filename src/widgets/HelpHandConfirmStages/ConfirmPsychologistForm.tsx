@@ -450,8 +450,9 @@ export const ConfirmPsychologistForm = () => {
       params.append('selected_psychologist', generatedId);
     }
 
-    // Если психолог не из сообщества, направляем на страницу /groups
-    const basePath = currentPsychologist?.group !== "Сообщество" ? "/groups" : "/";
+    // Если психолог из Сообщества или Старт практики, направляем на главную страницу, иначе в /groups
+    const isMainPage = currentPsychologist?.group === "Сообщество" || currentPsychologist?.group === "Старт практики";
+    const basePath = isMainPage ? "/" : "/groups";
     return `${basePath}?${params.toString()}`;
   };
 
@@ -695,7 +696,23 @@ export const ConfirmPsychologistForm = () => {
                   {currentPsychologist?.name}
                   {currentPsychologist?.age && currentPsychologist.age !== 0 && `, ${currentPsychologist.age} ${getAgeWord(currentPsychologist.age)}`}
                 </h3>
-                {currentPsychologist.group !== "Сообщество" ? (
+                {currentPsychologist.group === "Старт практики" ? (
+                  <div className={`${styles_cards.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
+                    <span className={`${styles_cards.experience} text-[12px] whitespace-nowrap`}>
+                      Старт практики
+                    </span>
+                    {currentPsychologist.verified && (
+                      <Image
+                        src="/card/verified.svg"
+                        alt="Verified"
+                        width={23}
+                        height={23}
+                        style={{ marginLeft: '6px' }}
+                        unoptimized
+                      />
+                    )}
+                  </div>
+                ) : currentPsychologist.group !== "Сообщество" ? (
                   <div className={`${styles_cards.experienceWrapper} px-2 py-1 rounded-full w-fit bg-[#f5f5f5]`}>
                     {currentPsychologist.experience && (
                       <span className={`${styles_cards.experience} text-[12px] whitespace-nowrap`}>
@@ -749,12 +766,12 @@ export const ConfirmPsychologistForm = () => {
             </button>
           </div>
           {/* Desktop */}
-          <div className={`hidden lg:grid lg:gap-[30px] lg:mb-[30px] ${currentPsychologist.group !== "Сообщество" ? 'lg:grid-cols-2' : 'lg:grid-cols-3'}`}>
+          <div className={`hidden lg:grid lg:gap-[30px] lg:mb-[30px] ${currentPsychologist.group !== "Сообщество" && currentPsychologist.group !== "Старт практики" ? 'lg:grid-cols-2' : 'lg:grid-cols-3'}`}>
             <div>
               <span className="text-[#9A9A9A] text-[16px]">Основной подход:</span>
               <div className="flex items-center gap-[10px] mt-[5px]">
                 <p className="font-semibold text-[18px] leading-[25px]">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
-                {currentPsychologist.group === "Сообщество" && (
+                {(currentPsychologist.group === "Сообщество" || currentPsychologist.group === "Старт практики") && (
                   <Tooltip text={getMethodDescription(currentPsychologist.main_modal) != '' ? getMethodDescription(currentPsychologist.main_modal) : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
                 )}
               </div>
@@ -763,7 +780,7 @@ export const ConfirmPsychologistForm = () => {
               <span className="text-[#9A9A9A] text-[16px]">Формат встречи:</span>
               <p className="font-semibold text-[18px] leading-[25px] mt-[5px]">Онлайн</p>
             </div>
-            {currentPsychologist.group === "Сообщество" && (
+            {(currentPsychologist.group === "Сообщество" || currentPsychologist.group === "Старт практики") && (
               <div>
                 <span className="text-[#9A9A9A] text-[16px]">Стоимость:</span>
                 <div className="flex items-center gap-[10px] mt-[5px]">
@@ -780,7 +797,7 @@ export const ConfirmPsychologistForm = () => {
                 <span className="text-[#9A9A9A] text-[14px]">Основной подход:</span>
                 <div className="flex items-center gap-[10px]">
                   <p className="font-semibold text-[14px] leading-[20px]">{currentPsychologist.main_modal ? currentPsychologist.main_modal : ''}</p>
-                  {currentPsychologist.group === "Сообщество" && (
+                  {(currentPsychologist.group === "Сообщество" || currentPsychologist.group === "Старт практики") && (
                     <Tooltip text={getMethodDescription(currentPsychologist.main_modal) != '' ? getMethodDescription(currentPsychologist.main_modal) : "Подход определяет основные методы и техники работы психолога. Этот подход наиболее эффективен для решения ваших запросов."} />
                   )}
                 </div>
@@ -789,7 +806,7 @@ export const ConfirmPsychologistForm = () => {
                 <span className="text-[#9A9A9A] text-[14px]">Формат встречи:</span>
                 <p className="font-semibold text-[14px] leading-[20px]">Онлайн</p>
               </div>
-              {currentPsychologist.group === "Сообщество" && (
+              {(currentPsychologist.group === "Сообщество" || currentPsychologist.group === "Старт практики") && (
                 <div className="flex flex-col w-fit">
                   <span className="text-[#9A9A9A] text-[14px]">Стоимость:</span>
                   <div className="flex items-center gap-[10px]">
