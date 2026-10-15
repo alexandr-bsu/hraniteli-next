@@ -15,15 +15,15 @@ export async function getPsychologistAll(is_group: boolean = false) {
         });
 
         if (is_group){
-            // Фильтрация для страницы groups - показываем только "Супервизии"
+            // Фильтрация для страницы groups - исключаем "Сообщество" и "Старт практики"
             const beforeFilter = data.length
-            data = data.filter((psy: any) => psy.group !== 'Сообщество')
-            console.log(`Groups page: filtered for "Супервизии": ${data.length} psychologists (was ${beforeFilter})`)
+            data = data.filter((psy: any) => psy.group !== 'Сообщество' && psy.group !== 'Старт практики')
+            console.log(`Groups page: filtered for groups: ${data.length} psychologists (was ${beforeFilter})`)
         } else {
-            // Фильтрация для главной страницы - показываем только "Сообщество"
+            // Фильтрация для главной страницы - показываем "Сообщество" и "Старт практики"
             const beforeFilter = data.length
-            data = data.filter((psy: any) => psy.group === 'Сообщество')
-            console.log(`Main page: filtered for "Сообщество": ${data.length} psychologists (was ${beforeFilter})`)
+            data = data.filter((psy: any) => psy.group === 'Сообщество' || psy.group === 'Старт практики')
+            console.log(`Main page: filtered for "Сообщество" & "Старт практики": ${data.length} psychologists (was ${beforeFilter})`)
         }
         console.log('API Response:',is_group, data)
         // Убедимся что данные - это массив
