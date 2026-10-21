@@ -163,6 +163,12 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({ isOpen, onClose, e
 
             const data = await response.json();
 
+            // Проверяем на ограничение доступа
+            if (data.error === "access_denied") {
+                showToast(data.message || 'Запись на мероприятия сообщества недоступна для вашего профиля 🙏', 'error');
+                return;
+            }
+
             // Проверяем на ошибку тарифа супервизий
             if (data.error === "max_supervision_tarif_reached") {
                 showToast('К сожалению ваш тариф не включает в себя посещение супервизий', 'error');

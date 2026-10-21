@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import CardItem from './CalendarItem';
 import { CalendarModal } from './CalendarModal';
-import { Check, ChevronRight, X } from 'lucide-react';
+import { Check, ChevronRight, X, Lock } from 'lucide-react';
 import { useDragToScroll } from '../../hooks/useDragToScroll';
 import styles from './Calendar.module.css';
 
@@ -247,6 +247,7 @@ export const Calendar: React.FC = () => {
     const [events, setEvents] = useState<Event[]>([]);
     const [slots, setSlots] = useState<SlotsResponse | null>(null);
     const [loading, setLoading] = useState(true);
+    const [accessDeniedMessage, setAccessDeniedMessage] = useState<string | null>(null);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedFilters, setSelectedFilters] = useState<string[]>(['юнгианство', 'кпт', 'гештальт', 'психоанализ', 'общие']);
@@ -366,6 +367,13 @@ export const Calendar: React.FC = () => {
                 console.log('Сырые данные событий:', eventsData);
                 console.log('Сырые данные слотов:', slotsData);
 
+                // Проверяем на ограничение доступа
+                if (eventsData && !Array.isArray(eventsData) && (eventsData.error === 'access_denied' || eventsData.message)) {
+                    setAccessDeniedMessage(eventsData.message || 'Запись на мероприятия сообщества недоступна для вашего профиля 🙏');
+                    setLoading(false);
+                    return;
+                }
+
                 // Проверяем структуру данных
                 if (!Array.isArray(eventsData)) {
                     console.error('eventsData не является массивом:', eventsData);
@@ -421,6 +429,20 @@ export const Calendar: React.FC = () => {
 
     if (loading) {
         return <div className="flex justify-center items-center h-64">Загрузка событий...</div>;
+    }
+
+    if (accessDeniedMessage) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] p-8 text-center bg-white">
+                <div className="w-16 h-16 rounded-full bg-amber-50 flex items-center justify-center mb-4">
+                    <Lock className="w-8 h-8 text-[#155d5e]" />
+                </div>
+                <h2 className="text-xl font-bold text-[#333] mb-2">Доступ ограничен</h2>
+                <p className="text-gray-600 max-w-md text-sm leading-relaxed">
+                    {accessDeniedMessage}
+                </p>
+            </div>
+        );
     }
 
     return (
