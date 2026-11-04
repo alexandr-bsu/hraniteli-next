@@ -32,11 +32,11 @@ const MainContent = () => {
         
         if (selectedPsychologistId) {
           // Проверяем формат ID - если это не ID, а имя психолога
-          let psychologist = psychologists.find(p => p.id === selectedPsychologistId)
+          let psychologist = psychologists.find((p: any) => p.id === selectedPsychologistId)
           
           // Если не нашли по ID, пробуем найти по имени (для обратной совместимости)
           if (!psychologist) {
-            psychologist = psychologists.find(p => p.name === selectedPsychologistId)
+            psychologist = psychologists.find((p: any) => p.name === selectedPsychologistId)
           }
           
           if (psychologist) {

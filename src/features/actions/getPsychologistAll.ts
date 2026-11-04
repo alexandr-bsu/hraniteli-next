@@ -1,4 +1,4 @@
-export async function getPsychologistAll(is_group: boolean = false) {
+export async function getPsychologistAll(is_group: boolean = false): Promise<any[]> {
     try {
         const res = await fetch('https://cache-api.hrani.live/cards', {
             cache: 'no-cache'
@@ -31,6 +31,15 @@ export async function getPsychologistAll(is_group: boolean = false) {
             console.error('API returned non-array data:', data);
             return [];
         }
+
+        // Дедупликация: исключаем повторяющихся психологов из кэш-API
+        const seen = new Set<string>();
+        data = data.filter((psy: any) => {
+            const key = psy.id ? String(psy.id) : psy.name ? String(psy.name) : null;
+            if (!key || seen.has(key)) return false;
+            seen.add(key);
+            return true;
+        });
 
         // TODO: Добавляем тестовое видео для первого психолога
         if (data.length > 0) {

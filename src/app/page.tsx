@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react'
 import { useAppDispatch } from '@/redux/store'
 import { getPsychologistAll } from '@/features/actions/getPsychologistAll'
 import { Psychologist_cards, ApplicationForm } from '@/views'
-import { fill_filtered_by_automatch_psy, setSelectedPsychologist } from '@/redux/slices/filter'
+import { fill_filtered_by_automatch_psy, fill_card_stages_psychologists, setSelectedPsychologist } from '@/redux/slices/filter'
 import { useSearchParams, usePathname } from 'next/navigation'
 
 const MainContent = () => {
@@ -26,6 +26,7 @@ const MainContent = () => {
 
         // Инициализируем список психологов
         dispatch(fill_filtered_by_automatch_psy(psychologists))
+        dispatch(fill_card_stages_psychologists(psychologists))
         
         // Проверяем, есть ли выбранный психолог
         const selectedPsychologistId = searchParams.get('selected_psychologist')
