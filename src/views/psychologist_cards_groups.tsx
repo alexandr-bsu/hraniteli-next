@@ -1,7 +1,7 @@
 'use client'
 import { RootState } from "@/redux/store";
 import { CardGroup, Filter } from "@/widgets";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from 'axios';
 import Error from "next/error";
@@ -203,7 +203,7 @@ export const Psychologist_cards_groups = ({ data, isLoaded }: Props) => {
         count: fullySortedPersons.length,
         estimateSize: () => 350, // средняя высота карточки
         overscan: 5,
-        getItemKey: (index) => fullySortedPersons[index]?.id || index,
+        getItemKey: (index) => fullySortedPersons[index]?.id ? String(fullySortedPersons[index].id) : `psy_group_${index}`,
         gap: 20, // гарантированный отступ между карточками
         scrollToFn, // добавляем кастомный scrollToFn
     });
@@ -372,13 +372,15 @@ export const Psychologist_cards_groups = ({ data, isLoaded }: Props) => {
         p => String(p.id) === String(selectedId) || p.name === selectedId
     );
 
+    const hasScrolledRef = useRef<string | null>(null);
+
     // Эффект для скролла к выбранному психологу
     useEffect(() => {
-        if (selectedIndex >= 0 && selectedIndex < fullySortedPersons.length) {
-            virtualizer.measure();
+        if (selectedId && selectedIndex >= 0 && selectedIndex < fullySortedPersons.length && hasScrolledRef.current !== selectedId) {
+            hasScrolledRef.current = selectedId;
             virtualizer.scrollToIndex(selectedIndex, { align: 'start', behavior: 'auto' });
         }
-    }, [selectedIndex, fullySortedPersons.length, JSON.stringify(fullySortedPersons.map(p => p.id)), virtualizer]);
+    }, [selectedId, selectedIndex, fullySortedPersons.length, virtualizer]);
 
     // --- Новый код для Popup подробной карточки психолога ---
     // Получаем параметр selected_psychologist из поисковой строки
@@ -523,20 +525,11 @@ export const Psychologist_cards_groups = ({ data, isLoaded }: Props) => {
                                     if (!item.id && item.name) {
                                         item.id = `id_${item.name.replace(/\s+/g, '_')}`;
                                     }
-                                    // создаём ref для каждой карточки
-                                    const cardRef = (el: HTMLDivElement | null) => {
-                                        virtualizer.measureElement(el);
-                                    };
-                                    // функция для обновления высоты карточки
-                                    const handleCardExpand = () => {
-                                        const el = document.querySelector(`[data-index='${index}']`);
-                                        if (el) virtualizer.measureElement(el as HTMLElement);
-                                    };
                                     return (
                                         <div
                                             key={virtualRow.key}
                                             data-index={index}
-                                            ref={cardRef}
+                                            ref={virtualizer.measureElement}
                                             style={{
                                                 position: 'absolute',
                                                 top: 0,
@@ -550,7 +543,6 @@ export const Psychologist_cards_groups = ({ data, isLoaded }: Props) => {
                                                 psychologist={item}
                                                 isSelected={filter.selected_psychologist?.id === item.id}
                                                 showBestMatch={hasActiveFilters && index < 3}
-                                                onExpand={handleCardExpand}
                                             />
                                         </div>
                                     );
